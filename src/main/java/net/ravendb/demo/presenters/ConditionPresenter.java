@@ -26,6 +26,13 @@ public class ConditionPresenter implements ConditionViewListener {
 	}
 
 	@Override
+	public void delete(Condition condition) {
+			 try (IDocumentSession session = RavenDBDocumentStore.INSTANCE.getStore().openSession()) {
+		           session.delete(condition.getId());
+		           session.saveChanges();
+		     }			
+	}
+	@Override
 	public Patient getPatientById(String id) {
 		try (IDocumentSession session = RavenDBDocumentStore.INSTANCE.getStore().openSession()) {
 			Patient patient = session.load(Patient.class, id);
@@ -35,26 +42,12 @@ public class ConditionPresenter implements ConditionViewListener {
 	}
 
 	@Override
-	public void save(String patientId, Date visitDate, Condition condition) {
+	public void save(Condition condition) {
 		try (IDocumentSession session = RavenDBDocumentStore.INSTANCE.getStore().openSession()) {
-			Patient patient = session.load(Patient.class, patientId);
-			Visit visit = (Patient.getVisit(patient.getVisits(), visitDate));
-			Objects.requireNonNull(visit);
 			// clear the session
 			session.advanced().clear();
-			session.advanced().evict(patient);
-			if (condition.getId() == null) {
-				condition.setPatientId(patientId);
-				session.store(condition);
-
-				visit.setConditionId(condition.getId());
-				// re save visits
-				session.store(patient);
-			} else {
-				session.store(condition);
-			}
+			session.store(condition);
 			session.saveChanges();
-
 		}
 	}
 
@@ -73,17 +66,8 @@ public class ConditionPresenter implements ConditionViewListener {
 			}
     		conditions.skip(offset)
     		.take(limit);
-			
-    		Collection<Condition> list=conditions.toList();
-    		//gather patients
-    		List<String> ids=list.stream().map(c->c.getPatientId()).collect(Collectors.toList());
-    		
-    		Map<String,Patient> patients=session.load(Patient.class, ids);
-    		
-    		for(Condition condition:list){
-    			condition.setPatient(patients.get(condition.getPatientId()));
-    		}
-    		return list; 
+		
+    		return conditions.toList(); 
 		}
 	}
 

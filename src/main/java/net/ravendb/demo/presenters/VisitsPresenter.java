@@ -35,10 +35,10 @@ public class VisitsPresenter implements VisitsViewListener {
 		try (IDocumentSession session = RavenDBDocumentStore.INSTANCE.getStore().openSession()) {
 			
 			IDocumentQuery<PatientVisit> visits = session.advanced().documentQuery(Patient.class).
-		    		groupBy("visits[].doctorName","visits[].date","firstName","lastName","visits[].conditionSummery")
+		    		groupBy("visits[].doctorName","visits[].date","firstName","lastName","visits[].visitSummery")
 		    		.selectKey("visits[].doctorName", "doctorName")
 		    		.selectKey("visits[].date", "date")
-		    		.selectKey("visits[].conditionSummery","conditionSummery")
+		    		.selectKey("visits[].visitSummery","visitSummery")
 		    		.selectKey("firstName", "firstName")
 		    		.selectKey("lastName", "lastName")
 		    		.selectCount()
@@ -76,10 +76,10 @@ public class VisitsPresenter implements VisitsViewListener {
 		try (IDocumentSession session = RavenDBDocumentStore.INSTANCE.getStore().openSession()) {
 			
 			IDocumentQuery<PatientVisit> visits = session.advanced().documentQuery(Patient.class).
-		    		groupBy("visits[].doctorName","visits[].date","firstName","lastName","visits[].conditionSummery")
+		    		groupBy("visits[].doctorName","visits[].date","firstName","lastName","visits[].visitSummery")
 		    		.selectKey("visits[].doctorName", "doctorName")
 		    		.selectKey("visits[].date", "date")
-		    		.selectKey("visits[].conditionSummery","conditionSummery")
+		    		.selectKey("visits[].visitSummery","visitSummery")
 		    		.selectKey("firstName", "firstName")
 		    		.selectKey("lastName", "lastName")
 		    		.selectCount()

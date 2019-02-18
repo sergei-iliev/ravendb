@@ -1,7 +1,5 @@
 package net.ravendb.demo.components.editor;
 
-import java.util.Date;
-
 import com.vaadin.flow.component.ClickEvent;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
@@ -9,25 +7,19 @@ import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.textfield.TextField;
 
-import net.ravendb.demo.command.PatientVisit;
 import net.ravendb.demo.model.Condition;
-import net.ravendb.demo.model.Patient;
-import net.ravendb.demo.model.Visit;
 import net.ravendb.demo.presenters.ConditionViewable.ConditionViewListener;
 
 public class ConditionEditorDialog extends AbstractEditorDialog<Condition>{
 
 	private ConditionViewListener presenter;
 	private Runnable run;
-	private String patientId;
-	private Date date;
 	
-	public ConditionEditorDialog(String title,String patientId,Date date,Condition condition,ConditionViewListener presenter,Runnable run) {
+	public ConditionEditorDialog(String title,Condition condition,ConditionViewListener presenter,Runnable run) {
 		super(title,condition);
 		this.run=run;
-		this.patientId=patientId;
 		this.presenter=presenter;
-		this.date=date;
+
 	}
 	protected void fetch(){
 		load();
@@ -64,7 +56,7 @@ public class ConditionEditorDialog extends AbstractEditorDialog<Condition>{
 
 	@Override
 	protected void save(ClickEvent<Button> e) {		   
-		presenter.save(patientId,date,binder.getBean());	   
+		presenter.save(binder.getBean());	   
 		run.run();
 		this.close();
 	}

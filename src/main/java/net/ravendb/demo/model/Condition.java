@@ -25,7 +25,6 @@ public class Condition implements Serializable{
 	}
 	
 	private String id;
-	private String patientId;	
 	private Type severity;
 	private String prescription;
 	private String description;
@@ -36,12 +35,6 @@ public class Condition implements Serializable{
 	}
 	public void setId(String id) {
 		this.id = id;
-	}
-	public String getPatientId() {
-		return patientId;
-	}
-	public void setPatientId(String patientId) {
-		this.patientId = patientId;
 	}
 	public Type getSeverity() {
 		return severity;

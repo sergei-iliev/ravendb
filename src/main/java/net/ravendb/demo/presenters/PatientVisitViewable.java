@@ -23,5 +23,6 @@ public interface PatientVisitViewable {
 	  void save(String patientId,Visit visit);
 	  Patient getPatientById(String id);
 	  Collection<Doctor> getDoctorsList();
+	  Collection<Condition> getConditionsList();
 	}
 }

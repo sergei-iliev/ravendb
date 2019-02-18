@@ -110,14 +110,13 @@ public class VisitsView extends VerticalLayout implements  VisitsViewable{
 		   
 		   grid.addColumn(v->v.getFirstName()).setHeader("First Name");
 		   grid.addColumn(v->v.getLastName()).setHeader("Last Name");
-		   grid.addColumn(v->v.getConditionSummery()).setHeader("Condition Summery");	
+		   grid.addColumn(v->v.getVisitSummery()).setHeader("Visit Summery");	
 		   return grid;
 	}
 	private void search(String term) {
 		grid.setDataProvider(searchDataProvider(term, order.getValue()));
 	}
 	private void load() {
-		System.out.println(order.getValue());
 		grid.setDataProvider(listDataProvider(order.getValue()));
 	}
 	private DataProvider<PatientVisit, Void> listDataProvider(boolean sort) {

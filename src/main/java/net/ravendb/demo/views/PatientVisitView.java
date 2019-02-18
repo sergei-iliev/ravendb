@@ -63,7 +63,6 @@ public class PatientVisitView extends VerticalLayout implements  PatientVisitVie
 	private Patient patient;
 	private Grid<PatientVisit> grid;
 	private String patientId;
-	private Button condition;
 	private Checkbox order;
 	
 	public PatientVisitView() {
@@ -142,19 +141,6 @@ public class PatientVisitView extends VerticalLayout implements  PatientVisitVie
 			 d.open();			 
 		 });		 
 		 header.add(add);
-		
-		 condition=new Button("Add Condition",e->{
-			 Condition condition=presenter.getConditionById(grid.asSingleSelect().getValue().getConditionId());
-			 if(condition==null){
-				 condition=new Condition();
-			 }
-			 ConditionEditorDialog d=new ConditionEditorDialog("Add",patientId, grid.asSingleSelect().getValue().getDate(),condition,new ConditionPresenter(null),()->{
-					load(null,false);
-			 });
-			 d.open();			 
-		 });		
-		 condition.setEnabled(false);
-		 header.add(condition);
 		 
 		 return header;
 				     	
@@ -170,16 +156,7 @@ public class PatientVisitView extends VerticalLayout implements  PatientVisitVie
 		   		   
 
 		   grid.addColumn(v->v.getType()).setHeader("Type");
-		   grid.addColumn(v->v.getConditionSummery()).setHeader("Condition Summery");
-		   grid.addSelectionListener(e -> {
-				if (grid.getSelectedItems().size() > 0) {
-					condition.setEnabled(true);
-
-				} else {
-					condition.setEnabled(false);
-
-				}
-			});
+		   grid.addColumn(v->v.getVisitSummery()).setHeader("Visit Summery");
 			
 		   return grid;
 		}	

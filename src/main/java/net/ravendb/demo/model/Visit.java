@@ -38,10 +38,11 @@ public class Visit implements Serializable{
 	private Date date;
 	private String doctorId;	
 	private Type type;
-	private String conditionSummery;
+	private String visitSummery;
 	private String conditionId;
 	private Doctor doctor;
 	private String doctorName;
+	private Condition condition;
 	
 	public Date getDate() {
 		return date;
@@ -65,12 +66,12 @@ public class Visit implements Serializable{
 		this.doctorId = value.getId();
 		this.doctorName=value.getName();
 	}	
-	
-	public String getConditionSummery() {
-		return conditionSummery;
+
+	public String getVisitSummery() {
+		return visitSummery;
 	}
-	public void setConditionSummery(String conditionSummery) {
-		this.conditionSummery = conditionSummery;
+	public void setVisitSummery(String visitSummery) {
+		this.visitSummery = visitSummery;
 	}
 	public String getConditionId() {
 		return conditionId;
@@ -91,6 +92,23 @@ public class Visit implements Serializable{
 	}
 	public void setDoctorName(String doctorName) {
 		this.doctorName = doctorName;
+	}
+	@JsonIgnore
+	public ComboValue getConditionValue() {
+	  return new ComboValue(conditionId,null);
+	}
+	
+	@JsonIgnore
+	public void setConditionValue(ComboValue value) {
+		this.conditionId = value.getId();		
+	}	
+	@JsonIgnore
+	public Condition getCondition() {
+		return condition;
+	}
+	@JsonIgnore
+	public void setCondition(Condition condition) {
+		this.condition = condition;
 	}
 	@JsonIgnore
 	public void setLocalDate(LocalDate localDate) {

@@ -1,9 +1,17 @@
 package net.ravendb.demo.views;
 
+import java.net.URLEncoder;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.claspina.confirmdialog.ButtonOption;
+import org.claspina.confirmdialog.ConfirmDialog;
+
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.KeyDownEvent;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.grid.Grid;
@@ -21,6 +29,7 @@ import com.vaadin.flow.router.Route;
 
 import net.ravendb.demo.RavenDBApp;
 import net.ravendb.demo.components.editor.ConditionEditorDialog;
+import net.ravendb.demo.components.editor.PatientEditorDialog;
 import net.ravendb.demo.components.editor.PatientVisitEditorDialog;
 import net.ravendb.demo.model.Condition;
 import net.ravendb.demo.model.Doctor;
@@ -36,6 +45,7 @@ public class ConditionView extends VerticalLayout implements ConditionViewable{
 	private final ConditionViewListener presenter;
 	private Grid<Condition> grid;
 	TextField search;
+	Button edit,delete;
 	
 	public ConditionView() {
 	   presenter=new ConditionPresenter(this);
@@ -50,9 +60,46 @@ public class ConditionView extends VerticalLayout implements ConditionViewable{
 	private void init(){
 		H2 title = new H2("Condition");	
 		add(title);
+		add(createHeader());
 		add(createSearchBox());
 		add(createGrid());
 	}
+	private Component createHeader() {
+		HorizontalLayout header = new HorizontalLayout();
+
+		Button add = new Button("Add", e -> {
+			ConditionEditorDialog d = new ConditionEditorDialog("Add", new Condition(), this.presenter, () -> {
+				load();
+			});
+			d.open();
+		});
+		header.add(add);
+
+		edit = new Button("Edit", e -> {
+			ConditionEditorDialog d = new ConditionEditorDialog("Edit", this.grid.asSingleSelect().getValue(),
+					this.presenter, () -> {
+						load();
+					});
+			d.open();
+		});
+		edit.setEnabled(false);
+		header.add(edit);
+
+		delete = new Button("Delete", e -> {
+			ConfirmDialog.createQuestion().withCaption("System alert").withMessage("Do you want to delete?")
+					.withOkButton(() -> {
+						presenter.delete(grid.asSingleSelect().getValue());
+						load();
+					}, ButtonOption.focus(), ButtonOption.caption("YES")).withCancelButton(ButtonOption.caption("NO"))
+					.open();
+		});
+		delete.setEnabled(false);
+		header.add(delete);
+
+
+		return header;
+
+	}	
 	private Component createSearchBox() {
 		HorizontalLayout layout = new HorizontalLayout();
 		Span span = new Span();
@@ -76,11 +123,18 @@ public class ConditionView extends VerticalLayout implements ConditionViewable{
 
 
 		   grid.addColumn(Condition::getDescription).setHeader("Description");
-		   grid.addColumn(Condition::getDescription).setHeader("Prescription");
+		   grid.addColumn(Condition::getPrescription).setHeader("Prescription");
 		   grid.addColumn(Condition::getSeverity).setHeader("Severity");
-		   grid.addColumn(c->c.getPatient().getFirstName()).setHeader("First Name");
-		   grid.addColumn(c->c.getPatient().getLastName()).setHeader("Last Name");
-		   
+		   grid.addSelectionListener(e -> {
+				if (grid.getSelectedItems().size() > 0) {
+					edit.setEnabled(true);
+					delete.setEnabled(true);
+
+				} else {
+					edit.setEnabled(false);
+					delete.setEnabled(false);
+				}
+			});
 		   return grid;
 
 	}

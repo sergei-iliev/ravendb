@@ -11,8 +11,9 @@ public interface ConditionViewable {
 	public interface ConditionViewListener{
 		public Condition getConditionById(String id);
 		public Patient getPatientById(String id) ;
-	    public void save(String patientId,Date visitDate,Condition condition);
-	
+	    public void save(Condition condition);
+	    public void delete(Condition condition);
+	    
 	    Collection<Condition> getConditionsList(int offset,int limit,String term);
 	    int getConditionsCount(String term);
 	}

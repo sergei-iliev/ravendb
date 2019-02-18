@@ -58,10 +58,10 @@ public class PatientVisitPresenter implements PatientVisitViewListener {
 			Patient patient=session.load(Patient.class, patientId);
 
 			IDocumentQuery<PatientVisit> visits = session.advanced().documentQuery(Patient.class).waitForNonStaleResults()							    		
-					.groupBy("visits[].doctorName","visits[].date","visits[].type","visits[].conditionId","firstName","lastName","visits[].conditionSummery")
+					.groupBy("visits[].doctorName","visits[].date","visits[].type","visits[].conditionId","firstName","lastName","visits[].visitSummery")
 		    		.selectKey("visits[].doctorName", "doctorName")
 		    		.selectKey("visits[].date", "date")
-		    		.selectKey("visits[].conditionSummery","conditionSummery")
+		    		.selectKey("visits[].visitSummery","visitSummery")
 		    		.selectKey("firstName", "firstName")
 		    		.selectKey("lastName", "lastName")	
 		    		.selectKey("visits[].type", "type")
@@ -157,7 +157,12 @@ public class PatientVisitPresenter implements PatientVisitViewListener {
 		}
 
 	}
-
+	@Override
+	public Collection<Condition> getConditionsList() {
+		try (IDocumentSession session = RavenDBDocumentStore.INSTANCE.getStore().openSession()) {
+			return session.query(Condition.class).distinct().toList();
+		}
+	}
 	@Override
 	public Condition getConditionById(String conditionId) {
 		try (IDocumentSession session = RavenDBDocumentStore.INSTANCE.getStore().openSession()) {
