@@ -37,13 +37,10 @@ public class PatientPresenter implements PatientViewListener {
 			 return session.query(Patient.class).count();			 			 			 
 		 }
 	}
-	/*
-	 * Use aggressive cache for fast scralling 
-	 */
+
 	@Override
 	public Collection<Patient> getPatientsList(int offset,int limit,boolean order) {
 		   try (IDocumentSession session = RavenDBDocumentStore.INSTANCE.getStore().openSession()) {
-			   //try (CleanCloseable cacheScope = session.advanced().getDocumentStore().aggressivelyCacheFor(Duration.ofMinutes(5))) {
 				   Collection<Patient> list=null;
 
 				   if(order){
@@ -72,7 +69,6 @@ public class PatientPresenter implements PatientViewListener {
 						 }
 				   }
 				   return list;
-				//}
 	       }		
 	}
 	

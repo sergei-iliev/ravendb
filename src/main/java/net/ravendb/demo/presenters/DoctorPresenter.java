@@ -68,7 +68,7 @@ public class DoctorPresenter implements DoctorViewListener {
 			 results.forEach(v->{ 
 			  v.setDoctorName(map.get(v.getDoctorId()).getName());	 	           
 			 });
-			 
+			 assert (session.advanced().getNumberOfRequests()==1);
 			 return results;
 		   }
 		   

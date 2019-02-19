@@ -31,7 +31,7 @@ public class ConditionEditorDialog extends AbstractEditorDialog<Condition>{
       
         TextField description=new TextField();
         binder.forField(description).bind(Condition::getDescription,Condition::setDescription);
-        layout.addFormItem(description, "Description");
+        layout.addFormItem(description, "Name");
         
         TextField prescription=new TextField();
         binder.forField(prescription).bind(Condition::getPrescription,Condition::setPrescription);
