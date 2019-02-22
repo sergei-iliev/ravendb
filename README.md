@@ -19,5 +19,9 @@ Installing RavenDB is pretty straight forward:
 4. Once installed RavenDB Studio will show up in web browser, open "About" tab and register your license
 5. Create your first noSQL database.
 
+## Domain Entity descrption
+Since noSQL is basically a document based key:value structure there is no requirement for field type definitions. The model consists of
+4 basic entitities, one of which is embedded as an array to demonstrate the power of grouping and fetching queries in RavenDB.
+
 
 
