@@ -1,2 +1,1 @@
-# 
-Sample Hospital Mangement web application
+# Sample Hospital Mangement web application
