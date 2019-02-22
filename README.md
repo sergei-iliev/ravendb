@@ -11,4 +11,10 @@ It uses RavenDB Java client to communicate with the document store.
 * Group by queries
 
 ## RavenDB community edition install
+Installing RavenDB is pretty straight forward:
+1.Download the zip bundle from https://ravendb.net/download unzip in a local drive
+2.Register a community edition free licence from https://ravendb.net/buy
+3.In powershell start either .\run.ps1 (console mode app) or .\setup-as-service.ps1 (service mode app) and follow the install instractions.
+4.Once installed RavenDB Studio will show up in web browser, open "About" tab and register your license
+5.Create your first noSQL database
 
