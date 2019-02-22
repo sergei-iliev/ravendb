@@ -10,4 +10,5 @@ It uses RavenDB Java client to communicate with the document store.
 * BLOB handling - attachements
 * Group by queries
 
+## RavenDB community edition install
 
