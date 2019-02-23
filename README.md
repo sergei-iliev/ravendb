@@ -23,5 +23,44 @@ Installing RavenDB is pretty straight forward:
 Since noSQL is basically a document based key:value structure there is no requirement for field type definitions. The model consists of
 4 basic entitities, one of which is embedded as an array to demonstrate the power of grouping and fetching queries in RavenDB.
 
+```java
+public class Patient implements Serializable{
+    public enum Gender{
+    	MALE,
+    	FEMALE;
+        
+    	@JsonCreator
+        public static Gender convert(String status){
+            if(status==null){
+                return Gender.MALE;
+            }
+            
+            return Gender.valueOf(status);
+        }
+        
+        @JsonValue
+        public String getGender() {        
+            return this.toString();
+        }    	
+    }
+	
+    private String id;
+	private String firstName,lastName;
+	private Date birthDate;
+	private Gender gender;
+	
+	private String email;
+	private Address address;
+	private List<Visit> visits;
+	
+	private Attachment attachment;
+  
+  ......
+  
+  }
+```  
+  
+  
+
 
 
