@@ -97,5 +97,30 @@ public class Visit implements Serializable{
 }	
 ```
 
+```java
+public class Condition implements Serializable{
+	public enum Type{
+		SEVIER,MINOR,CHRONIC,NORMAL;
+    	@JsonCreator
+        public static Type convert(String status){
+            if(status==null){
+                return Type.NORMAL;
+            }
+            
+            return Type.valueOf(status);
+        }
+        
+        @JsonValue
+        public String getType() {        
+            return this.toString();
+        }  
+	}
+	
+	private String id;
+	private Type severity;
+	private String prescription;
+	private String description;
 
-
+..........
+}
+```
