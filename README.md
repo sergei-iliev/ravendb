@@ -19,9 +19,10 @@ Installing RavenDB is pretty straight forward:
 4. Once installed RavenDB Studio will show up in web browser, open "About" tab and register your license
 5. Create your first noSQL database.
 
-## Domain Entity descrption
-Since noSQL is basically a document based key:value structure there is no requirement for field type definitions. The model consists of
-4 basic entitities, one of which is embedded as an array to demonstrate the power of grouping and fetching queries in RavenDB.
+## Entities, tables, collections, and documents
+When it comes to persisting data a Java programmer tends to annotate Java POJO with @Entity so that the underlying JPA framework would treat the class as a domain object mapped to a row in a database.
+RavenDB doesn’t use tables. Instead, it creates objects as documents, and multiple documents are known as a collection. 
+In RavenDB, a domain object is mapped to a single document. In this regard there is no need of special class treatment other then having a default no args constructor. The sample model consists of 4 basic entitities, one of which is embedded as an array to demonstrate the power of grouping and fetching queries in RavenDB.
 
 1. Patient - stored as a separate collection
 ```java
@@ -135,3 +136,6 @@ public class Doctor implements Serializable{
  ........  
  }
  ```
+Each POJO has a property name "id" which will triger the usage RavenDB algorithm of autogenarating Ids 
+The convention is that entities get the identifiers in the following format collection/number-tag so the programmer is not concerned with the uniqueness of each document in a collection.
+ 
