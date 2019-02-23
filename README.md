@@ -124,3 +124,13 @@ public class Condition implements Serializable{
 ..........
 }
 ```
+
+```java
+public class Doctor implements Serializable{
+    private String id;
+    private String name;
+    private String department;
+    private int age;
+ ........  
+ }
+ ```
