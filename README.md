@@ -168,5 +168,19 @@ INSTANCE;
 ```
 
 ## CRUD operations
-One 
- 
+Patient entity is given as an example only
+```java
+	
+public void create(Patient patient) {
+		 try (IDocumentSession session = RavenDBDocumentStore.INSTANCE.getStore().openSession()) {
+			 
+			   session.store(patient);
+				 
+	           if(patient.getAttachment()!=null){	        	 
+			     	session.advanced().attachments().store(patient,patient.getAttachment().getName(),patient.getAttachment().getInputStream(),patient.getAttachment().getMimeType());
+	           }
+	           session.saveChanges();
+	           
+	     }	  		
+}
+```
