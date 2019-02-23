@@ -44,7 +44,7 @@ public class Patient implements Serializable{
         }    	
     }
 	
-    private String id;
+        private String id;
 	private String firstName,lastName;
 	private Date birthDate;
 	private Gender gender;
@@ -52,7 +52,7 @@ public class Patient implements Serializable{
 	private String email;
 	private Address address;
 	private List<Visit> visits;
-	
+	@JsonIgnore
 	private Attachment attachment;
   
   ......
@@ -60,7 +60,42 @@ public class Patient implements Serializable{
   }
 ```  
   
-  
+```java
+public class Visit implements Serializable{
+    public enum Type{
+    	HOUSE,
+    	EMERGENCYROOM,
+    	HOSPITAL;
+        
+    	@JsonCreator
+        public static Type convert(String type){
+            if(type==null){
+                return Type.HOUSE;
+            }
+            
+            return Type.valueOf(type);
+        }
+        
+        @JsonValue
+        public String getType() {        
+            return this.toString();
+        }    	
+    }
+	
+    	
+	private Date date;
+	private String doctorId;	
+	private Type type;
+	private String visitSummery;
+	private String conditionId;
+	@JsonIgnore
+	private Doctor doctor;
+	private String doctorName;
+	@JsonIgnore
+	private Condition condition;
+.............
+}	
+```
 
 
 
