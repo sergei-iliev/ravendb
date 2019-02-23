@@ -23,6 +23,7 @@ Installing RavenDB is pretty straight forward:
 Since noSQL is basically a document based key:value structure there is no requirement for field type definitions. The model consists of
 4 basic entitities, one of which is embedded as an array to demonstrate the power of grouping and fetching queries in RavenDB.
 
+1. Patient - stored as a separate collection
 ```java
 public class Patient implements Serializable{
     public enum Gender{
@@ -59,7 +60,7 @@ public class Patient implements Serializable{
   
   }
 ```  
-  
+2. Visist - stored as an array in Patient collection  
 ```java
 public class Visit implements Serializable{
     public enum Type{
@@ -96,7 +97,7 @@ public class Visit implements Serializable{
 .............
 }	
 ```
-
+3. Condition - list of available conditions
 ```java
 public class Condition implements Serializable{
 	public enum Type{
@@ -124,7 +125,7 @@ public class Condition implements Serializable{
 ..........
 }
 ```
-
+4. Doctor - stored in a separate collection
 ```java
 public class Doctor implements Serializable{
     private String id;
