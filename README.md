@@ -226,7 +226,41 @@ Update operation is worth noting - it handles optimistic conqurrency control and
 ```
 
 ## Paging on large record sets
+Paging through large data is one of the most common operations with RavenDB. A typical scenario is the need to display results in chunks in a lazy loading or pagable grid. 
 
 ![Patient CRUD](/screenshots/p_paging.png)
 
-Commin soon...
+```java
+	public Collection<Patient> getPatientsList(int offset,int limit,boolean order) {
+		   try (IDocumentSession session = RavenDBDocumentStore.INSTANCE.getStore().openSession()) {
+				   Collection<Patient> list=null;
+
+				   if(order){
+					   IDocumentQuery<Patient>  query = session.query(Patient.class);
+					   list= query.orderBy("birthDate").skip(offset).take(limit).toList();
+				     }else{
+				       IDocumentQuery<Patient> query = session.query(Patient.class);
+				       list= query.skip(offset).take(limit).toList();	 
+				     }
+				   
+				   
+				   for(Patient patient:list){
+						 AttachmentName[] names=session.advanced().attachments().getNames(patient);					
+						 if(names.length>0){
+							try(CloseableAttachmentResult result= session.advanced().attachments().get(patient,names[0].getName())){
+							  	Attachment attachment=new Attachment();
+							  	attachment.setName(names[0].getName());
+							  	attachment.setMimeType(names[0].getContentType());
+							  	byte[] bytes = IOUtils.toByteArray(result.getData());
+								attachment.setBytes(bytes);
+							    patient.setAttachment(attachment);
+							}catch(IOException e){
+								e.printStackTrace();
+							}
+							 
+						 }
+				   }
+				   return list;
+	       }		
+	}
+```
