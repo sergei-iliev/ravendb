@@ -170,7 +170,7 @@ INSTANCE;
 ## CRUD operations
 Patient entity is given as an example only.
 
-![Patient CRUD](/screenshots/p-edit.png)
+![Patient CRUD](/screenshots/p_edit.png)
 
 ```java
 	
