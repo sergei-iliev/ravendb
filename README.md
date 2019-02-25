@@ -231,13 +231,18 @@ Paging through large data is one of the most common operations with RavenDB. A t
 ![Patient CRUD](/screenshots/p_paging.png)
 
 ```java
+	public int getPatientsCount() {
+		 try (IDocumentSession session = RavenDBDocumentStore.INSTANCE.getStore().openSession()) {			 
+			 return session.query(Patient.class).count();			 			 			 
+		 }
+	}
 	public Collection<Patient> getPatientsList(int offset,int limit,boolean order) {
 		   try (IDocumentSession session = RavenDBDocumentStore.INSTANCE.getStore().openSession()) {
 				   Collection<Patient> list=null;
 
 				   if(order){
-					   IDocumentQuery<Patient>  query = session.query(Patient.class);
-					   list= query.orderBy("birthDate").skip(offset).take(limit).toList();
+				       IDocumentQuery<Patient>  query = session.query(Patient.class);
+				       list= query.orderBy("birthDate").skip(offset).take(limit).toList();
 				     }else{
 				       IDocumentQuery<Patient> query = session.query(Patient.class);
 				       list= query.skip(offset).take(limit).toList();	 
