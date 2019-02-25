@@ -168,12 +168,13 @@ INSTANCE;
 ```
 
 ## CRUD operations
-Patient entity is given as an example only. For any operation we want to perform on RavenDB, we start by obtaining a new Session object from the document store. The Session object will contain everything we need to perform any operation necessary. It has corresponding methods for Create, Update and Delete document from a collection.
+Patient entity is given as an example only. 
 
 ![Patient CRUD](/screenshots/p_edit.png)
 
+For any operation we want to perform on RavenDB, we start by obtaining a new Session object from the document store. The Session object will contain everything we need to perform any operation necessary. It has corresponding methods for Create, Update and Delete document from a collection.
+
 ```java
-	
 public void create(Patient patient) {
 		 try (IDocumentSession session = RavenDBDocumentStore.INSTANCE.getStore().openSession()) {
 			 
@@ -187,15 +188,15 @@ public void create(Patient patient) {
 	     }	  		
 }
 ```
+Update operation is worth noting - it handles optimistic conqurrency control and throws ConcurrecyException provided that another use has already changed the record. The method also handles attachement as a 1:1 relationship with each patient. 
 
 ```java
-	@Override
 	public void update(Patient patient)throws ConcurrencyException{
 
 		 try (IDocumentSession session = RavenDBDocumentStore.INSTANCE.getStore().openSession()) {
 			   
 			   //enable oca			   
-			   //session.advanced().setUseOptimisticConcurrency(true);			   			   
+			   session.advanced().setUseOptimisticConcurrency(true);			   			   
 			   session.store(patient);
 			   
 	           //delete previous attachments	           
@@ -211,5 +212,15 @@ public void create(Patient patient) {
 	           session.saveChanges();
 	           
 	     }
+	}
+```
+
+```java
+	public void delete(Patient patient) {
+		 try (IDocumentSession session = RavenDBDocumentStore.INSTANCE.getStore().openSession()) {
+	           session.delete(patient.getId());
+	           session.saveChanges();
+	     }
+		
 	}
 ```
