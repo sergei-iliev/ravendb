@@ -168,8 +168,10 @@ INSTANCE;
 ```
 
 ## CRUD operations
-Patient entity is given as an example only
+Patient entity is given as an example only.
+
 ![Patient CRUD](/screenshots/p-edit.png)
+
 ```java
 	
 public void create(Patient patient) {
