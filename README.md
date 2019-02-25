@@ -224,3 +224,7 @@ Update operation is worth noting - it handles optimistic conqurrency control and
 		
 	}
 ```
+
+## Paging on large record sets
+
+![Patient CRUD](/screenshots/p_paging.png)
