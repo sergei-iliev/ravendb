@@ -168,7 +168,7 @@ INSTANCE;
 ```
 
 ## CRUD operations
-Patient entity is given as an example only.
+Patient entity is given as an example only. For any operation we want to perform on RavenDB, we start by obtaining a new Session object from the document store. The Session object will contain everything we need to perform any operation necessary. It has corresponding methods for Create, Update and Delete document from a collection.
 
 ![Patient CRUD](/screenshots/p_edit.png)
 
@@ -186,4 +186,30 @@ public void create(Patient patient) {
 	           
 	     }	  		
 }
+```
+
+```java
+	@Override
+	public void update(Patient patient)throws ConcurrencyException{
+
+		 try (IDocumentSession session = RavenDBDocumentStore.INSTANCE.getStore().openSession()) {
+			   
+			   //enable oca			   
+			   //session.advanced().setUseOptimisticConcurrency(true);			   			   
+			   session.store(patient);
+			   
+	           //delete previous attachments	           
+			   AttachmentName[] names=session.advanced().attachments().getNames(patient);
+			   if(names.length>0){				
+				  session.advanced().attachments().delete(patient,names[0].getName());				
+			   }
+				 
+	           if(patient.getAttachment()!=null){	        	  
+			     session.advanced().attachments().store(patient,patient.getAttachment().getName(),patient.getAttachment().getInputStream(),patient.getAttachment().getMimeType());			     
+	           }
+	           
+	           session.saveChanges();
+	           
+	     }
+	}
 ```
