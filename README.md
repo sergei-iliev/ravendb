@@ -226,7 +226,7 @@ Update operation is worth noting - it handles optimistic conqurrency control and
 ```
 
 ## Paging on large record sets
-Paging through large data is one of the most common operations with RavenDB. A typical scenario is the need to display results in chunks in a lazy loading or pagable grid. 
+Paging through large data is one of the most common operations with RavenDB. A typical scenario is the need to display results in chunks in a lazy loading or pagable grid. The grid is configured to first obtain the total amount of records to shaow and then lazily as the user scrolls up and down to obtain records by batches of 50. 
 
 ![Patient CRUD](/screenshots/p_paging.png)
 
