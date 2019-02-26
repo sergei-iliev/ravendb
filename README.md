@@ -277,7 +277,43 @@ Paging through large data is one of the most common operations with RavenDB. A t
 When binary data(images,documents,media) needs to be associated with the document, RavenDB provides the Attachement API.
 Attachements are completely decopled from documents. They can be updated and changed separately from the document and do not 
 participate in transactions.
+```java
+public class Attachment {
 
+	String name;
+	String mimeType;
+	byte[] bytes; 
+	
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	public String getMimeType() {
+		return mimeType;
+	}
+	public void setMimeType(String mimeType) {
+		this.mimeType = mimeType;
+	}
+	
+	public byte[] getBytes(){
+		return bytes;
+	}
+	
+	public void setBytes(byte[] bytes) {
+		this.bytes = bytes;
+	}
+	public InputStream getInputStream(){
+		return new ByteArrayInputStream(bytes);
+	}
+	public StreamResource getStreamResource(){
+	  ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
+	  return new StreamResource(name, () -> bis);
+	}
+	
+}
+```
 In Patient entity, image is attached to the document using the session.Advanced.Attachments.Store method.
 Attachments, just like documents, are a part of the session and will be only saved on the Server when DocumentSession.SaveChanges is executed.
 
@@ -285,3 +321,16 @@ Attachments, just like documents, are a part of the session and will be only sav
 session.advanced().attachments().store(patient,patient.getAttachment().getName(),patient.getAttachment().getInputStream(),patient.getAttachment().getMimeType());			     	           	          
 session.saveChanges();
 ```
+
+This operation is used to get an attachment from a patient document.
+```java
+try(CloseableAttachmentResult result= session.advanced().attachments().get(patient,names[0].getName())){
+	  	Attachment attachment=new Attachment();
+	  	attachment.setName(names[0].getName());
+	  	attachment.setMimeType(names[0].getContentType());
+	  	byte[] bytes = IOUtils.toByteArray(result.getData());
+		attachment.setBytes(bytes);
+  	        patient.setAttachment(attachment);
+}
+```
+
