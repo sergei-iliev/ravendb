@@ -274,4 +274,8 @@ Paging through large data is one of the most common operations with RavenDB. A t
 ```
 
 ## BLOB handling - attachements
+When binary data(images,documents,media) needs to be associated with the document, RavenDB provides the Attachement API.
+Attachements are completely decopled from documents. They can be updated and changed separately from the document and do not 
+participate in transactions.
+
 
