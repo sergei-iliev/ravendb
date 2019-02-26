@@ -173,7 +173,7 @@ Patient entity is given as an example only.
 
 ![Patient CRUD](/screenshots/p_edit.png)
 
-For any operation we want to perform on RavenDB, we start by obtaining a new Session object from the document store. The Session object will contain everything we need to perform any operation necessary. It has corresponding methods for Create, Update and Delete document from a collection.
+For any operation we want to perform on RavenDB, we start by obtaining a new Session object from the document store. The Session object will contain everything we need to perform any operation necessary. It implements the Unit of Work pattern and is capable of batching the requests to save expensive remote calls. In contrast to a DocumentStore it is a lightweight object and can be created more frequently. For example, in web applications, a common (and recommended) pattern is to create a session per request.
 
 ```java
 public void create(Patient patient) {
