@@ -272,4 +272,6 @@ Paging through large data is one of the most common operations with RavenDB. A t
 	       }		
 	}
 ```
-Commin soon........
+
+## BLOB handling - attachements
+
