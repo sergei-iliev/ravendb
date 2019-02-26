@@ -9,7 +9,7 @@ It uses RavenDB Java client to communicate with the document store.
 * CRUD operations
 * Paging on large record sets
 * BLOB handling - attachements
-* Group by queries
+* Queries
 
 ## RavenDB community edition install
 Installing RavenDB is pretty straight forward:
@@ -333,4 +333,4 @@ try(CloseableAttachmentResult result= session.advanced().attachments().get(patie
   	        patient.setAttachment(attachment);
 }
 ```
-
+## Queries
