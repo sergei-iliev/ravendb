@@ -278,4 +278,10 @@ When binary data(images,documents,media) needs to be associated with the documen
 Attachements are completely decopled from documents. They can be updated and changed separately from the document and do not 
 participate in transactions.
 
+In Patient entity, image is attached to the document using the session.Advanced.Attachments.Store method.
+Attachments, just like documents, are a part of the session and will be only saved on the Server when DocumentSession.SaveChanges is executed.
 
+```java
+session.advanced().attachments().store(patient,patient.getAttachment().getName(),patient.getAttachment().getInputStream(),patient.getAttachment().getMimeType());			     	           	          
+session.saveChanges();
+```
