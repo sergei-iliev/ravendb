@@ -150,6 +150,7 @@ The convention is that entities get the identifiers in the following format coll
 ## RavenDB connector
 The focal point is the [RavenDB Java connector](https://github.com/ravendb/ravendb-jvm-client), which is codded as a singleton. It
 instantiates DocumentStore object to set up connection with the Server and download various configuration metadata.
+The DocumentStore is capable of working with multiple databases and for proper operation it is recommend having only one instance of it per application.
 ```java
 public enum RavenDBDocumentStore {
 INSTANCE;
