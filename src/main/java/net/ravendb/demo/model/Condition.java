@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonValue;
 
-public class Condition implements Serializable{
+public class Condition{
 	public enum Type{
 		SEVIER,MINOR,CHRONIC,NORMAL;
     	@JsonCreator

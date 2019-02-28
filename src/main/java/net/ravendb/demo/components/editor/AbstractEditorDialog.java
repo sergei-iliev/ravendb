@@ -15,7 +15,7 @@ import com.vaadin.flow.component.orderedlayout.FlexComponent.JustifyContentMode;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.data.binder.Binder;
 
-public abstract class  AbstractEditorDialog<T extends Serializable> extends Dialog{
+public abstract class  AbstractEditorDialog<T> extends Dialog{
 
 	protected final Binder<T> binder;
 	protected final T bean;

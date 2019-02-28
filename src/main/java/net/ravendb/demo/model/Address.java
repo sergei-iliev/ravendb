@@ -2,7 +2,7 @@ package net.ravendb.demo.model;
 
 import java.io.Serializable;
 
-public class Address implements Serializable{
+public class Address{
     private String line;
     private String city;
     private String region;

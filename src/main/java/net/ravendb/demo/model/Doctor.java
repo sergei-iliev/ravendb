@@ -2,7 +2,7 @@ package net.ravendb.demo.model;
 
 import java.io.Serializable;
 
-public class Doctor implements Serializable{
+public class Doctor{
 	private String id;
     private String name;
     private String department;

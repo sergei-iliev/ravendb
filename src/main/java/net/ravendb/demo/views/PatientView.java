@@ -154,7 +154,8 @@ public class PatientView extends VerticalLayout implements PatientViewable {
 		grid = new Grid<>();
 		grid.setSelectionMode(SelectionMode.SINGLE);
 		grid.setWidth("100%");
-
+		
+		
 		grid.addComponentColumn(p -> {
 			if (p.getAttachment() == null) {
 				Image image = new Image("/frontend/images/avatar.jpeg", "");

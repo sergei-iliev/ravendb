@@ -15,7 +15,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 import net.ravendb.demo.command.Attachment;
 
-public class Patient implements Cloneable,Serializable{
+public class Patient implements Cloneable{
     public enum Gender{
     	MALE,
     	FEMALE;
@@ -44,6 +44,7 @@ public class Patient implements Cloneable,Serializable{
 	private Address address;
 	private List<Visit> visits;
 	
+	@JsonIgnore
 	private Attachment attachment;
 	
 	public String getEmail() {

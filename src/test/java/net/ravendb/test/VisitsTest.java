@@ -36,7 +36,7 @@ public class VisitsTest {
 		   Visit v=new Visit();
 	       v.setDate(new Date());
 	       v.setType(Type.EMERGENCYROOM);
-	       v.setConditionSummery("minor headache");
+	       v.setVisitSummery("minor headache");
 		   presenter.save(patient.getId(),v);
 		   
        
