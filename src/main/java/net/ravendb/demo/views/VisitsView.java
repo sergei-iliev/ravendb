@@ -39,7 +39,7 @@ public class VisitsView extends VerticalLayout implements  VisitsViewable{
 	private Checkbox order;
 	
 	public VisitsView() {
-	   presenter=new VisitsPresenter(this);  
+	   presenter=new VisitsPresenter();  
 	   init();	
 	}
 

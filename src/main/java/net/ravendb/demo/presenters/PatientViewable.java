@@ -21,5 +21,8 @@ public interface PatientViewable {
 	  
 	  Collection<Patient> searchPatientsList(int offset,int limit,String term,boolean order);
 	  int searchPatientsCount(String term);
+	  
+	  void openSession();
+	  void releaseSession();
 	}
 }

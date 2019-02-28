@@ -12,6 +12,7 @@ import org.claspina.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentEventListener;
+import com.vaadin.flow.component.DetachEvent;
 import com.vaadin.flow.component.KeyDownEvent;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
@@ -50,15 +51,22 @@ public class PatientView extends VerticalLayout implements PatientViewable {
 	private Checkbox order;
 
 	public PatientView() {
-		presenter = new PatientPresenter(this);
+		presenter = new PatientPresenter();
 		init();
 	}
 
+	
 	@Override
 	protected void onAttach(AttachEvent attachEvent) {
+		presenter.openSession();
 		load();
 	}
 
+	@Override
+	protected void onDetach(DetachEvent detachEvent) {
+		presenter.releaseSession();
+		super.onDetach(detachEvent);
+	}
 	private void init() {
 		this.setWidth("100%");
 		H4 title = new H4("Patients");

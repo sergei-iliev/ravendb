@@ -48,7 +48,7 @@ public class ConditionView extends VerticalLayout implements ConditionViewable{
 	Button edit,delete;
 	
 	public ConditionView() {
-	   presenter=new ConditionPresenter(this);
+	   presenter=new ConditionPresenter();
 	   init();	
 	}
 	

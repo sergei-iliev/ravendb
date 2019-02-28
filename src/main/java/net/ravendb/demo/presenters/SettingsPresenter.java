@@ -15,10 +15,10 @@ import net.ravendb.demo.presenters.PatientViewable.PatientViewListener;
 import net.ravendb.demo.presenters.SettingsViewable.SettingsViewListener;
 
 public class SettingsPresenter implements SettingsViewListener{
-   private final SettingsViewable view;
+
    
-   public SettingsPresenter(SettingsViewable view) {
-	   this.view=view;
+   public SettingsPresenter() {
+
    }
 
 

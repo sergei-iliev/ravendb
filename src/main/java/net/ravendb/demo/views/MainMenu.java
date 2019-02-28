@@ -34,10 +34,5 @@ public class MainMenu extends VerticalLayout{
 		 });		 		
 		 add(visitsButton);	
 		 
-		 Button patientvisitButton=new Button("Settings",new Icon(VaadinIcon.HOSPITAL),e->{
-			UI.getCurrent().navigate("settings"); 
-		 });		 		 
-		 add(patientvisitButton);		 
-		 
 	}
 }

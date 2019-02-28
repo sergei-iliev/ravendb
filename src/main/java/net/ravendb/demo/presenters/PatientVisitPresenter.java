@@ -22,10 +22,10 @@ import net.ravendb.demo.model.Visit;
 import net.ravendb.demo.presenters.PatientVisitViewable.PatientVisitViewListener;
 
 public class PatientVisitPresenter implements PatientVisitViewListener {
-	private final PatientVisitViewable view;
 
-	public PatientVisitPresenter(PatientVisitViewable view) {
-		this.view = view;
+
+	public PatientVisitPresenter() {
+
 	}
 
 //	@Override

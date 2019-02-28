@@ -28,7 +28,7 @@ public class SettingsView extends VerticalLayout implements SettingsViewable{
     private Button edit;
     
 	public SettingsView() {
-		   presenter=new SettingsPresenter(this);  
+		   presenter=new SettingsPresenter();  
 		   init();	
 	}
 	

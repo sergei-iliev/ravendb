@@ -15,10 +15,10 @@ import net.ravendb.demo.model.Patient;
 import net.ravendb.demo.presenters.DoctorViewable.DoctorViewListener;
 
 public class DoctorPresenter implements DoctorViewListener {
-	private final DoctorViewable view;
 
-	public DoctorPresenter(DoctorViewable view) {
-		this.view = view;
+
+	public DoctorPresenter() {
+
 	}
 
 	@Override

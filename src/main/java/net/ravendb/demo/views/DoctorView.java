@@ -31,7 +31,7 @@ public class DoctorView extends VerticalLayout implements DoctorViewable{
     private Button edit,delete;
     
 	public DoctorView() {
-		   presenter=new DoctorPresenter(this);  
+		   presenter=new DoctorPresenter();  
 		   init();	
 	}
 	

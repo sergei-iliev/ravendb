@@ -66,7 +66,7 @@ public class PatientVisitView extends VerticalLayout implements  PatientVisitVie
 	private Checkbox order;
 	
 	public PatientVisitView() {
-	   presenter=new PatientVisitPresenter(this);  
+	   presenter=new PatientVisitPresenter();  
 	   init();	
 	}
 	@Override

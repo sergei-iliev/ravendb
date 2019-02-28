@@ -19,10 +19,9 @@ import net.ravendb.demo.model.Visit.Type;
 import net.ravendb.demo.presenters.ConditionViewable.ConditionViewListener;
 
 public class ConditionPresenter implements ConditionViewListener {
-	private final ConditionViewable view;
 
-	public ConditionPresenter(ConditionViewable view) {
-		this.view = view;
+	public ConditionPresenter() {
+
 	}
 
 	@Override
