@@ -1,4 +1,4 @@
-# Sample Hospital Management web application
+# RavenDB Hospital tutorial
 RavenDB is an open-source NoSQL document store database. It is fully transactional,multi-platform and high availability distributed data store which support clients for a varity of programming languages including Java.
 The following sample Hospital Management app is built upon the dynamic document based structure that RavenDB represents.
 It uses RavenDB Java client to communicate with the document store.
@@ -34,26 +34,7 @@ In RavenDB, a domain object is mapped to a single document. In this regard there
 
 1. Patient - stored as a separate collection
 ```java
-public class Patient implements Serializable{
-    public enum Gender{
-    	MALE,
-    	FEMALE;
-        
-    	@JsonCreator
-        public static Gender convert(String status){
-            if(status==null){
-                return Gender.MALE;
-            }
-            
-            return Gender.valueOf(status);
-        }
-        
-        @JsonValue
-        public String getGender() {        
-            return this.toString();
-        }    	
-    }
-	
+public class Patient {
         private String id;
 	private String firstName,lastName;
 	private Date birthDate;
@@ -62,94 +43,53 @@ public class Patient implements Serializable{
 	private String email;
 	private Address address;
 	private List<Visit> visits;
-	@JsonIgnore
-	private Attachment attachment;
-  
-  ......
   
   }
 ```  
 2. Visist - stored as an array in Patient collection  
 ```java
-public class Visit implements Serializable{
-    public enum Type{
-    	HOUSE,
-    	EMERGENCYROOM,
-    	HOSPITAL;
-        
-    	@JsonCreator
-        public static Type convert(String type){
-            if(type==null){
-                return Type.HOUSE;
-            }
-            
-            return Type.valueOf(type);
-        }
-        
-        @JsonValue
-        public String getType() {        
-            return this.toString();
-        }    	
-    }
-	
-    	
+public class Visit{
 	private Date date;
 	private String doctorId;	
 	private Type type;
 	private String visitSummery;
 	private String conditionId;
-	@JsonIgnore
-	private Doctor doctor;
 	private String doctorName;
-	@JsonIgnore
-	private Condition condition;
-.............
+
 }	
 ```
 3. Condition - list of available conditions
 ```java
-public class Condition implements Serializable{
-	public enum Type{
-		SEVIER,MINOR,CHRONIC,NORMAL;
-    	@JsonCreator
-        public static Type convert(String status){
-            if(status==null){
-                return Type.NORMAL;
-            }
-            
-            return Type.valueOf(status);
-        }
-        
-        @JsonValue
-        public String getType() {        
-            return this.toString();
-        }  
-	}
-	
+public class Condition {
 	private String id;
 	private Type severity;
 	private String prescription;
 	private String description;
 
-..........
 }
 ```
 4. Doctor - stored in a separate collection
 ```java
-public class Doctor implements Serializable{
-    private String id;
-    private String name;
-    private String department;
-    private int age;
- ........  
+public class Doctor{
+    	private String id;
+    	private String name;
+    	private String department;
+   	private int age; 
  }
  ```
 Each POJO has a property name "id" which will triger the usage RavenDB algorithm of autogenarating Ids. 
 The convention is that entities get the identifiers in the following format collection/number-tag so the programmer is not concerned with the uniqueness of each document in a collection.
 
 ## RavenDB connector
-The focal point is the [RavenDB Java connector](https://github.com/ravendb/ravendb-jvm-client), which is codded as a singleton. It
-instantiates DocumentStore object to set up connection with the Server and download various configuration metadata.
+The focal point is the RavenDB Java connector, which is added as a dependency to pom.xml. 
+```
+<dependency>
+  <groupId>net.ravendb</groupId>
+  <artifactId>ravendb</artifactId>
+  <version>4.0.5</version>
+</dependency>
+```
+It provides  the main API object document store, which sets up connection with the Server and downloads various configuration metadata.
 The DocumentStore is capable of working with multiple databases and for proper operation it is recommend having only one instance of it per application.
 ```java
 public enum RavenDBDocumentStore {
@@ -157,12 +97,14 @@ INSTANCE;
 	
 	private static IDocumentStore store;
 
-    static {
-        store = new DocumentStore("http://127.0.0.1:18080", "Hospital");
+    static {    
+        store = new DocumentStore(
+	new String[]{ "http://127.0.0.1:18080" /*,"http://127.0.0.1:18081","http://127.0.0.1:18082"*/}, 
+	"Hospital");
+        store.initialize();
     }
 
-    public IDocumentStore getStore() {
-    	store.initialize();
+    public IDocumentStore getStore() {    	
         return store;
     }
 }
