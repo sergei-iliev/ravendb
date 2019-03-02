@@ -34,26 +34,7 @@ In RavenDB, a domain object is mapped to a single document. In this regard there
 
 1. Patient - stored as a separate collection
 ```java
-public class Patient implements Serializable{
-    public enum Gender{
-    	MALE,
-    	FEMALE;
-        
-    	@JsonCreator
-        public static Gender convert(String status){
-            if(status==null){
-                return Gender.MALE;
-            }
-            
-            return Gender.valueOf(status);
-        }
-        
-        @JsonValue
-        public String getGender() {        
-            return this.toString();
-        }    	
-    }
-	
+public class Patient {
         private String id;
 	private String firstName,lastName;
 	private Date birthDate;
@@ -62,8 +43,6 @@ public class Patient implements Serializable{
 	private String email;
 	private Address address;
 	private List<Visit> visits;
-	@JsonIgnore
-	private Attachment attachment;
   
   ......
   
@@ -71,61 +50,20 @@ public class Patient implements Serializable{
 ```  
 2. Visist - stored as an array in Patient collection  
 ```java
-public class Visit implements Serializable{
-    public enum Type{
-    	HOUSE,
-    	EMERGENCYROOM,
-    	HOSPITAL;
-        
-    	@JsonCreator
-        public static Type convert(String type){
-            if(type==null){
-                return Type.HOUSE;
-            }
-            
-            return Type.valueOf(type);
-        }
-        
-        @JsonValue
-        public String getType() {        
-            return this.toString();
-        }    	
-    }
-	
-    	
+public class Visit{
 	private Date date;
 	private String doctorId;	
 	private Type type;
 	private String visitSummery;
 	private String conditionId;
-	@JsonIgnore
-	private Doctor doctor;
 	private String doctorName;
-	@JsonIgnore
-	private Condition condition;
+
 .............
 }	
 ```
 3. Condition - list of available conditions
 ```java
-public class Condition implements Serializable{
-	public enum Type{
-		SEVIER,MINOR,CHRONIC,NORMAL;
-    	@JsonCreator
-        public static Type convert(String status){
-            if(status==null){
-                return Type.NORMAL;
-            }
-            
-            return Type.valueOf(status);
-        }
-        
-        @JsonValue
-        public String getType() {        
-            return this.toString();
-        }  
-	}
-	
+public class Condition {
 	private String id;
 	private Type severity;
 	private String prescription;
@@ -136,7 +74,7 @@ public class Condition implements Serializable{
 ```
 4. Doctor - stored in a separate collection
 ```java
-public class Doctor implements Serializable{
+public class Doctor{
     private String id;
     private String name;
     private String department;
