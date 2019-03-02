@@ -89,7 +89,7 @@ The focal point is the RavenDB Java connector, which is added as a dependency to
   <version>4.0.5</version>
 </dependency>
 ```
-It provides  the main API object document store, which sets up connection with the Server and download various configuration metadata.
+It provides  the main API object document store, which sets up connection with the Server and downloads various configuration metadata.
 The DocumentStore is capable of working with multiple databases and for proper operation it is recommend having only one instance of it per application.
 ```java
 public enum RavenDBDocumentStore {
