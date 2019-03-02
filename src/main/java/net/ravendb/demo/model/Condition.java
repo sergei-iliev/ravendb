@@ -6,23 +6,9 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonValue;
 
+import net.ravendb.demo.assets.Type;
+
 public class Condition{
-	public enum Type{
-		SEVIER,MINOR,CHRONIC,NORMAL;
-    	@JsonCreator
-        public static Type convert(String status){
-            if(status==null){
-                return Type.NORMAL;
-            }
-            
-            return Type.valueOf(status);
-        }
-        
-        @JsonValue
-        public String getType() {        
-            return this.toString();
-        }  
-	}
 	
 	private String id;
 	private Type severity;

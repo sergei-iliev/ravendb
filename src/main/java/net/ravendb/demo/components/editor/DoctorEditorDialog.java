@@ -1,40 +1,15 @@
 package net.ravendb.demo.components.editor;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Iterator;
-
-import javax.imageio.ImageIO;
-import javax.imageio.ImageReader;
-import javax.imageio.stream.ImageInputStream;
-
-import org.apache.commons.io.IOUtils;
-
-import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.ClickEvent;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
-import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.formlayout.FormLayout;
-import com.vaadin.flow.component.html.Image;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.component.upload.SucceededEvent;
-import com.vaadin.flow.component.upload.Upload;
-import com.vaadin.flow.component.upload.receivers.MemoryBuffer;
 import com.vaadin.flow.data.converter.StringToIntegerConverter;
-import com.vaadin.flow.server.StreamResource;
 
-import net.ravendb.demo.command.Attachment;
 import net.ravendb.demo.model.Doctor;
-import net.ravendb.demo.model.Patient;
-import net.ravendb.demo.model.Patient.Gender;
-import net.ravendb.demo.model.Visit;
 import net.ravendb.demo.presenters.DoctorViewable.DoctorViewListener;
-import net.ravendb.demo.presenters.PatientViewable.PatientViewListener;
-import net.ravendb.demo.presenters.PatientVisitViewable.PatientVisitViewListener;
 
 public class DoctorEditorDialog extends AbstractEditorDialog<Doctor>{
 

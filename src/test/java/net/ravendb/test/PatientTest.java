@@ -13,10 +13,10 @@ import org.junit.Test;
 import net.ravendb.client.documents.operations.attachments.AttachmentName;
 import net.ravendb.client.documents.operations.attachments.CloseableAttachmentResult;
 import net.ravendb.client.documents.session.IDocumentSession;
+import net.ravendb.demo.assets.Gender;
 import net.ravendb.demo.db.RavenDBDocumentStore;
 import net.ravendb.demo.model.Address;
 import net.ravendb.demo.model.Patient;
-import net.ravendb.demo.model.Patient.Gender;
 import net.ravendb.demo.presenters.PatientPresenter;
 
 public class PatientTest {
@@ -87,23 +87,23 @@ public class PatientTest {
 			   session.saveChanges();			   
 	       }
 	}
-	@Test
-	public void testPatientList() {
-       PatientPresenter presenter=new PatientPresenter(null);
-       
-       Collection<Patient> p= presenter.getPatientsList(0,5,false);
-       p.forEach(pp->{
-    	   System.out.println(pp.getBirthDate());;
-       });
-	}	
-	@Test
-	public void testPatientSearch() {
-       PatientPresenter presenter=new PatientPresenter(null);
-       Collection<Patient> p= presenter.searchPatientsList(0,10,"ser",true);
-       p.forEach(pp->{
-    	   System.out.println(pp.getBirthDate());;
-       });
-	}	
+//	@Test
+//	public void testPatientList() {
+//       PatientPresenter presenter=new PatientPresenter();
+//       
+//       Collection<Patient> p= presenter.getPatientsList(0,5,false);
+//       p.forEach(pp->{
+//    	   System.out.println(pp.getBirthDate());;
+//       });
+//	}	
+//	@Test
+//	public void testPatientSearch() {
+//       PatientPresenter presenter=new PatientPresenter();
+//       Collection<Patient> p= presenter.searchPatientsList(0,10,"ser",true);
+//       p.forEach(pp->{
+//    	   System.out.println(pp.getBirthDate());;
+//       });
+//	}	
 	
 	@Test
 	public void testGeneratePatients() {

@@ -7,7 +7,9 @@ import java.util.Date;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import net.ravendb.demo.model.Visit.Type;
+import net.ravendb.demo.assets.Location;
+
+
 
 public class PatientVisit {
 
@@ -16,7 +18,7 @@ public class PatientVisit {
 	private Date date;
 	private String doctorName;
 	private String visitSummery;
-	private Type type;
+	private Location type;
 	private String conditionId;
 	
 	
@@ -64,10 +66,10 @@ public class PatientVisit {
 		this.doctorName = doctorName;
 	}
 	
-	public Type getType() {
+	public Location getType() {
 		return type;
 	}
-	public void setType(Type type) {
+	public void setType(Location type) {
 		this.type = type;
 	}
 	@JsonIgnore

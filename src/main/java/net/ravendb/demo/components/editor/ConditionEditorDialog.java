@@ -7,6 +7,7 @@ import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.textfield.TextField;
 
+import net.ravendb.demo.assets.Type;
 import net.ravendb.demo.model.Condition;
 import net.ravendb.demo.presenters.ConditionViewable.ConditionViewListener;
 
@@ -39,8 +40,8 @@ public class ConditionEditorDialog extends AbstractEditorDialog<Condition>{
         
 
 
-        ComboBox<Condition.Type> type=new ComboBox<>();
-        type.setItems(Condition.Type.values());
+        ComboBox<Type> type=new ComboBox<>();
+        type.setItems(Type.values());
         binder.forField(type).bind(Condition::getSeverity,Condition::setSeverity);
         layout.addFormItem(type, "Severity");
         

@@ -12,6 +12,7 @@ import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 
+import net.ravendb.demo.assets.Location;
 import net.ravendb.demo.command.ComboValue;
 import net.ravendb.demo.model.Condition;
 import net.ravendb.demo.model.Visit;
@@ -52,8 +53,8 @@ public class PatientVisitEditorDialog extends AbstractEditorDialog<Visit>{
         binder.forField(date).bind(Visit::getLocalDate, Visit::setLocalDate);
         layout.addFormItem(date,"Date");
 
-        ComboBox<Visit.Type> type=new ComboBox<>();
-        type.setItems(Visit.Type.values());
+        ComboBox<Location> type=new ComboBox<>();
+        type.setItems(Location.values());
         binder.forField(type).bind(Visit::getType,Visit::setType);
         layout.addFormItem(type, "Type");
         

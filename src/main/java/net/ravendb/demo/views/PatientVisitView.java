@@ -2,35 +2,24 @@ package net.ravendb.demo.views;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.net.URLEncoder;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
-import java.util.HashMap;
-import java.util.Map;
-
-import org.claspina.confirmdialog.ButtonOption;
-import org.claspina.confirmdialog.ConfirmDialog;
 
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.KeyDownEvent;
-import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.SelectionMode;
-import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.H4;
 import com.vaadin.flow.component.html.H5;
-import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.data.provider.DataProvider;
-import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.renderer.LocalDateRenderer;
 import com.vaadin.flow.router.BeforeEvent;
 import com.vaadin.flow.router.HasUrlParameter;
@@ -39,19 +28,11 @@ import com.vaadin.flow.router.Route;
 
 import net.ravendb.demo.RavenDBApp;
 import net.ravendb.demo.command.PatientVisit;
-import net.ravendb.demo.components.editor.AddressEditorDialog;
-import net.ravendb.demo.components.editor.ConditionEditorDialog;
-import net.ravendb.demo.components.editor.PatientEditorDialog;
 import net.ravendb.demo.components.editor.PatientVisitEditorDialog;
-import net.ravendb.demo.model.Condition;
 import net.ravendb.demo.model.Patient;
-import net.ravendb.demo.model.Patient.Gender;
 import net.ravendb.demo.model.Visit;
-import net.ravendb.demo.presenters.ConditionPresenter;
-import net.ravendb.demo.presenters.PatientPresenter;
 import net.ravendb.demo.presenters.PatientVisitPresenter;
 import net.ravendb.demo.presenters.PatientVisitViewable;
-import net.ravendb.demo.presenters.PatientVisitViewable.PatientVisitViewListener;
 
 @Route(value="patientvisit",layout=RavenDBApp.class)
 @PageTitle(value = "Hospital Management")

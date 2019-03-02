@@ -34,10 +34,10 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
 import net.ravendb.demo.RavenDBApp;
+import net.ravendb.demo.assets.Gender;
 import net.ravendb.demo.components.editor.AddressEditorDialog;
 import net.ravendb.demo.components.editor.PatientEditorDialog;
 import net.ravendb.demo.model.Patient;
-import net.ravendb.demo.model.Patient.Gender;
 import net.ravendb.demo.presenters.PatientPresenter;
 import net.ravendb.demo.presenters.PatientViewable;
 
@@ -213,7 +213,7 @@ public class PatientView extends VerticalLayout implements PatientViewable {
 				visits.setEnabled(false);
 			}
 		});
-		grid.setHeightByRows(true);
+		
 		return grid;
 	}
 
@@ -226,6 +226,7 @@ public class PatientView extends VerticalLayout implements PatientViewable {
 	}
 
 	private DataProvider<Patient, Void> listDataProvider(boolean sort) {
+		int count= presenter.getPatientsList(0,0, false).getValue();
 		DataProvider<Patient, Void> dataProvider = DataProvider.fromCallbacks(
 				// First callback fetches items based on a query
 				query -> {
@@ -234,15 +235,16 @@ public class PatientView extends VerticalLayout implements PatientViewable {
 					// The number of items to load
 					int limit = query.getLimit();
 
-					return presenter.getPatientsList(offset, limit, sort).stream();
+					return presenter.getPatientsList(offset, limit, sort).getKey().stream();
 				},
 				// Second callback fetches the number of items for a query
-				query -> presenter.getPatientsCount());
+				query ->count);
 
 		return dataProvider;
 	}
 
 	private DataProvider<Patient, Void> searchDataProvider(String term, boolean sort) {
+		int count = presenter.searchPatientsList(0,0,term,false).getValue();
 		DataProvider<Patient, Void> dataProvider = DataProvider.fromCallbacks(
 				// First callback fetches items based on a query
 				query -> {
@@ -251,10 +253,10 @@ public class PatientView extends VerticalLayout implements PatientViewable {
 					// The number of items to load
 					int limit = query.getLimit();
 
-					return presenter.searchPatientsList(offset, limit, term, sort).stream();
+					return presenter.searchPatientsList(offset, limit, term, sort).getKey().stream();
 				},
 				// Second callback fetches the number of items for a query
-				query -> presenter.searchPatientsCount(term));
+				query ->  count);
 
 		return dataProvider;
 	}

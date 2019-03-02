@@ -1,36 +1,15 @@
 package net.ravendb.demo.components.editor;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Iterator;
-
-import javax.imageio.ImageIO;
-import javax.imageio.ImageReader;
-import javax.imageio.stream.ImageInputStream;
-
-import org.apache.commons.io.IOUtils;
-
 import com.vaadin.flow.component.ClickEvent;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
-import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.formlayout.FormLayout;
-import com.vaadin.flow.component.html.Image;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.orderedlayout.FlexComponent.JustifyContentMode;
 import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.component.upload.SucceededEvent;
-import com.vaadin.flow.component.upload.Upload;
-import com.vaadin.flow.component.upload.receivers.FileBuffer;
-import com.vaadin.flow.component.upload.receivers.MemoryBuffer;
 import com.vaadin.flow.data.binder.Binder;
-import com.vaadin.flow.server.StreamResource;
 
 import net.ravendb.demo.model.Address;
 import net.ravendb.demo.model.Patient;
-import net.ravendb.demo.model.Patient.Gender;
 import net.ravendb.demo.presenters.PatientViewable.PatientViewListener;
 
 public class AddressEditorDialog extends AbstractEditorDialog<Patient>{

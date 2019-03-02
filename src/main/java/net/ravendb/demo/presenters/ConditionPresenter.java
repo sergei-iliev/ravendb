@@ -1,21 +1,12 @@
 package net.ravendb.demo.presenters;
 
 import java.util.Collection;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
-import net.ravendb.client.documents.queries.IndexQuery;
 import net.ravendb.client.documents.session.IDocumentQuery;
 import net.ravendb.client.documents.session.IDocumentSession;
-import net.ravendb.demo.command.PatientVisit;
 import net.ravendb.demo.db.RavenDBDocumentStore;
 import net.ravendb.demo.model.Condition;
 import net.ravendb.demo.model.Patient;
-import net.ravendb.demo.model.Visit;
-import net.ravendb.demo.model.Visit.Type;
 import net.ravendb.demo.presenters.ConditionViewable.ConditionViewListener;
 
 public class ConditionPresenter implements ConditionViewListener {

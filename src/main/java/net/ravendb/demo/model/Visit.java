@@ -1,43 +1,19 @@
 package net.ravendb.demo.model;
 
-import java.io.Serializable;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Date;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonValue;
 
+import net.ravendb.demo.assets.Location;
 import net.ravendb.demo.command.ComboValue;
-import net.ravendb.demo.model.Patient.Gender;
 
-public class Visit implements Serializable{
-    public enum Type{
-    	HOUSE,
-    	EMERGENCYROOM,
-    	HOSPITAL;
-        
-    	@JsonCreator
-        public static Type convert(String type){
-            if(type==null){
-                return Type.HOUSE;
-            }
-            
-            return Type.valueOf(type);
-        }
-        
-        @JsonValue
-        public String getType() {        
-            return this.toString();
-        }    	
-    }
-	
-    	
+public class Visit{	
 	private Date date;
 	private String doctorId;	
-	private Type type;
+	private Location type;
 	private String visitSummery;
 	private String conditionId;
 	private Doctor doctor;
@@ -79,10 +55,10 @@ public class Visit implements Serializable{
 	public void setConditionId(String conditionId) {
 		this.conditionId = conditionId;
 	}
-	public Type getType() {
+	public Location getType() {
 		return type;
 	}
-	public void setType(Type type) {
+	public void setType(Location type) {
 		this.type = type;
 	}
 	

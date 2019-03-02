@@ -1,7 +1,5 @@
 package net.ravendb.demo.components.editor;
 
-import java.io.Serializable;
-
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.ClickEvent;
 import com.vaadin.flow.component.Component;

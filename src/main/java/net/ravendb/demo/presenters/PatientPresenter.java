@@ -5,12 +5,16 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 
 import net.ravendb.client.documents.operations.attachments.AttachmentName;
 import net.ravendb.client.documents.operations.attachments.CloseableAttachmentResult;
 import net.ravendb.client.documents.session.IDocumentQuery;
 import net.ravendb.client.documents.session.IDocumentSession;
+import net.ravendb.client.documents.session.QueryStatistics;
 import net.ravendb.client.exceptions.ConcurrencyException;
+import net.ravendb.client.primitives.Reference;
 import net.ravendb.demo.command.Attachment;
 import net.ravendb.demo.db.RavenDBDocumentStore;
 import net.ravendb.demo.model.Address;
@@ -25,22 +29,26 @@ public class PatientPresenter implements PatientViewListener {
 
 	}
 
-	@Override
-	public int getPatientsCount() {
-		return session.query(Patient.class).count();
-	}
+//	@Override
+//	public int getPatientsCount() {
+//		return session.query(Patient.class).count();
+//	}
 
 	@Override
-	public Collection<Patient> getPatientsList(int offset, int limit, boolean order) {
+	public Pair<Collection<Patient>,Integer> getPatientsList(int offset, int limit, boolean order) {
 		Collection<Patient> list = null;
-
+		
+		Reference<QueryStatistics> statsRef = new Reference<>();
+		
 		if (order) {
 			IDocumentQuery<Patient> query = session.query(Patient.class);
-			list = query.orderBy("birthDate").skip(offset).take(limit).toList();
+			list = query.orderBy("birthDate").skip(offset).take(limit).statistics(statsRef).toList();
 		} else {
 			IDocumentQuery<Patient> query = session.query(Patient.class);
-			list = query.skip(offset).take(limit).toList();
+			list = query.skip(offset).take(limit).statistics(statsRef).toList();
 		}
+		
+		int totalResults = statsRef.value.getTotalResults();
 
 		for (Patient patient : list) {
 			AttachmentName[] names = session.advanced().attachments().getNames(patient);
@@ -59,25 +67,28 @@ public class PatientPresenter implements PatientViewListener {
 
 			}
 		}
-		return list;
+		return new ImmutablePair<Collection<Patient>, Integer>(list, totalResults);
 	}
 
-	@Override
-	public int searchPatientsCount(String term) {
-		return session.query(Patient.class).whereStartsWith("firstName", term).count();
-	}
+//	@Override
+//	public int searchPatientsCount(String term) {
+//		return session.query(Patient.class).whereStartsWith("firstName", term).count();
+//	}
 
 	@Override
-	public Collection<Patient> searchPatientsList(int offset, int limit, String term, boolean order) {
+	public Pair<Collection<Patient>,Integer>  searchPatientsList(int offset, int limit, String term, boolean order) {
 		IDocumentQuery<Patient> query = session.query(Patient.class).whereStartsWith("firstName", term);
 
 		Collection<Patient> list;
+		Reference<QueryStatistics> statsRef = new Reference<>();
 		if (order) {
-			list = query.skip(offset).take(limit).orderBy("birthDate").toList();
+			list = query.skip(offset).take(limit).orderBy("birthDate").statistics(statsRef).toList();
 		} else {
-			list = query.skip(offset).take(limit).toList();
+			list = query.skip(offset).take(limit).statistics(statsRef).toList();
 		}
-
+		
+		int totalResults = statsRef.value.getTotalResults();
+		
 		for (Patient patient : list) {
 			AttachmentName[] names = session.advanced().attachments().getNames(patient);
 			if (names.length > 0) {
@@ -95,7 +106,7 @@ public class PatientPresenter implements PatientViewListener {
 
 			}
 		}
-		return list;
+		return new ImmutablePair<Collection<Patient>, Integer>(list, totalResults);
 
 	}
 
@@ -116,7 +127,7 @@ public class PatientPresenter implements PatientViewListener {
 		}
 		
 		session.saveChanges();
-
+		session.advanced().clear();
 	}
 
 	@Override

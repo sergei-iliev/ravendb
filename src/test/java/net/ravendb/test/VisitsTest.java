@@ -10,14 +10,13 @@ import java.util.stream.Collectors;
 import org.junit.Test;
 
 import net.ravendb.client.documents.session.IDocumentSession;
+import net.ravendb.demo.assets.Location;
 import net.ravendb.demo.command.DoctorVisit;
 import net.ravendb.demo.command.PatientVisit;
 import net.ravendb.demo.db.RavenDBDocumentStore;
 import net.ravendb.demo.model.Doctor;
 import net.ravendb.demo.model.Patient;
 import net.ravendb.demo.model.Visit;
-import net.ravendb.demo.model.Visit.Type;
-import net.ravendb.demo.presenters.PatientPresenter;
 import net.ravendb.demo.presenters.PatientVisitPresenter;
 import net.ravendb.demo.presenters.VisitsPresenter;
 
@@ -25,7 +24,7 @@ public class VisitsTest {
 
 	@Test
 	public void testVisitCreate() {
-	   PatientVisitPresenter presenter=new PatientVisitPresenter(null);
+	   PatientVisitPresenter presenter=new PatientVisitPresenter();
 	   Patient patient=presenter.getPatientById("patients/3500-A");
 	   
 	   
@@ -35,7 +34,7 @@ public class VisitsTest {
 		   
 		   Visit v=new Visit();
 	       v.setDate(new Date());
-	       v.setType(Type.EMERGENCYROOM);
+	       v.setType(Location.EMERGENCYROOM);
 	       v.setVisitSummery("minor headache");
 		   presenter.save(patient.getId(),v);
 		   
@@ -66,7 +65,7 @@ public class VisitsTest {
 	
 	@Test
 	public void testGetPatientsVisitList() {
-		   VisitsPresenter presenter=new VisitsPresenter(null);
+		   VisitsPresenter presenter=new VisitsPresenter();
 		   presenter.getVisistsList(0,1000,true);
 		   
 	}
@@ -87,14 +86,14 @@ public class VisitsTest {
 	@Test
 	public void testDoctorsList() {
        
-         PatientVisitPresenter p=new PatientVisitPresenter(null);
+         PatientVisitPresenter p=new PatientVisitPresenter();
          p.getDoctorsList();
 	}
 	
 	@Test
 	public void testVisistsList() {
        
-         PatientVisitPresenter p=new PatientVisitPresenter(null);
+         PatientVisitPresenter p=new PatientVisitPresenter();
          Collection<PatientVisit> visits=p.getVisistsList("patients/321-A","s",false);
          visits.forEach(v->{
         	 System.out.println(v.getFirstName()+"::"+v.getDoctorName()+"::"+ v.getType());;

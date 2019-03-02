@@ -28,9 +28,9 @@ import com.vaadin.flow.component.upload.receivers.MemoryBuffer;
 import com.vaadin.flow.server.StreamResource;
 
 import net.ravendb.client.exceptions.ConcurrencyException;
+import net.ravendb.demo.assets.Gender;
 import net.ravendb.demo.command.Attachment;
 import net.ravendb.demo.model.Patient;
-import net.ravendb.demo.model.Patient.Gender;
 import net.ravendb.demo.presenters.PatientViewable.PatientViewListener;
 
 public class PatientEditorDialog extends AbstractEditorDialog<Patient>{
@@ -103,7 +103,7 @@ public class PatientEditorDialog extends AbstractEditorDialog<Patient>{
                 .bind(Patient::getEmail, Patient::setEmail);
         layout.addFormItem(email, "Email");
         
-        ComboBox<Patient.Gender> gender=new ComboBox<>();
+        ComboBox<Gender> gender=new ComboBox<>();
         gender.setItems(Gender.values());
         binder.forField(gender).bind(Patient::getGender,Patient::setGender);
         layout.addFormItem(gender, "Gender");

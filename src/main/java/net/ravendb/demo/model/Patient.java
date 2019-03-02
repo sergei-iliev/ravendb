@@ -13,27 +13,10 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonValue;
 
+import net.ravendb.demo.assets.Gender;
 import net.ravendb.demo.command.Attachment;
 
 public class Patient implements Cloneable{
-    public enum Gender{
-    	MALE,
-    	FEMALE;
-        
-    	@JsonCreator
-        public static Gender convert(String status){
-            if(status==null){
-                return Gender.MALE;
-            }
-            
-            return Gender.valueOf(status);
-        }
-        
-        @JsonValue
-        public String getGender() {        
-            return this.toString();
-        }    	
-    }
 	
     private String id;
 	private String firstName,lastName;
