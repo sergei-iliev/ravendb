@@ -71,10 +71,10 @@ public class Condition {
 4. Doctor - stored in a separate collection
 ```java
 public class Doctor{
-    private String id;
-    private String name;
-    private String department;
-    private int age; 
+    	private String id;
+    	private String name;
+    	private String department;
+   	private int age; 
  }
  ```
 Each POJO has a property name "id" which will triger the usage RavenDB algorithm of autogenarating Ids. 
@@ -91,7 +91,9 @@ INSTANCE;
 	private static IDocumentStore store;
 
     static {    
-        store = new DocumentStore(new String[]{ "http://127.0.0.1:18080" /*,"http://127.0.0.1:18081","http://127.0.0.1:18082"*/}, "Hospital");
+        store = new DocumentStore(
+	new String[]{ "http://127.0.0.1:18080" /*,"http://127.0.0.1:18081","http://127.0.0.1:18082"*/}, 
+	"Hospital");
         store.initialize();
     }
 
