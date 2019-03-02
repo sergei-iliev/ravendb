@@ -44,8 +44,6 @@ public class Patient {
 	private Address address;
 	private List<Visit> visits;
   
-  ......
-  
   }
 ```  
 2. Visist - stored as an array in Patient collection  
@@ -58,7 +56,6 @@ public class Visit{
 	private String conditionId;
 	private String doctorName;
 
-.............
 }	
 ```
 3. Condition - list of available conditions
@@ -69,7 +66,6 @@ public class Condition {
 	private String prescription;
 	private String description;
 
-..........
 }
 ```
 4. Doctor - stored in a separate collection
@@ -78,8 +74,7 @@ public class Doctor{
     private String id;
     private String name;
     private String department;
-    private int age;
- ........  
+    private int age; 
  }
  ```
 Each POJO has a property name "id" which will triger the usage RavenDB algorithm of autogenarating Ids. 
