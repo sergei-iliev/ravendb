@@ -1,4 +1,4 @@
-# Sample Hospital Management web application
+# RavenDB Hospital tutorial
 RavenDB is an open-source NoSQL document store database. It is fully transactional,multi-platform and high availability distributed data store which support clients for a varity of programming languages including Java.
 The following sample Hospital Management app is built upon the dynamic document based structure that RavenDB represents.
 It uses RavenDB Java client to communicate with the document store.
