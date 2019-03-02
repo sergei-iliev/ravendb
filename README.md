@@ -81,8 +81,15 @@ Each POJO has a property name "id" which will triger the usage RavenDB algorithm
 The convention is that entities get the identifiers in the following format collection/number-tag so the programmer is not concerned with the uniqueness of each document in a collection.
 
 ## RavenDB connector
-The focal point is the [RavenDB Java connector](https://github.com/ravendb/ravendb-jvm-client), which is codded as a singleton. It
-instantiates DocumentStore object to set up connection with the Server and download various configuration metadata.
+The focal point is the RavenDB Java connector, which is added as a dependency to pom.xml. 
+```
+<dependency>
+  <groupId>net.ravendb</groupId>
+  <artifactId>ravendb</artifactId>
+  <version>4.0.5</version>
+</dependency>
+```
+It provides  the main API object document store, which sets up connection with the Server and download various configuration metadata.
 The DocumentStore is capable of working with multiple databases and for proper operation it is recommend having only one instance of it per application.
 ```java
 public enum RavenDBDocumentStore {
