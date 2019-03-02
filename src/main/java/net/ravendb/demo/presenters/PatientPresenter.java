@@ -46,7 +46,7 @@ public class PatientPresenter implements PatientViewListener {
 			AttachmentName[] names = session.advanced().attachments().getNames(patient);
 			if (names.length > 0) {
 				try (CloseableAttachmentResult result = session.advanced().attachments().get(patient,
-						names[0].getName())) {
+						names[0].getName())) {					
 					Attachment attachment = new Attachment();
 					attachment.setName(names[0].getName());
 					attachment.setMimeType(names[0].getContentType());
@@ -114,6 +114,7 @@ public class PatientPresenter implements PatientViewListener {
 			session.advanced().attachments().store(patient, patient.getAttachment().getName(),
 					patient.getAttachment().getInputStream(), patient.getAttachment().getMimeType());
 		}
+		
 		session.saveChanges();
 
 	}
@@ -137,7 +138,7 @@ public class PatientPresenter implements PatientViewListener {
 		}
 
 		session.saveChanges();
-
+		session.advanced().clear();
 	}
 
 	@Override

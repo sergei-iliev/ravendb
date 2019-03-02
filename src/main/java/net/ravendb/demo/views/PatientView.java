@@ -213,6 +213,7 @@ public class PatientView extends VerticalLayout implements PatientViewable {
 				visits.setEnabled(false);
 			}
 		});
+		grid.setHeightByRows(true);
 		return grid;
 	}
 
