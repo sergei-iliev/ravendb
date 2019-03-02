@@ -90,12 +90,12 @@ INSTANCE;
 	
 	private static IDocumentStore store;
 
-    static {
-        store = new DocumentStore("http://127.0.0.1:18080", "Hospital");
+    static {    
+        store = new DocumentStore(new String[]{ "http://127.0.0.1:18080" /*,"http://127.0.0.1:18081","http://127.0.0.1:18082"*/}, "Hospital");
+        store.initialize();
     }
 
-    public IDocumentStore getStore() {
-    	store.initialize();
+    public IDocumentStore getStore() {    	
         return store;
     }
 }
