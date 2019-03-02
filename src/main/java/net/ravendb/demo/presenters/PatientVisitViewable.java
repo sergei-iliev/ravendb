@@ -24,5 +24,8 @@ public interface PatientVisitViewable {
 	  Patient getPatientById(String id);
 	  Collection<Doctor> getDoctorsList();
 	  Collection<Condition> getConditionsList();
+	  
+	  void openSession();
+	  void releaseSession();
 	}
 }

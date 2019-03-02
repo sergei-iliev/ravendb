@@ -5,6 +5,7 @@ import org.claspina.confirmdialog.ConfirmDialog;
 
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.DetachEvent;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.SelectionMode;
@@ -34,11 +35,18 @@ public class DoctorView extends VerticalLayout implements DoctorViewable{
 		   presenter=new DoctorPresenter();  
 		   init();	
 	}
-	
 	@Override
-	protected void onAttach(AttachEvent attachEvent) {	
+	protected void onAttach(AttachEvent attachEvent) {
+		presenter.openSession();
 		load();
 	}
+
+	@Override
+	protected void onDetach(DetachEvent detachEvent) {
+		presenter.releaseSession();
+		super.onDetach(detachEvent);
+	}
+
 	private void init(){
 		this.setWidth("100%");
 		H4 title = new H4("Doctors");	

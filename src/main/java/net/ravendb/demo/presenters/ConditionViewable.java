@@ -16,6 +16,9 @@ public interface ConditionViewable {
 	    
 	    Collection<Condition> getConditionsList(int offset,int limit,String term);
 	    int getConditionsCount(String term);
+	    
+		  void openSession();
+		  void releaseSession();
 	}
 	
 	

@@ -18,5 +18,8 @@ public interface DoctorViewable {
 	  void delete(Doctor doctor);
 	  
 	  Collection<DoctorVisit>  getDoctorVisitsList();
+	  
+	  void openSession();
+	  void releaseSession();
 	}
 }

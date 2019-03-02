@@ -6,6 +6,7 @@ import java.time.format.FormatStyle;
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentEventListener;
+import com.vaadin.flow.component.DetachEvent;
 import com.vaadin.flow.component.KeyDownEvent;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.grid.Grid;
@@ -42,11 +43,18 @@ public class VisitsView extends VerticalLayout implements  VisitsViewable{
 	   presenter=new VisitsPresenter();  
 	   init();	
 	}
-
 	@Override
 	protected void onAttach(AttachEvent attachEvent) {
+		presenter.openSession();
 		load();
 	}
+
+	@Override
+	protected void onDetach(DetachEvent detachEvent) {
+		presenter.releaseSession();
+		super.onDetach(detachEvent);
+	}
+
 	private void init(){
 		this.setWidth("100%");
 		H4 title = new H4("Visits");	

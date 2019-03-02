@@ -16,6 +16,7 @@ import net.ravendb.demo.presenters.DoctorViewable.DoctorViewListener;
 
 public class DoctorPresenter implements DoctorViewListener {
 
+	private IDocumentSession session;
 
 	public DoctorPresenter() {
 
@@ -23,54 +24,54 @@ public class DoctorPresenter implements DoctorViewListener {
 
 	@Override
 	public Collection<Doctor> getDoctorsList() {
-		   try (IDocumentSession session = RavenDBDocumentStore.INSTANCE.getStore().openSession()) {
-			   return session.query(Doctor.class).toList();
-		   }
+		return session.query(Doctor.class).toList();
 	}
 
 	@Override
 	public Collection<String> getDepartments() {
-		return Arrays.asList("LV", "SA", "PO", "BG", "ASU", "VO","RD");
+		return Arrays.asList("LV", "SA", "PO", "BG", "ASU", "VO", "RD");
 
 	}
 
 	@Override
 	public void save(Doctor doctor) {
-		   try (IDocumentSession session = RavenDBDocumentStore.INSTANCE.getStore().openSession()) {
-			   session.store(doctor);
-			   session.saveChanges();			   
-	       }	
+		session.store(doctor);
+		session.saveChanges();
+
 	}
 
 	@Override
 	public void delete(Doctor doctor) {
-			 try (IDocumentSession session = RavenDBDocumentStore.INSTANCE.getStore().openSession()) {
-		           session.delete(doctor.getId());
-		           session.saveChanges();
-		     }
+
+		session.delete(doctor.getId());
+		session.saveChanges();
+
 	}
-	
+
 	@Override
 	public Collection<DoctorVisit> getDoctorVisitsList() {
-		   try (IDocumentSession session = RavenDBDocumentStore.INSTANCE.getStore().openSession()) {
-			   List<DoctorVisit> results =session.advanced().documentQuery(Patient.class)
-					   .groupBy("visits[].doctorId")
-					   .selectKey("visits[].doctorId", "doctorId")							   
-                       .selectCount()
-                       .whereNotEquals("doctorId",null)
-                       .orderByDescending("count")
-                       .ofType(DoctorVisit.class)
-                       .toList();
-			 //fetch doctors by batch  
-			 Set<String> doctorIds=results.stream().map(p->p.getDoctorId()).collect(Collectors.toSet());
-			 Map<String,Doctor> map= session.load(Doctor.class,doctorIds);
-			   
-			 results.forEach(v->{ 
-			  v.setDoctorName(map.get(v.getDoctorId()).getName());	 	           
-			 });
-			 assert (session.advanced().getNumberOfRequests()==1);
-			 return results;
-		   }
-		   
+		List<DoctorVisit> results = session.advanced().documentQuery(Patient.class).groupBy("visits[].doctorId")
+				.selectKey("visits[].doctorId", "doctorId").selectCount().whereNotEquals("doctorId", null)
+				.orderByDescending("count").ofType(DoctorVisit.class).toList();
+		// fetch doctors by batch
+		Set<String> doctorIds = results.stream().map(p -> p.getDoctorId()).collect(Collectors.toSet());
+		Map<String, Doctor> map = session.load(Doctor.class, doctorIds);
+
+		results.forEach(v -> {
+			v.setDoctorName(map.get(v.getDoctorId()).getName());
+		});
+		assert (session.advanced().getNumberOfRequests() == 1);
+		return results;
+
+	}
+
+	@Override
+	public void openSession() {
+		session = RavenDBDocumentStore.INSTANCE.getStore().openSession();
+	}
+
+	@Override
+	public void releaseSession() {
+		session.close();
 	}
 }

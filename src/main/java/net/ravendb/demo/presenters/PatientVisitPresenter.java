@@ -1,18 +1,9 @@
 package net.ravendb.demo.presenters;
 
-import java.time.Duration;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 
-import net.ravendb.client.documents.queries.QueryData;
 import net.ravendb.client.documents.session.IDocumentQuery;
 import net.ravendb.client.documents.session.IDocumentSession;
-import net.ravendb.client.documents.session.SessionOptions;
-import net.ravendb.client.primitives.CleanCloseable;
 import net.ravendb.demo.command.PatientVisit;
 import net.ravendb.demo.db.RavenDBDocumentStore;
 import net.ravendb.demo.model.Condition;
@@ -23,7 +14,7 @@ import net.ravendb.demo.presenters.PatientVisitViewable.PatientVisitViewListener
 
 public class PatientVisitPresenter implements PatientVisitViewListener {
 
-
+	private IDocumentSession session;
 	public PatientVisitPresenter() {
 
 	}
@@ -52,8 +43,6 @@ public class PatientVisitPresenter implements PatientVisitViewListener {
 
 	@Override
 	public Collection<PatientVisit> getVisistsList(String patientId,String term,boolean order) {
-		try (IDocumentSession session = RavenDBDocumentStore.INSTANCE.getStore().openSession()) {
-		   try (CleanCloseable cacheScope = session.advanced().getDocumentStore().disableAggressiveCaching()){
 			session.advanced().eagerly().executeAllPendingLazyOperations();
 			Patient patient=session.load(Patient.class, patientId);
 
@@ -84,7 +73,7 @@ public class PatientVisitPresenter implements PatientVisitViewListener {
 			
 			
 			
-		   }	
+		 	
 //			IDocumentQuery<Patient> q=session.query(Patient.class).include("visits[].doctorId")
 //					.whereEquals("id", patientId);
 //			
@@ -123,50 +112,57 @@ public class PatientVisitPresenter implements PatientVisitViewListener {
 //            
 //			return patient.getVisits();
 
-		}
 	}
 
 	@Override
 	public void save(String patientId, Visit visit) {
 		
-		
-		try (IDocumentSession session = RavenDBDocumentStore.INSTANCE.getStore().openSession()) {  
 
 			 Patient patient=session.load(Patient.class, patientId);			
              patient.getVisits().add(visit);
              session.store(patient);
 			 session.saveChanges();
 			 session.advanced().eagerly().executeAllPendingLazyOperations();
-			}
+			
 		
 	}
 
 	@Override
 	public Patient getPatientById(String id) {
-		try (IDocumentSession session = RavenDBDocumentStore.INSTANCE.getStore().openSession()) {
+
 			Patient patient = session.load(Patient.class, id);
 			return patient;
-		}
+		
 
 	}
 
 	@Override
 	public Collection<Doctor> getDoctorsList() {
-		try (IDocumentSession session = RavenDBDocumentStore.INSTANCE.getStore().openSession()) {
+
 			return session.query(Doctor.class).distinct().toList();
-		}
+		
 
 	}
 	@Override
 	public Collection<Condition> getConditionsList() {
-		try (IDocumentSession session = RavenDBDocumentStore.INSTANCE.getStore().openSession()) {
+
 			return session.query(Condition.class).distinct().toList();
-		}
+		
 	}
 	@Override
 	public Condition getConditionById(String conditionId) {
-		try (IDocumentSession session = RavenDBDocumentStore.INSTANCE.getStore().openSession()) {
+
 			return session.load(Condition.class,conditionId);
-		}
+		
+	}
+	
+	@Override
+	public void openSession() {
+		session = RavenDBDocumentStore.INSTANCE.getStore().openSession();
+	}
+
+	@Override
+	public void releaseSession() {
+		session.close();
 	}
 }

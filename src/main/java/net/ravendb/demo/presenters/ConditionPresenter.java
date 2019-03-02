@@ -10,6 +10,7 @@ import net.ravendb.demo.model.Patient;
 import net.ravendb.demo.presenters.ConditionViewable.ConditionViewListener;
 
 public class ConditionPresenter implements ConditionViewListener {
+	private IDocumentSession session;
 
 	public ConditionPresenter() {
 
@@ -17,62 +18,66 @@ public class ConditionPresenter implements ConditionViewListener {
 
 	@Override
 	public void delete(Condition condition) {
-			 try (IDocumentSession session = RavenDBDocumentStore.INSTANCE.getStore().openSession()) {
-		           session.delete(condition.getId());
-		           session.saveChanges();
-		     }			
+		session.delete(condition.getId());
+		session.saveChanges();
+
 	}
+
 	@Override
 	public Patient getPatientById(String id) {
-		try (IDocumentSession session = RavenDBDocumentStore.INSTANCE.getStore().openSession()) {
-			Patient patient = session.load(Patient.class, id);
-			return patient;
-		}
+
+		Patient patient = session.load(Patient.class, id);
+		return patient;
 
 	}
 
 	@Override
 	public void save(Condition condition) {
-		try (IDocumentSession session = RavenDBDocumentStore.INSTANCE.getStore().openSession()) {
-			// clear the session
-			session.advanced().clear();
-			session.store(condition);
-			session.saveChanges();
-		}
+
+		// clear the session
+		session.advanced().clear();
+		session.store(condition);
+		session.saveChanges();
+
 	}
 
 	@Override
-	public Condition getConditionById(String id) {	
+	public Condition getConditionById(String id) {
 		return null;
 	}
 
 	@Override
 	public Collection<Condition> getConditionsList(int offset, int limit, String term) {
-		try (IDocumentSession session = RavenDBDocumentStore.INSTANCE.getStore().openSession()) {
-			IDocumentQuery<Condition> conditions = session.advanced().documentQuery(Condition.class).include("patientId");
-				
-			if(term!=null){
-				conditions.whereStartsWith("description", term);
-			}
-    		conditions.skip(offset)
-    		.take(limit);
-		
-    		return conditions.toList(); 
+		IDocumentQuery<Condition> conditions = session.advanced().documentQuery(Condition.class).include("patientId");
+
+		if (term != null) {
+			conditions.whereStartsWith("description", term);
 		}
+		conditions.skip(offset).take(limit);
+
+		return conditions.toList();
+
 	}
 
 	@Override
 	public int getConditionsCount(String term) {
-		try (IDocumentSession session = RavenDBDocumentStore.INSTANCE.getStore().openSession()) {
-			IDocumentQuery<Condition> conditions = session.advanced().documentQuery(Condition.class);
-				
-			if(term!=null){
-				conditions.whereStartsWith("description", term);
-			}
-    		
-			
-    		return conditions.count();
+		IDocumentQuery<Condition> conditions = session.advanced().documentQuery(Condition.class);
 
+		if (term != null) {
+			conditions.whereStartsWith("description", term);
 		}
+
+		return conditions.count();
+
+	}
+
+	@Override
+	public void openSession() {
+		session = RavenDBDocumentStore.INSTANCE.getStore().openSession();
+	}
+
+	@Override
+	public void releaseSession() {
+		session.close();
 	}
 }

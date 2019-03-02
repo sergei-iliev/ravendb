@@ -5,8 +5,10 @@ import java.net.URLDecoder;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 
+import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentEventListener;
+import com.vaadin.flow.component.DetachEvent;
 import com.vaadin.flow.component.KeyDownEvent;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.checkbox.Checkbox;
@@ -51,11 +53,21 @@ public class PatientVisitView extends VerticalLayout implements  PatientVisitVie
 	   init();	
 	}
 	@Override
+	protected void onAttach(AttachEvent attachEvent) {
+		presenter.openSession();
+		load(patientId);
+	}
+
+	@Override
+	protected void onDetach(DetachEvent detachEvent) {
+		presenter.releaseSession();
+		super.onDetach(detachEvent);
+	}
+	
+	@Override
 	public void setParameter(BeforeEvent event, String id) {
-		
 		try {
 			patientId=URLDecoder.decode(id,"UTF-8");
-			load(patientId);
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		}

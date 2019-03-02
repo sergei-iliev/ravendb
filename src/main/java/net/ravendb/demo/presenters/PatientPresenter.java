@@ -29,11 +29,6 @@ public class PatientPresenter implements PatientViewListener {
 
 	}
 
-//	@Override
-//	public int getPatientsCount() {
-//		return session.query(Patient.class).count();
-//	}
-
 	@Override
 	public Pair<Collection<Patient>,Integer> getPatientsList(int offset, int limit, boolean order) {
 		Collection<Patient> list = null;
@@ -69,11 +64,6 @@ public class PatientPresenter implements PatientViewListener {
 		}
 		return new ImmutablePair<Collection<Patient>, Integer>(list, totalResults);
 	}
-
-//	@Override
-//	public int searchPatientsCount(String term) {
-//		return session.query(Patient.class).whereStartsWith("firstName", term).count();
-//	}
 
 	@Override
 	public Pair<Collection<Patient>,Integer>  searchPatientsList(int offset, int limit, String term, boolean order) {

@@ -10,6 +10,7 @@ import org.claspina.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentEventListener;
+import com.vaadin.flow.component.DetachEvent;
 import com.vaadin.flow.component.KeyDownEvent;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
@@ -53,9 +54,18 @@ public class ConditionView extends VerticalLayout implements ConditionViewable{
 	}
 	
 	@Override
-	protected void onAttach(AttachEvent attachEvent) {	
+	protected void onAttach(AttachEvent attachEvent) {
+		presenter.openSession();
 		load();
 	}
+
+	@Override
+	protected void onDetach(DetachEvent detachEvent) {
+		presenter.releaseSession();
+		super.onDetach(detachEvent);
+	}
+	
+	
 	
 	private void init(){
 		H2 title = new H2("Condition");	
