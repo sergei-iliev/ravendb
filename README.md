@@ -46,7 +46,41 @@ public class Patient {
 	private List<Visit> visits;
   
   }
-```  
+```
+JSON representation of Patient document at RavenDB side
+```JSON
+{
+    "firstName": "Megi",
+    "lastName": "Devasko",
+    "birthDate": "2016-11-30T22:00:00.0000000Z",
+    "gender": "FEMALE",
+    "email": "sss@box.com",
+    "address": null,
+    "visits": [
+        {
+            "date": "2019-02-26T22:00:00.0000000Z",
+            "doctorId": "doctors/1-A",
+            "type": "HOUSE",
+            "visitSummery": "just a mainor pain",
+            "conditionId": "conditions/1-A",
+            "doctorName": "Sergiz Ovesian"
+        },
+        {
+            "date": "2019-01-31T22:00:00.0000000Z",
+            "doctorId": "doctors/2-A",
+            "type": "EMERGENCYROOM",
+            "visitSummery": "never worry",
+            "conditionId": "conditions/2-A",
+            "doctorName": "Megalo Karimov"
+        }
+    ],
+    "@metadata": {
+        "@collection": "Patients",
+        "@flags": "HasAttachments",
+        "Raven-Java-Type": "net.ravendb.demo.model.Patient"
+    }
+}
+```
 2. Visist - stored as an array in Patient collection  
 ```java
 public class Visit{
