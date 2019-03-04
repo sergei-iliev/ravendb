@@ -1,9 +1,5 @@
 package net.ravendb.demo.views;
 
-import java.net.URLEncoder;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.claspina.confirmdialog.ButtonOption;
 import org.claspina.confirmdialog.ConfirmDialog;
 
@@ -12,9 +8,7 @@ import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.DetachEvent;
 import com.vaadin.flow.component.KeyDownEvent;
-import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.SelectionMode;
 import com.vaadin.flow.component.html.H2;
@@ -30,15 +24,9 @@ import com.vaadin.flow.router.Route;
 
 import net.ravendb.demo.RavenDBApp;
 import net.ravendb.demo.components.editor.ConditionEditorDialog;
-import net.ravendb.demo.components.editor.PatientEditorDialog;
-import net.ravendb.demo.components.editor.PatientVisitEditorDialog;
 import net.ravendb.demo.model.Condition;
-import net.ravendb.demo.model.Doctor;
-import net.ravendb.demo.model.Patient;
-import net.ravendb.demo.model.Visit;
 import net.ravendb.demo.presenters.ConditionPresenter;
 import net.ravendb.demo.presenters.ConditionViewable;
-import net.ravendb.demo.presenters.DoctorViewable.DoctorViewListener;
 
 @Route(value="condition",layout=RavenDBApp.class)
 @PageTitle(value = "Hospital Management")
@@ -154,6 +142,7 @@ public class ConditionView extends VerticalLayout implements ConditionViewable{
 
 	}
 	private DataProvider<Condition, Void> listDataProvider(String term) {
+		int count = presenter.getConditionsList(0,0,term).getValue();
 		DataProvider<Condition, Void> dataProvider = DataProvider.fromCallbacks(
 				// First callback fetches items based on a query
 				query -> {
@@ -162,10 +151,10 @@ public class ConditionView extends VerticalLayout implements ConditionViewable{
 					// The number of items to load
 					int limit = query.getLimit();
 
-					return presenter.getConditionsList(offset, limit,term).stream();
+					return presenter.getConditionsList(offset, limit, term).getKey().stream();
 				},
 				// Second callback fetches the number of items for a query
-				query -> presenter.getConditionsCount(term));
+				query -> count);
 
 		return dataProvider;
 	}	

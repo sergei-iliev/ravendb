@@ -1,9 +1,15 @@
 package net.ravendb.demo.presenters;
 
 import java.util.Collection;
+import java.util.List;
+
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 
 import net.ravendb.client.documents.session.IDocumentQuery;
 import net.ravendb.client.documents.session.IDocumentSession;
+import net.ravendb.client.documents.session.QueryStatistics;
+import net.ravendb.client.primitives.Reference;
 import net.ravendb.demo.command.PatientVisit;
 import net.ravendb.demo.db.RavenDBDocumentStore;
 import net.ravendb.demo.model.Patient;
@@ -17,19 +23,20 @@ public class VisitsPresenter implements VisitsViewListener {
 
 	}
 
+//	@Override
+//	public int getVisistsCount() {
+//		return session.advanced().documentQuery(Patient.class)
+//				.groupBy("visits[].doctorName", "visits[].date", "firstName", "lastName")
+//				.selectKey("visits[].doctorName", "doctorName").selectKey("visits[].date", "date")
+//				.selectKey("firstName", "firstName").selectKey("lastName", "lastName").selectCount()
+//				.whereNotEquals("date", null).count();
+//
+//	}
+
 	@Override
-	public int getVisistsCount() {
-		return session.advanced().documentQuery(Patient.class)
-				.groupBy("visits[].doctorName", "visits[].date", "firstName", "lastName")
-				.selectKey("visits[].doctorName", "doctorName").selectKey("visits[].date", "date")
-				.selectKey("firstName", "firstName").selectKey("lastName", "lastName").selectCount()
-				.whereNotEquals("date", null).count();
-
-	}
-
-	@Override
-	public Collection<PatientVisit> getVisistsList(int offset, int limit, boolean order) {
-
+	public Pair<Collection<PatientVisit>,Integer> getVisistsList(int offset, int limit, boolean order) {
+		Reference<QueryStatistics> statsRef = new Reference<>();
+		List<PatientVisit> list;
 		IDocumentQuery<PatientVisit> visits = session.advanced().documentQuery(Patient.class)
 				.groupBy("visits[].doctorName", "visits[].date", "firstName", "lastName", "visits[].visitSummery")
 				.selectKey("visits[].doctorName", "doctorName").selectKey("visits[].date", "date")
@@ -37,26 +44,30 @@ public class VisitsPresenter implements VisitsViewListener {
 				.selectKey("lastName", "lastName").selectCount().ofType(PatientVisit.class).whereNotEquals("date", null)
 				.skip(offset).take(limit);
 		if (order) {
-			return visits.orderByDescending("date").toList();
+			list= visits.orderByDescending("date").statistics(statsRef).toList();
 		} else {
-			return visits.orderBy("date").toList();
+			list= visits.orderBy("date").statistics(statsRef).toList();
 		}
-
+        
+		int totalResults = statsRef.value.getTotalResults();
+		
+		return new ImmutablePair<Collection<PatientVisit>, Integer>(list, totalResults);
 	}
 
+//	@Override
+//	public int searchVisitsCount(String term) {
+//		return session.advanced().documentQuery(Patient.class)
+//				.groupBy("visits[].doctorName", "visits[].date", "firstName", "lastName")
+//				.selectKey("visits[].doctorName", "doctorName").selectKey("visits[].date", "date")
+//				.selectKey("firstName", "firstName").selectKey("lastName", "lastName").selectCount()
+//				.whereNotEquals("date", null).whereStartsWith("doctorName", term).count();
+//
+//	}
+
 	@Override
-	public int searchVisitsCount(String term) {
-		return session.advanced().documentQuery(Patient.class)
-				.groupBy("visits[].doctorName", "visits[].date", "firstName", "lastName")
-				.selectKey("visits[].doctorName", "doctorName").selectKey("visits[].date", "date")
-				.selectKey("firstName", "firstName").selectKey("lastName", "lastName").selectCount()
-				.whereNotEquals("date", null).whereStartsWith("doctorName", term).count();
-
-	}
-
-	@Override
-	public Collection<PatientVisit> searchVisitsList(int offset, int limit, String term, boolean order) {
-
+	public Pair<Collection<PatientVisit>,Integer> searchVisitsList(int offset, int limit, String term, boolean order) {
+		Reference<QueryStatistics> statsRef = new Reference<>();
+		List<PatientVisit> list;
 		IDocumentQuery<PatientVisit> visits = session.advanced().documentQuery(Patient.class)
 				.groupBy("visits[].doctorName", "visits[].date", "firstName", "lastName", "visits[].visitSummery")
 				.selectKey("visits[].doctorName", "doctorName").selectKey("visits[].date", "date")
@@ -64,11 +75,14 @@ public class VisitsPresenter implements VisitsViewListener {
 				.selectKey("lastName", "lastName").selectCount().ofType(PatientVisit.class).whereNotEquals("date", null)
 				.whereStartsWith("doctorName", term).skip(offset).take(limit);
 		if (order) {
-			return visits.orderByDescending("date").toList();
+			list= visits.orderByDescending("date").statistics(statsRef).toList();
 		} else {
-			return visits.orderBy("date").toList();
+			list= visits.orderBy("date").statistics(statsRef).toList();
 		}
 
+		int totalResults = statsRef.value.getTotalResults();
+		
+		return new ImmutablePair<Collection<PatientVisit>, Integer>(list, totalResults);
 	}
 
 	@Override

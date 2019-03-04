@@ -1,9 +1,15 @@
 package net.ravendb.demo.presenters;
 
 import java.util.Collection;
+import java.util.List;
+
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 
 import net.ravendb.client.documents.session.IDocumentQuery;
 import net.ravendb.client.documents.session.IDocumentSession;
+import net.ravendb.client.documents.session.QueryStatistics;
+import net.ravendb.client.primitives.Reference;
 import net.ravendb.demo.db.RavenDBDocumentStore;
 import net.ravendb.demo.model.Condition;
 import net.ravendb.demo.model.Patient;
@@ -47,29 +53,31 @@ public class ConditionPresenter implements ConditionViewListener {
 	}
 
 	@Override
-	public Collection<Condition> getConditionsList(int offset, int limit, String term) {
+	public Pair<Collection<Condition>, Integer> getConditionsList(int offset, int limit, String term) {
 		IDocumentQuery<Condition> conditions = session.advanced().documentQuery(Condition.class).include("patientId");
-
+		Reference<QueryStatistics> statsRef = new Reference<>();
 		if (term != null) {
 			conditions.whereStartsWith("description", term);
 		}
-		conditions.skip(offset).take(limit);
+		List<Condition> list = conditions.skip(offset).take(limit).statistics(statsRef).toList();
+		int totalResults = statsRef.value.getTotalResults();
 
-		return conditions.toList();
-
-	}
-
-	@Override
-	public int getConditionsCount(String term) {
-		IDocumentQuery<Condition> conditions = session.advanced().documentQuery(Condition.class);
-
-		if (term != null) {
-			conditions.whereStartsWith("description", term);
-		}
-
-		return conditions.count();
+		return new ImmutablePair<Collection<Condition>, Integer>(list, totalResults);
 
 	}
+
+	// @Override
+	// public int getConditionsCount(String term) {
+	// IDocumentQuery<Condition> conditions =
+	// session.advanced().documentQuery(Condition.class);
+	//
+	// if (term != null) {
+	// conditions.whereStartsWith("description", term);
+	// }
+	//
+	// return conditions.count();
+	//
+	// }
 
 	@Override
 	public void openSession() {

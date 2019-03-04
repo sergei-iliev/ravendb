@@ -128,6 +128,7 @@ public class VisitsView extends VerticalLayout implements  VisitsViewable{
 		grid.setDataProvider(listDataProvider(order.getValue()));
 	}
 	private DataProvider<PatientVisit, Void> listDataProvider(boolean sort) {
+		int count= presenter.getVisistsList(0,0, false).getValue();
 		DataProvider<PatientVisit, Void> dataProvider = DataProvider.fromCallbacks(
 				// First callback fetches items based on a query
 				query -> {
@@ -136,15 +137,16 @@ public class VisitsView extends VerticalLayout implements  VisitsViewable{
 					// The number of items to load
 					int limit = query.getLimit();
 
-					return presenter.getVisistsList(offset, limit, sort).stream();
+					return presenter.getVisistsList(offset, limit, sort).getKey().stream();
 				},
 				// Second callback fetches the number of items for a query
-				query -> presenter.getVisistsCount());
+				query -> count);
 
 		return dataProvider;
 	}
 
 	private DataProvider<PatientVisit, Void> searchDataProvider(String term, boolean sort) {
+		int count = presenter.searchVisitsList(0,0,term,false).getValue();
 		DataProvider<PatientVisit, Void> dataProvider = DataProvider.fromCallbacks(
 				// First callback fetches items based on a query
 				query -> {
@@ -153,10 +155,10 @@ public class VisitsView extends VerticalLayout implements  VisitsViewable{
 					// The number of items to load
 					int limit = query.getLimit();
 
-					return presenter.searchVisitsList(offset, limit, term, sort).stream();
+					return presenter.searchVisitsList(offset, limit, term, sort).getKey().stream();
 				},
 				// Second callback fetches the number of items for a query
-				query -> presenter.searchVisitsCount(term));
+				query -> count);
 
 		return dataProvider;
 	}	
