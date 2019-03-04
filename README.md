@@ -93,7 +93,7 @@ public class Visit{
 
 }	
 ```
-JSON representation of Visit document at RavenDB side is an array of documents in Patient document
+JSON representation of Visit document at RavenDB side is an array of documents in Patient document(look above)
 
 3. Condition - list of available conditions
 ```java
@@ -105,6 +105,18 @@ public class Condition {
 
 }
 ```
+JSON representation of Condition document at RavenDB side
+```JSON
+{
+    "severity": "SEVIER",
+    "prescription": "stay at home fro a week",
+    "description": "headache",
+    "@metadata": {
+        "@collection": "Conditions",
+        "Raven-Java-Type": "net.ravendb.demo.model.Condition"
+    }
+}
+```
 4. Doctor - stored in a separate collection
 ```java
 public class Doctor{
@@ -113,6 +125,18 @@ public class Doctor{
     	private String department;
    	private int age; 
  }
+ ```
+ JSON representation of Doctor document at RavenDB side
+ ```JSON
+ {
+    "name": "Sergiz Ovesian",
+    "department": "LV",
+    "age": 45,
+    "@metadata": {
+        "@collection": "Doctors",
+        "Raven-Java-Type": "net.ravendb.demo.model.Doctor"
+    }
+}
  ```
 Each POJO has a property name "id" which will triger the usage RavenDB algorithm of autogenarating Ids. 
 The convention is that entities get the identifiers in the following format collection/number-tag so the programmer is not concerned with the uniqueness of each document in a collection.
