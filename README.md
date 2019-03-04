@@ -33,7 +33,6 @@ RavenDB doesn’t use tables. Instead, it creates objects as documents, and mult
 In RavenDB, a domain object is mapped to a single document. In this regard there is no need of special class treatment other then having a default no args constructor. The sample model consists of 4 basic entitities, one of which is embedded as an array to demonstrate the power of grouping and fetching queries in RavenDB.
 
 ![UML Diagram](/screenshots/uml.png)
-
 1. Patient - stored as a separate collection
 ```java
 public class Patient {
