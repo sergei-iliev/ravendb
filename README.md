@@ -32,6 +32,7 @@ When it comes to persisting data a Java programmer tends to annotate Java POJO w
 RavenDB doesn’t use tables. Instead, it creates objects as documents, and multiple documents are known as a collection. 
 In RavenDB, a domain object is mapped to a single document. In this regard there is no need of special class treatment other then having a default no args constructor. The sample model consists of 4 basic entitities, one of which is embedded as an array to demonstrate the power of grouping and fetching queries in RavenDB.
 
+![UML Diagram](/screenshots/uml.png)
 1. Patient - stored as a separate collection
 ```java
 public class Patient {
@@ -45,7 +46,41 @@ public class Patient {
 	private List<Visit> visits;
   
   }
-```  
+```
+JSON representation of Patient document at RavenDB side
+```JSON
+{
+    "firstName": "Megi",
+    "lastName": "Devasko",
+    "birthDate": "2016-11-30T22:00:00.0000000Z",
+    "gender": "FEMALE",
+    "email": "sss@box.com",
+    "address": null,
+    "visits": [
+        {
+            "date": "2019-02-26T22:00:00.0000000Z",
+            "doctorId": "doctors/1-A",
+            "type": "HOUSE",
+            "visitSummery": "just a mainor pain",
+            "conditionId": "conditions/1-A",
+            "doctorName": "Sergiz Ovesian"
+        },
+        {
+            "date": "2019-01-31T22:00:00.0000000Z",
+            "doctorId": "doctors/2-A",
+            "type": "EMERGENCYROOM",
+            "visitSummery": "never worry",
+            "conditionId": "conditions/2-A",
+            "doctorName": "Megalo Karimov"
+        }
+    ],
+    "@metadata": {
+        "@collection": "Patients",
+        "@flags": "HasAttachments",
+        "Raven-Java-Type": "net.ravendb.demo.model.Patient"
+    }
+}
+```
 2. Visist - stored as an array in Patient collection  
 ```java
 public class Visit{
@@ -58,6 +93,8 @@ public class Visit{
 
 }	
 ```
+JSON representation of Visit document at RavenDB side is an array of documents in Patient document(look above)
+
 3. Condition - list of available conditions
 ```java
 public class Condition {
@@ -68,6 +105,18 @@ public class Condition {
 
 }
 ```
+JSON representation of Condition document at RavenDB side
+```JSON
+{
+    "severity": "SEVIER",
+    "prescription": "stay at home fro a week",
+    "description": "headache",
+    "@metadata": {
+        "@collection": "Conditions",
+        "Raven-Java-Type": "net.ravendb.demo.model.Condition"
+    }
+}
+```
 4. Doctor - stored in a separate collection
 ```java
 public class Doctor{
@@ -76,6 +125,18 @@ public class Doctor{
     	private String department;
    	private int age; 
  }
+ ```
+ JSON representation of Doctor document at RavenDB side
+ ```JSON
+ {
+    "name": "Sergiz Ovesian",
+    "department": "LV",
+    "age": 45,
+    "@metadata": {
+        "@collection": "Doctors",
+        "Raven-Java-Type": "net.ravendb.demo.model.Doctor"
+    }
+}
  ```
 Each POJO has a property name "id" which will triger the usage RavenDB algorithm of autogenarating Ids. 
 The convention is that entities get the identifiers in the following format collection/number-tag so the programmer is not concerned with the uniqueness of each document in a collection.
