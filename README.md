@@ -93,6 +93,8 @@ public class Visit{
 
 }	
 ```
+JSON representation of Visit document at RavenDB side is an array of documents in Patient document
+
 3. Condition - list of available conditions
 ```java
 public class Condition {
