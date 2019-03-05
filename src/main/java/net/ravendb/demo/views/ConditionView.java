@@ -142,7 +142,6 @@ public class ConditionView extends VerticalLayout implements ConditionViewable{
 
 	}
 	private DataProvider<Condition, Void> listDataProvider(String term) {
-		int count = presenter.getConditionsList(0,0,term).getValue();
 		DataProvider<Condition, Void> dataProvider = DataProvider.fromCallbacks(
 				// First callback fetches items based on a query
 				query -> {
@@ -154,7 +153,7 @@ public class ConditionView extends VerticalLayout implements ConditionViewable{
 					return presenter.getConditionsList(offset, limit, term).getKey().stream();
 				},
 				// Second callback fetches the number of items for a query
-				query -> count);
+				query -> presenter.getConditionsList(0,0,term).getValue());
 
 		return dataProvider;
 	}	

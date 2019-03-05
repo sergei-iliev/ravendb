@@ -87,7 +87,9 @@ public class VisitsPresenter implements VisitsViewListener {
 
 	@Override
 	public void openSession() {
-		session = RavenDBDocumentStore.INSTANCE.getStore().openSession();
+		if(session==null){
+			  session = RavenDBDocumentStore.INSTANCE.getStore().openSession();
+		}
 	}
 
 	@Override

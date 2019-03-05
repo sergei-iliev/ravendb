@@ -226,7 +226,6 @@ public class PatientView extends VerticalLayout implements PatientViewable {
 	}
 
 	private DataProvider<Patient, Void> listDataProvider(boolean sort) {
-		int count= presenter.getPatientsList(0,0, false).getValue();
 		DataProvider<Patient, Void> dataProvider = DataProvider.fromCallbacks(
 				// First callback fetches items based on a query
 				query -> {
@@ -238,13 +237,13 @@ public class PatientView extends VerticalLayout implements PatientViewable {
 					return presenter.getPatientsList(offset, limit, sort).getKey().stream();
 				},
 				// Second callback fetches the number of items for a query
-				query ->count);
+				query ->presenter.getPatientsList(0,0, false).getValue());
 
 		return dataProvider;
 	}
 
 	private DataProvider<Patient, Void> searchDataProvider(String term, boolean sort) {
-		int count = presenter.searchPatientsList(0,0,term,false).getValue();
+	
 		DataProvider<Patient, Void> dataProvider = DataProvider.fromCallbacks(
 				// First callback fetches items based on a query
 				query -> {
@@ -256,7 +255,7 @@ public class PatientView extends VerticalLayout implements PatientViewable {
 					return presenter.searchPatientsList(offset, limit, term, sort).getKey().stream();
 				},
 				// Second callback fetches the number of items for a query
-				query ->  count);
+				query ->  presenter.searchPatientsList(0,0,term,false).getValue());
 
 		return dataProvider;
 	}
