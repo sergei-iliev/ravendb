@@ -50,9 +50,15 @@ public class DoctorPresenter implements DoctorViewListener {
 
 	@Override
 	public Collection<DoctorVisit> getDoctorVisitsList() {
-		List<DoctorVisit> results = session.advanced().documentQuery(Patient.class).groupBy("visits[].doctorId")
-				.selectKey("visits[].doctorId", "doctorId").selectCount().whereNotEquals("doctorId", null)
-				.orderByDescending("count").ofType(DoctorVisit.class).include("visits[].doctorId").toList();
+		List<DoctorVisit> results = session.query(Patient.class)
+				.groupBy("visits[].doctorId")
+				.selectKey("visits[].doctorId", "doctorId")
+				.selectCount()
+				.whereNotEquals("doctorId", null)
+				.orderByDescending("count")
+				.ofType(DoctorVisit.class)
+				.include("visits[].doctorId")
+				.toList();
 		// fetch doctors by batch
 		Set<String> doctorIds = results.stream().map(p -> p.getDoctorId()).collect(Collectors.toSet());
 		Map<String, Doctor> map = session.load(Doctor.class, doctorIds);
