@@ -6,6 +6,7 @@ It uses RavenDB Java client to communicate with the document store.
 
 * RavenDB community edition install
 * Domain Entity descrption
+* Session and Unit of Work pattern
 * CRUD operations
 * Paging on large record sets
 * BLOB handling - attachements
