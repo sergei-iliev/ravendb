@@ -171,13 +171,19 @@ INSTANCE;
     }
 }
 ```
+## Session and Unit of Work pattern
+For any operation we want to perform on RavenDB, we start by obtaining a new Session object from the document store. The Session object will contain everything we need to perform any operation necessary. Much like JPA's Hibernate implementation, the RavenDB Session also   
+implements the Unit of Work pattern which has several implications in the context of a single session:
+* Batching requests to save expensive remote calls.
+* Single document (identified by its ID) always resolves to the same instance.
+* Change tracking for all the entities that it has either loaded or stored.
+
+In contrast to a DocumentStore,  Session is a lightweight object and can be created more frequently. For example, in web applications, a common (and recommended) pattern is to create a session per request.
 
 ## CRUD operations
 Patient entity is given as an example only. 
 
 ![Patient CRUD](/screenshots/p_edit.png)
-
-For any operation we want to perform on RavenDB, we start by obtaining a new Session object from the document store. The Session object will contain everything we need to perform any operation necessary. It implements the Unit of Work pattern and is capable of batching the requests to save expensive remote calls. In contrast to a DocumentStore it is a lightweight object and can be created more frequently. For example, in web applications, a common (and recommended) pattern is to create a session per request.
 
 Create operation inserts a new document. Each document contains a unique ID that identifies it, data and adjacent metadata, both stored in JSON format. The metadata contains information describing the document, e.g. the last modification date (@last-modified property) or the collection (@collection property) assignment. As alreay mentioned we will use the default algoritm for letting RavenDB generate unique ID for our entities by specifing a property named "id" in each entity. 
 
