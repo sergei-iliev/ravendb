@@ -177,7 +177,6 @@ implements the Unit of Work pattern which has several implications in the contex
 * Batching requests to save expensive remote calls.
 * Single document (identified by its ID) always resolves to the same instance.
 * Change tracking for all the entities that it has either loaded or stored.
-
 In contrast to a DocumentStore,  Session is a lightweight object and can be created more frequently. For example, in web applications, a common (and recommended) pattern is to create a session per request.
 
 ## CRUD operations
