@@ -148,7 +148,7 @@ The focal point is the RavenDB Java connector, which is added as a dependency to
 <dependency>
   <groupId>net.ravendb</groupId>
   <artifactId>ravendb</artifactId>
-  <version>4.0.5</version>
+  <version>LATEST</version>
 </dependency>
 ```
 It provides  the main API object document store, which sets up connection with the Server and downloads various configuration metadata.
