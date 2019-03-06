@@ -6,6 +6,7 @@ It uses RavenDB Java client to communicate with the document store.
 
 * RavenDB community edition install
 * Domain Entity descrption
+* Session and Unit of Work pattern
 * CRUD operations
 * Paging on large record sets
 * BLOB handling - attachements
@@ -147,7 +148,7 @@ The focal point is the RavenDB Java connector, which is added as a dependency to
 <dependency>
   <groupId>net.ravendb</groupId>
   <artifactId>ravendb</artifactId>
-  <version>4.0.5</version>
+  <version>LATEST</version>
 </dependency>
 ```
 It provides  the main API object document store, which sets up connection with the Server and downloads various configuration metadata.
@@ -170,13 +171,26 @@ INSTANCE;
     }
 }
 ```
+## Session and Unit of Work pattern
+For any operation we want to perform on RavenDB, we start by obtaining a new Session object from the document store. The Session object will contain everything we need to perform any operation necessary. Much like JPA's Hibernate implementation, the RavenDB Session is also expressed by the Unit of Work pattern which has several implications in the context of a single session:
+* Batching requests to save expensive remote calls.
+* Single document (identified by its ID) always resolves to the same instance.
+* Change tracking for all the entities that it has either loaded or stored.
 
+In contrast to a DocumentStore,  Session is a lightweight object and can be created more frequently. For example, in web applications, a common (and recommended) pattern is to create a session per request.
+Current demo application uses page attach/detach events to demarcate Session's create and release. The session stays open for the duration of page activity.
+```java
+	public void onAttach(AttachEvent attachEvent) {
+		presenter.openSession();		
+	}
+	public void onDetach(DetachEvent detachEvent) {
+		presenter.releaseSession();	
+	}
+```
 ## CRUD operations
 Patient entity is given as an example only. 
 
 ![Patient CRUD](/screenshots/p_edit.png)
-
-For any operation we want to perform on RavenDB, we start by obtaining a new Session object from the document store. The Session object will contain everything we need to perform any operation necessary. It implements the Unit of Work pattern and is capable of batching the requests to save expensive remote calls. In contrast to a DocumentStore it is a lightweight object and can be created more frequently. For example, in web applications, a common (and recommended) pattern is to create a session per request.
 
 Create operation inserts a new document. Each document contains a unique ID that identifies it, data and adjacent metadata, both stored in JSON format. The metadata contains information describing the document, e.g. the last modification date (@last-modified property) or the collection (@collection property) assignment. As alreay mentioned we will use the default algoritm for letting RavenDB generate unique ID for our entities by specifing a property named "id" in each entity. 
 
