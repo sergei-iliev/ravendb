@@ -180,10 +180,10 @@ For any operation we want to perform on RavenDB, we start by obtaining a new Ses
 In contrast to a DocumentStore,  Session is a lightweight object and can be created more frequently. For example, in web applications, a common (and recommended) pattern is to create a session per request.
 Current demo application uses page attach/detach events to demarcate Session's create and release. The session stays open for the duration of page activity.
 ```java
-	protected void onAttach(AttachEvent attachEvent) {
+	public void onAttach(AttachEvent attachEvent) {
 		presenter.openSession();		
 	}
-	protected void onDetach(DetachEvent detachEvent) {
+	public void onDetach(DetachEvent detachEvent) {
 		presenter.releaseSession();	
 	}
 ```
