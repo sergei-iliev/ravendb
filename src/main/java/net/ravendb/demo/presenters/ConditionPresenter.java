@@ -54,7 +54,7 @@ public class ConditionPresenter implements ConditionViewListener {
 
 	@Override
 	public Pair<Collection<Condition>, Integer> getConditionsList(int offset, int limit, String term) {
-		IDocumentQuery<Condition> conditions = session.advanced().documentQuery(Condition.class).include("patientId");
+		IDocumentQuery<Condition> conditions = session.query(Condition.class).include("patientId");
 		Reference<QueryStatistics> statsRef = new Reference<>();
 		if (term != null) {
 			conditions.whereStartsWith("description", term);

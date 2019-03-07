@@ -37,10 +37,19 @@ public class PatientPresenter implements PatientViewListener {
 		
 		if (order) {
 			IDocumentQuery<Patient> query = session.query(Patient.class);
-			list = query.orderBy("birthDate").skip(offset).take(limit).statistics(statsRef).toList();
+			list = query
+					.orderBy("birthDate")
+					.skip(offset)
+					.take(limit)
+					.statistics(statsRef)
+					.toList();
 		} else {
 			IDocumentQuery<Patient> query = session.query(Patient.class);
-			list = query.skip(offset).take(limit).statistics(statsRef).toList();
+			list = query
+					.skip(offset)
+					.take(limit)
+					.statistics(statsRef)
+					.toList();
 		}
 		
 		int totalResults = statsRef.value.getTotalResults();
@@ -72,9 +81,18 @@ public class PatientPresenter implements PatientViewListener {
 		Collection<Patient> list;
 		Reference<QueryStatistics> statsRef = new Reference<>();
 		if (order) {
-			list = query.skip(offset).take(limit).orderBy("birthDate").statistics(statsRef).toList();
+			list = query
+					.skip(offset)
+					.take(limit)
+					.orderBy("birthDate")
+					.statistics(statsRef)
+					.toList();
 		} else {
-			list = query.skip(offset).take(limit).statistics(statsRef).toList();
+			list = query
+					.skip(offset)
+					.take(limit)
+					.statistics(statsRef)
+					.toList();
 		}
 		
 		int totalResults = statsRef.value.getTotalResults();
