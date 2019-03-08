@@ -46,7 +46,7 @@ public class PatientVisitPresenter implements PatientVisitViewListener {
 			session.advanced().eagerly().executeAllPendingLazyOperations();
 			Patient patient=session.load(Patient.class, patientId);
 
-			IDocumentQuery<PatientVisit> visits = session.advanced().documentQuery(Patient.class).waitForNonStaleResults()							    		
+			IDocumentQuery<PatientVisit> visits = session.query(Patient.class).waitForNonStaleResults()							    		
 					.groupBy("visits[].doctorName","visits[].date","visits[].type","visits[].conditionId","firstName","lastName","visits[].visitSummery")
 		    		.selectKey("visits[].doctorName", "doctorName")
 		    		.selectKey("visits[].date", "date")

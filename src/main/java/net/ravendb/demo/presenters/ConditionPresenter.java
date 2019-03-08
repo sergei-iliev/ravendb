@@ -59,25 +59,17 @@ public class ConditionPresenter implements ConditionViewListener {
 		if (term != null) {
 			conditions.whereStartsWith("description", term);
 		}
-		List<Condition> list = conditions.skip(offset).take(limit).statistics(statsRef).toList();
+		List<Condition> list = conditions
+				.skip(offset)
+				.take(limit)
+				.statistics(statsRef)
+				.toList();
 		int totalResults = statsRef.value.getTotalResults();
 
 		return new ImmutablePair<Collection<Condition>, Integer>(list, totalResults);
 
 	}
 
-	// @Override
-	// public int getConditionsCount(String term) {
-	// IDocumentQuery<Condition> conditions =
-	// session.advanced().documentQuery(Condition.class);
-	//
-	// if (term != null) {
-	// conditions.whereStartsWith("description", term);
-	// }
-	//
-	// return conditions.count();
-	//
-	// }
 
 	@Override
 	public void openSession() {
