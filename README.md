@@ -139,7 +139,7 @@ public class Doctor{
     }
 }
  ```
-Each POJO has a property name "id" which will trigger the usage RavenDB algorithm of autogenarating Ids. 
+Each POJO has a property name `id` which will trigger the usage RavenDB algorithm of autogenarating Ids. 
 The convention is that entities get the identifiers in the following format collection/number-tag so the programmer is not concerned with the uniqueness of each document in a collection.
 
 ## RavenDB connector
