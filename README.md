@@ -1,22 +1,22 @@
 # RavenDB Hospital tutorial
-RavenDB is an open-source NoSQL document store database. It is fully transactional,multi-platform and high availability distributed data store which support clients for a varity of programming languages including Java.
+RavenDB is an open-source NoSQL document store database. It is fully transactional,multi-platform and high availability distributed data store which support clients for a variety of programming languages including Java.
 The following sample Hospital Management app is built upon the dynamic document based structure that RavenDB represents.
 It uses RavenDB Java client to communicate with the document store.
 
 
 * RavenDB community edition install
-* Domain Entity descrption
+* Domain Entity description
 * Session and Unit of Work pattern
 * CRUD operations
 * Paging on large record sets
-* BLOB handling - attachements
+* BLOB handling - attachments
 * Queries
 
 ## RavenDB community edition install
 Installing RavenDB is pretty straight forward:
 1. Download the zip bundle from https://ravendb.net/download and unzip in a local drive folder
 2. Register a community edition free licence from https://ravendb.net/buy
-3. In powershell start either .\run.ps1 (console mode app) or .\setup-as-service.ps1 (service mode app) and follow the install instractions.
+3. In powershell start either .\run.ps1 (console mode app) or .\setup-as-service.ps1 (service mode app) and follow the install instructions.
 4. Once installed RavenDB Studio will show up in web browser, open "About" tab and register your license
 5. Create your first noSQL database.
 
@@ -24,14 +24,14 @@ As noSQL database RavenDB is based on following properties
 * Stores data in JSON-like documents that can have various structures
 * Uses dynamic schemas, which means that we can create records without predefining anything
 * The structure of a record can be changed simply by adding new fields or deleting existing ones
-* Dynamically generated indexes to fascilitated fast data retrieval
+* Dynamically generated indexes to facilitate fast data retrieval
 * Map/Reduce to process large sets of documents
 * On top of this RavenDB is easy to administer and deploy
 
 ## Entities, tables, collections, and documents
 When it comes to persisting data a Java programmer tends to annotate Java POJO with @Entity so that the underlying JPA framework would treat the class as a domain object mapped to a row in a database.
 RavenDB doesn’t use tables. Instead, it creates objects as documents, and multiple documents are known as a collection. 
-In RavenDB, a domain object is mapped to a single document. In this regard there is no need of special class treatment other then having a default no args constructor. The sample model consists of 4 basic entitities, one of which is embedded as an array to demonstrate the power of grouping and fetching queries in RavenDB.
+In RavenDB, a domain object is mapped to a single document. In this regard there is no need of special class treatment other then having a default no args constructor. The sample model consists of 4 basic entities, one of which is embedded as an array to demonstrate the power of grouping and fetching queries in RavenDB.
 
 ![UML Diagram](/screenshots/uml.png)
 1. Patient - stored as a separate collection
@@ -139,7 +139,7 @@ public class Doctor{
     }
 }
  ```
-Each POJO has a property name "id" which will triger the usage RavenDB algorithm of autogenarating Ids. 
+Each POJO has a property name "id" which will trigger the usage RavenDB algorithm of autogenarating Ids. 
 The convention is that entities get the identifiers in the following format collection/number-tag so the programmer is not concerned with the uniqueness of each document in a collection.
 
 ## RavenDB connector
@@ -192,7 +192,7 @@ Patient entity is given as an example only.
 
 ![Patient CRUD](/screenshots/p_edit.png)
 
-Create operation inserts a new document. Each document contains a unique ID that identifies it, data and adjacent metadata, both stored in JSON format. The metadata contains information describing the document, e.g. the last modification date (`@last-modified` property) or the collection (`@collection` property) assignment. As alreay mentioned we will use the default algoritm for letting RavenDB generate unique ID for our entities by specifing a property named "id" in each entity. 
+Create operation inserts a new document. Each document contains a unique ID that identifies it, data and adjacent metadata, both stored in JSON format. The metadata contains information describing the document, e.g. the last modification date (`@last-modified` property) or the collection (`@collection` property) assignment. As already mentioned we will use the default algorithm for letting RavenDB generate unique ID for our entities by specifying a property named `id` in each entity. 
 
 ```java
 public void create(Patient patient) {
@@ -210,7 +210,8 @@ public void create(Patient patient) {
 	           	  		
 }
 ```
-Update operation is worth noting - it handles optimistic conqurrency control and throws ConcurrecyException provided that another use has already changed the record. The method also handles attachement as a 1:1 relationship with each patient. 
+Update operation is worth noting - it handles optimistic concurrency control and throws ConcurrecyException provided that another 
+update has already changed the record. The method also handles attachment as a 1:1 relationship with each patient. 
 
 ```java
 public void update(Patient patient)throws ConcurrencyException{
@@ -247,7 +248,7 @@ public void delete(Patient patient) {
 ```
 
 ## Paging on large record sets
-Paging through large data is one of the most common operations with RavenDB. A typical scenario is the need to display results in chunks in a lazy loading or pageable grid. The grid is configured to first obtain the total amount of records to show and then lazily as the user scrolls up and down to obtain records by batches of 50. There is a convenient statistics method to obtain the total count of the documents while querying at the same time thus making a one time request only! For the patients grid, the corresponding attachments are also obtained and streamed into a convinient byte array to show in one of the grid columns. 
+Paging through large data is one of the most common operations with RavenDB. A typical scenario is the need to display results in chunks in a lazy loading or pageable grid. The grid is configured to first obtain the total amount of records to show and then lazily as the user scrolls up and down to obtain records by batches of 50. There is a convenient statistics method to obtain the total count of the documents while querying at the same time thus making a one time remote request only! For the patients grid, the corresponding attachments are also obtained and streamed into a convinient byte array to show in one of the grid columns. 
 
 ![Patient CRUD](/screenshots/p_paging.png)
 
