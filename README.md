@@ -247,7 +247,7 @@ public void delete(Patient patient) {
 ```
 
 ## Paging on large record sets
-Paging through large data is one of the most common operations with RavenDB. A typical scenario is the need to display results in chunks in a lazy loading or pagable grid. The grid is configured to first obtain the total amount of records to shaow and then lazily as the user scrolls up and down to obtain records by batches of 50. For the patients grid, the corresponding attachements are also obtained and streamed into a convinient byte array to show in one of the grid columns. 
+Paging through large data is one of the most common operations with RavenDB. A typical scenario is the need to display results in chunks in a lazy loading or pageable grid. The grid is configured to first obtain the total amount of records to show and then lazily as the user scrolls up and down to obtain records by batches of 50. There is a convenient statistics method to obtain the total count of the documents while querying at the same time thus making a one time request only! For the patients grid, the corresponding attachments are also obtained and streamed into a convinient byte array to show in one of the grid columns. 
 
 ![Patient CRUD](/screenshots/p_paging.png)
 
