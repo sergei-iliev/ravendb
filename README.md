@@ -248,7 +248,7 @@ public void delete(Patient patient) {
 ```
 
 ## Paging on large record sets
-Paging through large data is one of the most common operations with RavenDB. A typical scenario is the need to display results in chunks in a lazy loading or pageable grid. The grid is configured to first obtain the total amount of records to show and then lazily as the user scrolls up and down to obtain records by batches of 50. There is a convenient statistics method to obtain the total count of the documents while querying at the same time thus making a one time remote request only! For the patients grid, the corresponding attachments are also obtained and streamed into a convinient byte array to show in one of the grid columns. 
+Paging through large data is one of the most common operations with RavenDB. A typical scenario is the need to display results in chunks in a lazy loading or pageable grid. The grid is configured to first obtain the total amount of records to show and then lazily as the user scrolls up and down to obtain records by batches of 50. There is a convenient statistics method to obtain the total count of the documents while querying at the same time thus making a one time remote request only! For the patients grid, the corresponding attachments are also obtained and streamed into a convenient byte array to show in one of the grid columns. 
 
 ![Patient CRUD](/screenshots/p_paging.png)
 
@@ -300,8 +300,8 @@ public Pair<Collection<Patient>,Integer> getPatientsList(int offset, int limit, 
 ```
 
 ## BLOB handling - attachements
-When binary data(images,documents,media) needs to be associated with the document, RavenDB provides the Attachement API.
-Attachements are completely decopled from documents. They can be updated and changed separately from the document and do not 
+When binary data(images,documents,media) needs to be associated with the document, RavenDB provides the Attachment API.
+Attachments are completely decoupled from documents. They can be updated and changed separately from the document and do not 
 participate in transactions. Following POJO represents attachments on client side.
 ```java
 public class Attachment {
@@ -344,8 +344,12 @@ In Patient entity, image is attached to the document using the session.Advanced.
 Attachments, just like documents, are a part of the session and will be only saved on the Server when DocumentSession.SaveChanges is executed.
 
 ```java
-session.advanced().attachments().store(patient,patient.getAttachment().getName(),patient.getAttachment().getInputStream(),patient.getAttachment().getMimeType());			     	           	          
-session.saveChanges();
+		Attachment attachment=patient.getAttachment();
+                InputStream inputStream=attachment.getInputStream();
+		String name=attachment.getName();
+		String mimeType=attachment.getMimeType();
+		session.advanced().attachments().store(patient,name,inputStream,mimeType);
+		session.saveChanges();
 ```
 
 This operation is used to get an attachment from a patient document.
