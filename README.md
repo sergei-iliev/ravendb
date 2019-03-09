@@ -373,5 +373,29 @@ The provided Patient type as the generic type parameter does not only define the
 	return patient;
 		
 ```
+When there is a 'relationship' between documents, those documents can be loaded in a single request call using the `Include + Load` methods. The following code snippet shows how to obtain Patient's visit data and associated Doctor in a single session request.
+```java
+public Collection<DoctorVisit> getDoctorVisitsList() {
+	List<DoctorVisit> results = session.query(Patient.class)
+				.groupBy("visits[].doctorId")
+				.selectKey("visits[].doctorId", "doctorId")
+				.selectCount()
+				.whereNotEquals("doctorId", null)
+				.orderByDescending("count")
+				.ofType(DoctorVisit.class)
+				.include("visits[].doctorId")
+				.toList();
+	// fetch doctors by batch
+	Set<String> doctorIds = results.stream().map(p -> p.getDoctorId()).collect(Collectors.toSet());
+	Map<String, Doctor> map = session.load(Doctor.class, doctorIds);
 
+	results.forEach(v -> {
+		v.setDoctorName(map.get(v.getDoctorId()).getName());
+	});
+		
+	assert (session.advanced().getNumberOfRequests() == 1);
+	return results;
+
+}
+```
 
