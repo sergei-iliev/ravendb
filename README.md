@@ -196,16 +196,18 @@ Create operation inserts a new document. Each document contains a unique ID that
 
 ```java
 public void create(Patient patient) {
-		 try (IDocumentSession session = RavenDBDocumentStore.INSTANCE.getStore().openSession()) {
 			 
-			   session.store(patient);
-				 
-	           if(patient.getAttachment()!=null){	        	 
-			     	session.advanced().attachments().store(patient,patient.getAttachment().getName(),patient.getAttachment().getInputStream(),patient.getAttachment().getMimeType());
-	           }
-	           session.saveChanges();
-	           
-	     }	  		
+	session.store(patient);		 
+	   if(patient.getAttachment()!=null){	        	 
+		    Attachment attachment=patient.getAttachment();
+                    InputStream inputStream=attachment.getInputStream();   		   
+		    String name=attachment.getName();
+		    String mimeType=attachment.getMimeType();
+		    session.advanced().attachments().store(patient,name,inputStream,mimeType);
+	   }
+	          
+        session.saveChanges();
+	           	  		
 }
 ```
 Update operation is worth noting - it handles optimistic conqurrency control and throws ConcurrecyException provided that another use has already changed the record. The method also handles attachement as a 1:1 relationship with each patient. 
