@@ -180,12 +180,12 @@ For any operation we want to perform on RavenDB, we start by obtaining a new Ses
 In contrast to a DocumentStore,  Session is a lightweight object and can be created more frequently. For example, in web applications, a common (and recommended) pattern is to create a session per request.
 Current demo application uses page attach/detach events to demarcate Session's create and release. The session stays open for the duration of page activity.
 ```java
-	public void onAttach(AttachEvent attachEvent) {
-		presenter.openSession();		
-	}
-	public void onDetach(DetachEvent detachEvent) {
-		presenter.releaseSession();	
-	}
+public void onAttach(AttachEvent attachEvent) {
+	presenter.openSession();		
+}
+public void onDetach(DetachEvent detachEvent) {
+	presenter.releaseSession();	
+}
 ```
 ## CRUD operations
 Patient entity is given as an example only. 
@@ -213,38 +213,37 @@ public void create(Patient patient) {
 Update operation is worth noting - it handles optimistic conqurrency control and throws ConcurrecyException provided that another use has already changed the record. The method also handles attachement as a 1:1 relationship with each patient. 
 
 ```java
-	public void update(Patient patient)throws ConcurrencyException{
+public void update(Patient patient)throws ConcurrencyException{
 			   
 			   //enable oca			   
-		session.advanced().setUseOptimisticConcurrency(true);			   
-		session.store(patient);
+	session.advanced().setUseOptimisticConcurrency(true);			   
+	session.store(patient);
 			   
 	           //delete previous attachments	           
-	        AttachmentName[] names=session.advanced().attachments().getNames(patient);
-		if(names.length>0){				
-			session.advanced().attachments().delete(patient,names[0].getName());
-		}
-				 
-	        if(patient.getAttachment()!=null){  
-		    Attachment attachment=patient.getAttachment();
-                    InputStream inputStream=attachment.getInputStream();
-		    String name=attachment.getName();
-		    String mimeType=attachment.getMimeType();
-		    session.advanced().attachments().store(patient,name,inputStream,mimeType);
-	        }
-	           
-	        session.saveChanges();
-	           	 
+	AttachmentName[] names=session.advanced().attachments().getNames(patient);
+	if(names.length>0){				
+		session.advanced().attachments().delete(patient,names[0].getName());
 	}
+			 
+	if(patient.getAttachment()!=null){  
+		Attachment attachment=patient.getAttachment();
+                InputStream inputStream=attachment.getInputStream();
+		String name=attachment.getName();
+		String mimeType=attachment.getMimeType();
+		session.advanced().attachments().store(patient,name,inputStream,mimeType);
+	}	           
+       session.saveChanges();
+	           	 
+}
 ```
 
 ```java
-	public void delete(Patient patient) {
+public void delete(Patient patient) {
 		
-	           session.delete(patient.getId());
-	           session.saveChanges();     
+	session.delete(patient.getId());
+	session.saveChanges();     
 		
-	}
+}
 ```
 
 ## Paging on large record sets
@@ -253,14 +252,14 @@ Paging through large data is one of the most common operations with RavenDB. A t
 ![Patient CRUD](/screenshots/p_paging.png)
 
 ```java
-	public int getPatientsCount() {
-		 try (IDocumentSession session = RavenDBDocumentStore.INSTANCE.getStore().openSession()) {			 
-			 return session.query(Patient.class).count();			 			 			 
-		 }
-	}
-	public Collection<Patient> getPatientsList(int offset,int limit,boolean order) {
-		   try (IDocumentSession session = RavenDBDocumentStore.INSTANCE.getStore().openSession()) {
-				   Collection<Patient> list=null;
+public int getPatientsCount() {
+				 
+	return session.query(Patient.class).count();			 			 			 
+		 
+}
+public Collection<Patient> getPatientsList(int offset,int limit,boolean order) {
+		   
+		 Collection<Patient> list=null;
 
 				   if(order){
 				       IDocumentQuery<Patient>  query = session.query(Patient.class);
@@ -289,7 +288,7 @@ Paging through large data is one of the most common operations with RavenDB. A t
 				   }
 				   return list;
 	       }		
-	}
+}
 ```
 
 ## BLOB handling - attachements
