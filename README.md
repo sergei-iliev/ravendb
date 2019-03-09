@@ -240,10 +240,9 @@ Update operation is worth noting - it handles optimistic conqurrency control and
 
 ```java
 	public void delete(Patient patient) {
-		 try (IDocumentSession session = RavenDBDocumentStore.INSTANCE.getStore().openSession()) {
+		
 	           session.delete(patient.getId());
-	           session.saveChanges();
-	     }
+	           session.saveChanges();     
 		
 	}
 ```
