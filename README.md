@@ -214,26 +214,27 @@ Update operation is worth noting - it handles optimistic conqurrency control and
 
 ```java
 	public void update(Patient patient)throws ConcurrencyException{
-
-		 try (IDocumentSession session = RavenDBDocumentStore.INSTANCE.getStore().openSession()) {
 			   
 			   //enable oca			   
-			   session.advanced().setUseOptimisticConcurrency(true);			   			   
-			   session.store(patient);
+		session.advanced().setUseOptimisticConcurrency(true);			   			   
+		session.store(patient);
 			   
 	           //delete previous attachments	           
-			   AttachmentName[] names=session.advanced().attachments().getNames(patient);
-			   if(names.length>0){				
-				  session.advanced().attachments().delete(patient,names[0].getName());				
-			   }
+	        AttachmentName[] names=session.advanced().attachments().getNames(patient);
+		if(names.length>0){				
+			session.advanced().attachments().delete(patient,names[0].getName());				
+		}
 				 
-	           if(patient.getAttachment()!=null){	        	  
-			     session.advanced().attachments().store(patient,patient.getAttachment().getName(),patient.getAttachment().getInputStream(),patient.getAttachment().getMimeType());			     
-	           }
+	        if(patient.getAttachment()!=null){	        	  
+		    Attachment attachment=patient.getAttachment();
+                    InputStream inputStream=attachment.getInputStream();   		   
+		    String name=attachment.getName();
+		    String mimeType=attachment.getMimeType();
+		    session.advanced().attachments().store(patient,name,inputStream,mimeType);			     
+	        }
 	           
-	           session.saveChanges();
-	           
-	     }
+	        session.saveChanges();
+	           	 
 	}
 ```
 
