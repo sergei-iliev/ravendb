@@ -374,6 +374,7 @@ The provided Patient type as the generic type parameter does not only define the
 		
 ```
 When there is a 'relationship' between documents, those documents can be loaded in a single request call using the `Include + Load` methods. The following code snippet shows how to obtain Patient's visit data and associated Doctor in a single session request.
+When the Doctors collection is requested it is fetched from the local session cache thus avoiding a second round trip to RavenDB.
 ```java
 public Collection<DoctorVisit> getDoctorVisitsList() {
 	List<DoctorVisit> results = session.query(Patient.class)
