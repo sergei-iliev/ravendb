@@ -3,8 +3,7 @@ package net.ravendb.demo.db;
 import net.ravendb.client.documents.DocumentStore;
 import net.ravendb.client.documents.IDocumentStore;
 
-public enum RavenDBDocumentStore {
-INSTANCE;
+public final class RavenDBDocumentStore {
 	
 	private static IDocumentStore store;
 
@@ -13,7 +12,7 @@ INSTANCE;
         store.initialize();
     }
 
-    public IDocumentStore getStore() {    	
+    public static IDocumentStore getStore() {    	
         return store;
     }
 }

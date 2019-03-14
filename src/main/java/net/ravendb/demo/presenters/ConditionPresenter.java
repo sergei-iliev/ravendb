@@ -74,7 +74,7 @@ public class ConditionPresenter implements ConditionViewListener {
 	@Override
 	public void openSession() {
 		if(session==null){
-		  session = RavenDBDocumentStore.INSTANCE.getStore().openSession();
+		  session = RavenDBDocumentStore.getStore().openSession();
 		}
 	}
 

@@ -3,9 +3,13 @@ package net.ravendb.demo.views;
 import java.net.URLEncoder;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.claspina.confirmdialog.ButtonOption;
 import org.claspina.confirmdialog.ConfirmDialog;
 
@@ -37,6 +41,7 @@ import net.ravendb.demo.RavenDBApp;
 import net.ravendb.demo.assets.Gender;
 import net.ravendb.demo.components.editor.AddressEditorDialog;
 import net.ravendb.demo.components.editor.PatientEditorDialog;
+import net.ravendb.demo.components.grid.PageableGrid;
 import net.ravendb.demo.model.Patient;
 import net.ravendb.demo.presenters.PatientPresenter;
 import net.ravendb.demo.presenters.PatientViewable;
@@ -46,7 +51,7 @@ import net.ravendb.demo.presenters.PatientViewable;
 public class PatientView extends VerticalLayout implements PatientViewable {
 
 	private final PatientViewListener presenter;
-	private Grid<Patient> grid;
+	private PageableGrid<Patient> grid;
 	private Button edit, delete, visits;
 	private Checkbox order;
 
@@ -90,7 +95,7 @@ public class PatientView extends VerticalLayout implements PatientViewable {
 		header.add(add);
 
 		edit = new Button("Edit", e -> {
-			PatientEditorDialog d = new PatientEditorDialog("Edit", this.grid.asSingleSelect().getValue(),
+			PatientEditorDialog d = new PatientEditorDialog("Edit", this.grid.getGrid().asSingleSelect().getValue(),
 					this.presenter, () -> {
 						load();
 					});
@@ -102,7 +107,7 @@ public class PatientView extends VerticalLayout implements PatientViewable {
 		delete = new Button("Delete", e -> {
 			ConfirmDialog.createQuestion().withCaption("System alert").withMessage("Do you want to delete?")
 					.withOkButton(() -> {
-						presenter.delete(grid.asSingleSelect().getValue());
+						presenter.delete(grid.getGrid().asSingleSelect().getValue());
 						load();
 					}, ButtonOption.focus(), ButtonOption.caption("YES")).withCancelButton(ButtonOption.caption("NO"))
 					.open();
@@ -112,10 +117,10 @@ public class PatientView extends VerticalLayout implements PatientViewable {
 
 		visits = new Button("Manage Visits", e -> {
 			Map<String, String> map = new HashMap<>();
-			map.put("patientId", grid.asSingleSelect().getValue().getId());
+			map.put("patientId", grid.getGrid().asSingleSelect().getValue().getId());
 			try {
 				UI.getCurrent().navigate(
-						"patientvisit/" + URLEncoder.encode(grid.asSingleSelect().getValue().getId(), "UTF-8"));
+						"patientvisit/" + URLEncoder.encode(grid.getGrid().asSingleSelect().getValue().getId(), "UTF-8"));
 			} catch (Exception e1) {
 
 				e1.printStackTrace();
@@ -159,12 +164,11 @@ public class PatientView extends VerticalLayout implements PatientViewable {
 	}
 
 	private Component createGrid() {
-		grid = new Grid<>();
-		grid.setSelectionMode(SelectionMode.SINGLE);
+		grid = new PageableGrid(3,this::loadPage);
+		grid.getGrid().setSelectionMode(SelectionMode.SINGLE);
 		grid.setWidth("100%");
 		
-		
-		grid.addComponentColumn(p -> {
+		grid.getGrid().addComponentColumn(p -> {
 			if (p.getAttachment() == null) {
 				Image image = new Image("/frontend/images/avatar.jpeg", "");
 				image.setWidth("60px");
@@ -177,22 +181,22 @@ public class PatientView extends VerticalLayout implements PatientViewable {
 				image.setHeight("60px");
 				image.getStyle().set("borderRadius", "50%");
 				return image;
-			}
+			}			
 		});
-		grid.addColumn(Patient::getFirstName).setHeader("First Name");
-		grid.addColumn(Patient::getLastName).setHeader("Last Name");
-		grid.addColumn(Patient::getEmail).setHeader("Email");
-		grid.addColumn(new ComponentRenderer<>(person -> {
+		grid.getGrid().addColumn(Patient::getFirstName).setHeader("First Name");
+		grid.getGrid().addColumn(Patient::getLastName).setHeader("Last Name");
+		grid.getGrid().addColumn(Patient::getEmail).setHeader("Email");
+		grid.getGrid().addColumn(new ComponentRenderer<>(person -> {
 			if (person.getGender() == Gender.MALE) {
 				return new Icon(VaadinIcon.MALE);
 			} else {
 				return new Icon(VaadinIcon.FEMALE);
 			}
 		})).setHeader("Gender");
-		grid.addColumn(new LocalDateRenderer<>(Patient::getBirthLocalDate,
+		grid.getGrid().addColumn(new LocalDateRenderer<>(Patient::getBirthLocalDate,
 				DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM))).setHeader("Birth Date");
 
-		grid.addComponentColumn(p -> {
+		grid.getGrid().addComponentColumn(p -> {
 			Button address = new Button();
 			address.setIcon(new Icon(VaadinIcon.HOME));
 			address.addClickListener(e -> {
@@ -202,8 +206,8 @@ public class PatientView extends VerticalLayout implements PatientViewable {
 			return address;
 		}).setHeader("Address");
 
-		grid.addSelectionListener(e -> {
-			if (grid.getSelectedItems().size() > 0) {
+		grid.getGrid().addSelectionListener(e -> {
+			if (grid.getGrid().getSelectedItems().size() > 0) {
 				edit.setEnabled(true);
 				delete.setEnabled(true);
 				visits.setEnabled(true);
@@ -218,46 +222,51 @@ public class PatientView extends VerticalLayout implements PatientViewable {
 	}
 
 	private void search(String term) {
-		grid.setDataProvider(searchDataProvider(term, order.getValue()));
+		//grid.setDataProvider(searchDataProvider(term, order.getValue()));
 	}
 
 	private void load() {
-		grid.setDataProvider(listDataProvider(order.getValue()));
+		grid.loadFirstPage();
+		//grid.setDataProvider(listDataProvider(order.getValue()));
 	}
-
-	private DataProvider<Patient, Void> listDataProvider(boolean sort) {
-		DataProvider<Patient, Void> dataProvider = DataProvider.fromCallbacks(
-				// First callback fetches items based on a query
-				query -> {
-					// The index of the first item to load
-					int offset = query.getOffset();
-					// The number of items to load
-					int limit = query.getLimit();
-
-					return presenter.getPatientsList(offset, limit, sort).getKey().stream();
-				},
-				// Second callback fetches the number of items for a query
-				query ->presenter.getPatientsList(0,0, false).getValue());
-
-		return dataProvider;
+    
+	private Pair<Collection<Patient>,Integer> loadPage(int page,int pageSize){
+		System.out.println(page);
+		return presenter.getPatientsList(page*pageSize,pageSize, false);
 	}
-
-	private DataProvider<Patient, Void> searchDataProvider(String term, boolean sort) {
-	
-		DataProvider<Patient, Void> dataProvider = DataProvider.fromCallbacks(
-				// First callback fetches items based on a query
-				query -> {
-					// The index of the first item to load
-					int offset = query.getOffset();
-					// The number of items to load
-					int limit = query.getLimit();
-
-					return presenter.searchPatientsList(offset, limit, term, sort).getKey().stream();
-				},
-				// Second callback fetches the number of items for a query
-				query ->  presenter.searchPatientsList(0,0,term,false).getValue());
-
-		return dataProvider;
-	}
+//	private DataProvider<Patient, Void> listDataProvider(boolean sort) {
+//		DataProvider<Patient, Void> dataProvider = DataProvider.fromCallbacks(
+//				// First callback fetches items based on a query
+//				query -> {
+//					// The index of the first item to load
+//					int offset = query.getOffset();
+//					// The number of items to load
+//					int limit = query.getLimit();
+//
+//					return presenter.getPatientsList(offset, limit, sort).getKey().stream();
+//				},
+//				// Second callback fetches the number of items for a query
+//				query ->presenter.getPatientsList(0,0, false).getValue());
+//
+//		return dataProvider;
+//	}
+//
+//	private DataProvider<Patient, Void> searchDataProvider(String term, boolean sort) {
+//	
+//		DataProvider<Patient, Void> dataProvider = DataProvider.fromCallbacks(
+//				// First callback fetches items based on a query
+//				query -> {
+//					// The index of the first item to load
+//					int offset = query.getOffset();
+//					// The number of items to load
+//					int limit = query.getLimit();
+//
+//					return presenter.searchPatientsList(offset, limit, term, sort).getKey().stream();
+//				},
+//				// Second callback fetches the number of items for a query
+//				query ->  presenter.searchPatientsList(0,0,term,false).getValue());
+//
+//		return dataProvider;
+//	}
 
 }

@@ -19,28 +19,6 @@ public class PatientVisitPresenter implements PatientVisitViewListener {
 
 	}
 
-//	@Override
-//	public Collection<PatientVisit> getVisistsList(boolean order) {
-//		try (IDocumentSession session = RavenDBDocumentStore.INSTANCE.getStore().openSession()) {
-//			
-//			IDocumentQuery<PatientVisit> visits = session.advanced().documentQuery(Patient.class).
-//		    		groupBy("visits[].doctorName","visits[].date","visits[].conditionSummery")
-//		    		.selectKey("visits[].doctorName", "doctorName")
-//		    		.selectKey("visits[].date", "date")
-//		    		.selectKey("visits[].conditionSummery","conditionSummery")		    	
-//		    		.selectCount()
-//		    		.ofType(PatientVisit.class)
-//		    		.whereNotEquals("date",null);
-//		    
-//			if(order){
-//	    		return visits.orderByDescending("date").toList();
-//		    }else{
-//		    	return visits.orderBy("date").toList();
-//		    }
-//
-//		}
-//	}
-
 	@Override
 	public Collection<PatientVisit> getVisistsList(String patientId,String term,boolean order) {
 			session.advanced().eagerly().executeAllPendingLazyOperations();
@@ -74,43 +52,6 @@ public class PatientVisitPresenter implements PatientVisitViewListener {
 			
 			
 		 	
-//			IDocumentQuery<Patient> q=session.query(Patient.class).include("visits[].doctorId")
-//					.whereEquals("id", patientId);
-//			
-//			if(term!=null){
-//				q.search("visits[].doctorName", term);
-//			}else{
-//				
-//			}
-//			Patient patient=q.first();
-			
-//			IDocumentQuery<Visit> visits = session.query(Patient.class).whereEquals("Id",patientId).
-//		    		groupBy("visits[].doctorName","visits[].date","visits[].doctorId","visits[].type","visits[].conditionSummery","id")
-//		    		.selectKey("visits[].doctorName", "doctorName")
-//		    		.selectKey("visits[].date", "date")
-//		    		.selectKey("visits[].conditionSummery","conditionSummery")
-//		    		.selectKey("visits[].doctorId", "doctorId")
-//		    		.selectKey("id", "id")
-//		    		.selectCount()
-//		    		//.whereEquals("id", patientId)
-//		    		.ofType(Visit.class)		    		
-//		    		.include("doctorId");		    		
-//		    		
-//		    if(order){
-//	    		return visits.orderByDescending("date").toList();
-//		    }else{
-//		    	return visits.orderBy("date").toList();
-//		    }
-		    
-			//fetch doctors by batch  
-//	 	    Set<String> doctorIds=patient.getVisits().stream().map(v->v.getDoctorId()).collect(Collectors.toSet());
-//			Map<String,Doctor> map= session.load(Doctor.class,doctorIds);
-//			   
-//            for (Visit visit : patient.getVisits()) {			
-//				visit.setDoctor(map.get(visit.getDoctorId()));				
-//			}            
-//            
-//			return patient.getVisits();
 
 	}
 
@@ -159,7 +100,7 @@ public class PatientVisitPresenter implements PatientVisitViewListener {
 	@Override
 	public void openSession() {
 		if(session==null){
-			  session = RavenDBDocumentStore.INSTANCE.getStore().openSession();
+			  session = RavenDBDocumentStore.getStore().openSession();
 		}
 	}
 

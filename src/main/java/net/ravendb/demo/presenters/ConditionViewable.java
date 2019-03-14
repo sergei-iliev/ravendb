@@ -17,7 +17,6 @@ public interface ConditionViewable {
 	    public void delete(Condition condition);
 	    
 	    Pair<Collection<Condition>,Integer> getConditionsList(int offset,int limit,String term);
-	    //int getConditionsCount(String term);
 	    
 		  void openSession();
 		  void releaseSession();
