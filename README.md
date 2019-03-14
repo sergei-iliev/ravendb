@@ -100,18 +100,18 @@ JSON representation of Visit document at RavenDB side is an array of documents i
 ```java
 public class Condition {
 	private String id;
-	private Type severity;
-	private String prescription;
-	private String description;
+	private String name;
+	private String symptoms;
+	private String recommendedTreatment;
 
 }
 ```
 JSON representation of Condition document at RavenDB side
 ```JSON
 {
-    "severity": "SEVIER",
-    "prescription": "stay at home fro a week",
-    "description": "headache",
+    "name": "Diabetes",
+    "symptoms": "swollen legs, eye sight",
+    "recommendedTreatment": "carbon free diet",
     "@metadata": {
         "@collection": "Conditions",
         "Raven-Java-Type": "net.ravendb.demo.model.Condition"
