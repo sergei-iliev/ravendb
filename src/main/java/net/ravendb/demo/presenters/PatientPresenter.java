@@ -3,6 +3,8 @@ package net.ravendb.demo.presenters;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -16,13 +18,15 @@ import net.ravendb.client.documents.session.QueryStatistics;
 import net.ravendb.client.exceptions.ConcurrencyException;
 import net.ravendb.client.primitives.Reference;
 import net.ravendb.demo.command.Attachment;
+import net.ravendb.demo.components.editor.PatientEditorDialog;
 import net.ravendb.demo.db.RavenDBDocumentStore;
 import net.ravendb.demo.model.Address;
 import net.ravendb.demo.model.Patient;
 import net.ravendb.demo.presenters.PatientViewable.PatientViewListener;
 
 public class PatientPresenter implements PatientViewListener {
-	
+	private static Logger logger = Logger.getLogger(PatientPresenter.class.getSimpleName());
+	 
 	private IDocumentSession session;
 
 	public PatientPresenter() {
@@ -59,7 +63,7 @@ public class PatientPresenter implements PatientViewListener {
 					attachment.setBytes(bytes);
 					patient.setAttachment(attachment);
 				} catch (IOException e) {
-					e.printStackTrace();
+					logger.log(Level.SEVERE,"", e);
 				}
 
 			}
@@ -98,7 +102,7 @@ public class PatientPresenter implements PatientViewListener {
 					attachment.setBytes(bytes);
 					patient.setAttachment(attachment);
 				} catch (IOException e) {
-					e.printStackTrace();
+					logger.log(Level.SEVERE,"", e);
 				}
 
 			}

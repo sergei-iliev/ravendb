@@ -6,6 +6,8 @@ import java.time.format.FormatStyle;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.claspina.confirmdialog.ButtonOption;
@@ -45,7 +47,8 @@ import net.ravendb.demo.presenters.PatientViewable;
 @Route(value = "patient", layout = RavenDBApp.class)
 @PageTitle(value = "Hospital Management")
 public class PatientView extends VerticalLayout implements PatientViewable {
-
+	private static Logger logger = Logger.getLogger(PatientView.class.getSimpleName());
+	
 	private final PatientViewListener presenter;
 	private PageableGrid<Patient> grid;
 	private Button edit, delete, visits;
@@ -120,7 +123,7 @@ public class PatientView extends VerticalLayout implements PatientViewable {
 						+ URLEncoder.encode(grid.getGrid().asSingleSelect().getValue().getId(), "UTF-8"));
 			} catch (Exception e1) {
 
-				e1.printStackTrace();
+				logger.log(Level.SEVERE,"", e);
 			}
 		});
 		visits.setEnabled(false);

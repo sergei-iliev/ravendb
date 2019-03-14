@@ -4,6 +4,8 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Iterator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.crypto.CipherInputStream;
 import javax.imageio.ImageIO;
@@ -35,6 +37,8 @@ import net.ravendb.demo.presenters.PatientViewable.PatientViewListener;
 
 public class PatientEditorDialog extends AbstractEditorDialog<Patient>{
 
+    private static Logger logger = Logger.getLogger(PatientEditorDialog.class.getSimpleName());
+    
 	private PatientViewListener presenter;
 	private Image image;
 	private Runnable run;
@@ -148,7 +152,7 @@ public class PatientEditorDialog extends AbstractEditorDialog<Patient>{
                 }
             }		  
 		}catch(IOException e){
-			e.printStackTrace();
+			logger.log(Level.SEVERE,"", e);
 		}
 	}
 	@Override

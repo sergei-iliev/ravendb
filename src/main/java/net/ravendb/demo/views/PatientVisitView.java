@@ -4,6 +4,8 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.Component;
@@ -33,13 +35,14 @@ import net.ravendb.demo.command.PatientVisit;
 import net.ravendb.demo.components.editor.PatientVisitEditorDialog;
 import net.ravendb.demo.model.Patient;
 import net.ravendb.demo.model.Visit;
+import net.ravendb.demo.presenters.PatientPresenter;
 import net.ravendb.demo.presenters.PatientVisitPresenter;
 import net.ravendb.demo.presenters.PatientVisitViewable;
 
 @Route(value="patientvisit",layout=RavenDBApp.class)
 @PageTitle(value = "Hospital Management")
 public class PatientVisitView extends VerticalLayout implements  PatientVisitViewable,HasUrlParameter<String>{
-	
+	private static Logger logger = Logger.getLogger(PatientVisitView.class.getSimpleName());
 
 	private H5 name;
 	private PatientVisitViewListener presenter;
@@ -69,7 +72,7 @@ public class PatientVisitView extends VerticalLayout implements  PatientVisitVie
 		try {
 			patientId=URLDecoder.decode(id,"UTF-8");
 		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
+			logger.log(Level.SEVERE,"", e);
 		}
 		
 	}
