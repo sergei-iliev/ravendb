@@ -32,10 +32,11 @@ import com.vaadin.flow.server.StreamResource;
 import net.ravendb.client.exceptions.ConcurrencyException;
 import net.ravendb.demo.assets.Gender;
 import net.ravendb.demo.command.Attachment;
+import net.ravendb.demo.command.PatientAttachment;
 import net.ravendb.demo.model.Patient;
 import net.ravendb.demo.presenters.PatientViewable.PatientViewListener;
 
-public class PatientEditorDialog extends AbstractEditorDialog<Patient>{
+public class PatientEditorDialog extends AbstractEditorDialog<PatientAttachment>{
 
     private static Logger logger = Logger.getLogger(PatientEditorDialog.class.getSimpleName());
     
@@ -43,7 +44,7 @@ public class PatientEditorDialog extends AbstractEditorDialog<Patient>{
 	private Image image;
 	private Runnable run;
 	
-	public PatientEditorDialog(String title,Patient bean,PatientViewListener presenter,Runnable run) {
+	public PatientEditorDialog(String title,PatientAttachment bean,PatientViewListener presenter,Runnable run) {
 		super(title,bean);
 		this.run=run;
 		this.presenter=presenter;
@@ -88,7 +89,7 @@ public class PatientEditorDialog extends AbstractEditorDialog<Patient>{
         firstname.setRequiredIndicatorVisible(true);
         binder.forField(firstname)
                 .asRequired()
-                .bind(Patient::getFirstName, Patient::setFirstName);
+                .bind(p->p.getPatient().getFirstName(),(p,s)->p.getPatient().setFirstName(s));
         layout.addFormItem(firstname, "First Name");
         
         TextField lastname =
@@ -96,7 +97,7 @@ public class PatientEditorDialog extends AbstractEditorDialog<Patient>{
         lastname.setRequiredIndicatorVisible(true);
         binder.forField(lastname)
                 .asRequired()
-                .bind(Patient::getLastName, Patient::setLastName);
+                .bind(p->p.getPatient().getLastName(), (p,s)->p.getPatient().setLastName(s));
         layout.addFormItem(lastname, "Last Name");
         
         TextField email =
@@ -104,17 +105,17 @@ public class PatientEditorDialog extends AbstractEditorDialog<Patient>{
         lastname.setRequiredIndicatorVisible(true);
         binder.forField(email)
                 .asRequired()
-                .bind(Patient::getEmail, Patient::setEmail);
+                .bind(p->p.getPatient().getEmail(), (p,s)->p.getPatient().setEmail(s));
         layout.addFormItem(email, "Email");
         
         ComboBox<Gender> gender=new ComboBox<>();
         gender.setItems(Gender.values());
-        binder.forField(gender).bind(Patient::getGender,Patient::setGender);
+        binder.forField(gender).bind(p->p.getPatient().getGender(),(p,s)->p.getPatient().setGender(s));
         layout.addFormItem(gender, "Gender");
         
         DatePicker birth=new DatePicker();
         birth.setWeekNumbersVisible(false);        
-        binder.forField(birth).bind(Patient::getBirthLocalDate, Patient::setBirthLocalDate);
+        binder.forField(birth).bind(p->p.getPatient().getBirthLocalDate(), (p,s)->p.getPatient().setBirthLocalDate(s));
         layout.addFormItem(birth,"Date of birth");
         
         layout.setResponsiveSteps(
@@ -158,7 +159,7 @@ public class PatientEditorDialog extends AbstractEditorDialog<Patient>{
 	@Override
 	protected void save(ClickEvent<Button> e) {		   
 		try{
-		  if(binder.getBean().getId()!=null)	
+		  if(binder.getBean().getPatient().getId()!=null)	
 		    presenter.update(binder.getBean());
 		  else
 			presenter.create(binder.getBean());  

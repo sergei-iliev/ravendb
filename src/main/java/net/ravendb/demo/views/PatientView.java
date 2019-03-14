@@ -37,10 +37,10 @@ import com.vaadin.flow.router.Route;
 
 import net.ravendb.demo.RavenDBApp;
 import net.ravendb.demo.assets.Gender;
+import net.ravendb.demo.command.PatientAttachment;
 import net.ravendb.demo.components.editor.AddressEditorDialog;
 import net.ravendb.demo.components.editor.PatientEditorDialog;
 import net.ravendb.demo.components.grid.PageableGrid;
-import net.ravendb.demo.model.Patient;
 import net.ravendb.demo.presenters.PatientPresenter;
 import net.ravendb.demo.presenters.PatientViewable;
 
@@ -50,7 +50,7 @@ public class PatientView extends VerticalLayout implements PatientViewable {
 	private static Logger logger = Logger.getLogger(PatientView.class.getSimpleName());
 	
 	private final PatientViewListener presenter;
-	private PageableGrid<Patient> grid;
+	private PageableGrid<PatientAttachment> grid;
 	private Button edit, delete, visits;
 	private Checkbox order;
 	private TextField search;
@@ -87,7 +87,7 @@ public class PatientView extends VerticalLayout implements PatientViewable {
 		HorizontalLayout header = new HorizontalLayout();
 
 		Button add = new Button("Add", e -> {
-			PatientEditorDialog d = new PatientEditorDialog("Add", new Patient(), this.presenter, () -> {
+			PatientEditorDialog d = new PatientEditorDialog("Add", new PatientAttachment(), this.presenter, () -> {
 				load();
 			});
 			d.open();
@@ -117,10 +117,10 @@ public class PatientView extends VerticalLayout implements PatientViewable {
 
 		visits = new Button("Manage Visits", e -> {
 			Map<String, String> map = new HashMap<>();
-			map.put("patientId", grid.getGrid().asSingleSelect().getValue().getId());
+			map.put("patientId", grid.getGrid().asSingleSelect().getValue().getPatient().getId());
 			try {
 				UI.getCurrent().navigate("patientvisit/"
-						+ URLEncoder.encode(grid.getGrid().asSingleSelect().getValue().getId(), "UTF-8"));
+						+ URLEncoder.encode(grid.getGrid().asSingleSelect().getValue().getPatient().getId(), "UTF-8"));
 			} catch (Exception e1) {
 
 				logger.log(Level.SEVERE,"", e);
@@ -175,24 +175,24 @@ public class PatientView extends VerticalLayout implements PatientViewable {
 				return image;
 			}
 		});
-		grid.getGrid().addColumn(Patient::getFirstName).setHeader("First Name");
-		grid.getGrid().addColumn(Patient::getLastName).setHeader("Last Name");
-		grid.getGrid().addColumn(Patient::getEmail).setHeader("Email");
+		grid.getGrid().addColumn(p->p.getPatient().getFirstName()).setHeader("First Name");
+		grid.getGrid().addColumn(p->p.getPatient().getLastName()).setHeader("Last Name");
+		grid.getGrid().addColumn(p->p.getPatient().getEmail()).setHeader("Email");
 		grid.getGrid().addColumn(new ComponentRenderer<>(person -> {
-			if (person.getGender() == Gender.MALE) {
+			if (person.getPatient().getGender() == Gender.MALE) {
 				return new Icon(VaadinIcon.MALE);
 			} else {
 				return new Icon(VaadinIcon.FEMALE);
 			}
 		})).setHeader("Gender");
-		grid.getGrid().addColumn(new LocalDateRenderer<>(Patient::getBirthLocalDate,
+		grid.getGrid().addColumn(new LocalDateRenderer<>(p->p.getPatient().getBirthLocalDate(),
 				DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM))).setHeader("Birth Date");
 
 		grid.getGrid().addComponentColumn(p -> {
 			Button address = new Button();
 			address.setIcon(new Icon(VaadinIcon.HOME));
 			address.addClickListener(e -> {
-				AddressEditorDialog d = new AddressEditorDialog("Address", p, this.presenter);
+				AddressEditorDialog d = new AddressEditorDialog("Address", p.getPatient(), this.presenter);
 				d.open();
 			});
 			return address;
@@ -217,7 +217,7 @@ public class PatientView extends VerticalLayout implements PatientViewable {
 		grid.loadFirstPage();
 	}
 
-	private Pair<Collection<Patient>, Integer> loadPage(int page, int pageSize) {
+	private Pair<Collection<PatientAttachment>, Integer> loadPage(int page, int pageSize) {
 		if (search.getValue().length() > 1) {
 			return presenter.searchPatientsList(page * pageSize, pageSize, search.getValue(), order.getValue());
 		} else {

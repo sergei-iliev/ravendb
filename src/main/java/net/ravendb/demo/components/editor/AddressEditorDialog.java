@@ -30,10 +30,6 @@ public class AddressEditorDialog extends AbstractEditorDialog<Patient>{
 		this.addbinder.setBean(bean.getAddress());
 	}
 
-//	protected void init(String title){
-//		
-//	     super.init(title);
-//	}
 	@Override
 	protected Component buildFormContent() {
 

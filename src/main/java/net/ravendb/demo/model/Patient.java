@@ -1,6 +1,5 @@
 package net.ravendb.demo.model;
 
-import java.io.Serializable;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -9,14 +8,11 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonValue;
 
 import net.ravendb.demo.assets.Gender;
-import net.ravendb.demo.command.Attachment;
 
-public class Patient implements Cloneable{
+public class Patient{
 	
     private String id;
 	private String firstName,lastName;
@@ -27,8 +23,6 @@ public class Patient implements Cloneable{
 	private Address address;
 	private List<Visit> visits;
 	
-	@JsonIgnore
-	private Attachment attachment;
 	
 	public String getEmail() {
 		return email;
@@ -99,15 +93,6 @@ public class Patient implements Cloneable{
 		  return null;	 
 	}
 	
-	@JsonIgnore
-	public Attachment getAttachment() {
-		return attachment;
-	}
-	@JsonIgnore
-	public void setAttachment(Attachment attachment) {
-		this.attachment = attachment;
-	}
-	
 	@JsonIgnore 
 	public static Visit getVisit(Collection<Visit> visists,Date date){
 		for(Visit v:visists){
@@ -117,10 +102,6 @@ public class Patient implements Cloneable{
 		}
 		return null;
 	}
-	@Override
-	public Patient clone() throws CloneNotSupportedException {
-	
-		return (Patient)super.clone();
-	}
+
 	
 }

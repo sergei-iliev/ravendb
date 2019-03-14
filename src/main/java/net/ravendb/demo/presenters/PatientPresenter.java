@@ -1,6 +1,7 @@
 package net.ravendb.demo.presenters;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.logging.Level;
@@ -18,6 +19,7 @@ import net.ravendb.client.documents.session.QueryStatistics;
 import net.ravendb.client.exceptions.ConcurrencyException;
 import net.ravendb.client.primitives.Reference;
 import net.ravendb.demo.command.Attachment;
+import net.ravendb.demo.command.PatientAttachment;
 import net.ravendb.demo.components.editor.PatientEditorDialog;
 import net.ravendb.demo.db.RavenDBDocumentStore;
 import net.ravendb.demo.model.Address;
@@ -34,7 +36,7 @@ public class PatientPresenter implements PatientViewListener {
 	}
 
 	@Override
-	public Pair<Collection<Patient>,Integer> getPatientsList(int offset, int limit, boolean order) {
+	public Pair<Collection<PatientAttachment>,Integer> getPatientsList(int offset, int limit, boolean order) {
 
 		
 		Reference<QueryStatistics> statsRef = new Reference<>();
@@ -50,8 +52,9 @@ public class PatientPresenter implements PatientViewListener {
 		Collection<Patient> list = query.toList();		
 		int totalResults = statsRef.value.getTotalResults();
 		
-
+        Collection<PatientAttachment> patientAttachments=new ArrayList<>();
 		for (Patient patient : list) {
+			PatientAttachment patientAttachment=new PatientAttachment(patient);
 			AttachmentName[] names = session.advanced().attachments().getNames(patient);
 			if (names.length > 0) {
 				try (CloseableAttachmentResult result = session.advanced().attachments().get(patient,
@@ -61,18 +64,19 @@ public class PatientPresenter implements PatientViewListener {
 					attachment.setMimeType(names[0].getContentType());
 					byte[] bytes = IOUtils.toByteArray(result.getData());
 					attachment.setBytes(bytes);
-					patient.setAttachment(attachment);
+					patientAttachment.setAttachment(attachment);
 				} catch (IOException e) {
 					logger.log(Level.SEVERE,"", e);
 				}
 
 			}
+		  patientAttachments.add(patientAttachment);
 		}
-		return new ImmutablePair<Collection<Patient>, Integer>(list, totalResults);
+		return new ImmutablePair<Collection<PatientAttachment>, Integer>(patientAttachments, totalResults);
 	}
 
 	@Override
-	public Pair<Collection<Patient>,Integer>  searchPatientsList(int offset, int limit, String term, boolean order) {
+	public Pair<Collection<PatientAttachment>,Integer>  searchPatientsList(int offset, int limit, String term, boolean order) {
 		
 		Reference<QueryStatistics> statsRef = new Reference<>();
 		
@@ -90,7 +94,9 @@ public class PatientPresenter implements PatientViewListener {
 		Collection<Patient> list = query.toList();	
 		int totalResults = statsRef.value.getTotalResults();
 		
+		Collection<PatientAttachment> patientAttachments=new ArrayList<>();
 		for (Patient patient : list) {
+			PatientAttachment patientAttachment=new PatientAttachment(patient);
 			AttachmentName[] names = session.advanced().attachments().getNames(patient);
 			if (names.length > 0) {
 				try (CloseableAttachmentResult result = session.advanced().attachments().get(patient,
@@ -100,14 +106,15 @@ public class PatientPresenter implements PatientViewListener {
 					attachment.setMimeType(names[0].getContentType());
 					byte[] bytes = IOUtils.toByteArray(result.getData());
 					attachment.setBytes(bytes);
-					patient.setAttachment(attachment);
+					patientAttachment.setAttachment(attachment);
 				} catch (IOException e) {
 					logger.log(Level.SEVERE,"", e);
 				}
 
 			}
+			  patientAttachments.add(patientAttachment);
 		}
-		return new ImmutablePair<Collection<Patient>, Integer>(list, totalResults);
+		return new ImmutablePair<Collection<PatientAttachment>,Integer>(patientAttachments, totalResults);
 
 	}
 
@@ -119,12 +126,14 @@ public class PatientPresenter implements PatientViewListener {
 	}
 
 	@Override
-	public void create(Patient patient) {
+	public void create(PatientAttachment patientAttachment) {
+		Patient patient=patientAttachment.getPatient();
+		Attachment attachment=patientAttachment.getAttachment();
 		session.store(patient);
 
-		if (patient.getAttachment() != null) {
-			session.advanced().attachments().store(patient, patient.getAttachment().getName(),
-					patient.getAttachment().getInputStream(), patient.getAttachment().getMimeType());
+		if (attachment != null) {
+			session.advanced().attachments().store(patient, attachment.getName(),
+					attachment.getInputStream(), attachment.getMimeType());
 		}
 		
 		session.saveChanges();
@@ -132,9 +141,11 @@ public class PatientPresenter implements PatientViewListener {
 	}
 
 	@Override
-	public void update(Patient patient) throws ConcurrencyException {
+	public void update(PatientAttachment patientAttachment) throws ConcurrencyException {
 		// enable oca
 		// session.advanced().setUseOptimisticConcurrency(true);
+		Patient patient=patientAttachment.getPatient();
+		Attachment attachment=patientAttachment.getAttachment();
 		session.store(patient);
 
 		// delete previous attachments
@@ -144,9 +155,9 @@ public class PatientPresenter implements PatientViewListener {
 		}
 		session.saveChanges();
 
-		if (patient.getAttachment() != null) {
-			session.advanced().attachments().store(patient, patient.getAttachment().getName(),
-					patient.getAttachment().getInputStream(), patient.getAttachment().getMimeType());
+		if (attachment != null) {
+			session.advanced().attachments().store(patient, attachment.getName(),
+					attachment.getInputStream(), attachment.getMimeType());
 		}
 
 		session.saveChanges();
@@ -163,8 +174,8 @@ public class PatientPresenter implements PatientViewListener {
 	}
 
 	@Override
-	public void delete(Patient patient) {
-		session.delete(patient.getId());
+	public void delete(PatientAttachment patient) {
+		session.delete(patient.getPatient().getId());
 		session.saveChanges();
 	}
 
