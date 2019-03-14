@@ -1,5 +1,8 @@
 package net.ravendb.demo.views;
 
+import java.util.Collection;
+
+import org.apache.commons.lang3.tuple.Pair;
 import org.claspina.confirmdialog.ButtonOption;
 import org.claspina.confirmdialog.ConfirmDialog;
 
@@ -23,7 +26,9 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
 import net.ravendb.demo.RavenDBApp;
+import net.ravendb.demo.command.PatientVisit;
 import net.ravendb.demo.components.editor.ConditionEditorDialog;
+import net.ravendb.demo.components.grid.PageableGrid;
 import net.ravendb.demo.model.Condition;
 import net.ravendb.demo.presenters.ConditionPresenter;
 import net.ravendb.demo.presenters.ConditionViewable;
@@ -32,7 +37,7 @@ import net.ravendb.demo.presenters.ConditionViewable;
 @PageTitle(value = "Hospital Management")
 public class ConditionView extends VerticalLayout implements ConditionViewable{
 	private final ConditionViewListener presenter;
-	private Grid<Condition> grid;
+	private PageableGrid<Condition> grid;
 	TextField search;
 	Button edit,delete;
 	
@@ -74,7 +79,7 @@ public class ConditionView extends VerticalLayout implements ConditionViewable{
 		header.add(add);
 
 		edit = new Button("Edit", e -> {
-			ConditionEditorDialog d = new ConditionEditorDialog("Edit", this.grid.asSingleSelect().getValue(),
+			ConditionEditorDialog d = new ConditionEditorDialog("Edit", this.grid.getGrid().asSingleSelect().getValue(),
 					this.presenter, () -> {
 						load();
 					});
@@ -86,7 +91,7 @@ public class ConditionView extends VerticalLayout implements ConditionViewable{
 		delete = new Button("Delete", e -> {
 			ConfirmDialog.createQuestion().withCaption("System alert").withMessage("Do you want to delete?")
 					.withOkButton(() -> {
-						presenter.delete(grid.asSingleSelect().getValue());
+						presenter.delete(grid.getGrid().asSingleSelect().getValue());
 						load();
 					}, ButtonOption.focus(), ButtonOption.caption("YES")).withCancelButton(ButtonOption.caption("NO"))
 					.open();
@@ -115,16 +120,16 @@ public class ConditionView extends VerticalLayout implements ConditionViewable{
 		return layout;
 	}	
 	private Component createGrid() {
-		   grid=new Grid<>();
-		   grid.setSelectionMode(SelectionMode.SINGLE);
-		   grid.setWidth("100%");
+		   grid=new PageableGrid<>(this::loadPage);
+		   grid.getGrid().setSelectionMode(SelectionMode.SINGLE);
+		   grid.setWidth("50%");
 
 
-		   grid.addColumn(Condition::getDescription).setHeader("Description");
-		   grid.addColumn(Condition::getPrescription).setHeader("Prescription");
-		   grid.addColumn(Condition::getSeverity).setHeader("Severity");
-		   grid.addSelectionListener(e -> {
-				if (grid.getSelectedItems().size() > 0) {
+		   grid.getGrid().addColumn(Condition::getDescription).setHeader("Description");
+		   grid.getGrid().addColumn(Condition::getPrescription).setHeader("Prescription");
+		   grid.getGrid().addColumn(Condition::getSeverity).setHeader("Severity");
+		   grid.getGrid().addSelectionListener(e -> {
+				if (grid.getGrid().getSelectedItems().size() > 0) {
 					edit.setEnabled(true);
 					delete.setEnabled(true);
 
@@ -137,24 +142,9 @@ public class ConditionView extends VerticalLayout implements ConditionViewable{
 
 	}
 	private void load() {
-		
-	   grid.setDataProvider(listDataProvider(search.getValue().length()==0?null:search.getValue()));
-
+	   grid.loadFirstPage();	
 	}
-	private DataProvider<Condition, Void> listDataProvider(String term) {
-		DataProvider<Condition, Void> dataProvider = DataProvider.fromCallbacks(
-				// First callback fetches items based on a query
-				query -> {
-					// The index of the first item to load
-					int offset = query.getOffset();
-					// The number of items to load
-					int limit = query.getLimit();
-
-					return presenter.getConditionsList(offset, limit, term).getKey().stream();
-				},
-				// Second callback fetches the number of items for a query
-				query -> presenter.getConditionsList(0,0,term).getValue());
-
-		return dataProvider;
+	private Pair<Collection<Condition>, Integer> loadPage(int page, int pageSize) {
+			return presenter.getConditionsList(page * pageSize, pageSize, search.getValue());
 	}	
 }

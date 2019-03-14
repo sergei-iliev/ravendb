@@ -31,28 +31,21 @@ public class PatientPresenter implements PatientViewListener {
 
 	@Override
 	public Pair<Collection<Patient>,Integer> getPatientsList(int offset, int limit, boolean order) {
-		Collection<Patient> list = null;
+
 		
 		Reference<QueryStatistics> statsRef = new Reference<>();
-		
+
+		IDocumentQuery<Patient> query = session.query(Patient.class)
+				.skip(offset)
+				.take(limit)
+				.statistics(statsRef);
 		if (order) {
-			IDocumentQuery<Patient> query = session.query(Patient.class);
-			list = query
-					.orderBy("birthDate")
-					.skip(offset)
-					.take(limit)
-					.statistics(statsRef)
-					.toList();
-		} else {
-			IDocumentQuery<Patient> query = session.query(Patient.class);
-			list = query
-					.skip(offset)
-					.take(limit)
-					.statistics(statsRef)
-					.toList();
+			    query.orderBy("birthDate");
 		}
-		
+
+		Collection<Patient> list = query.toList();		
 		int totalResults = statsRef.value.getTotalResults();
+		
 
 		for (Patient patient : list) {
 			AttachmentName[] names = session.advanced().attachments().getNames(patient);
@@ -76,25 +69,21 @@ public class PatientPresenter implements PatientViewListener {
 
 	@Override
 	public Pair<Collection<Patient>,Integer>  searchPatientsList(int offset, int limit, String term, boolean order) {
-		IDocumentQuery<Patient> query = session.query(Patient.class).whereStartsWith("firstName", term);
-
-		Collection<Patient> list;
+		
 		Reference<QueryStatistics> statsRef = new Reference<>();
+		
+		IDocumentQuery<Patient> query = session.query(Patient.class)
+				.whereStartsWith("firstName", term)
+				.skip(offset)
+				.take(limit)
+				.statistics(statsRef);
+
 		if (order) {
-			list = query
-					.skip(offset)
-					.take(limit)
-					.orderBy("birthDate")
-					.statistics(statsRef)
-					.toList();
-		} else {
-			list = query
-					.skip(offset)
-					.take(limit)
-					.statistics(statsRef)
-					.toList();
+			query.orderBy("birthDate");
+
 		}
 		
+		Collection<Patient> list = query.toList();	
 		int totalResults = statsRef.value.getTotalResults();
 		
 		for (Patient patient : list) {

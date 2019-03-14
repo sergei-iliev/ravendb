@@ -54,27 +54,28 @@ public class ConditionPresenter implements ConditionViewListener {
 
 	@Override
 	public Pair<Collection<Condition>, Integer> getConditionsList(int offset, int limit, String term) {
-		IDocumentQuery<Condition> conditions = session.query(Condition.class).include("patientId");
 		Reference<QueryStatistics> statsRef = new Reference<>();
-		if (term != null) {
-			conditions.whereStartsWith("description", term);
-		}
-		List<Condition> list = conditions
+		IDocumentQuery<Condition> conditions = session.query(Condition.class)
+				.include("patientId")
 				.skip(offset)
 				.take(limit)
-				.statistics(statsRef)
-				.toList();
+				.statistics(statsRef);
+
+		if (term != null) {
+			    conditions.whereStartsWith("description", term);
+		}
+
+		List<Condition> list = conditions.toList();
 		int totalResults = statsRef.value.getTotalResults();
 
 		return new ImmutablePair<Collection<Condition>, Integer>(list, totalResults);
 
 	}
 
-
 	@Override
 	public void openSession() {
-		if(session==null){
-		  session = RavenDBDocumentStore.getStore().openSession();
+		if (session == null) {
+			session = RavenDBDocumentStore.getStore().openSession();
 		}
 	}
 

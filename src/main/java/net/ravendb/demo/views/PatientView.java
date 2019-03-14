@@ -4,11 +4,9 @@ import java.net.URLEncoder;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.claspina.confirmdialog.ButtonOption;
 import org.claspina.confirmdialog.ConfirmDialog;
@@ -21,7 +19,6 @@ import com.vaadin.flow.component.KeyDownEvent;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.checkbox.Checkbox;
-import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.SelectionMode;
 import com.vaadin.flow.component.html.H4;
 import com.vaadin.flow.component.html.Image;
@@ -31,7 +28,6 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.renderer.LocalDateRenderer;
 import com.vaadin.flow.router.PageTitle;
@@ -54,13 +50,13 @@ public class PatientView extends VerticalLayout implements PatientViewable {
 	private PageableGrid<Patient> grid;
 	private Button edit, delete, visits;
 	private Checkbox order;
+	private TextField search;
 
 	public PatientView() {
 		presenter = new PatientPresenter();
 		init();
 	}
 
-	
 	@Override
 	protected void onAttach(AttachEvent attachEvent) {
 		presenter.openSession();
@@ -72,6 +68,7 @@ public class PatientView extends VerticalLayout implements PatientViewable {
 		presenter.releaseSession();
 		super.onDetach(detachEvent);
 	}
+
 	private void init() {
 		this.setWidth("100%");
 		H4 title = new H4("Patients");
@@ -119,8 +116,8 @@ public class PatientView extends VerticalLayout implements PatientViewable {
 			Map<String, String> map = new HashMap<>();
 			map.put("patientId", grid.getGrid().asSingleSelect().getValue().getId());
 			try {
-				UI.getCurrent().navigate(
-						"patientvisit/" + URLEncoder.encode(grid.getGrid().asSingleSelect().getValue().getId(), "UTF-8"));
+				UI.getCurrent().navigate("patientvisit/"
+						+ URLEncoder.encode(grid.getGrid().asSingleSelect().getValue().getId(), "UTF-8"));
 			} catch (Exception e1) {
 
 				e1.printStackTrace();
@@ -137,24 +134,16 @@ public class PatientView extends VerticalLayout implements PatientViewable {
 		HorizontalLayout layout = new HorizontalLayout();
 		Span span = new Span();
 
-		TextField search = new TextField();
+		search = new TextField();
 		search.setPlaceholder("Search");
 		search.addKeyDownListener(com.vaadin.flow.component.Key.ENTER,
 				(ComponentEventListener<KeyDownEvent>) keyDownEvent -> {
-					if (search.getValue().length() > 1) {
-						search(search.getValue());						
-					} else {
-						load();
-					}
+					load();
 				});
 
 		order = new Checkbox("Order by birth date");
 		order.addValueChangeListener(e -> {
-			if (search.getValue() == null) {
-				load();
-			} else {
-				search(search.getValue());
-			}
+			load();
 		});
 
 		span.add(new Icon(VaadinIcon.SEARCH), search, order);
@@ -164,10 +153,10 @@ public class PatientView extends VerticalLayout implements PatientViewable {
 	}
 
 	private Component createGrid() {
-		grid = new PageableGrid(3,this::loadPage);
+		grid = new PageableGrid<>(this::loadPage);
 		grid.getGrid().setSelectionMode(SelectionMode.SINGLE);
 		grid.setWidth("100%");
-		
+
 		grid.getGrid().addComponentColumn(p -> {
 			if (p.getAttachment() == null) {
 				Image image = new Image("/frontend/images/avatar.jpeg", "");
@@ -181,7 +170,7 @@ public class PatientView extends VerticalLayout implements PatientViewable {
 				image.setHeight("60px");
 				image.getStyle().set("borderRadius", "50%");
 				return image;
-			}			
+			}
 		});
 		grid.getGrid().addColumn(Patient::getFirstName).setHeader("First Name");
 		grid.getGrid().addColumn(Patient::getLastName).setHeader("Last Name");
@@ -217,56 +206,20 @@ public class PatientView extends VerticalLayout implements PatientViewable {
 				visits.setEnabled(false);
 			}
 		});
-		
-		return grid;
-	}
 
-	private void search(String term) {
-		//grid.setDataProvider(searchDataProvider(term, order.getValue()));
+		return grid;
 	}
 
 	private void load() {
 		grid.loadFirstPage();
-		//grid.setDataProvider(listDataProvider(order.getValue()));
 	}
-    
-	private Pair<Collection<Patient>,Integer> loadPage(int page,int pageSize){
-		System.out.println(page);
-		return presenter.getPatientsList(page*pageSize,pageSize, false);
+
+	private Pair<Collection<Patient>, Integer> loadPage(int page, int pageSize) {
+		if (search.getValue().length() > 1) {
+			return presenter.searchPatientsList(page * pageSize, pageSize, search.getValue(), order.getValue());
+		} else {
+			return presenter.getPatientsList(page * pageSize, pageSize, order.getValue());
+		}
 	}
-//	private DataProvider<Patient, Void> listDataProvider(boolean sort) {
-//		DataProvider<Patient, Void> dataProvider = DataProvider.fromCallbacks(
-//				// First callback fetches items based on a query
-//				query -> {
-//					// The index of the first item to load
-//					int offset = query.getOffset();
-//					// The number of items to load
-//					int limit = query.getLimit();
-//
-//					return presenter.getPatientsList(offset, limit, sort).getKey().stream();
-//				},
-//				// Second callback fetches the number of items for a query
-//				query ->presenter.getPatientsList(0,0, false).getValue());
-//
-//		return dataProvider;
-//	}
-//
-//	private DataProvider<Patient, Void> searchDataProvider(String term, boolean sort) {
-//	
-//		DataProvider<Patient, Void> dataProvider = DataProvider.fromCallbacks(
-//				// First callback fetches items based on a query
-//				query -> {
-//					// The index of the first item to load
-//					int offset = query.getOffset();
-//					// The number of items to load
-//					int limit = query.getLimit();
-//
-//					return presenter.searchPatientsList(offset, limit, term, sort).getKey().stream();
-//				},
-//				// Second callback fetches the number of items for a query
-//				query ->  presenter.searchPatientsList(0,0,term,false).getValue());
-//
-//		return dataProvider;
-//	}
 
 }

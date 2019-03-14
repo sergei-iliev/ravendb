@@ -11,7 +11,8 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import net.ravendb.demo.model.Patient;
 
 public class PageableGrid<T> extends VerticalLayout {
-
+    private static final int PAGE_SIZE=10;  
+	
 	@FunctionalInterface
 	public interface PageableCallback<T>{
 	    public Pair<Collection<T>,Integer> loadPage(int page,int pageSize);	
@@ -22,8 +23,8 @@ public class PageableGrid<T> extends VerticalLayout {
 	private final PageableCallback pageableCallback;
     private int size;
     
-	public PageableGrid(int size,PageableCallback pageableCallback) {
-		this.size=size;
+	public PageableGrid(PageableCallback pageableCallback) {
+		this.size=PAGE_SIZE;
 		paginator.setInitialPage(false);
 		paginator.setSize(size);
 		this.pageableCallback=pageableCallback;
@@ -53,6 +54,7 @@ public class PageableGrid<T> extends VerticalLayout {
 	public void loadFirstPage(){
 		Pair<Collection<T>,Integer> result=pageableCallback.loadPage(0,size);
 		grid.setItems(result.getKey());
+		paginator.setPage(0);
 		paginator.setTotal(result.getValue());			
 	}
 	

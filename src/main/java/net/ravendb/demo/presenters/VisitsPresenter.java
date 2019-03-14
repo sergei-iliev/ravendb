@@ -27,7 +27,7 @@ public class VisitsPresenter implements VisitsViewListener {
 	@Override
 	public Pair<Collection<PatientVisit>,Integer> getVisistsList(int offset, int limit, boolean order) {
 		Reference<QueryStatistics> statsRef = new Reference<>();
-		List<PatientVisit> list;
+
 		IDocumentQuery<PatientVisit> visits = session.query(Patient.class)
 				.groupBy("visits[].doctorName", "visits[].date", "firstName", "lastName", "visits[].visitSummery")
 				.selectKey("visits[].doctorName", "doctorName").selectKey("visits[].date", "date")
@@ -37,18 +37,16 @@ public class VisitsPresenter implements VisitsViewListener {
 				.ofType(PatientVisit.class)
 				.whereNotEquals("date", null)
 				.skip(offset)
-				.take(limit);
+				.take(limit)
+				.statistics(statsRef);
+		
 		if (order) {
-			list= visits
-					.orderByDescending("date")
-					.statistics(statsRef)
-					.toList();
+			 visits.orderByDescending("date");
 		} else {
-			list= visits
-					.orderBy("date")
-					.statistics(statsRef)
-					.toList();
+			 visits.orderBy("date");
 		}
+		
+		List<PatientVisit> list=visits.toList();
         
 		int totalResults = statsRef.value.getTotalResults();
 		
@@ -59,7 +57,7 @@ public class VisitsPresenter implements VisitsViewListener {
 	@Override
 	public Pair<Collection<PatientVisit>,Integer> searchVisitsList(int offset, int limit, String term, boolean order) {
 		Reference<QueryStatistics> statsRef = new Reference<>();
-		List<PatientVisit> list;
+		
 		IDocumentQuery<PatientVisit> visits = session.advanced().documentQuery(Patient.class)
 				.groupBy("visits[].doctorName", "visits[].date", "firstName", "lastName", "visits[].visitSummery")
 				.selectKey("visits[].doctorName", "doctorName").selectKey("visits[].date", "date")
@@ -70,19 +68,16 @@ public class VisitsPresenter implements VisitsViewListener {
 				.whereNotEquals("date", null)
 				.whereStartsWith("doctorName", term)
 				.skip(offset)
-				.take(limit);
+				.take(limit)
+				.statistics(statsRef);
+		
 		if (order) {
-			list= visits
-					.orderByDescending("date")
-					.statistics(statsRef)
-					.toList();
+			 visits.orderByDescending("date");
 		} else {
-			list= visits
-					.orderBy("date")
-					.statistics(statsRef)
-					.toList();
+			 visits.orderBy("date");
 		}
-
+		
+		List<PatientVisit> list=visits.toList();
 		int totalResults = statsRef.value.getTotalResults();
 		
 		return new ImmutablePair<Collection<PatientVisit>, Integer>(list, totalResults);
