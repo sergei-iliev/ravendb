@@ -31,26 +31,25 @@ public class PatientPresenter implements PatientViewListener {
 
 	@Override
 	public Pair<Collection<Patient>,Integer> getPatientsList(int offset, int limit, boolean order) {
-		Collection<Patient> list = null;
+
 		
 		Reference<QueryStatistics> statsRef = new Reference<>();
-		
+
+
+		// todo: reduce code duplication when defining sort order
+		IDocumentQuery<Patient> query = session.query(Patient.class)
+				.skip(offset)
+				.take(limit)
+				.statistics(statsRef);
 		if (order) {
-			IDocumentQuery<Patient> query = session.query(Patient.class);
-			list = query
-					.orderBy("birthDate")
-					.skip(offset)
-					.take(limit)
-					.statistics(statsRef)
-					.toList();
-		} else {
-			IDocumentQuery<Patient> query = session.query(Patient.class);
-			list = query
-					.skip(offset)
-					.take(limit)
-					.statistics(statsRef)
-					.toList();
+
+			query = query
+					.orderBy("birthDate");
+
+
 		}
+
+		Collection<Patient> list = query.toList();
 		
 		int totalResults = statsRef.value.getTotalResults();
 
