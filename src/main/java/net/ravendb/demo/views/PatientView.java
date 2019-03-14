@@ -3,9 +3,11 @@ package net.ravendb.demo.views;
 import java.net.URLEncoder;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.claspina.confirmdialog.ButtonOption;
 import org.claspina.confirmdialog.ConfirmDialog;
 
@@ -226,6 +228,12 @@ public class PatientView extends VerticalLayout implements PatientViewable {
 	}
 
 	private DataProvider<Patient, Void> listDataProvider(boolean sort) {
+
+		// todo: find a way to perform only one db call for the first page load (meaning, there will be no seperate "count" call)
+		// code below is product of discussion and may not be used.
+		Pair<Collection<Patient>,Integer> initialPatients = presenter.getPatientsList(0,50, false);
+
+
 		DataProvider<Patient, Void> dataProvider = DataProvider.fromCallbacks(
 				// First callback fetches items based on a query
 				query -> {
@@ -234,10 +242,13 @@ public class PatientView extends VerticalLayout implements PatientViewable {
 					// The number of items to load
 					int limit = query.getLimit();
 
+					if (offset==0 && limit == 50)
+						return initialPatients.getKey().stream();
+
 					return presenter.getPatientsList(offset, limit, sort).getKey().stream();
 				},
 				// Second callback fetches the number of items for a query
-				query ->presenter.getPatientsList(0,0, false).getValue());
+				query ->initialPatients.getValue());
 
 		return dataProvider;
 	}

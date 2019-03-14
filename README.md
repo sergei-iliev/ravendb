@@ -109,9 +109,10 @@ public class Condition {
 JSON representation of Condition document at RavenDB side
 ```JSON
 {
-    "severity": "SEVIER",
-    "prescription": "stay at home fro a week",
-    "description": "headache",
+// todo: we want to change condition's fields to be like that:
+    "symptoms": "swollen legs, eye sight",
+    "recommendedTreatment": "carbon free diet",
+    "name": "Diabetes",
     "@metadata": {
         "@collection": "Conditions",
         "Raven-Java-Type": "net.ravendb.demo.model.Condition"
@@ -182,6 +183,7 @@ Current demo application uses page attach/detach events to demarcate Session's c
 ```java
 public void openSession() {
 	if(session==null){
+	// todo: please implement that without "Instance"
 	     session = RavenDBDocumentStore.INSTANCE.getStore().openSession();
 	}
 }
@@ -198,15 +200,15 @@ Create operation inserts a new document. Each document contains a unique ID that
 
 ```java
 public void create(Patient patient) {
-			 
-	session.store(patient);		 
-	   if(patient.getAttachment()!=null){	        	 
-		    Attachment attachment=patient.getAttachment();
-                    InputStream inputStream=attachment.getInputStream();   		   
-		    String name=attachment.getName();
-		    String mimeType=attachment.getMimeType();
-		    session.advanced().attachments().store(patient,name,inputStream,mimeType);
-	   }
+		// todo: fix indentation
+        session.store(patient);
+        if(patient.getAttachment()!=null){
+            Attachment attachment=patient.getAttachment();
+                    InputStream inputStream=attachment.getInputStream();
+            String name=attachment.getName();
+            String mimeType=attachment.getMimeType();
+            session.advanced().attachments().store(patient,name,inputStream,mimeType);
+        }
 	          
         session.saveChanges();
 	           	  		
@@ -256,26 +258,23 @@ Paging through large data is one of the most common operations with RavenDB. A t
 
 ```java
 public Pair<Collection<Patient>,Integer> getPatientsList(int offset, int limit, boolean order) {
-		Collection<Patient> list = null;
 		
 		Reference<QueryStatistics> statsRef = new Reference<>();
-		
+
+		// todo: have less code duplication useing the query building in all cases when we have ordering
+
+		IDocumentQuery<Patient> query =
+		    session.query(Patient.class)
+                .skip(offset)
+                .take(limit)
+                .statistics(statsRef);
+
+
 		if (order) {
-			IDocumentQuery<Patient> query = session.query(Patient.class);
-			list = query
-					.orderBy("birthDate")
-					.skip(offset)
-					.take(limit)
-					.statistics(statsRef)
-					.toList();
-		} else {
-			IDocumentQuery<Patient> query = session.query(Patient.class);
-			list = query
-					.skip(offset)
-					.take(limit)
-					.statistics(statsRef)
-					.toList();
+			IDocumentQuery<Patient> query = query.orderBy("birthDate");
 		}
+
+        Collection<Patient> list = query.toList();
 		
 		int totalResults = statsRef.value.getTotalResults();
 
@@ -291,7 +290,7 @@ public Pair<Collection<Patient>,Integer> getPatientsList(int offset, int limit, 
 					attachment.setBytes(bytes);
 					patient.setAttachment(attachment);
 			  } catch (IOException e) {
-				e.printStackTrace();
+				e.printStackTrace(); // todo: substitute all e.printStackTrace() calls to log calls
 			  }
 
 			}
