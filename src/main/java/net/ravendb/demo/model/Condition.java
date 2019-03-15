@@ -1,19 +1,13 @@
 package net.ravendb.demo.model;
 
-import java.io.Serializable;
-
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonValue;
-
-import net.ravendb.demo.assets.Type;
 
 public class Condition{
 	
 	private String id;
-	private Type severity;
-	private String prescription;
-	private String description;
+	private String name;
+	private String symptoms;
+	private String recommendedTreatment;
 	private Patient patient;
 	
 	public String getId() {
@@ -22,25 +16,25 @@ public class Condition{
 	public void setId(String id) {
 		this.id = id;
 	}
-	public Type getSeverity() {
-		return severity;
-	}
-	public void setSeverity(Type severity) {
-		this.severity = severity;
-	}
-	public String getPrescription() {
-		return prescription;
-	}
-	public void setPrescription(String prescription) {
-		this.prescription = prescription;
-	}
-	public String getDescription() {
-		return description;
-	}
-	public void setDescription(String description) {
-		this.description = description;
-	}
 	
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	public String getSymptoms() {
+		return symptoms;
+	}
+	public void setSymptoms(String symptoms) {
+		this.symptoms = symptoms;
+	}
+	public String getRecommendedTreatment() {
+		return recommendedTreatment;
+	}
+	public void setRecommendedTreatment(String recommendedTreatment) {
+		this.recommendedTreatment = recommendedTreatment;
+	}
 	@JsonIgnore
 	public Patient getPatient() {
 		return patient;

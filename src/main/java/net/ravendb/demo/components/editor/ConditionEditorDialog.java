@@ -3,11 +3,9 @@ package net.ravendb.demo.components.editor;
 import com.vaadin.flow.component.ClickEvent;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.textfield.TextField;
 
-import net.ravendb.demo.assets.Type;
 import net.ravendb.demo.model.Condition;
 import net.ravendb.demo.presenters.ConditionViewable.ConditionViewListener;
 
@@ -31,19 +29,18 @@ public class ConditionEditorDialog extends AbstractEditorDialog<Condition>{
 		FormLayout layout=new FormLayout();		
       
         TextField description=new TextField();
-        binder.forField(description).bind(Condition::getDescription,Condition::setDescription);
+        binder.forField(description).bind(Condition::getName,Condition::setName);
         layout.addFormItem(description, "Name");
         
         TextField prescription=new TextField();
-        binder.forField(prescription).bind(Condition::getPrescription,Condition::setPrescription);
-        layout.addFormItem(prescription, "Prescription");
+        binder.forField(prescription).bind(Condition::getSymptoms,Condition::setSymptoms);
+        layout.addFormItem(prescription, "Symptoms");
         
 
 
-        ComboBox<Type> type=new ComboBox<>();
-        type.setItems(Type.values());
-        binder.forField(type).bind(Condition::getSeverity,Condition::setSeverity);
-        layout.addFormItem(type, "Severity");
+        TextField type=new TextField();        
+        binder.forField(type).bind(Condition::getRecommendedTreatment,Condition::setRecommendedTreatment);
+        layout.addFormItem(type, "Recommended Treatment");
         
         
         layout.setResponsiveSteps(

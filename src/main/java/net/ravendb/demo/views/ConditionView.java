@@ -125,9 +125,9 @@ public class ConditionView extends VerticalLayout implements ConditionViewable{
 		   grid.setWidth("50%");
 
 
-		   grid.getGrid().addColumn(Condition::getDescription).setHeader("Description");
-		   grid.getGrid().addColumn(Condition::getPrescription).setHeader("Prescription");
-		   grid.getGrid().addColumn(Condition::getSeverity).setHeader("Severity");
+		   grid.getGrid().addColumn(Condition::getName).setHeader("Name");
+		   grid.getGrid().addColumn(Condition::getSymptoms).setHeader("Symptoms");
+		   grid.getGrid().addColumn(Condition::getRecommendedTreatment).setHeader("Recommended Treatment");
 		   grid.getGrid().addSelectionListener(e -> {
 				if (grid.getGrid().getSelectedItems().size() > 0) {
 					edit.setEnabled(true);

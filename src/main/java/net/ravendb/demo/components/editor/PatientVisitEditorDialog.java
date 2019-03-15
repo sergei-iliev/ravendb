@@ -37,7 +37,7 @@ public class PatientVisitEditorDialog extends AbstractEditorDialog<Visit>{
 		list.add(ComboValue.NULL);
 	    doctor.setItems(list);
 	    
-		list= presenter.getConditionsList().stream().map(d->new ComboValue(d.getId(), d.getDescription())).collect(Collectors.toList());
+		list= presenter.getConditionsList().stream().map(d->new ComboValue(d.getId(), d.getName())).collect(Collectors.toList());
 		list.add(ComboValue.NULL);
 		condition.setItems(list);
 	    super.fetch();
