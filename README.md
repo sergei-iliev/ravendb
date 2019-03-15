@@ -218,11 +218,11 @@ update has already changed the record. The method also handles attachment as a 1
 ```java
 public void update(Patient patient)throws ConcurrencyException{
 			   
-			   //enable oca			   
+	//enable oca			   
 	session.advanced().setUseOptimisticConcurrency(true);			   
 	session.store(patient);
 			   
-	           //delete previous attachments	           
+	//delete previous attachments	           
 	AttachmentName[] names=session.advanced().attachments().getNames(patient);
 	if(names.length>0){				
 		session.advanced().attachments().delete(patient,names[0].getName());
