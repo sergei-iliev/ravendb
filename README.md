@@ -212,7 +212,7 @@ public void create(Patient patient) {
 	           	  		
 }
 ```
-Update operation is worth noting - it handles optimistic concurrency control and throws ConcurrecyException provided that another 
+Update operation is worth noting - it handles optimistic concurrency control and throws `ConcurrecyException` provided that another 
 update has already changed the record. The method also handles attachment as a 1:1 relationship with each patient. 
 
 ```java
@@ -294,7 +294,7 @@ public Pair<Collection<PatientAttachment>,Integer> getPatientsList(int offset, i
 ```
 
 ## BLOB handling - attachements
-When binary data(images,documents,media) needs to be associated with the document, RavenDB provides the Attachment API.
+When binary data(images,documents,media) needs to be associated with the document, RavenDB provides the `Attachment API`.
 Attachments are completely decoupled from documents. They can be updated and changed separately from the document and do not 
 participate in transactions. Following POJO represents attachments on client side.
 ```java
@@ -334,7 +334,7 @@ public class Attachment {
 	
 }
 ```
-In Patient entity, image is attached to the document using the session.Advanced.Attachments.Store method.
+In Patient entity, image is attached to the document using the `Session.Advanced.Attachments.Store` method.
 Attachments, just like documents, are a part of the session and will be only saved on the Server when `DocumentSession.SaveChanges` is executed.
 
 ```java
