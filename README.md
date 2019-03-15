@@ -274,7 +274,7 @@ public Pair<Collection<PatientAttachment>,Integer> getPatientsList(int offset, i
 			PatientAttachment patientAttachment=new PatientAttachment(patient);
 			AttachmentName[] names = session.advanced().attachments().getNames(patient);
 			if (names.length > 0) {
-				try (CloseableAttachmentResult result = session.advanced().attachments().get(patient,
+			  try (CloseableAttachmentResult result = session.advanced().attachments().get(patient,
 						names[0].getName())) {					
 					Attachment attachment = new Attachment();
 					attachment.setName(names[0].getName());
@@ -282,9 +282,9 @@ public Pair<Collection<PatientAttachment>,Integer> getPatientsList(int offset, i
 					byte[] bytes = IOUtils.toByteArray(result.getData());
 					attachment.setBytes(bytes);
 					patientAttachment.setAttachment(attachment);
-				} catch (IOException e) {
+			  } catch (IOException e) {
 					logger.log(Level.SEVERE,"", e);
-				}
+			  }
 
 			}
 		  patientAttachments.add(patientAttachment);
