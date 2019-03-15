@@ -37,7 +37,7 @@ In RavenDB, a domain object is mapped to a single document. In this regard there
 1. Patient - stored as a separate collection
 ```java
 public class Patient {
-        private String id;
+	private String id;
 	private String firstName,lastName;
 	private Date birthDate;
 	private Gender gender;
@@ -255,49 +255,41 @@ Paging through large data is one of the most common operations with RavenDB. A t
 ![Patient CRUD](/screenshots/p_paging.png)
 
 ```java
-public Pair<Collection<Patient>,Integer> getPatientsList(int offset, int limit, boolean order) {
-		Collection<Patient> list = null;
-		
-		Reference<QueryStatistics> statsRef = new Reference<>();
-		
-		if (order) {
-			IDocumentQuery<Patient> query = session.query(Patient.class);
-			list = query
-					.orderBy("birthDate")
-					.skip(offset)
-					.take(limit)
-					.statistics(statsRef)
-					.toList();
-		} else {
-			IDocumentQuery<Patient> query = session.query(Patient.class);
-			list = query
-					.skip(offset)
-					.take(limit)
-					.statistics(statsRef)
-					.toList();
-		}
-		
-		int totalResults = statsRef.value.getTotalResults();
+public Pair<Collection<PatientAttachment>,Integer> getPatientsList(int offset, int limit, boolean order) {
 
+	Reference<QueryStatistics> statsRef = new Reference<>();
+	IDocumentQuery<Patient> query = session.query(Patient.class)
+			.skip(offset)
+			.take(limit)
+			.statistics(statsRef);
+	if (order) {
+		    query.orderBy("birthDate");
+	}
+
+	Collection<Patient> list = query.toList();		
+	int totalResults = statsRef.value.getTotalResults();
+		
+        Collection<PatientAttachment> patientAttachments=new ArrayList<>();
 		for (Patient patient : list) {
+			PatientAttachment patientAttachment=new PatientAttachment(patient);
 			AttachmentName[] names = session.advanced().attachments().getNames(patient);
 			if (names.length > 0) {
-			  try (CloseableAttachmentResult result = session.advanced().attachments().get(patient,
+				try (CloseableAttachmentResult result = session.advanced().attachments().get(patient,
 						names[0].getName())) {					
 					Attachment attachment = new Attachment();
 					attachment.setName(names[0].getName());
 					attachment.setMimeType(names[0].getContentType());
 					byte[] bytes = IOUtils.toByteArray(result.getData());
 					attachment.setBytes(bytes);
-					patient.setAttachment(attachment);
-			  } catch (IOException e) {
-				e.printStackTrace();
-			  }
+					patientAttachment.setAttachment(attachment);
+				} catch (IOException e) {
+					logger.log(Level.SEVERE,"", e);
+				}
 
 			}
-		}
-		return new ImmutablePair<Collection<Patient>, Integer>(list, totalResults);
+		  patientAttachments.add(patientAttachment);
 	}
+	return new ImmutablePair<Collection<PatientAttachment>, Integer>(patientAttachments, totalResults);
 }
 ```
 
@@ -343,26 +335,28 @@ public class Attachment {
 }
 ```
 In Patient entity, image is attached to the document using the session.Advanced.Attachments.Store method.
-Attachments, just like documents, are a part of the session and will be only saved on the Server when DocumentSession.SaveChanges is executed.
+Attachments, just like documents, are a part of the session and will be only saved on the Server when `DocumentSession.SaveChanges` is executed.
 
 ```java
-		Attachment attachment=patient.getAttachment();
-                InputStream inputStream=attachment.getInputStream();
-		String name=attachment.getName();
-		String mimeType=attachment.getMimeType();
-		session.advanced().attachments().store(patient,name,inputStream,mimeType);
-		session.saveChanges();
+	Patient patient=patientAttachment.getPatient();
+	Attachment attachment=patientAttachment.getAttachment();
+
+        InputStream inputStream=attachment.getInputStream();
+	String name=attachment.getName();
+	String mimeType=attachment.getMimeType();
+	session.advanced().attachments().store(patient,name,inputStream,mimeType);
+	session.saveChanges();
 ```
 
 This operation is used to get an attachment from a patient document.
 ```java
 try(CloseableAttachmentResult result= session.advanced().attachments().get(patient,names[0].getName())){
-	  	Attachment attachment=new Attachment();
-	  	attachment.setName(names[0].getName());
-	  	attachment.setMimeType(names[0].getContentType());
-	  	byte[] bytes = IOUtils.toByteArray(result.getData());
-		attachment.setBytes(bytes);
-  	        patient.setAttachment(attachment);
+	Attachment attachment = new Attachment();
+	attachment.setName(names[0].getName());
+	attachment.setMimeType(names[0].getContentType());
+	byte[] bytes = IOUtils.toByteArray(result.getData());
+	attachment.setBytes(bytes);
+	patientAttachment.setAttachment(attachment);
 }
 ```
 ## Queries
