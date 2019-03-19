@@ -199,46 +199,47 @@ Patient entity is given as an example only.
 Create operation inserts a new document. Each document contains a unique ID that identifies it, data and adjacent metadata, both stored in JSON format. The metadata contains information describing the document, e.g. the last modification date (`@last-modified` property) or the collection (`@collection` property) assignment. As already mentioned we will use the default algorithm for letting RavenDB generate unique ID for our entities by specifying a property named `id` in each entity. 
 
 ```java
-public void create(Patient patient) {
-			 
-	session.store(patient);		 
-	   if(patient.getAttachment()!=null){	        	 
-		    Attachment attachment=patient.getAttachment();
-                    InputStream inputStream=attachment.getInputStream();   		   
-		    String name=attachment.getName();
-		    String mimeType=attachment.getMimeType();
-		    session.advanced().attachments().store(patient,name,inputStream,mimeType);
-	   }
-	          
-        session.saveChanges();
-	           	  		
+public void create(PatientAttachment patientAttachment) {
+	Patient patient=patientAttachment.getPatient();
+	Attachment attachment=patientAttachment.getAttachment();
+	session.store(patient);
+
+	if (attachment != null) {
+		session.advanced().attachments().store(patient, attachment.getName(),
+					attachment.getInputStream(), attachment.getMimeType());
+	}
+		
+	session.saveChanges();
+	session.advanced().clear();
 }
 ```
 Update operation is worth noting - it handles optimistic concurrency control and throws `ConcurrecyException` provided that another 
 update has already changed the record. The method also handles attachment as a 1:1 relationship with each patient. 
 
 ```java
-public void update(Patient patient)throws ConcurrencyException{
-			   
-	//enable oca			   
-	session.advanced().setUseOptimisticConcurrency(true);			   
+public void update(PatientAttachment patientAttachment) throws ConcurrencyException {
+	// enable oca
+	session.advanced().setUseOptimisticConcurrency(true);
+	Patient patient=patientAttachment.getPatient();
+	Attachment attachment=patientAttachment.getAttachment();
 	session.store(patient);
-			   
-	//delete previous attachments	           
-	AttachmentName[] names=session.advanced().attachments().getNames(patient);
-	if(names.length>0){				
-		session.advanced().attachments().delete(patient,names[0].getName());
+
+	// delete previous attachments
+	AttachmentName[] names = session.advanced().attachments().getNames(patient);
+	if (names.length > 0) {
+		session.advanced().attachments().delete(patient, names[0].getName());
 	}
-			 
-	if(patient.getAttachment()!=null){  
-		Attachment attachment=patient.getAttachment();
-                InputStream inputStream=attachment.getInputStream();
-		String name=attachment.getName();
-		String mimeType=attachment.getMimeType();
-		session.advanced().attachments().store(patient,name,inputStream,mimeType);
-	}	           
-       session.saveChanges();
-	           	 
+	session.saveChanges();
+
+	if (attachment != null) {
+		session.advanced().attachments().store(patient, 
+			attachment.getName(),
+			attachment.getInputStream(),
+			attachment.getMimeType());
+	}
+
+	session.saveChanges();
+	session.advanced().clear();
 }
 ```
 
