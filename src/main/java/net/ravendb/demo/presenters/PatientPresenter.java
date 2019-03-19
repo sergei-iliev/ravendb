@@ -142,8 +142,6 @@ public class PatientPresenter implements PatientViewListener {
 
 	@Override
 	public void update(PatientAttachment patientAttachment) throws ConcurrencyException {
-		// enable oca
-		// session.advanced().setUseOptimisticConcurrency(true);
 		Patient patient=patientAttachment.getPatient();
 		Attachment attachment=patientAttachment.getAttachment();
 		session.store(patient);
