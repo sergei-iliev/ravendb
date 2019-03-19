@@ -32,7 +32,7 @@ As noSQL database RavenDB is based on following properties
 ## How to run demo
 To run this project locally
 ```
-$ git clone https://github.com/mkyong/spring3-mvc-maven-annotation-hello-world
+$ git clone https://github.com/sergei-iliev/ravendb.git
 $ mvn jetty:run
 ```
 
