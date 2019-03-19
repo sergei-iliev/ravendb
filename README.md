@@ -182,7 +182,7 @@ Current demo application uses page attach/detach events to demarcate Session's c
 ```java
 public void openSession() {
 	if(session==null){
-	     session = RavenDBDocumentStore.INSTANCE.getStore().openSession();
+	     session = RavenDBDocumentStore.getStore().openSession();
 	}
 }
 public void releaseSession() {
