@@ -154,21 +154,23 @@ The focal point is the RavenDB Java connector, which is added as a dependency to
 It provides  the main API object document store, which sets up connection with the Server and downloads various configuration metadata.
 The DocumentStore is capable of working with multiple databases and for proper operation it is recommend having only one instance of it per application.
 ```java
-public enum RavenDBDocumentStore {
-INSTANCE;
+public final class RavenDBDocumentStore {
 	
 	private static IDocumentStore store;
 
-    static {    
-        store = new DocumentStore(
-	new String[]{ "http://127.0.0.1:18080" ,"http://127.0.0.1:18081","http://127.0.0.1:18082"}, 
-	"Hospital");
-        store.initialize();
-    }
+    	static {    
+        	store = new DocumentStore(new String[]{ 
+		"http://127.0.0.1:18080",
+		"http://127.0.0.1:18081",
+		"http://127.0.0.1:18082"},
+		"Hospital");
+        	
+		store.initialize();
+    	}
 
-    public IDocumentStore getStore() {    	
-        return store;
-    }
+    	public static IDocumentStore getStore() {    	
+        	return store;
+    	}
 }
 ```
 ## Session and Unit of Work pattern
