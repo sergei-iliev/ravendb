@@ -5,6 +5,7 @@ It uses RavenDB Java client to communicate with the document store.
 
 
 * RavenDB community edition install
+* How to run demo
 * Domain Entity description
 * Session and Unit of Work pattern
 * CRUD operations
@@ -27,6 +28,13 @@ As noSQL database RavenDB is based on following properties
 * Dynamically generated indexes to facilitate fast data retrieval
 * Map/Reduce to process large sets of documents
 * On top of this RavenDB is easy to administer and deploy
+
+## How to run demo
+To run this project locally
+```
+$ git clone https://github.com/mkyong/spring3-mvc-maven-annotation-hello-world
+$ mvn jetty:run
+```
 
 ## Entities, tables, collections, and documents
 When it comes to persisting data a Java programmer tends to annotate Java POJO with @Entity so that the underlying JPA framework would treat the class as a domain object mapped to a row in a database.
