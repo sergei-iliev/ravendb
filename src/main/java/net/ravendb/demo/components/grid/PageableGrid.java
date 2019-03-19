@@ -33,7 +33,6 @@ public class PageableGrid<T> extends VerticalLayout {
 
 	private void buildUI() {
 		setSizeFull();
-		//grid.setHeightByRows(true);
 		
 		paginator.setInitialPage(true);
 
