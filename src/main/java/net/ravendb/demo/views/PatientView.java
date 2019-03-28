@@ -1,12 +1,11 @@
 package net.ravendb.demo.views;
 
-import java.net.URLEncoder;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
+import java.util.Base64;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.commons.lang3.tuple.Pair;
@@ -118,13 +117,10 @@ public class PatientView extends VerticalLayout implements PatientViewable {
 		visits = new Button("Manage Visits", e -> {
 			Map<String, String> map = new HashMap<>();
 			map.put("patientId", grid.getGrid().asSingleSelect().getValue().getPatient().getId());
-			try {
-				UI.getCurrent().navigate("patientvisit/"
-						+ URLEncoder.encode(grid.getGrid().asSingleSelect().getValue().getPatient().getId(), "UTF-8"));
-			} catch (Exception e1) {
+			
+				UI.getCurrent().navigate("patient/patientvisit/"
+						+ Base64.getEncoder().encodeToString((grid.getGrid().asSingleSelect().getValue().getPatient().getId()).getBytes()));
 
-				logger.log(Level.SEVERE,"", e);
-			}
 		});
 		visits.setEnabled(false);
 		header.add(visits);

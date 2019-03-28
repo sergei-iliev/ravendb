@@ -7,13 +7,12 @@ import java.util.Date;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import net.ravendb.demo.assets.Location;
 import net.ravendb.demo.command.ComboValue;
 
 public class Visit{	
 	private Date date;
 	private String doctorId;	
-	private Location type;
+	private String type;
 	private String visitSummery;
 	private String conditionId;
 	private Doctor doctor;
@@ -39,8 +38,10 @@ public class Visit{
 	
 	@JsonIgnore
 	public void setDoctorValue(ComboValue value) {
+	   if(value!=null){	
 		this.doctorId = value.getId();
 		this.doctorName=value.getName();
+	   }
 	}	
 
 	public String getVisitSummery() {
@@ -55,10 +56,10 @@ public class Visit{
 	public void setConditionId(String conditionId) {
 		this.conditionId = conditionId;
 	}
-	public Location getType() {
+	public String getType() {
 		return type;
 	}
-	public void setType(Location type) {
+	public void setType(String type) {
 		this.type = type;
 	}
 	

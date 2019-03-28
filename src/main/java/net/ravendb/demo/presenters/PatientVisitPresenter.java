@@ -1,12 +1,14 @@
 package net.ravendb.demo.presenters;
 
 import java.util.Collection;
+import java.util.Collections;
 
 import net.ravendb.client.documents.session.IDocumentQuery;
 import net.ravendb.client.documents.session.IDocumentSession;
 import net.ravendb.demo.command.PatientVisit;
 import net.ravendb.demo.db.RavenDBDocumentStore;
 import net.ravendb.demo.model.Condition;
+import net.ravendb.demo.model.Configuration;
 import net.ravendb.demo.model.Doctor;
 import net.ravendb.demo.model.Patient;
 import net.ravendb.demo.model.Visit;
@@ -107,5 +109,15 @@ public class PatientVisitPresenter implements PatientVisitViewListener {
 	@Override
 	public void releaseSession() {
 		session.close();
+	}
+
+	@Override
+	public Collection<String> getLocationsList() {
+		Configuration condition=session.query(Configuration.class).first();
+        if(condition!=null){
+        	return condition.getLocations();
+        }else{
+        	return Collections.EMPTY_LIST;
+        }
 	}
 }

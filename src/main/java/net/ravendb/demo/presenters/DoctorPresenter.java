@@ -2,6 +2,7 @@ package net.ravendb.demo.presenters;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -10,6 +11,7 @@ import java.util.stream.Collectors;
 import net.ravendb.client.documents.session.IDocumentSession;
 import net.ravendb.demo.command.DoctorVisit;
 import net.ravendb.demo.db.RavenDBDocumentStore;
+import net.ravendb.demo.model.Configuration;
 import net.ravendb.demo.model.Doctor;
 import net.ravendb.demo.model.Patient;
 import net.ravendb.demo.presenters.DoctorViewable.DoctorViewListener;
@@ -29,8 +31,12 @@ public class DoctorPresenter implements DoctorViewListener {
 
 	@Override
 	public Collection<String> getDepartments() {
-		return Arrays.asList("LV", "SA", "PO", "BG", "ASU", "VO", "RD");
-
+		Configuration condition=session.query(Configuration.class).first();
+        if(condition!=null){
+        	return condition.getDepartments();
+        }else{
+        	return Collections.EMPTY_LIST;
+        }
 	}
 
 	@Override

@@ -10,11 +10,8 @@ import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.textfield.TextArea;
-import com.vaadin.flow.component.textfield.TextField;
 
-import net.ravendb.demo.assets.Location;
 import net.ravendb.demo.command.ComboValue;
-import net.ravendb.demo.model.Condition;
 import net.ravendb.demo.model.Visit;
 import net.ravendb.demo.presenters.PatientVisitViewable.PatientVisitViewListener;
 
@@ -25,6 +22,7 @@ public class PatientVisitEditorDialog extends AbstractEditorDialog<Visit>{
 	private ComboBox<ComboValue> doctor;
 	private String patientId;
 	ComboBox<ComboValue> condition;
+	ComboBox<String> location;
 	
 	public PatientVisitEditorDialog(String title,String patientId,Visit bean,PatientVisitViewListener presenter,Runnable run) {
 		super(title,bean);
@@ -40,6 +38,9 @@ public class PatientVisitEditorDialog extends AbstractEditorDialog<Visit>{
 		list= presenter.getConditionsList().stream().map(d->new ComboValue(d.getId(), d.getName())).collect(Collectors.toList());
 		list.add(ComboValue.NULL);
 		condition.setItems(list);
+		
+        location.setItems(presenter.getLocationsList());
+        
 	    super.fetch();
 	}
 	@Override
@@ -53,10 +54,9 @@ public class PatientVisitEditorDialog extends AbstractEditorDialog<Visit>{
         binder.forField(date).bind(Visit::getLocalDate, Visit::setLocalDate);
         layout.addFormItem(date,"Date");
 
-        ComboBox<Location> type=new ComboBox<>();
-        type.setItems(Location.values());
-        binder.forField(type).bind(Visit::getType,Visit::setType);
-        layout.addFormItem(type, "Type");
+        location=new ComboBox<>();
+        binder.forField(location).bind(Visit::getType,Visit::setType);
+        layout.addFormItem(location, "Type");
         
         doctor=new ComboBox<>(); 
         doctor.setItemLabelGenerator(ComboValue::getName);

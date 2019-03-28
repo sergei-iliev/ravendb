@@ -4,6 +4,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
+import java.util.Base64;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -39,7 +40,7 @@ import net.ravendb.demo.presenters.PatientPresenter;
 import net.ravendb.demo.presenters.PatientVisitPresenter;
 import net.ravendb.demo.presenters.PatientVisitViewable;
 
-@Route(value="patientvisit",layout=RavenDBApp.class)
+@Route(value="patient/patientvisit",layout=RavenDBApp.class)
 @PageTitle(value = "Hospital Management")
 public class PatientVisitView extends VerticalLayout implements  PatientVisitViewable,HasUrlParameter<String>{
 	private static Logger logger = Logger.getLogger(PatientVisitView.class.getSimpleName());
@@ -69,12 +70,7 @@ public class PatientVisitView extends VerticalLayout implements  PatientVisitVie
 	
 	@Override
 	public void setParameter(BeforeEvent event, String id) {
-		try {
-			patientId=URLDecoder.decode(id,"UTF-8");
-		} catch (UnsupportedEncodingException e) {
-			logger.log(Level.SEVERE,"", e);
-		}
-		
+		patientId=new String(Base64.getDecoder().decode(id));				
 	}
 	
 	private void init(){
