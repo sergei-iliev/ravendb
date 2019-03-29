@@ -30,9 +30,16 @@ As noSQL database RavenDB is based on following properties
 * On top of this RavenDB is easy to administer and deploy
 
 ## How to run demo
-To run this project locally
+In order to run the project locally, once the RavenDB is installed a database should be created with the name `Hospital` in it. In the project root there is an import file `hospital.ravendbdump`, which should be imported in the newly created database. There is a well described import from external file procedure at the following link:
+https://ravendb.net/docs/article-page/4.1/java/studio/database/tasks/import-data/import-data-file
+
+Project code sources must be fetched from github using git tool command
 ```
 $ git clone https://github.com/sergei-iliev/ravendb.git
+```
+
+Once the database is created,default configuration data imported and sources available locally, the application could be brought to life by executing
+```
 $ mvn jetty:run
 ```
 
