@@ -17,6 +17,9 @@
 				<li class="nav-item ${param.activeMenuItem eq 'email' ? 'active' : ''}">
 						<a class="nav-link" href="/email">Test Email</a>			
 				</li>
+				<li class="nav-item ${param.activeMenuItem eq 'sendgrid' ? 'active' : ''}">
+						<a class="nav-link" href="/email/sendgrid">Test SendGrid</a>			
+				</li>				
 				<li class="nav-item ${param.activeMenuItem eq 'payout' ? 'active' : ''}">
 				<a class="nav-link" href="/payout">Test
 						Payout</a>
