@@ -77,8 +77,10 @@ public class EmailController {
         email.setSubject("Cool email from SendGrid");
         email.setContent(Constants.DEMO_HTML);
         
+        email.setToName("To Name");
+        email.setFromName("From Name");
         try{
-        	sendGridService.sendMail(email);	
+        	sendGridService.sendMail(email,Constants.ccMail);	
         }catch(IOException e){
         	logger.log(Level.SEVERE,"sendgrid", e);
         }

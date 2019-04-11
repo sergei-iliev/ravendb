@@ -9,6 +9,8 @@ public class Email {
 	@NotNull
 	@Size(min=1)
 	private String to;
+	private String toName;
+	private String fromName;
 	
 	private String from="sergei.iliev@gmail.com";
 	
@@ -50,6 +52,18 @@ public class Email {
 	}
 	public void setAttachment(Attachment attachment) {
 		this.attachment = attachment;
+	}
+	public String getToName() {
+		return toName;
+	}
+	public void setToName(String toName) {
+		this.toName = toName;
+	}
+	public String getFromName() {
+		return fromName;
+	}
+	public void setFromName(String fromName) {
+		this.fromName = fromName;
 	}
 	
 	

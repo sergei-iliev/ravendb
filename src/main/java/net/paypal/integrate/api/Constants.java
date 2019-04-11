@@ -8,6 +8,7 @@ public interface Constants {
 	//google authorized -> see gae console settings tab
 	public static final String fromMail ="sergei.iliev@gmail.com";
 	public static final String toInvoiceMail ="sergei_iliev@yahoo.com";
+	public static final String ccMail ="sergei_iliev@yahoo.com";
 	
 	public static final String SENDGRID_API_KEY="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";
 
