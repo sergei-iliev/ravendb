@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<datastore-indexes autoGenerate="true">
+    
+    <datastore-index kind="RedeemingRequests" ancestor="false">
+       <property name="paid" direction="asc"/>
+        <property name="countryCode" direction="asc"/>
+        <property name="packageName" direction="asc"/>
+        <property name="confirmedEmail" direction="asc"/>
+        <property name="type" direction="asc"/>
+        <property name="amount" direction="asc"/>
+        <property name="date" direction="desc"/>
+    </datastore-index>
+    
+</datastore-indexes>

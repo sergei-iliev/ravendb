@@ -1,9 +1,10 @@
-package net.paypal.integrate.service;
+package net.paypal.integrate.repository;
 
 import java.util.Collection;
 
 import org.springframework.stereotype.Repository;
 
+import com.google.cloud.Timestamp;
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.ObjectifyService;
 
@@ -11,6 +12,7 @@ import net.paypal.integrate.api.ShardedSequence;
 import net.paypal.integrate.entity.Counter;
 import net.paypal.integrate.entity.PayPalPayment;
 import net.paypal.integrate.entity.PayPalUser;
+import net.paypal.integrate.entity.RedeemingRequests;
 
 @Repository
 public class ObjectifyRepository {
@@ -53,4 +55,6 @@ public class ObjectifyRepository {
 		  return sequence.next();
 		  //return ObjectifyService.ofy().load().type(Counter.class).filterKey("<",Key.create(Counter.class,5634472569470976l)).count();			 		 
 	}
+
+	
 }

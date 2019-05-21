@@ -44,9 +44,9 @@ import net.paypal.integrate.command.invoice.Payee;
 import net.paypal.integrate.command.invoice.PayoutResult;
 import net.paypal.integrate.entity.PayPalPayment;
 import net.paypal.integrate.entity.PayPalUser;
+import net.paypal.integrate.repository.ObjectifyRepository;
 import net.paypal.integrate.service.InvoiceService;
 import net.paypal.integrate.service.MailService;
-import net.paypal.integrate.service.ObjectifyRepository;
 import net.paypal.integrate.service.PayPalService;
 
 @Controller

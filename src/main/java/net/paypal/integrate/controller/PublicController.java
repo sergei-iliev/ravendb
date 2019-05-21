@@ -49,6 +49,7 @@ public class PublicController {
 	public String cancel(){
 		return "cancel";
 	}
+	
 	@RequestMapping(value = "/payment/execute")
 	public String execute(  @RequestParam String paymentId,  @RequestParam String token,  @RequestParam String PayerID){		        		
 		try {

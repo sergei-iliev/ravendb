@@ -17,8 +17,8 @@ import org.springframework.web.servlet.ModelAndView;
 
 import net.paypal.integrate.api.ShardedSequence;
 import net.paypal.integrate.entity.PayPalUser;
+import net.paypal.integrate.repository.ObjectifyRepository;
 import net.paypal.integrate.service.MailService;
-import net.paypal.integrate.service.ObjectifyRepository;
 
 @Controller
 @RequestMapping("/account")

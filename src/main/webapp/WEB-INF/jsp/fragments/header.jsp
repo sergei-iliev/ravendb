@@ -26,6 +26,8 @@
 				</li>
 				<li class="nav-item ${param.activeMenuItem eq 'accounts' ? 'active' : ''}"><a class="nav-link" href="/account">Accounts</a>
 				</li>
+				<li class="nav-item ${param.activeMenuItem eq 'export' ? 'active' : ''}"><a class="nav-link" href="/export">Export</a>
+				</li>
 			</ul>
 		</div>
 	</div>

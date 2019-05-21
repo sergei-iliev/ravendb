@@ -31,6 +31,7 @@ import net.paypal.integrate.command.invoice.Money;
 import net.paypal.integrate.command.invoice.PayoutResult;
 import net.paypal.integrate.entity.Counter;
 import net.paypal.integrate.entity.PayPalUser;
+import net.paypal.integrate.repository.ObjectifyRepository;
 
 @Service
 public class InvoiceService {
