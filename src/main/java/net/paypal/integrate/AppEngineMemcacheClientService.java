@@ -77,10 +77,10 @@ public class AppEngineMemcacheClientService implements MemcacheService {
 	      return this.casValues.getNewValue();
 	    }
 
-	    @Override
-	    public IdentifiableValue withValue(final Object value) {
-	      return new AppEngineIdentifiableValue(new CasValues(casValues.getOldValue(), casValues.getNewValue()));
-	    }
+//	    @Override
+//	    public IdentifiableValue withValue(final Object value) {
+//	      return new AppEngineIdentifiableValue(new CasValues(casValues.getOldValue(), casValues.getNewValue()));
+//	    }
 
 	    public CasValues getCasValues() {
 	      return casValues;

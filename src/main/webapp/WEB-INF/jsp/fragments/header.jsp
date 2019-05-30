@@ -28,6 +28,8 @@
 				</li>
 				<li class="nav-item ${param.activeMenuItem eq 'export' ? 'active' : ''}"><a class="nav-link" href="/export">Export</a>
 				</li>
+				<li class="nav-item ${param.activeMenuItem eq 'import' ? 'active' : ''}"><a class="nav-link" href="/import">Import</a>
+				</li>				
 			</ul>
 		</div>
 	</div>

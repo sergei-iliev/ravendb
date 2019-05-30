@@ -17,7 +17,7 @@
         <spring.boot.version>1.5.9.RELEASE</spring.boot.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
-
+		<skipTests>true</skipTests>
         
 	</properties>
 
@@ -59,18 +59,36 @@
       <artifactId>jul-to-slf4j</artifactId>
       <scope>provided</scope>
     </dependency>
-
+	<dependency>
+    	<groupId>com.googlecode.objectify</groupId>
+    	<artifactId>objectify</artifactId>
+    	<version>6.0.3</version>
+	</dependency> 
     <!-- Need to security-constraint in web.xml to work -->
     <dependency>
       <groupId>com.google.api-client</groupId>
       <artifactId>google-api-client-appengine</artifactId>
-      <version>1.22.0</version>
+      <version>1.29.0</version>
     </dependency>
+    <!-- 
 	<dependency>
-    	<groupId>com.googlecode.objectify</groupId>
-    	<artifactId>objectify</artifactId>
-    	<version>6.0</version>
-	</dependency>    
+    	<groupId>com.google.apis</groupId>
+    	<artifactId>google-api-services-drive</artifactId>
+    	<version>v3-rev164-1.25.0</version>
+	</dependency>
+	-->
+<dependency>
+  <groupId>com.google.cloud</groupId>
+  <artifactId>google-cloud-storage</artifactId>
+         <exclusions>
+            <exclusion>
+                <groupId>io.opencensus</groupId>
+                <artifactId>opencensus-api</artifactId>
+            </exclusion>
+        </exclusions>  
+  <version>1.29.0</version>
+</dependency>	
+   
 	<dependency>
     	<groupId>org.json</groupId>
     	<artifactId>json</artifactId>
@@ -117,7 +135,26 @@
     	<artifactId>spring-boot-starter-test</artifactId>
     	<scope>test</scope>
     	<version>2.0.4.RELEASE</version>
-	</dependency>	
+	</dependency>
+	<dependency>
+    	<groupId>com.google.appengine</groupId>
+    	<artifactId>appengine-testing</artifactId>
+    	<version>1.9.71</version>
+    	<scope>test</scope>
+	</dependency>    
+	<dependency>
+  		<groupId>com.google.appengine</groupId>
+  		<artifactId>appengine-api-labs</artifactId>
+  		<version>1.9.71</version>
+  		<scope>test</scope>
+	</dependency>
+
+	<dependency>
+  		<groupId>com.google.appengine</groupId>
+  		<artifactId>appengine-api-stubs</artifactId>
+  		<version>1.9.71</version>
+  		<scope>test</scope>
+	</dependency>		
 </dependencies>
 
   <dependencyManagement>

@@ -25,7 +25,7 @@ public class RedeemingRequests {
 	private boolean paid;
 	
 	@Index
-	private Timestamp date;
+	private Timestamp date;  /*this is the date where the request to redeem the money was created.*/
 	
 	@Index
 	private String packageName;
@@ -34,12 +34,20 @@ public class RedeemingRequests {
 	private boolean confirmedEmail;
 	
 	@Index
-	private String type;
+	private String type;  /*"PayPal" / "Google Play" / "Amazon" */
 	
 	@Index
 	private String countryCode;
 
+	@Index
+	private String fullName;
     
+	@Index
+	private String fullAddress;
+	
+	
+	private Timestamp creationDate; /* this is the date when the user was created*/
+	
 	public RedeemingRequests() {
 	   this.message="Congratulations! This is your reward from PlaySpot";
 	   this.from="PlaySpot";	
@@ -143,6 +151,30 @@ public class RedeemingRequests {
 		this.countryCode = countryCode;
 	}
 	
+	public String getFullName() {
+		return fullName;
+	}
+
+	public void setFullName(String fullName) {
+		this.fullName = fullName;
+	}
+
+	public String getFullAddress() {
+		return fullAddress;
+	}
+
+	public void setFullAddress(String fullAddress) {
+		this.fullAddress = fullAddress;
+	}
+
+	public Timestamp getCreationDate() {
+		return creationDate;
+	}
+
+	public void setCreationDate(Timestamp creationDate) {
+		this.creationDate = creationDate;
+	}
+
 	@Override
 	public String toString() {
 	  StringBuilder sb=new StringBuilder();

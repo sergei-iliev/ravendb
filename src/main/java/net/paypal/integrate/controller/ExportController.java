@@ -38,6 +38,7 @@ import net.paypal.integrate.api.Constants;
 import net.paypal.integrate.entity.RedeemingRequests;
 import net.paypal.integrate.repository.ExportRepository;
 import net.paypal.integrate.service.ExportService;
+import net.paypal.integrate.service.ImportService;
 import net.paypal.integrate.service.PayPalService;
 
 @Controller
@@ -52,12 +53,15 @@ public class ExportController {
 	@Autowired
 	private ExportRepository exportRepository;
 	
+	@Autowired
+	private ImportService importService;
+	
 	@RequestMapping(value = "RedeemingRequestsNew", method = RequestMethod.GET)
 	public void RedeemingRequestsNew(HttpServletResponse response,HttpServletRequest request) throws IOException {
 		  Timestamp startDate=Timestamp.parseTimestamp("2018-05-17T10:15:30Z");		
 		  Collection<RedeemingRequests> list= exportService.find(false,"BG","com.moregames.makemoney",true,"Amazon","20",startDate);
 		
-		 System.out.println(list.size());
+	
 		  response.setContentType("text/csv");
 		  response.setHeader("Content-Disposition", "attachment; filename=\"RedeemingRequestsNew.csv\"");
 		   
@@ -91,6 +95,15 @@ public class ExportController {
 //		}
 		
 		model.addAttribute("count", exportRepository.count());
+		return new ModelAndView("export");		
+	}
+	
+	
+	@RequestMapping(value = "import/csv", method = RequestMethod.GET)
+	public ModelAndView importFile(ModelMap model) throws IOException {		    
+		importService.importFile();
+		
+		
 		return new ModelAndView("export");		
 	}
 

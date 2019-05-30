@@ -32,7 +32,7 @@ public class ObjectifyServletContextListener implements ServletContextListener{
 //		            new AppEngineMemcacheClientService()
 //		        ));
 
- //      	ObjectifyService.init();
+       	 //ObjectifyService.init();
         
         
 		 ObjectifyService.register(PayPalUser.class);
