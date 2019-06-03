@@ -36,7 +36,7 @@ import com.paypal.base.rest.PayPalRESTException;
 
 import net.paypal.integrate.api.Constants;
 import net.paypal.integrate.entity.RedeemingRequests;
-import net.paypal.integrate.repository.ExportRepository;
+import net.paypal.integrate.repository.ImpexRepository;
 import net.paypal.integrate.service.ExportService;
 import net.paypal.integrate.service.ImportService;
 import net.paypal.integrate.service.PayPalService;
@@ -51,7 +51,7 @@ public class ExportController {
 	private ExportService exportService; 
 
 	@Autowired
-	private ExportRepository exportRepository;
+	private ImpexRepository impexRepository;
 	
 	@Autowired
 	private ImportService importService;
@@ -79,7 +79,7 @@ public class ExportController {
 	@RequestMapping(value = "generateData", method = RequestMethod.GET)
 	public ModelAndView generateData(ModelMap model) throws IOException {
 		exportService.generateData();
-		model.addAttribute("count", exportRepository.count());
+		model.addAttribute("count", impexRepository.count());
 		return new ModelAndView("export");
 	}
 
@@ -94,17 +94,10 @@ public class ExportController {
 //			System.out.println(x);
 //		}
 		
-		model.addAttribute("count", exportRepository.count());
+		model.addAttribute("count", impexRepository.count());
 		return new ModelAndView("export");		
 	}
 	
 	
-	@RequestMapping(value = "import/csv", method = RequestMethod.GET)
-	public ModelAndView importFile(ModelMap model) throws IOException {		    
-		importService.importFile();
-		
-		
-		return new ModelAndView("export");		
-	}
 
 }

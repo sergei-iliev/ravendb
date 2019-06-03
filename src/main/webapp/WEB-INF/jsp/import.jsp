@@ -17,22 +17,33 @@
 	 <div class="row"><div class="col-12">
 		<c:if test="${error}">
 			<div class="alert alert-danger" role="alert">
-			 <c:out value="${error}"/>
+			 <c:out value="${message}"/>
 			</div>
 		</c:if>
 	 </div></div>
 	 <div class="row mt-5">
 	 <div class="col-2"> 	
-		<a href="/import/generateFile" class="btn btn-primary btn-lg active" role="button" aria-pressed="true">Generate File</a>
+		<a href="/import/createDemoPDFInCloudStore" class="btn btn-primary btn-lg active" role="button" aria-pressed="true">Generate File</a>
 	 </div>
 	 <div class="col-10">
-	   <h2>Generate file in a bucket to test Google storage</h2>
+	   <h2>Generate demo pdf file in a bucket to test Google storage</h2>
 	 </div>
 	</div>
-	
-	 <div class="row mt-5"><div class="col-12"> 	
-		<a href="/import/RedeemingRequestsNew" class="btn btn-primary btn-lg active" role="button" aria-pressed="true">Download</a>
-	</div></div>
+	 <div class="row mt-5">
+	 <div class="col-2"> 	
+		<a href="/import/generateDemoRedeemingRequests" class="btn btn-primary btn-lg active" role="button" aria-pressed="true">Generate Entities</a>
+	 </div>
+	 <div class="col-10">
+	   <h2>Total count of entities in <i>RedeemingRequestsNew</i> table is <c:out value="${count}"/></h2>
+	 </div>
+	</div>	
+	 <div class="row mt-5"><div class="col-2"> 	
+		<a href="/import/csv/RedeemingRequests" class="btn btn-primary btn-lg active" role="button" aria-pressed="true">Import</a>
+	</div>
+		 <div class="col-10">
+	   <h2>Import CSV file, transforms data and create PDF files in Google Storage</h2>
+	 </div>
+	</div>
 	</div>
 
 

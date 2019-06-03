@@ -9,6 +9,7 @@ import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,10 +28,12 @@ import com.itextpdf.text.pdf.PdfWriter;
 
 import net.paypal.integrate.api.Constants;
 import net.paypal.integrate.command.PdfAttachment;
+import net.paypal.integrate.command.csv.PaidUsers2018;
 import net.paypal.integrate.command.invoice.Money;
 import net.paypal.integrate.command.invoice.PayoutResult;
 import net.paypal.integrate.entity.Counter;
 import net.paypal.integrate.entity.PayPalUser;
+import net.paypal.integrate.entity.RedeemingRequests;
 import net.paypal.integrate.repository.ObjectifyRepository;
 
 @Service
@@ -76,6 +79,107 @@ public class InvoiceService {
 		
 		return result;
 	}
+	/*
+	 * CSV file import to pdf
+	 */
+	public InputStream createInvoice(RedeemingRequests redeemingRequests,PaidUsers2018 paidUsers2018,String invoiceNumber) throws Exception{
+	    ByteArrayOutputStream output=new ByteArrayOutputStream();
+		Document document = new Document();
+		PdfWriter.getInstance(document,output);
+
+		
+	    
+		Paragraph title=setHeader();
+		
+		long diffInSec = Math.abs(redeemingRequests.getDate().getSeconds() - redeemingRequests.getCreationDate().getSeconds());
+		long days = TimeUnit.DAYS.convert(diffInSec, TimeUnit.SECONDS);
+		long workInDays=3*days;
+		
+		PdfPTable topTable = new PdfPTable(2);
+		topTable.setHorizontalAlignment(Element.ALIGN_RIGHT);
+		topTable.setWidthPercentage(160 / 4f);
+		topTable.addCell(getIRDCell("Credit Voice No"));
+		topTable.addCell(getIRDCell("Date"));
+		topTable.addCell(getIRDCell(invoiceNumber)); // pass invoice number
+		topTable.addCell(getIRDCell(paidUsers2018.getDate())); // pass invoice date	
+				
+		PdfPTable addressTable = new PdfPTable(3);
+		addressTable.setSpacingBefore(12);
+		
+		addressTable.setWidthPercentage(100);
+		
+		
+		addressTable.addCell(getCell("To",12, PdfPCell.ALIGN_LEFT, Font.BOLD));
+		addressTable.addCell(getCell("",12, PdfPCell.ALIGN_LEFT, Font.BOLD));
+		addressTable.addCell(getCell("From",12, PdfPCell.ALIGN_LEFT, Font.BOLD));	
+		
+		addressTable.addCell(getCell(redeemingRequests.getFullName(),10, PdfPCell.ALIGN_LEFT));
+		addressTable.addCell(getCell("",12, PdfPCell.ALIGN_LEFT, Font.BOLD));
+		addressTable.addCell(getCell("Soft Baked Apps UG (haftungsbeschränkt)",10, PdfPCell.ALIGN_LEFT));
+		
+		addressTable.addCell(getCell(Objects.toString(redeemingRequests.getFullAddress(), ""),10, PdfPCell.ALIGN_LEFT));
+		addressTable.addCell(getCell("",12, PdfPCell.ALIGN_LEFT, Font.BOLD));
+		addressTable.addCell(getCell("Schinkestrasse 14",10, PdfPCell.ALIGN_LEFT));
+		
+		
+		addressTable.addCell(getCell("Country: "+Objects.toString(redeemingRequests.getCountryCode(), ""),10, PdfPCell.ALIGN_LEFT));
+		addressTable.addCell(getCell("",12, PdfPCell.ALIGN_LEFT, Font.BOLD));
+		addressTable.addCell(getCell("12047, Berlin, Germany",10, PdfPCell.ALIGN_LEFT));
+		
+		
+		addressTable.addCell(getCell(Objects.toString(redeemingRequests.getEmail(), "") ,10, PdfPCell.ALIGN_LEFT));
+		addressTable.addCell(getCell("",12, PdfPCell.ALIGN_LEFT, Font.BOLD));
+		addressTable.addCell(getCell("VAT ID: DE300857037",10, PdfPCell.ALIGN_LEFT));
+		
+		PdfPTable billTable = new PdfPTable(4); //one page contains 15 records 
+		billTable.setWidthPercentage(100);
+		billTable.setWidths(new float[] {5,1,2,2 });
+		billTable.setSpacingBefore(30.0f);
+		billTable.addCell(getBillHeaderCell("Description"));
+		billTable.addCell(getBillHeaderCell("Unit Price"));
+		billTable.addCell(getBillHeaderCell("Qty"));
+		billTable.addCell(getBillHeaderCell("Amount"));
+		
+		billTable.addCell(getBillRowCell("Interaction and usage of mobile app - "+String.valueOf(workInDays) +" hours"));				
+		billTable.addCell(getBillRowCell(paidUsers2018.getPayedAmount()));
+		billTable.addCell(getBillRowCell("1"));
+		billTable.addCell(getBillRowCell(paidUsers2018.getPayedAmount()+" EUR"));
+		
+		
+		PdfPTable validity = new PdfPTable(1);
+		validity.setWidthPercentage(100);	
+		
+		if(redeemingRequests.getType()!=null){
+		  if(redeemingRequests.getType().equalsIgnoreCase("paypal")){
+			validity.addCell(getValidityCell(" * Paid through "+redeemingRequests.getType()));
+		  }else{
+			validity.addCell(getValidityCell(" * Paid through "+redeemingRequests.getType()+" voucher"));  
+		  }
+		}
+		PdfPCell summaryL = new PdfPCell (validity);
+		summaryL.setColspan (2);
+		summaryL.setPadding (1.0f);	                   
+		billTable.addCell(summaryL);
+
+		PdfPTable accounts = new PdfPTable(2);
+		accounts.setWidthPercentage(100);
+
+		accounts.addCell(getAccountsCell("Total:"));
+		accounts.addCell(getAccountsCellR(paidUsers2018.getPayedAmount()+" EUR"));			
+		PdfPCell summaryR = new PdfPCell (accounts);
+		summaryR.setColspan (2);         
+		billTable.addCell(summaryR);  
+		
+		document.open();
+		document.add(title);
+		document.add(topTable);
+		document.add(addressTable);
+		document.add(billTable);
+		
+		document.close();
+
+		return  new ByteArrayInputStream(output.toByteArray());
+	}	
 	public InputStream createInvoice(PayoutResult payoutResult,PayPalUser user,String invoiceNumber) throws Exception{
 	    ByteArrayOutputStream output=new ByteArrayOutputStream();
 		Document document = new Document();

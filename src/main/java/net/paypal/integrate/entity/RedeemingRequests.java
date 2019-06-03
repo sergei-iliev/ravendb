@@ -12,14 +12,18 @@ public class RedeemingRequests {
 	private Long uuid;
 	@Index
 	private String amount;
+	
 	@Index
 	private String email;
+	
 	@Index
 	private String message;
+	
 	@Index
 	private String from;
 	
-	private long userUuid;
+	@Index
+	private String userGuid;
 	
 	@Index
 	private boolean paid;
@@ -87,12 +91,14 @@ public class RedeemingRequests {
 		this.from = from;
 	}
 
-	public long getUserUuid() {
-		return userUuid;
+
+
+	public String getUserGuid() {
+		return userGuid;
 	}
 
-	public void setUserUuid(long userUuid) {
-		this.userUuid = userUuid;
+	public void setUserGuid(String userGuid) {
+		this.userGuid = userGuid;
 	}
 
 	public String getAmount() {

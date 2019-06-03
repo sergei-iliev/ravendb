@@ -15,17 +15,17 @@ import com.google.cloud.Timestamp;
 
 import net.paypal.integrate.api.GenerateCSV;
 import net.paypal.integrate.entity.RedeemingRequests;
-import net.paypal.integrate.repository.ExportRepository;
+import net.paypal.integrate.repository.ImpexRepository;
 
 @Service
 public class ExportService {
 	private final Logger logger = Logger.getLogger(ExportService.class.getName());
 	
 	@Autowired
-	private ExportRepository exportRepository;
+	private ImpexRepository impexRepository;
 	
 	public Collection<RedeemingRequests> find(boolean paid,String countryCode,String packageName,boolean confirmedEmail,String type,String amount,Timestamp date){
-		return exportRepository.find( paid, countryCode, packageName, confirmedEmail, type, amount, date);
+		return impexRepository.find( paid, countryCode, packageName, confirmedEmail, type, amount, date);
 	}
 	
 	public void convertToCSV(Writer write,Collection<RedeemingRequests> list)throws IOException{
@@ -37,7 +37,7 @@ public class ExportService {
 			line.add(item.getEmail());
 			line.add(item.getMessage());
 			line.add(item.getFrom());
-			line.add(String.valueOf(item.getUserUuid()));
+			line.add(String.valueOf(item.getUserGuid()));
 			GenerateCSV.INSTANCE.writeLine(write, line);
 			line.clear();
 		}
@@ -52,10 +52,23 @@ public class ExportService {
 			else
 				r.setCountryCode("BG");	
 			r.setEmail("br@home.bg");
-			r.setAmount("20");			
+			r.setFullAddress("Levski town, Baba Tonka 7");
+			r.setFullName("Sergei Rachev Iliev");
+			if(i%2==0){
+				r.setAmount("20.23");
+				r.setUserGuid("634095b2-c739-4789-8de9-02aeffa503dd");
+			}else if(i%3==0){
+				r.setAmount("25.23");
+				r.setUserGuid("1b85072b-3a54-4bfe-b49e-25d0022a223d");
+			}else{
+				r.setAmount("36.23");				
+			    r.setUserGuid("dcb12c58-b747-469e-9510-f4f0c2ea0517");
+			}
+			
+						
 			r.setType("Amazon");
 			r.setConfirmedEmail(true);
-			exportRepository.save(r);
+			impexRepository.save(r);
 			
 		}
 	}
