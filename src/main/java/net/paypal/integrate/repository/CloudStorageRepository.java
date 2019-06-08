@@ -20,8 +20,6 @@ public class CloudStorageRepository {
 	public void saveFile(Attachment attachment){
 		Storage storage = StorageOptions.getDefaultInstance().getService();
 
-		Bucket bucket = storage.get(BUCKET_NAME);
-
 		// Upload a blob to the newly created bucket
 		BlobId blobId = BlobId.of(BUCKET_NAME,attachment.getFileName());
 		BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType(attachment.getContentType()).build();

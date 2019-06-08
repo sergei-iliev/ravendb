@@ -58,7 +58,7 @@ INSTANCE;
     	return result;
     }
     
-    private static List<String> parseLine(String cvsLine, char separators, char customQuote) {
+    private List<String> parseLine(String cvsLine, char separators, char customQuote) {
 
         List<String> result = new ArrayList<>();
 
