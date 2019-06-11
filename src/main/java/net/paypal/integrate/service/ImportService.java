@@ -6,7 +6,9 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.io.StringReader;
 import java.io.Writer;
+import java.math.BigDecimal;
 import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -26,6 +28,7 @@ import com.google.cloud.Timestamp;
 import net.paypal.integrate.api.GenerateCSV;
 import net.paypal.integrate.command.PdfAttachment;
 import net.paypal.integrate.command.csv.PaidUsers2018;
+import net.paypal.integrate.command.csv.UserLevelRevenue;
 import net.paypal.integrate.command.invoice.Money;
 import net.paypal.integrate.command.invoice.PayoutResult;
 import net.paypal.integrate.entity.PayPalUser;
@@ -123,11 +126,11 @@ public class ImportService {
 	
 	public Collection<PaidUsers2018> importCSVFile()throws Exception{
 		
-		List<List<String>> list=readFile(IMPORT_CSV_FILE);		
-		return convertToObject(list);
+		List<List<String>> list=readCSVFile(IMPORT_CSV_FILE);		
+		return convertToPaidUsers2018(list);
 	}
 	
-	public List<List<String>>  readFile(String fileName) throws Exception{
+	public List<List<String>>  readCSVFile(String fileName) throws Exception{
 		  URL url = getClass().getResource(fileName);
 		  File file= new File(url.getFile());
 		  try (BufferedReader br = new BufferedReader(new FileReader(file))) {
@@ -135,8 +138,48 @@ public class ImportService {
 		  } 
 		  
 	} 
+	public Collection<PaidUsers2018> importCSVText()throws Exception{
+		
+		List<List<String>> list=readCSVFile(IMPORT_CSV_FILE);		
+		return convertToPaidUsers2018(list);
+	}
 	
-	public Collection<PaidUsers2018> convertToObject(List<List<String>> lines){
+	public Collection<UserLevelRevenue> importCSVText(String text)throws Exception{
+		
+		List<List<String>> list=readCSVText(text);		
+		return convertToUserLevelRevenue(list);
+	}
+	
+	public List<List<String>>  readCSVText(String text) throws Exception{		  		  
+		  try (BufferedReader br = new BufferedReader(new StringReader(text))) {
+			 return GenerateCSV.INSTANCE.readLines(br);
+		  } 		  
+	} 
+	/*
+	 * Skip first line
+	 */
+	public Collection<UserLevelRevenue> convertToUserLevelRevenue(List<List<String>> lines){
+		Collection<UserLevelRevenue> result=new ArrayList<>();
+		boolean isFirstLine=false;
+		for(List<String> line:lines){
+			if(!isFirstLine){
+				isFirstLine=true;
+				continue;
+			}
+			UserLevelRevenue user=new UserLevelRevenue();
+			user.setAdUnitID(line.get(0));
+			user.setIDFA(line.get(1));
+			user.setIDFV(line.get(2));
+			user.setUserID(line.get(3));
+			user.setRevenue(new BigDecimal(line.get(4)));
+			user.setImpressions(Integer.parseInt(line.get(5)));
+			result.add(user);
+		}
+		
+		return result;
+	}
+	
+	public Collection<PaidUsers2018> convertToPaidUsers2018(List<List<String>> lines){
 		Collection<PaidUsers2018> result=new ArrayList<>();
 		for(List<String> line:lines){
 			PaidUsers2018 user=new PaidUsers2018();
