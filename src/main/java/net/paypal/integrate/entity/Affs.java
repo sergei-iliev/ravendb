@@ -1,11 +1,14 @@
 package net.paypal.integrate.entity;
 
+import java.beans.Transient;
 import java.math.BigDecimal;
 import java.util.Set;
 
 import com.google.cloud.Timestamp;
+import com.googlecode.objectify.Key;
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
+import com.googlecode.objectify.annotation.Ignore;
 import com.googlecode.objectify.annotation.Index;
 
 @Entity
@@ -24,6 +27,11 @@ public class Affs {
 
 	public Affs() {
 	   date=Timestamp.now();
+	}
+	
+	@Transient
+	public Key<Affs> getKey(){
+		return Key.create(Affs.class,id);
 	}
 	public Long getId() {
 		return id;

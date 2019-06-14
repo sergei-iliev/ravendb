@@ -21,12 +21,12 @@ public class ObjectifyServletContextListener implements ServletContextListener{
 		//cloud_datastore_emulator.cmd start --host=localhost --port=8884 --store_on_disk=True --consistency=0.9 "C:\Users\Sergey Iliev\AppData\Roaming\gcloud\emulators\datastore"
 		//gcloud beta emulators datastore start --host-port=localhost:<yourpreferredport>		
 /*DEBUG*/		
-        ObjectifyService.init(new ObjectifyFactory(
-                DatastoreOptions.newBuilder().setHost("http://localhost:8884")
-                    .setProjectId("sapient-office-232912")
-                    .build().getService(),
-                new AppEngineMemcacheClientService()
-            ));
+//        ObjectifyService.init(new ObjectifyFactory(
+//                DatastoreOptions.newBuilder().setHost("http://localhost:8884")
+//                    .setProjectId("sapient-office-232912")
+//                    .build().getService(),
+//                new AppEngineMemcacheClientService()
+//            ));
         
 /*PRODUCTION*/		
 //		 ObjectifyService.init(new ObjectifyFactory(
@@ -34,7 +34,7 @@ public class ObjectifyServletContextListener implements ServletContextListener{
 //		            new AppEngineMemcacheClientService()
 //		        ));
 
-       	// ObjectifyService.init();
+       	 ObjectifyService.init();
         
         
 		 ObjectifyService.register(PayPalUser.class);

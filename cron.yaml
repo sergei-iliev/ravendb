@@ -1,0 +1,5 @@
+cron:
+- description: "Daily user revenue job"
+  url: /cron/user/revenue
+  target: beta
+  schedule: every 24 hours

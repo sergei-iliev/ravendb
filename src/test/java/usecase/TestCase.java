@@ -1,7 +1,9 @@
 package usecase;
 
 import java.io.Closeable;
+import java.text.SimpleDateFormat;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -103,7 +105,10 @@ public class TestCase{
 	public void createDemoTest() throws Exception{
 	  userRevenueService.createUserRevenueDEMO("2019-05-28");	
 	}
-	
+	@Test
+	public void processUserRevenueTest() throws Exception{
+	    userRevenueService.processUserRevenue("2019-06-01");	
+	}
 	@Test
 	public void connectionMgrTest() throws Exception{
 //		String result=ConnectionMgr.INSTANCE.getJSON(u);

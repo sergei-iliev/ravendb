@@ -1,13 +1,17 @@
 package net.paypal.integrate.service;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.net.MalformedURLException;
+import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -59,6 +63,9 @@ public class UserRevenueService {
 
 	private String[] packageNamesB = { "com.adp.gamebox" };
 
+	/*
+	 * Test DEMO create method
+	 */
 	public void createUserRevenueDEMO(String date) throws Exception {
 		System.out.println("affs count="+ObjectifyService.ofy().load().type(Affs.class).count());
 		Collection<UserDailyRevenue> revs= ObjectifyService.ofy().load().type(UserDailyRevenue.class).limit(1000).list();
@@ -119,11 +126,96 @@ public class UserRevenueService {
 		
 		System.out.println("affs count="+ObjectifyService.ofy().load().type(Affs.class).count());
 	}
-
-	public void processUserRevenue(String date) {
-
+	
+	public String getYesterdayDate(){		 
+		Date yesterday=new Date(System.currentTimeMillis()-24*60*60*1000);
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+		return format.format(yesterday);
 	}
-
+	/*
+	 * Process User Revenue for a particular date in format "yyyy-MM-dd"
+	 */
+	public void processUserRevenue(String date)throws Exception{
+		Objects.requireNonNull(date, "Date to process daily revenue is null");
+		
+		// for each link read csv
+		Collection<RevenueLinkVO> revenueLinks = this.getRevenueLinks(date);
+		for (RevenueLinkVO revenueLink : revenueLinks) {
+			Collection<UserLevelRevenue> userLevelRevenues = getUserLevelRevenues(revenueLink);
+			for (UserLevelRevenue userLevelRevenue : userLevelRevenues) {
+				//System.out.println(userLevelRevenues.size());
+				//DEBUG
+				if (userLevelRevenues.size() > 2000) {
+					continue;
+				}
+				
+				
+				//read user revenue history table
+				Affs affs=revenueRepository.getAffsByGaid(userLevelRevenue.getIDFA());
+				if(affs==null){  //no user present
+					continue;
+				}
+				
+				UserDailyRevenue userDailyRevenue = revenueRepository
+						.getUserDailyRevenueByGaid(userLevelRevenue.getIDFA());
+				if(userDailyRevenue==null){
+			    	userDailyRevenue = new UserDailyRevenue();
+					userDailyRevenue.setGaid(userLevelRevenue.getIDFA());
+					userDailyRevenue.setAffs(affs.getKey());									  	
+				}
+				
+				Map<String, Set<String>>  historyMap=userDailyRevenue.getRevenueCheckDates();
+				if(historyMap==null||historyMap.isEmpty()){  //1. no entry at all
+					//create history entry for first time
+					Set<String> set = new HashSet<>(1);
+					set.add(date);		
+					userDailyRevenue.getRevenueCheckDates().put(revenueLink.getPackageName(), set);										
+					
+					//accumulate revenue
+				    this.updateUserRevenue(affs, userDailyRevenue, userLevelRevenue.getRevenue());					
+				}else if(historyMap.containsKey(revenueLink.getPackageName())){  //2.there is a package -> check date history
+					Set<String> set = historyMap.get(revenueLink.getPackageName());
+					if(set==null){
+						set = new HashSet<>(1);									
+					}
+					
+					if(set.contains(date)){   //date is registered already. Second run? 
+						continue;
+					}
+					
+					set.add(date);		
+					userDailyRevenue.getRevenueCheckDates().put(revenueLink.getPackageName(), set);										
+					//accumulate revenue
+				    this.updateUserRevenue(affs, userDailyRevenue, userLevelRevenue.getRevenue());
+				    
+				}else{  //no package , add it
+					//create history entry for first time
+					Set<String> set = new HashSet<>(1);
+					
+					set.add(date);		
+					userDailyRevenue.getRevenueCheckDates().put(revenueLink.getPackageName(), set);										
+					//accumulate revenue
+				    this.updateUserRevenue(affs, userDailyRevenue, userLevelRevenue.getRevenue());
+				}
+				
+			}
+			
+			
+		}
+		
+	}
+	/*
+	 * Update both user revenue and affs records in transaction
+	 */
+	private void updateUserRevenue(Affs affs,UserDailyRevenue userDailyRevenue,BigDecimal revenue){
+			BigDecimal amount=BigDecimal.valueOf(affs.getTotalRevenue());
+			BigDecimal total=amount.add(revenue);					
+			affs.setTotalRevenue(total.doubleValue());
+			revenueRepository.save(affs, userDailyRevenue);			  
+	}
+	/*
+	 * Read Revenue links for each package  
+	 */
 	public Collection<RevenueLinkVO> getRevenueLinks(String date) throws MalformedURLException, IOException {
 		Map<String, Collection<UserLevelRevenue>> result = new HashMap<>();
 		Collection<RevenueLinkVO> revenues = new LinkedList<>();
@@ -138,7 +230,7 @@ public class UserRevenueService {
 				revenue.setPackageName(packageName);
 				revenues.add(revenue);
 			} catch (Exception e) {
-				logger.log(Level.SEVERE, "json url read error", e.getMessage());
+				logger.log(Level.WARNING,"json url read result:"+e.getMessage());
 			}
 		}
 
@@ -152,13 +244,16 @@ public class UserRevenueService {
 				revenue.setPackageName(packageName);
 				revenues.add(revenue);
 			} catch (Exception e) {
-				logger.log(Level.SEVERE, "json url read error", e.getMessage());
+				logger.log(Level.WARNING ,"json url read result:"+e.getMessage());
+
 			}
 		}
 		return revenues;
 
 	}
-
+	/*
+	 * Read user revenue for each package 
+	 */
 	public Collection<UserLevelRevenue> getUserLevelRevenues(RevenueLinkVO revenue)
 			throws MalformedURLException, IOException {
 		Collection<UserLevelRevenue> result = new LinkedList<>();
@@ -175,55 +270,5 @@ public class UserRevenueService {
 		return Collections.EMPTY_LIST;
 	}
 
-	// public Map<String,Collection<UserLevelRevenue>> getUserRevenueMap(String
-	// date) throws MalformedURLException, IOException{
-	// Map<String,Collection<UserLevelRevenue>> result =new HashMap<>();
-	// Collection<RevenueLinkVO> revenues=new LinkedList<>();
-	//
-	// for(String packageName:packageNamesA){
-	// String
-	// url="https://r.applovin.com/max/userAdRevenueReport?api_key="+API_KEY_A+"&date="+date+"&platform=android&application="+packageName;
-	//
-	// try{
-	// String response=ConnectionMgr.INSTANCE.getJSON(url);
-	// RevenueLinkVO revenue=JSONUtils.readObject(response,
-	// RevenueLinkVO.class);
-	// revenue.setPackageName(packageName);
-	// revenues.add(revenue);
-	// }catch(Exception e){
-	// logger.log(Level.SEVERE, "json url read error",e.getMessage());
-	// }
-	// }
-	//
-	// for(String packageName:packageNamesB){
-	// String
-	// url="https://r.applovin.com/max/userAdRevenueReport?api_key="+API_KEY_B+"&date="+date+"&platform=android&application="+packageName;
-	//
-	// try{
-	// String response=ConnectionMgr.INSTANCE.getJSON(url);
-	// RevenueLinkVO revenue=JSONUtils.readObject(response,
-	// RevenueLinkVO.class);
-	// revenue.setPackageName(packageName);
-	// revenues.add(revenue);
-	// }catch(Exception e){
-	// logger.log(Level.SEVERE, "json url read error",e.getMessage());
-	// }
-	// }
-	// System.out.println("----------------------------"+revenues.size());
-	//
-	// //read csv
-	// for(RevenueLinkVO revenue:revenues){
-	// String response=ConnectionMgr.INSTANCE.getCSV(revenue.getUrl());
-	// try {
-	// Collection<UserLevelRevenue> csv= importService.importCSVText(response);
-	// result.put(revenue.getPackageName(),csv);
-	//
-	// } catch (Exception e) {
-	// logger.log(Level.SEVERE, "csv url read error",response);
-	// }
-	// }
-	//
-	// return result;
-	// }
 
 }
