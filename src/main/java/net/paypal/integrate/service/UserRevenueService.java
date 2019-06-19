@@ -27,7 +27,9 @@ import net.paypal.integrate.command.json.RevenueLinkVO;
 import net.paypal.integrate.entity.Affs;
 import net.paypal.integrate.entity.UserDailyRevenue;
 import net.paypal.integrate.repository.RevenueRepository;
-
+//BASED ON REST API
+//https://docs.google.com/document/d/1CoGRN_NzmMCVNUCQsdtbU0jm5VgEmtlkV8YTCsYNajE/edit
+	
 @Service
 public class UserRevenueService {
 	private final Logger logger = Logger.getLogger(UserRevenueService.class.getName());
