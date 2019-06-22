@@ -21,12 +21,7 @@ public class ObjectifyServletContextListener implements ServletContextListener{
 		//cloud_datastore_emulator.cmd start --host=localhost --port=8884 --store_on_disk=True --consistency=0.9 "C:\Users\Sergey Iliev\AppData\Roaming\gcloud\emulators\datastore"
 		//gcloud beta emulators datastore start --host-port=localhost:<yourpreferredport>		
 /*DEBUG*/		
-//        ObjectifyService.init(new ObjectifyFactory(
-//                DatastoreOptions.newBuilder().setHost("http://localhost:8884")
-//                    .setProjectId("sapient-office-232912")
-//                    .build().getService(),
-//                new AppEngineMemcacheClientService()
-//            ));
+
         
 /*PRODUCTION*/		
 //		 ObjectifyService.init(new ObjectifyFactory(
@@ -34,17 +29,38 @@ public class ObjectifyServletContextListener implements ServletContextListener{
 //		            new AppEngineMemcacheClientService()
 //		        ));
 
-       	 ObjectifyService.init();
+
+		dev();
+		
+		//prod();
         
         
+	}
+
+	public static void dev(){
+        ObjectifyService.init(new ObjectifyFactory(
+                DatastoreOptions.newBuilder().setHost("http://localhost:8884")
+                    .setProjectId("sapient-office-232912")
+                    .build().getService(),
+                new AppEngineMemcacheClientService()
+            ));
+        
+        registerEntities();
+	}
+	
+	public static void prod(){
+       	ObjectifyService.init();
+       	registerEntities();
+	}
+	
+	private static void registerEntities(){
 		 ObjectifyService.register(PayPalUser.class);
 		 ObjectifyService.register(PayPalPayment.class);
 		 ObjectifyService.register(Counter.class);
 		 ObjectifyService.register(RedeemingRequests.class);
 		 ObjectifyService.register(UserDailyRevenue.class);
-		 ObjectifyService.register(Affs.class);
+		 ObjectifyService.register(Affs.class);		
 	}
-
 	@Override
 	public void contextDestroyed(ServletContextEvent sce) {
 		// TODO Auto-generated method stub

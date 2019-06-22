@@ -52,7 +52,10 @@ INSTANCE;
     	String cvsLine;  
     	
 		while ((cvsLine = r.readLine()) != null) {
-		   result.add(parseLine(cvsLine, DEFAULT_SEPARATOR, DEFAULT_QUOTE));	       	  
+		    if(cvsLine.isEmpty()){
+		    	continue;
+		    }
+			result.add(parseLine(cvsLine, DEFAULT_SEPARATOR, DEFAULT_QUOTE));	       	  
 		}		 
     	
     	return result;
