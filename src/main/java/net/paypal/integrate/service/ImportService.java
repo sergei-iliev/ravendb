@@ -42,6 +42,14 @@ public class ImportService {
 
 	public static final String IMPORT_CSV_FILE = "/csv/paid_users_2018.csv";
 	
+	private static final String AD_UNIT_ID="Ad Unit ID";
+	private static final String PLACEMENT="Placement";
+	private static final String IDFA="IDFA";
+	private static final String IDFV="IDFV";
+	private static final String USER_ID="User ID";
+	private static final String REVENUE="Revenue";
+	private static final String IMPRESSIONS="Impressions";
+	
 	@Autowired
 	private InvoiceService invoiceService;
 	
@@ -156,23 +164,29 @@ public class ImportService {
 		  } 		  
 	} 
 	/*
-	 * Skip first line
+	 * First line carries the info about Column names
 	 */
 	public Collection<UserLevelRevenue> convertToUserLevelRevenue(List<List<String>> lines){
 		Collection<UserLevelRevenue> result=new ArrayList<>();
+		List<String> headers=new ArrayList<>();
+		
 		boolean isFirstLine=false;
 		for(List<String> line:lines){
 			if(!isFirstLine){
+				for(String item:line){
+				  headers.add(item);	
+				}
+				
 				isFirstLine=true;
 				continue;
 			}
 			UserLevelRevenue user=new UserLevelRevenue();
-			user.setAdUnitID(line.get(0));
-			user.setIDFA(line.get(1));
-			user.setIDFV(line.get(2));
-			user.setUserID(line.get(3));
-			user.setRevenue(new BigDecimal(line.get(4)));
-			user.setImpressions(Integer.parseInt(line.get(5)));
+			user.setAdUnitID(line.get(headers.indexOf(AD_UNIT_ID)));
+			user.setIDFA(line.get(headers.indexOf(IDFA)).trim());
+			user.setIDFV(line.get(headers.indexOf(IDFV)).trim());
+			//user.setUserID(line.get(3));
+			user.setRevenue(new BigDecimal(line.get(headers.indexOf(REVENUE)).trim()));
+			//user.setImpressions(Integer.parseInt(line.get(5)));
 			result.add(user);
 		}
 		
