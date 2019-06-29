@@ -2,6 +2,8 @@ package net.paypal.integrate.command;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
@@ -33,6 +35,13 @@ public class Attachment {
 		}finally{
 			in.close();
 		}
+	}
+	public void readFromStringWriter(StringWriter sw)throws IOException{
+	  try{   
+		buffer=sw.toString().getBytes();         
+	  }finally{
+		sw.close();
+	  }
 	}
 	public String getContentType() {
 		return contentType;

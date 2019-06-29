@@ -1,6 +1,8 @@
 package usecase;
 
 import java.io.Closeable;
+import java.io.FileOutputStream;
+import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -10,7 +12,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
+import java.util.UUID;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -25,13 +27,17 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.appengine.api.datastore.Cursor;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.EmbeddedEntity;
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.FetchOptions;
+import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.Query.FilterOperator;
+import com.google.appengine.api.datastore.QueryResultIterator;
+import com.google.appengine.api.datastore.QueryResultList;
 import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalMemcacheServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
@@ -41,6 +47,8 @@ import com.googlecode.objectify.ObjectifyService;
 
 import net.paypal.integrate.AppEngineMemcacheClientService;
 import net.paypal.integrate.PaypalApplication;
+import net.paypal.integrate.api.GenerateCSV;
+import net.paypal.integrate.command.Attachment;
 import net.paypal.integrate.command.csv.UserLevelRevenue;
 import net.paypal.integrate.command.json.JSONUtils;
 import net.paypal.integrate.command.json.RevenueLinkVO;
@@ -117,89 +125,61 @@ public class DBTestCase{
 		System.out.println(dates.contains("2281-03-17"));;
 		 
 	}
-	
-	public void processUserRevenue(String date)throws Exception{
-		Objects.requireNonNull(date, "Date to process daily revenue is null");
-		
-		// for each link read csv
-		Collection<RevenueLinkVO> revenueLinks = this.getRevenueLinks(date);
-		for (RevenueLinkVO revenueLink : revenueLinks) {
-			Collection<UserLevelRevenue> userLevelRevenues = getUserLevelRevenues(revenueLink);
-			for (UserLevelRevenue userLevelRevenue : userLevelRevenues) {				
-				
-				//read user revenue history table
-				Entity affs=DB.getAffForGaid(userLevelRevenue.getIDFA());
-				if(affs==null){  //no user present
-					continue;
-				}
-				else {
-					logger.warning("found user:"+affs.getProperty("user_guid"));
-				}
-				
-				Entity userDailyRevenue = DB
-						.getUserDailyRevenueByGaid(userLevelRevenue.getIDFA());
-				if(userDailyRevenue==null){
-			    	userDailyRevenue = new Entity("user_daily_revenue");
-					userDailyRevenue.setProperty("gaid", userLevelRevenue.getIDFA());
-					userDailyRevenue.setProperty("aff_key",affs.getKey());										 
-					userDailyRevenue.setProperty("rev_check_dates",new EmbeddedEntity());	
-				}
-				
-				EmbeddedEntity  historyMap=(EmbeddedEntity) userDailyRevenue.getProperty("rev_check_dates");
-				if(historyMap==null||historyMap.getProperty(revenueLink.getPackageName())==null){  //1. no entry at all
-					//create history entry for first time
-					logger.warning("no entry at all");
+	/*
+	 * Export from last 9 months all guid's from table affs and save in Cloud Store 
+	 */
+	@Test
+	public void createAffsGuidDBTest() throws Exception{
+		 DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
+		 
+		 for(int i=0;i<5002;i++){
+		  String uniqueID = UUID.randomUUID().toString();			 
+		  Entity affs=new Entity("affs");
+		  affs.setIndexedProperty("guid",uniqueID);
+		  Thread.currentThread().sleep(1);
+		  affs.setProperty("created",new Date());
+		  System.out.println(i);
+		  ds.put(affs);		 
+		 }
 
-					List<String> list = new ArrayList<>(1);
-					list.add(date);		
-					historyMap.setProperty(revenueLink.getPackageName(), list);										
-					
-					userDailyRevenue.setProperty("rev_check_dates", historyMap);	
+		 //read huge result set in batches
+		 
+		 Cursor cursor=null;
+		 QueryResultList<Entity> results;
+		 StringWriter sw=new StringWriter();
+	     do{
+	     FetchOptions fetchOptions;	 
+	     if(cursor!=null){	 
+	        fetchOptions = FetchOptions.Builder.withLimit(100).startCursor(cursor);
+	     }else{
+	        fetchOptions = FetchOptions.Builder.withLimit(100);	 
+	     }
+    	 Query query = new Query("affs");
+	     PreparedQuery preparedQuery = ds.prepare(query);
+	     results = preparedQuery.asQueryResultList(fetchOptions);
+	     
+	     for(Entity e:results){
+	    	 if(e.getProperty("guid")!=null) {
+	           GenerateCSV.INSTANCE.writeLine(sw, (String)e.getProperty("guid"));
+	    	 }
+	     }
 
-					//accumulate revenue
-				    this.updateUserRevenue(affs, userDailyRevenue, userLevelRevenue.getRevenue());					
-				}else if(historyMap.getProperty(revenueLink.getPackageName())!=null){  //2.there is a package -> check date history
-					logger.warning("there is a package -> check date history");
-
-					List<String> list = (List<String>)historyMap.getProperty(revenueLink.getPackageName());
-					if(list==null){
-						list = new ArrayList<>(1);									
-					}
-					Set<String> aset = new HashSet<String>(list);
-					if(aset.contains(date)){   //date is registered already. Second run? 
-						continue;
-					}
-					
-					list.add(date);
-					historyMap.setProperty(revenueLink.getPackageName(), list);										
-					
-					userDailyRevenue.setProperty("rev_check_dates", historyMap);	
-
-					//accumulate revenue
-				    this.updateUserRevenue(affs, userDailyRevenue, userLevelRevenue.getRevenue());
-				    
-				}else{  //no package , add it
-					//create history entry for first time
-					logger.warning("create history entry for first time");
-
-					List<String> list = new ArrayList<>(1);
-					
-					list.add(date);		
-					
-					historyMap.setProperty(revenueLink.getPackageName(), list);										
-					
-					userDailyRevenue.setProperty("rev_check_dates", historyMap);	
-
-					//accumulate revenue
-				    this.updateUserRevenue(affs, userDailyRevenue, userLevelRevenue.getRevenue());
-				}
-				
-			}
-			
-			
-		}
-		
+		 cursor=results.getCursor();
+	     }while(results.size()>0);
+			  
+	     
+		 //save in byte array
+		 Attachment attachment=new Attachment();
+		 attachment.setContentType("text/plain");
+		 attachment.setFileName("Last9.txt");
+		 attachment.readFromStringWriter(sw);
+		 
+		 try (FileOutputStream fos = new FileOutputStream("d:\\dddd.txt")) {
+			   fos.write(attachment.getBuffer());			   
+	     }
+		 
 	}
-
+	
+	
 		
 }

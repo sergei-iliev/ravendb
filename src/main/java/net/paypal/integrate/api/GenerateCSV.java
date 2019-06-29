@@ -27,6 +27,11 @@ INSTANCE;
 
     }
     
+    public  void writeLine(Writer w, String value) throws IOException {
+    	w.append(value);
+    	w.append("\r\n");
+    }
+    
     public  void writeLine(Writer w, Collection<String> values) throws IOException {
 
         boolean first = true;

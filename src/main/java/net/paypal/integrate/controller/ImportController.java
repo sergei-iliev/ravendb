@@ -61,8 +61,6 @@ public class ImportController {
 	@Autowired
 	private ImpexRepository impexRepository;
 
-	@Autowired
-	private CloudStorageRepository cloudStorageRepository;
 
 	@RequestMapping(value = "", method = RequestMethod.GET)
 	public ModelAndView start(ModelMap model) throws IOException {
