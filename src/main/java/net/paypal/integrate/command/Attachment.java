@@ -43,6 +43,9 @@ public class Attachment {
 		sw.close();
 	  }
 	}
+	public void setBuffer(byte[] buffer) {
+		this.buffer = buffer;
+	} 
 	public String getContentType() {
 		return contentType;
 	}

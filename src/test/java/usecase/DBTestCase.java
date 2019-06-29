@@ -1,16 +1,11 @@
 package usecase;
 
+import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
 import java.io.FileOutputStream;
-import java.io.StringWriter;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -18,15 +13,7 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringRunner;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.appengine.api.datastore.Cursor;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
@@ -36,31 +23,12 @@ import com.google.appengine.api.datastore.FetchOptions;
 import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.Query.FilterOperator;
-import com.google.appengine.api.datastore.QueryResultIterator;
 import com.google.appengine.api.datastore.QueryResultList;
 import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
-import com.google.appengine.tools.development.testing.LocalMemcacheServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
-import com.google.cloud.datastore.DatastoreOptions;
-import com.googlecode.objectify.ObjectifyFactory;
-import com.googlecode.objectify.ObjectifyService;
 
-import net.paypal.integrate.AppEngineMemcacheClientService;
-import net.paypal.integrate.PaypalApplication;
 import net.paypal.integrate.api.GenerateCSV;
 import net.paypal.integrate.command.Attachment;
-import net.paypal.integrate.command.csv.UserLevelRevenue;
-import net.paypal.integrate.command.json.JSONUtils;
-import net.paypal.integrate.command.json.RevenueLinkVO;
-import net.paypal.integrate.entity.Affs;
-import net.paypal.integrate.entity.PayPalUser;
-import net.paypal.integrate.entity.RedeemingRequests;
-import net.paypal.integrate.entity.UserDailyRevenue;
-import net.paypal.integrate.repository.ObjectifyRepository;
-import net.paypal.integrate.service.ConnectionMgr;
-import net.paypal.integrate.service.ImportService;
-import net.paypal.integrate.service.InvoiceService;
-import net.paypal.integrate.service.UserRevenueService;
 
 
 
@@ -143,10 +111,11 @@ public class DBTestCase{
 		 }
 
 		 //read huge result set in batches
+		 byte[] end="\r\n".getBytes();
 		 
 		 Cursor cursor=null;
 		 QueryResultList<Entity> results;
-		 StringWriter sw=new StringWriter();
+		 ByteArrayOutputStream os=new ByteArrayOutputStream();
 	     do{
 	     FetchOptions fetchOptions;	 
 	     if(cursor!=null){	 
@@ -160,7 +129,8 @@ public class DBTestCase{
 	     
 	     for(Entity e:results){
 	    	 if(e.getProperty("guid")!=null) {
-	           GenerateCSV.INSTANCE.writeLine(sw, (String)e.getProperty("guid"));
+	    	   os.write(((String)e.getProperty("guid")).getBytes());	 
+	           os.write(end);
 	    	 }
 	     }
 
@@ -172,9 +142,9 @@ public class DBTestCase{
 		 Attachment attachment=new Attachment();
 		 attachment.setContentType("text/plain");
 		 attachment.setFileName("Last9.txt");
-		 attachment.readFromStringWriter(sw);
+		 attachment.setBuffer(os.toByteArray());
 		 
-		 try (FileOutputStream fos = new FileOutputStream("d:\\dddd.txt")) {
+		 try (FileOutputStream fos = new FileOutputStream("d:\\dddd2.txt")) {
 			   fos.write(attachment.getBuffer());			   
 	     }
 		 
