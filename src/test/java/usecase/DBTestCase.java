@@ -1,13 +1,25 @@
 package usecase;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -27,7 +39,6 @@ import com.google.appengine.api.datastore.QueryResultList;
 import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 
-import net.paypal.integrate.api.GenerateCSV;
 import net.paypal.integrate.command.Attachment;
 
 
@@ -103,7 +114,7 @@ public class DBTestCase{
 		 for(int i=0;i<5002;i++){
 		  String uniqueID = UUID.randomUUID().toString();			 
 		  Entity affs=new Entity("affs");
-		  affs.setIndexedProperty("guid",uniqueID);
+		  affs.setIndexedProperty("gaid",uniqueID);
 		  Thread.currentThread().sleep(1);
 		  affs.setProperty("created",new Date());
 		  System.out.println(i);
@@ -112,7 +123,7 @@ public class DBTestCase{
 
 		 //read huge result set in batches
 		 byte[] end="\r\n".getBytes();
-		 
+		 int counter=0;
 		 Cursor cursor=null;
 		 QueryResultList<Entity> results;
 		 ByteArrayOutputStream os=new ByteArrayOutputStream();
@@ -128,12 +139,24 @@ public class DBTestCase{
 	     results = preparedQuery.asQueryResultList(fetchOptions);
 	     
 	     for(Entity e:results){
-	    	 if(e.getProperty("guid")!=null) {
-	    	   os.write(((String)e.getProperty("guid")).getBytes());	 
+	    	 if(e.getProperty("gaid")!=null) {
+	    	   os.write(((String)e.getProperty("gaid")).getBytes());	 
 	           os.write(end);
 	    	 }
 	     }
-
+	     counter++;
+	     if(counter==50){	
+	    	//save in  				
+			Attachment attachment=new Attachment();
+			attachment.setContentType("text/plain");
+			attachment.setFileName("Last_"+counter+".txt");
+			attachment.setBuffer(os.toByteArray());
+			saveBuffer(attachment);
+			
+	    	counter=0; 
+	    	os.close();
+	    	os=new ByteArrayOutputStream();
+	     }
 		 cursor=results.getCursor();
 	     }while(results.size()>0);
 			  
@@ -141,15 +164,53 @@ public class DBTestCase{
 		 //save in byte array
 		 Attachment attachment=new Attachment();
 		 attachment.setContentType("text/plain");
-		 attachment.setFileName("Last9.txt");
+		 attachment.setFileName("Last_"+counter+".txt");
 		 attachment.setBuffer(os.toByteArray());
 		 
-		 try (FileOutputStream fos = new FileOutputStream("d:\\dddd2.txt")) {
-			   fos.write(attachment.getBuffer());			   
-	     }
-		 
+		 saveBuffer(attachment);
 	}
 	
+	private void saveBuffer(Attachment attachment)throws IOException{
+		 try (FileOutputStream fos = new FileOutputStream(attachment.getFileName())) {
+			   fos.write(attachment.getBuffer());			   
+	     }
+	}
 	
+	@Test
+	public void merge2filesGuidDBTest() throws Exception{
+		Set<String> uniques1;
+		try( 
+			 InputStream inputFS = new FileInputStream(new File("D:\\Last9MonthsGaidList_15000.txt"));
+			 BufferedReader br = new BufferedReader(new InputStreamReader(inputFS));){
+			
+			 uniques1=br.lines().collect(Collectors.toSet());
+		}
+		
+		System.out.println(uniques1.size());
+		Set<String> uniques2;
+		try( 
+				 InputStream inputFS = new FileInputStream(new File("D:\\Last9MonthsGaidList_final.txt"));
+				 BufferedReader br = new BufferedReader(new InputStreamReader(inputFS));){
+				
+				 uniques2=br.lines().collect(Collectors.toSet());
+			}	
+		System.out.println(uniques2.size());
+		
+		uniques1.addAll(uniques2);
+		System.out.println(uniques1.size());
+        
+		//write to a total file
+ 		try( 
+				 OutputStream inputFS = new FileOutputStream(new File("D:\\Last9MonthsGaidList.txt"));
+ 				 BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(inputFS));){
+				
+ 			     for(String line:uniques1){
+ 			    	 bw.write(line);
+ 			    	 bw.write("\r\n");
+ 			     }
+				 bw.flush();
+			}	
+		
+	}
 		
 }
