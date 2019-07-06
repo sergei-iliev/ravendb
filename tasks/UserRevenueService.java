@@ -40,7 +40,7 @@ public class UserRevenueService {
 	private ImportService importService;
 
 
-	private String[] packageNamesA = { "com.relaxingbraintraining.knives", "com.relaxingbraintraining.cookiejellymatch",
+	private static String[] packageNamesA = { "com.relaxingbraintraining.knives", "com.relaxingbraintraining.cookiejellymatch",
 			"com.relaxingbraintraining.raccoonbubbles", "com.relaxingbraintraining.popslice",
 			"com.relaxingbraintraining.blocks", "com.relaxingbraintraining.wordcup",
 			"com.relaxingbraintraining.hexapuzzle", "com.relaxingbraintraining.dunk",
@@ -61,7 +61,7 @@ public class UserRevenueService {
 	
 	 
 		
-	private String[] packageNamesB = { "com.adp.gamebox" };
+	private static String[] packageNamesB = { "com.adp.gamebox" };
 
 	
 	/*
@@ -74,10 +74,26 @@ public class UserRevenueService {
 	 */
 	 
 
-	private String[] packageNamesC = { "com.moregames.makemoney", "com.coinmachine.app",
+	private static String[] packageNamesC = { "com.moregames.makemoney", "com.coinmachine.app",
 			"com.matchmine.app" };
 	
+	private static Collection<PackageURLGroup> packageURLGroups=new ArrayList<>();
 	
+	static{
+		
+		for (String packageName : packageNamesA) {
+	        PackageURLGroup group=new PackageURLGroup("https://r.applovin.com/max/userAdRevenueReport?api_key=", API_KEY_A, packageName);	
+	        packageURLGroups.add(group);
+		}
+		for (String packageName : packageNamesB) {
+			PackageURLGroup group=new PackageURLGroup("https://r.applovin.com/max/userAdRevenueReport?api_key=", API_KEY_B, packageName);
+			packageURLGroups.add(group);	
+		}
+		for (String packageName : packageNamesC) {
+			PackageURLGroup group=new PackageURLGroup("https://r.applovin.com/max/userAdRevenueReport?api_key=", API_KEY_C, packageName);	
+			packageURLGroups.add(group);		
+		}		
+	}
 		
 	public UserRevenueService() {
 		importService = new ImportService();
@@ -89,11 +105,90 @@ public class UserRevenueService {
 		return format.format(yesterday);
 	}
 	
+	/*
+	 * Process User Revenue for a particular date in format "yyyy-MM-dd"
+	 * #3 - prosess links sequencially to avoid time out
+	 */
+	public void processUserRevenueAggregated(String date)throws Exception{
+		Objects.requireNonNull(date, "Date to process daily revenue is null");
+		
+		// for each package itterate
+			
+		for (PackageURLGroup packageURLGroup : packageURLGroups) {
+			RevenueLinkVO revenueLink=this.getUserLevelRevenueLink(packageURLGroup, date);
+			if(revenueLink==null){
+			   continue;	
+			}
+			Collection<UserLevelRevenue> userLevelRevenues = getUserLevelRevenues(revenueLink);
 
+			//user map per package name
+			Map<String, BigDecimal> aggregatedUserRevenueMap = userLevelRevenues.stream()
+				    .collect(
+				        groupingBy(
+				            UserLevelRevenue::getIDFA,
+				            reducing(BigDecimal.ZERO, UserLevelRevenue::getRevenue, BigDecimal::add)));
+
+			for (Map.Entry<String,BigDecimal> userLevelRevenue : aggregatedUserRevenueMap.entrySet()) {
+
+				//read user revenue history table
+				Affs affs=revenueRepository.getAffsByGaid(userLevelRevenue.getKey());
+				if(affs==null){  //no user present
+					continue;
+				}
+				
+				UserDailyRevenue userDailyRevenue = revenueRepository
+						.getUserDailyRevenueByGaid(userLevelRevenue.getKey());
+				if(userDailyRevenue==null){
+			    	userDailyRevenue = new UserDailyRevenue();
+					userDailyRevenue.setGaid(userLevelRevenue.getKey());
+					userDailyRevenue.setAffs(affs.getKey());									  	
+				}
+				
+				Map<String, Set<String>>  historyMap=userDailyRevenue.getRevenueCheckDates();
+				if(historyMap==null||historyMap.isEmpty()){  //1. no entry at all
+					//create history entry for first time
+					Set<String> set = new HashSet<>(1);
+					set.add(date);		
+					userDailyRevenue.getRevenueCheckDates().put(revenueLink.getPackageName(), set);										
+					
+					//accumulate revenue
+				    this.updateUserRevenue(affs, userDailyRevenue, userLevelRevenue.getValue());					
+				}else if(historyMap.containsKey(revenueLink.getPackageName())){  //2.there is a package -> check date history
+					Set<String> set = historyMap.get(revenueLink.getPackageName());
+					if(set==null){
+						set = new HashSet<>(1);									
+					}
+					
+					if(set.contains(date)){   //date is registered already. Second run? 
+						continue;
+					}
+					
+					set.add(date);		
+					userDailyRevenue.getRevenueCheckDates().put(revenueLink.getPackageName(), set);										
+					//accumulate revenue
+				    this.updateUserRevenue(affs, userDailyRevenue, userLevelRevenue.getValue());
+				    
+				}else{  //no package , add it
+					//create history entry for first time
+					Set<String> set = new HashSet<>(1);
+					
+					set.add(date);		
+					userDailyRevenue.getRevenueCheckDates().put(revenueLink.getPackageName(), set);										
+					//accumulate revenue
+				    this.updateUserRevenue(affs, userDailyRevenue, userLevelRevenue.getValue());
+				}
+				
+			}
+			aggregatedUserRevenueMap.clear();
+			aggregatedUserRevenueMap=null;
+			
+		}
+		
+	}	
 	/*
 	 * Process User Revenue for a particular date in format "yyyy-MM-dd"
 	 * #2 - reduce/agregate datastore hits
-	 */
+	 *
 	public void processUserRevenueAggregated(String date)throws Exception{
 		Objects.requireNonNull(date, "Date to process daily revenue is null");
 		
@@ -188,10 +283,10 @@ public class UserRevenueService {
 		}
 		
 	}	
-	
+	*/
 	/*
 	 * Process User Revenue for a particular date in format "yyyy-MM-dd"
-	 */
+	 *
 	public void processUserRevenue(String date)throws Exception{
 		Objects.requireNonNull(date, "Date to process daily revenue is null");
 		
@@ -274,6 +369,8 @@ public class UserRevenueService {
 		}
 		
 	}
+	*/
+	
 	/*
 	 * Update both user revenue and affs records in transaction
 	 */
@@ -286,63 +383,20 @@ public class UserRevenueService {
 			
 			DB.saveAffsTotalAdRev(affs, userDailyRevenue);			  
 	}
-	/*
-	 * Read Revenue links for each package  
-	 */
-	public Collection<RevenueLinkVO> getRevenueLinks(String date) throws MalformedURLException, IOException {
-		Collection<RevenueLinkVO> revenues = new LinkedList<>();
 
-		for (String packageName : packageNamesA) {
-			String url = "https://r.applovin.com/max/userAdRevenueReport?api_key=" + API_KEY_A + "&date=" + date
-					+ "&platform=android&application=" + packageName;
+	private RevenueLinkVO getUserLevelRevenueLink(PackageURLGroup packageURLGroup,String date){
+		try {
+			String response = ConnectionMgr.INSTANCE.getJSON(packageURLGroup.createLink(date));
+			RevenueLinkVO revenue = JSONUtils.readObject(response, RevenueLinkVO.class);
+			revenue.setPackageName(packageURLGroup.getPackageName());
+			return revenue;
+		} catch (Exception e) {
+			logger.log(Level.WARNING ,"json url read result:"+e.getMessage());
 
-			try {
-				logger.log(Level.WARNING,"calling url:"+url);
-
-				String response = ConnectionMgr.INSTANCE.getJSON(url);
-				RevenueLinkVO revenue = JSONUtils.readObject(response, RevenueLinkVO.class);
-				revenue.setPackageName(packageName);
-				revenues.add(revenue);
-			} catch (Exception e) {
-				logger.log(Level.WARNING,"json url read result:"+e.getMessage());
-			}
 		}
-
-		for (String packageName : packageNamesB) {
-			String url = "https://r.applovin.com/max/userAdRevenueReport?api_key=" + API_KEY_B + "&date=" + date
-					+ "&platform=android&application=" + packageName;
-
-			try {
-				logger.log(Level.WARNING,"calling url:"+url);
-
-				String response = ConnectionMgr.INSTANCE.getJSON(url);
-				RevenueLinkVO revenue = JSONUtils.readObject(response, RevenueLinkVO.class);
-				revenue.setPackageName(packageName);
-				revenues.add(revenue);
-			} catch (Exception e) {
-				logger.log(Level.WARNING ,"json url read result:"+e.getMessage());
-
-			}
-		}
-		for (String packageName : packageNamesC) {
-			String url = "https://r.applovin.com/max/userAdRevenueReport?api_key=" + API_KEY_C + "&date=" + date
-					+ "&platform=android&application=" + packageName;
-
-			try {
-				logger.log(Level.WARNING,"calling url:"+url);
-
-				String response = ConnectionMgr.INSTANCE.getJSON(url);
-				RevenueLinkVO revenue = JSONUtils.readObject(response, RevenueLinkVO.class);
-				revenue.setPackageName(packageName);
-				revenues.add(revenue);
-			} catch (Exception e) {
-				logger.log(Level.WARNING ,"json url read result:"+e.getMessage());
-
-			}
-		}			
-		return revenues;
-
+		return null;
 	}
+	
 	/*
 	 * Read user revenue for each package 
 	 */
