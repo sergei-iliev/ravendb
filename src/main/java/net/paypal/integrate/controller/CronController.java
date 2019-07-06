@@ -41,7 +41,7 @@ public class CronController {
 	   public ResponseEntity<String> processUserRevenue() {
 	       try{
 	    	logger.log(Level.WARNING ,"Cron job started for date="+userRevenueService.getYesterdayDate());   
-	    	userRevenueService.processUserRevenue(userRevenueService.getYesterdayDate());
+	    	userRevenueService.processUserRevenueAggregated(userRevenueService.getYesterdayDate());
 			logger.log(Level.WARNING ,"Cron job finished");
 	       }catch(Exception e){
 				logger.log(Level.SEVERE, "user revenue service:", e);

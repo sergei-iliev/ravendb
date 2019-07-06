@@ -101,25 +101,19 @@ public class TestCase{
 	@Autowired
 	private UserRevenueService userRevenueService;
 	
-	@Test
-	public void createDemoTest() throws Exception{
-	  userRevenueService.createUserRevenueDEMO("2019-05-28");	
-	}
+//	@Test
+//	public void createDemoTest() throws Exception{
+//	  userRevenueService.createUserRevenueDEMO("2019-05-28");	
+//	}
+	
 	//1.Ad Unit ID,IDFA,IDFV,User ID,Revenue,Impressions
 	//2.Ad Unit ID,Placement,IDFA,IDFV,User ID,Revenue,Impressions
 	
 	@Test
-	public void processUserRevenueTest() throws Exception{
-	    userRevenueService.processUserRevenue("2019-06-13");	
-	}
-	@Test
 	public void processUserRevenueAggregatedTest() throws Exception{
 	    userRevenueService.processUserRevenueAggregated("2019-06-13");	
 	}	
-	@Test
-	public void createBigDataTest() throws Exception{
-	    userRevenueService.processUserRevenueAggregated("2019-06-13");	
-	}
+
 	
 	@Test
 	public void connectionMgrTest() throws Exception{
