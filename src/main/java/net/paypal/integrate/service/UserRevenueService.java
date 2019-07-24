@@ -30,6 +30,7 @@ import net.paypal.integrate.command.json.JSONUtils;
 import net.paypal.integrate.command.json.RevenueLinkVO;
 import net.paypal.integrate.entity.Affs;
 import net.paypal.integrate.entity.UserDailyRevenue;
+import net.paypal.integrate.entity.UserRevPackage;
 import net.paypal.integrate.repository.RevenueRepository;
 
 //BASED ON REST API
@@ -259,6 +260,11 @@ public class UserRevenueService {
 		// for each link read csv
 		Collection<RevenueLinkVO> revenueLinks = this.getRevenueLinks(date);		
 		for (RevenueLinkVO revenueLink : revenueLinks) {
+			//skip if package is  processed for this date
+			if(isUserRevPackageProcessed(revenueLink.getPackageName(), date)){
+				continue;
+			}
+			
 			Collection<UserLevelRevenue> userLevelRevenues = getUserLevelRevenues(revenueLink);
 
 			//user map per package name
@@ -328,6 +334,8 @@ public class UserRevenueService {
 			aggregatedUserRevenueMap.clear();
 			aggregatedUserRevenueMap=null;
 			
+			//mark package as complete for this date
+			saveUserRevPackage(revenueLink.getPackageName(), date);
 		}
 		
 	}	
@@ -498,5 +506,20 @@ public class UserRevenueService {
 		return Collections.EMPTY_LIST;
 	}
 
+	private boolean isUserRevPackageProcessed(String packageName,String date){
+		UserRevPackage userRevPackage= revenueRepository.getUserRevPackage(packageName);
+		if(userRevPackage==null){
+			return false;
+		}
+		if(!date.equals(userRevPackage.getLastUsedDate())){
+			return false;
+		}		
+		return true;
+	  	
+	}
+	
+	private void saveUserRevPackage(String packageName,String date){
+		revenueRepository.save(new UserRevPackage(packageName, date));	
+	}
 
 }

@@ -7,6 +7,7 @@ import com.googlecode.objectify.ObjectifyService;
 
 import net.paypal.integrate.entity.Affs;
 import net.paypal.integrate.entity.UserDailyRevenue;
+import net.paypal.integrate.entity.UserRevPackage;
 
 @Repository
 public class RevenueRepository {
@@ -45,5 +46,11 @@ public class RevenueRepository {
 	
 	}
 	
+	public UserRevPackage getUserRevPackage(String packageName){
+		return	ObjectifyService.ofy().load().type(UserRevPackage.class).filter("packageName =",packageName).first().now();
+	}
 	
+	public void save(UserRevPackage entity){
+		 ObjectifyService.ofy().save().entity(entity).now();
+	}
 }
