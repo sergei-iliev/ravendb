@@ -1,235 +1,144 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
 
-  <groupId>com.paypal.integration</groupId>
-  <artifactId>paypal-integration</artifactId>
-  <version>1.0.0</version>
-  <packaging>war</packaging>
+<project>                               <!-- REQUIRED -->
 
-  <name>paypal-integration</name>  
+  <modelVersion>4.0.0</modelVersion>    <!-- REQUIRED -->
+  <packaging>war</packaging>            <!-- REQUIRED -->
+
+  <groupId>com.paypal.integration.admin</groupId>
+  <artifactId>luee-wally-dev-admin</artifactId>    <!-- Name of your project -->
+  <version>1.0</version>       <!-- xx.xx.xx -SNAPSHOT means development -->
+
 
   <properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<java.version>1.8</java.version>
-        <spring.boot.version>1.5.9.RELEASE</spring.boot.version>
-        <maven.compiler.source>${java.version}</maven.compiler.source>
-        <maven.compiler.target>${java.version}</maven.compiler.target>
-		<skipTests>true</skipTests>
-        
-	</properties>
+    <!-- [START config] -->
+    <projectID>luee-wally-dev-admin</projectID> <!-- set w/ -DprojectID=myProjectID on command line -->
 
-	<dependencies>
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-web</artifactId>
-      <!-- Exclude Tomcat so that it doesn't conflict w/ Jetty server -->
-      <exclusions>
-        <exclusion>
-          <groupId>org.springframework.boot</groupId>
-          <artifactId>spring-boot-starter-tomcat</artifactId>
-        </exclusion>
-      </exclusions>
+
+    <appengine.maven.plugin>1.3.2</appengine.maven.plugin>
+    <jetty.maven.plugin>9.4.3.v20170317</jetty.maven.plugin>
+
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven.compiler.source>1.8</maven.compiler.source> <!-- REQUIRED -->
+    <maven.compiler.target>1.8</maven.compiler.target> <!-- REQUIRED -->
+    <maven.compiler.showDeprecation>true</maven.compiler.showDeprecation>
+    <maven.compiler.showWarnings>true</maven.compiler.showWarnings>
+    <maven.compiler.failOnWarning>true</maven.compiler.failOnWarning>
+    <maven.war.filteringDeploymentDescriptors>true</maven.war.filteringDeploymentDescriptors>
+    <skipTests>true</skipTests>
+  </properties>
+
+  <dependencies>
+    <dependency>                        <!-- REQUIRED -->
+      <groupId>javax.servlet</groupId>  <!-- Java Servlet API -->
+      <artifactId>javax.servlet-api</artifactId>
+      <version>3.1.0</version>
+      <scope>provided</scope>           <!-- Provided by the Jetty Servlet engine -->
     </dependency>
-		<!-- JSTL for JSP -->
-		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>jstl</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-jetty</artifactId>
-			<scope>provided</scope>
-		</dependency>
-<!-- 		
-		<dependency>
-			<groupId>org.eclipse.jetty</groupId>
-			<artifactId>apache-jsp</artifactId>
-			<scope>provided</scope>
-		</dependency>
-				 -->
+
+    <dependency>                        <!-- Java Server Pages -->
+      <groupId>javax.servlet</groupId>
+      <artifactId>jsp-api</artifactId>
+      <version>2.0</version>
+    </dependency>
+
+    <dependency>                        <!-- JSP standard tag library -->
+      <groupId>jstl</groupId>
+      <artifactId>jstl</artifactId>
+      <version>1.2</version>
+    </dependency>
+
+    <dependency>                        <!-- Apache Taglibs -->
+      <groupId>taglibs</groupId>
+      <artifactId>standard</artifactId>
+      <version>1.1.2</version>
+    </dependency>
+
 	<dependency>
     	<groupId>com.google.appengine</groupId>
     	<artifactId>appengine-api-1.0-sdk</artifactId>
     	<version>1.9.71</version>
 	</dependency>
-    <!-- Exclude any jul-to-slf4j -->
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>jul-to-slf4j</artifactId>
-      <scope>provided</scope>
-    </dependency>
-	<dependency>
-    	<groupId>com.googlecode.objectify</groupId>
-    	<artifactId>objectify</artifactId>
-    	<version>6.0.3</version>
-	</dependency> 
-    <!-- Need to security-constraint in web.xml to work -->
-    <dependency>
-      <groupId>com.google.api-client</groupId>
-      <artifactId>google-api-client-appengine</artifactId>
-      <version>1.29.0</version>
-    </dependency>
-    <!-- 
-	<dependency>
-    	<groupId>com.google.apis</groupId>
-    	<artifactId>google-api-services-drive</artifactId>
-    	<version>v3-rev164-1.25.0</version>
-	</dependency>
-	-->
-<dependency>
-  <groupId>com.google.cloud</groupId>
-  <artifactId>google-cloud-storage</artifactId>
-         <exclusions>
-            <exclusion>
-                <groupId>io.opencensus</groupId>
-                <artifactId>opencensus-api</artifactId>
-            </exclusion>
-        </exclusions>  
-  <version>1.29.0</version>
-</dependency>	
-   
-	<dependency>
-    	<groupId>org.json</groupId>
-    	<artifactId>json</artifactId>
-    	<version>20180813</version>
-	</dependency>   
-    <dependency>
-      <groupId>org.codehaus.jackson</groupId>
-      <artifactId>jackson-mapper-asl</artifactId>
-      <version>1.5.0</version>
-    </dependency>
-	<dependency>
-  		<groupId>org.apache.commons</groupId>
-  		<artifactId>commons-lang3</artifactId>
-  		<version>3.8.1</version>
-	</dependency>
-	<dependency>
-    	<groupId>commons-io</groupId>
-    	<artifactId>commons-io</artifactId>
-    	<version>2.6</version>
-	</dependency>
-	<dependency>
-			<groupId>com.itextpdf</groupId>
-			<artifactId>itextpdf</artifactId>
-			<version>5.5.12</version>
-	</dependency>
-    <dependency>
-		<groupId>com.paypal.sdk</groupId>
-		<artifactId>rest-api-sdk</artifactId>
-		<version>LATEST</version>
- 		<exclusions>
-               <exclusion>
-                   <artifactId>log4j-slf4j-impl</artifactId>
-                   <groupId>org.apache.logging.log4j</groupId>
-               </exclusion>
-           </exclusions>		
-	</dependency>
-	<dependency>
-    	<groupId>com.sendgrid</groupId>
-    	<artifactId>sendgrid-java</artifactId>
-    	<version>4.3.0</version>
-	</dependency>	
-	<dependency>
-    	<groupId>org.springframework.boot</groupId>
-    	<artifactId>spring-boot-starter-test</artifactId>
-    	<scope>test</scope>
-    	<version>2.1.3.RELEASE</version>
-	</dependency>
-	<dependency>
-    	<groupId>com.google.appengine</groupId>
-    	<artifactId>appengine-testing</artifactId>
-    	<version>1.9.71</version>
-    	<scope>test</scope>
-	</dependency>    
-	<dependency>
-  		<groupId>com.google.appengine</groupId>
-  		<artifactId>appengine-api-labs</artifactId>
-  		<version>1.9.71</version>
-  		<scope>test</scope>
-	</dependency>
 
-	<dependency>
-  		<groupId>com.google.appengine</groupId>
-  		<artifactId>appengine-api-stubs</artifactId>
-  		<version>1.9.71</version>
-  		<scope>test</scope>
-	</dependency>		
-</dependencies>
+    <!-- [START_EXCLUDE] -->
+    <!-- Test Dependencies -->
+    <dependency>
+      <groupId>com.google.appengine</groupId>
+      <artifactId>appengine-testing</artifactId>
+      <version>1.9.71</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.google.appengine</groupId>
+      <artifactId>appengine-api-stubs</artifactId>
+      <version>1.9.71</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.google.appengine</groupId>
+      <artifactId>appengine-tools-sdk</artifactId>
+      <version>1.9.71</version>
+      <scope>test</scope>
+    </dependency>
 
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <!-- Import dependency management from Spring Boot -->
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-dependencies</artifactId>
-        <version>${spring.boot.version}</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.13-beta-1</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-core</artifactId>
+      <version>2.23.4</version>
+      <scope>test</scope>
+    </dependency>
+    <!-- [END_EXCLUDE] -->
+  </dependencies>
 
   <build>
+    <!-- Optional - for hot reload of the web application when using an IDE Eclipse / IDEA -->
+    <outputDirectory>${project.build.directory}/${project.build.finalName}/WEB-INF/classes</outputDirectory>
     <plugins>
-      <plugin>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-maven-plugin</artifactId>
-        <version>${spring.boot.version}</version>
+
+      <plugin>                          <!-- Used for local debugging -->
+        <groupId>org.eclipse.jetty</groupId>
+        <artifactId>jetty-maven-plugin</artifactId>
+        <version>${jetty.maven.plugin}</version>
+        <configuration>
+          <webApp>
+            <overrideDescriptor>${project.build.directory}/${project.build.finalName}/WEB-INF/web.xml</overrideDescriptor>
+          </webApp>
+        </configuration>
       </plugin>
-      <!-- [START cloudplugin] -->
+
       <plugin>
         <groupId>com.google.cloud.tools</groupId>
         <artifactId>appengine-maven-plugin</artifactId>
-        <version>1.3.1</version>
+        <version>${appengine.maven.plugin}</version>
         <configuration>   
           <devserver.host>0.0.0.0</devserver.host>
-          <devserver.port>8882</devserver.port>
-     </configuration>
-      </plugin>
-      <!-- [END cloudplugin] -->
-
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>versions-maven-plugin</artifactId>
-        <version>2.4</version>
-        <executions>
-          <execution>
-            <phase>compile</phase>
-            <goals>
-              <goal>display-dependency-updates</goal>
-              <goal>display-plugin-updates</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <excludes>
-            <exclude>javax.servlet:javax.servlet-api</exclude>
-            <exclude>com.google.guava:guava</exclude> <!-- avoid android version -->
-          </excludes>
+          <devserver.port>8883</devserver.port>
         </configuration>
       </plugin>
+
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-war-plugin</artifactId>
-        <version>3.1.0</version>
         <configuration>
-          <failOnMissingWebXml>false</failOnMissingWebXml>
           <webResources>
-            <!-- in order to interpolate properties from pom into appengine-web.xml -->
             <resource>
-              <directory>${basedir}/src/main/webapp/WEB-INF</directory>
               <filtering>true</filtering>
-              <targetPath>WEB-INF</targetPath>
+              <directory>src/main/webapp</directory>
+              <includes>
+                <include>**/web.xml</include>
+              </includes>
             </resource>
           </webResources>
+          <warSourceDirectory>src/main/webapp</warSourceDirectory>
+          <webXml>src/main/webapp/WEB-INF/web.xml</webXml>
         </configuration>
       </plugin>
-
-
-  
-  
-</plugins>
-</build>
+    </plugins>
+  </build>
 </project>
