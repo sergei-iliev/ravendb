@@ -83,7 +83,7 @@ INSTANCE;
             separators = DEFAULT_SEPARATOR;
         }
 
-        StringBuffer curVal = new StringBuffer();
+        StringBuilder curVal = new StringBuilder();
         boolean inQuotes = false;
         boolean startCollectChar = false;
         boolean doubleQuotesInColumn = false;
@@ -129,7 +129,8 @@ INSTANCE;
 
                     result.add(curVal.toString());
 
-                    curVal = new StringBuffer();
+                    //curVal = new StringBuilder();
+                    curVal.setLength(0);
                     startCollectChar = false;
 
                 } else if (ch == '\r') {

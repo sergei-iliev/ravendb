@@ -13,6 +13,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
+import java.util.ConcurrentModificationException;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -36,6 +37,8 @@ import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.Query.FilterOperator;
 import com.google.appengine.api.datastore.QueryResultList;
+import com.google.appengine.api.datastore.Transaction;
+import com.google.appengine.api.datastore.TransactionOptions;
 import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 
@@ -213,4 +216,41 @@ public class DBTestCase{
 		
 	}
 		
+	@Test
+	public void testTransactionIsolation(){
+		Entity aff;
+		Entity userDailyRev;
+			DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+
+			  TransactionOptions options = TransactionOptions.Builder.withXG(true);
+			  Transaction txn = datastore.beginTransaction(options);
+		      for (int i = 1; i <= 10; i++) {
+			    try {
+
+			     datastore.put(txn, aff);
+			     userDailyRev.setProperty("aff_key", aff.getKey());
+			     datastore.put(txn, userDailyRev);
+
+			     txn.commit();
+			     
+			     return;   //in case of success , loop out
+			   }
+			   catch(ConcurrentModificationException e) {				
+				   log.warning(" Got concurrent update exception. Trying again. " + i);
+                   try {
+                       Thread.sleep(500);     //wait some time
+                   }
+                   catch (InterruptedException ie) {
+                       throw e;   //will not happen
+                   }
+                   continue;
+			   }
+			   finally {
+			     if (txn.isActive()) {
+			        txn.rollback();
+			     }
+			   }
+		}	
+		throw new IllegalStateException("Too many transaction repeat cycles");
+	}
 }
