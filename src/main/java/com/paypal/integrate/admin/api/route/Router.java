@@ -38,6 +38,7 @@ INSTANCE;
     	 httpGetRouteList.put("/administration", new Route(new AdminController(),"index"));
     	 httpGetRouteList.put("/administration/logout", new Route(new LoginController(),"logout"));
     	//post
+    	 httpPostRouteList.put("/administration/search", new Route(new AdminController(),"search"));
     	 httpPostRouteList.put("/administration/login", new Route(new LoginController(),"login"));
 
     }

@@ -34,13 +34,65 @@
       </div>
     </nav>
 
-    <main role="main" class="container">
-      <div class="jumbotron">
-        <h1>Navbar example</h1>
-        <p class="lead">This example is a quick exercise to illustrate how the top-aligned navbar works. As you scroll, this navbar remains in its original position and moves with the rest of the page.</p>
-        <a class="btn btn-lg btn-primary" href="../../components/navbar/" role="button">View navbar docs &raquo;</a>
-      </div>
-    </main>
+    <div class="container">
+    <div class="row">
+        <div class="col-md-5 offset-md-3">
+            <div class="well well-sm">
+                <form class="form-horizontal" method="post" action="/administration/search">
+                    <fieldset>
+                    <!-- 
+                        <legend class="text-center header">Contact us</legend>
+ -->
+  				<div class="form-label-group">
+  					<div class="col-6">
+  					    <label for="startDateId">Start Date</label>
+    					<input class="form-control" type="date" name="startDate" id="startDateId">
+  					</div>
+				</div>
+ 				<div class="form-label-group">
+  					<div class="col-6">
+  					<label for="endDateId">End Date</label>
+    					<input class="form-control" type="date"  name="endDate" id="endDateId">
+  					</div>  					
+				</div>
+                        <div class="form-label-group">
+                            
+                            <div class="col-md-12">
+                            	<label for="countryId">Country</label>                                
+                                <select name="country" class="form-control" id="countryId">
+      						
+      					    	<c:forEach var="item" items="${countries}">
+                                	<option>${item}</option>
+                            	</c:forEach>
+    							</select>
+                            </div>
+                        </div>
+                        <div class="form-label-group">
+                            
+                            <div class="col-md-12">
+                                <label for="experimentId">Experiment</label>
+                                <input id="experimentId" name="experiment" type="text" placeholder="Experiment" class="form-control">
+                            </div>
+                        </div>
+
+                        <div class="form-label-group">
+                             
+                            <div class="col-md-12">
+                            	<label for="packageNameId">Package Name</label>
+                                <input id="packageNameId" name="packageName" type="text" placeholder="Package Name" class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-12 text-center">
+                                <button type="submit" class="btn btn-primary btn-lg mt-5">Search</button>
+                            </div>
+                        </div>
+                    </fieldset>
+                </form>
+            </div>
+        </div>
+    </div>
+    </div>
 
 
   </body>

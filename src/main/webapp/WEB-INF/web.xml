@@ -20,14 +20,14 @@
 
     
     <filter>
-      <filter-name>SecurityFilter</filter-name>
-      <filter-class>com.paypal.integrate.admin.SecurityFilter</filter-class>
+      <filter-name>AdminFilter</filter-name>
+      <filter-class>com.paypal.integrate.admin.AdminFilter</filter-class>
     </filter>
     <filter-mapping>
-      <filter-name>SecurityFilter</filter-name>
+      <filter-name>AdminFilter</filter-name>
       <url-pattern>/administration/*</url-pattern>
     </filter-mapping>
-
+<!-- 
     <servlet>
       <servlet-name>Administration</servlet-name>
       <servlet-class>com.paypal.integrate.admin.AdminServlet</servlet-class>
@@ -36,6 +36,6 @@
     	<servlet-name>Administration</servlet-name>
     	<url-pattern>/administration/*</url-pattern>
 	</servlet-mapping>
-
+ -->
 </web-app>
 <!-- [END webxml] -->

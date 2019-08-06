@@ -22,7 +22,7 @@ public class LoginController implements Controller{
         String password=(String)req.getParameter("password");
 		if(email.equals(EMAIL)&&password.equals(PASSWORD)){
           req.getSession().setAttribute("login","MERINDA");
-      	  req.getSession().setMaxInactiveInterval(60*10);
+      	  req.getSession().setMaxInactiveInterval(60*15);
   		  resp.sendRedirect("/administration");
 		}else{
 		  req.setAttribute("error","Wrong user name or password.");

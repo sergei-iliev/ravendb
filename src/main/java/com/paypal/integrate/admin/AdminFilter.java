@@ -15,9 +15,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.paypal.integrate.admin.api.route.Router;
 
-public class SecurityFilter implements Filter {
+public class AdminFilter implements Filter {
 	 
-    public SecurityFilter() {
+    public AdminFilter() {
     }
  
     @Override
@@ -109,7 +109,7 @@ public class SecurityFilter implements Filter {
  
     @Override
     public void init(FilterConfig fConfig) throws ServletException {
- 
+
     }
  
 }
