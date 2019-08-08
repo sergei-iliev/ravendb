@@ -1,0 +1,108 @@
+package com.paypal.integrate.admin.service;
+
+import java.math.BigDecimal;
+import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import com.google.appengine.api.datastore.Cursor;
+import com.google.appengine.api.datastore.DatastoreService;
+import com.google.appengine.api.datastore.DatastoreServiceConfig;
+import com.google.appengine.api.datastore.DatastoreServiceFactory;
+import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.FetchOptions;
+import com.google.appengine.api.datastore.PreparedQuery;
+import com.google.appengine.api.datastore.Query;
+import com.google.appengine.api.datastore.Query.FilterOperator;
+import com.google.appengine.api.datastore.Query.FilterPredicate;
+import com.google.appengine.api.datastore.QueryResultList;
+import com.google.appengine.api.datastore.ReadPolicy;
+
+public class AffsSearchService {
+	private final Logger logger = Logger.getLogger(AffsSearchService.class.getName());
+	public void processAffsSearch(Date startDate,Date endDate,String country,String experiment,String packageName){
+
+		 DatastoreService ds=createDatastoreService();
+		 
+		 Query query=createQuery(startDate, endDate, country, experiment, packageName);
+		 PreparedQuery preparedQuery = ds.prepare(query);
+		 
+		 QueryResultList<Entity> results;
+		 
+		 Cursor cursor=null;
+	     BigDecimal sum=BigDecimal.ZERO;
+		 do{
+	    	 FetchOptions fetchOptions;	 
+	    	 if(cursor!=null){	 
+	    		 fetchOptions = FetchOptions.Builder.withLimit(100).startCursor(cursor);
+	    	 }else{
+	    		 fetchOptions = FetchOptions.Builder.withLimit(100);	 
+	    	 }
+   	     
+	    	 
+	    	 results = preparedQuery.asQueryResultList(fetchOptions);
+	     
+	    	 for(Entity e:results){
+	    		BigDecimal amount=BigDecimal.valueOf(e.getProperty("total_ad_rev")==null?0:(double)e.getProperty("total_ad_rev"));
+	    		sum=sum.add(amount); 
+	    	 }	     	     
+
+		     cursor=results.getCursor();
+	     }while(results.size()>0);
+		 
+		logger.log(Level.WARNING,"Sum="+sum);
+		
+		int count=(getAffsSearchCount(startDate, endDate, country, experiment, packageName));
+		logger.log(Level.WARNING,"Records #="+count);
+		if(count!=0){
+		  BigDecimal avr=sum.divide(new BigDecimal(count),4, BigDecimal.ROUND_HALF_UP);
+		  logger.log(Level.WARNING,"Avr="+avr);
+		}
+		
+		
+	}
+	public int getAffsSearchCount(Date startDate,Date endDate,String country,String experiment,String packageName){
+		 DatastoreService ds = DatastoreServiceFactory.getDatastoreService(); 
+		 Query query=createQuery(startDate, endDate, country, experiment, packageName);
+		 PreparedQuery preparedQuery = ds.prepare(query);
+	     
+	     return preparedQuery.countEntities(FetchOptions.Builder.withDefaults());
+	}
+	/*
+	 * Eventual consistency
+	 */
+	
+	private DatastoreService createDatastoreService(){
+		 double deadline = 15.0;
+		 // Construct a read policy for eventual consistency
+		 ReadPolicy policy = new ReadPolicy(ReadPolicy.Consistency.EVENTUAL);
+
+		// Set both the read policy and the call deadline
+		 DatastoreServiceConfig datastoreConfig =
+		    DatastoreServiceConfig.Builder.withReadPolicy(policy).deadline(deadline);
+
+		// Get Datastore service with the given configuration
+		 return DatastoreServiceFactory.getDatastoreService(datastoreConfig);
+	}
+	private Query createQuery(Date startDate,Date endDate,String country,String experiment,String packageName){
+		Query query = new Query("affs");
+		if(startDate!=null){
+			query.setFilter(new FilterPredicate("date", FilterOperator.GREATER_THAN, startDate));
+		}
+		if(endDate!=null){
+			query.setFilter(new FilterPredicate("date", FilterOperator.LESS_THAN , endDate));
+		}
+		if(country!=null){
+			query.setFilter(new FilterPredicate("country_code", FilterOperator.EQUAL , country));
+		}
+		if(experiment!=null){
+			query.setFilter(new FilterPredicate("experiment", FilterOperator.EQUAL , experiment));
+		}
+		if(packageName!=null){
+			query.setFilter(new FilterPredicate("package_name", FilterOperator.EQUAL , packageName));
+		}
+		
+		
+		return query;
+	}
+}

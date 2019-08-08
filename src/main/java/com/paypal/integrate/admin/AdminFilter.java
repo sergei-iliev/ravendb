@@ -31,12 +31,9 @@ public class AdminFilter implements Filter {
         HttpServletResponse response = (HttpServletResponse) resp;
  
         String servletPath = request.getServletPath();
-        
-        System.out.println(servletPath);
-        System.out.println(request.getRequestURI());
-        
+                
         String loginedUser = (String) request.getSession().getAttribute("login");
-        System.out.println("IS there a session:"+loginedUser);
+        System.out.println("Current session:"+loginedUser);
  
         //let resource go on
         if(request.getRequestURI().matches(".*(css|jpg|png|gif|js)")){        	

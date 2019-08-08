@@ -13,7 +13,6 @@ public class LoginController implements Controller{
 	private static final String PASSWORD="1";
 	
 	public void index(HttpServletRequest req, HttpServletResponse resp)throws ServletException, IOException{
-        System.out.println("LOGIN");
     	req.getRequestDispatcher("/jsp/login.jsp").forward(req, resp);
 	}
 	
@@ -21,7 +20,7 @@ public class LoginController implements Controller{
         String email=(String)req.getParameter("email");
         String password=(String)req.getParameter("password");
 		if(email.equals(EMAIL)&&password.equals(PASSWORD)){
-          req.getSession().setAttribute("login","MERINDA");
+          req.getSession().setAttribute("login","ADMIN_USER");
       	  req.getSession().setMaxInactiveInterval(60*15);
   		  resp.sendRedirect("/administration");
 		}else{

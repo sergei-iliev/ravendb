@@ -8,8 +8,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 </head>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script> 
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <link rel="stylesheet" href="../css/bootstrap/bootstrap.min.css">         
 <script src="../js/bootstrap/bootstrap.min.js"></script> 
+<script src="../js/jsp/index.js"></script> 
 <body>
     <nav class="navbar navbar-expand-md navbar-dark bg-dark mb-4">
       <a class="navbar-brand" href="#">Backed Soft</a>
@@ -19,14 +23,12 @@
       <div class="collapse navbar-collapse" id="navbarCollapse">
         <ul class="navbar-nav mr-auto">
           <li class="nav-item active">
-            <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+            <a class="nav-link" href="/administration">Home <span class="sr-only">(current)</span></a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="#">Link</a>
           </li>
-          <li class="nav-item">
-            <a class="nav-link disabled" href="#">Disabled</a>
-          </li>
+
         </ul>
         
         <a class="btn btn-outline-primary" href="/administration/logout">Sign out</a>
@@ -38,7 +40,12 @@
     <div class="row">
         <div class="col-md-5 offset-md-3">
             <div class="well well-sm">
-                <form class="form-horizontal" method="post" action="/administration/search">
+             <c:if test="${success!=null}">
+				<div class="alert alert-success" role="alert">
+  					${success}
+				</div>	
+			 </c:if> 
+                <form class="form-horizontal" id="search-form" method="post" action="/administration/search">
                     <fieldset>
                     <!-- 
                         <legend class="text-center header">Contact us</legend>
@@ -46,13 +53,13 @@
   				<div class="form-label-group">
   					<div class="col-6">
   					    <label for="startDateId">Start Date</label>
-    					<input class="form-control" type="date" name="startDate" id="startDateId">
+    					<input class="form-control" type="date"  data-date-format="MM/DD/YYYY"  name="startDate" id="startDateId">
   					</div>
 				</div>
  				<div class="form-label-group">
   					<div class="col-6">
   					<label for="endDateId">End Date</label>
-    					<input class="form-control" type="date"  name="endDate" id="endDateId">
+    					<input class="form-control" type="date" data-date-format="MM/DD/YYYY" name="endDate" id="endDateId">
   					</div>  					
 				</div>
                         <div class="form-label-group">
@@ -67,20 +74,48 @@
     							</select>
                             </div>
                         </div>
-                        <div class="form-label-group">
-                            
-                            <div class="col-md-12">
-                                <label for="experimentId">Experiment</label>
-                                <input id="experimentId" name="experiment" type="text" placeholder="Experiment" class="form-control">
+                        <div class="form-label-group mt-3">
+                        <div class="col-md-12">
+                        	<div class="row">
+                        	
+                            <div class="col-md-5">
+                               <label for="experimentId">Experiment</label>
+                               <input id="experimentId"  type="text" placeholder="Experiment" class="form-control">
                             </div>
+                            <div class="col-md-2">
+                              <button class="btn" id="add-btn"><i class="fa fa-arrow-right"></i></button>
+                              <button class="btn" id="remove-btn"><i class="fa fa-arrow-left"></i></button>
+                            </div>
+                             
+                            <div class="col-md-5">  
+                                <select class="form-control" name="experiments" id="experimentsId" multiple>
+                                
+                                </select>                            									
+                            </div>
+                          </div>
+                          </div>
                         </div>
 
-                        <div class="form-label-group">
-                             
-                            <div class="col-md-12">
-                            	<label for="packageNameId">Package Name</label>
-                                <input id="packageNameId" name="packageName" type="text" placeholder="Package Name" class="form-control">
+                        <div class="form-label-group mt-3">
+                        <div class="col-md-12">
+                        	<div class="row">
+                        	
+                            <div class="col-md-5">
+                               <label for="packageNameId">Package Name</label>
+                               <input id="packageNameId"  type="text" placeholder="Package Name" class="form-control">
                             </div>
+                            <div class="col-md-2">
+                              <button class="btn" id="p-add-btn"><i class="fa fa-arrow-right"></i></button>
+                              <button class="btn" id="p-remove-btn"><i class="fa fa-arrow-left"></i></button>
+                            </div>
+                             
+                            <div class="col-md-5">  
+                                <select class="form-control" name="packageNames" id="packageNamesId" multiple>
+                                
+                                </select>                            									
+                            </div>
+                          </div>  
+                        </div>
                         </div>
                         <div class="form-group">
                             <div class="col-md-12 text-center">

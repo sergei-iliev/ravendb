@@ -10,7 +10,7 @@ import java.util.logging.Logger;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.paypal.integrate.admin.controller.AdminController;
+import com.paypal.integrate.admin.controller.AffsSearchController;
 import com.paypal.integrate.admin.controller.LoginController;
 /*
  * Based on
@@ -35,10 +35,10 @@ INSTANCE;
     private void initRoutes() {
         //get
     	 httpGetRouteList.put("/administration/login", new Route(new LoginController(),"index"));
-    	 httpGetRouteList.put("/administration", new Route(new AdminController(),"index"));
+    	 httpGetRouteList.put("/administration", new Route(new AffsSearchController(),"index"));
     	 httpGetRouteList.put("/administration/logout", new Route(new LoginController(),"logout"));
     	//post
-    	 httpPostRouteList.put("/administration/search", new Route(new AdminController(),"search"));
+    	 httpPostRouteList.put("/administration/search", new Route(new AffsSearchController(),"search"));
     	 httpPostRouteList.put("/administration/login", new Route(new LoginController(),"login"));
 
     }
