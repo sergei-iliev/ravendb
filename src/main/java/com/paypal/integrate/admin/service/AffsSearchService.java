@@ -17,10 +17,11 @@ import com.google.appengine.api.datastore.Query.FilterOperator;
 import com.google.appengine.api.datastore.Query.FilterPredicate;
 import com.google.appengine.api.datastore.QueryResultList;
 import com.google.appengine.api.datastore.ReadPolicy;
+import com.paypal.integrate.admin.command.AffsSearchForm;
 
 public class AffsSearchService {
 	private final Logger logger = Logger.getLogger(AffsSearchService.class.getName());
-	public void processAffsSearch(Date startDate,Date endDate,String country,String experiment,String packageName){
+	public void processAffsSearch(AffsSearchForm affsSearchForm){
 
 		 DatastoreService ds=createDatastoreService();
 		 

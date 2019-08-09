@@ -17,6 +17,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.google.appengine.api.ThreadManager;
 import com.paypal.integrate.admin.api.route.Controller;
+import com.paypal.integrate.admin.command.AffsSearchForm;
 import com.paypal.integrate.admin.service.AffsSearchService;
 
 public class AffsSearchController implements Controller{
@@ -31,17 +32,10 @@ public class AffsSearchController implements Controller{
 	public void search(HttpServletRequest req, HttpServletResponse resp)throws ServletException, IOException{
 
 		
-        Date start=parseDate(req.getParameter("startDate"));
-        Date end=parseDate(req.getParameter("endDate"));
-        
 
-
-		String country=(req.getParameter("country").length()==0?null:req.getParameter("country")); 
-		//String experiment=req.getParameter("experiment").length()==0?null:req.getParameter("experiment");
-		System.out.println(req.getParameterValues("experiments").length);
-		
-		String packageName=req.getParameter("packageName").length()==0?null:req.getParameter("packageName"); 
-		
+        final AffsSearchForm form=AffsSearchForm.parse(req);
+		System.out.println(form.getExperiments());
+		System.out.println(form.getPackageNames());
 		ThreadManager.createBackgroundThread(new Runnable() {
 				@Override
 				public void run() {
@@ -49,7 +43,7 @@ public class AffsSearchController implements Controller{
 				        try  {												
 					    	  logger.log(Level.WARNING, "*************************Task in the background started ********************");
 					  		  AffsSearchService affsSearchService=new AffsSearchService();
-			//				  affsSearchService.processAffsSearch(start, end, country, experiment, packageName);
+							  affsSearchService.processAffsSearch(form);
 					    	  logger.log(Level.WARNING ,"*************************Background task finished*****************");
 				   		
 				   		}catch(Exception e){
@@ -82,15 +76,5 @@ public class AffsSearchController implements Controller{
 		"com.matchmine.app");		
 	}
 
-	private Date parseDate(String value)throws ServletException{
-		try{
-		if(value!= null && value.length() != 0 ){	
-			return new SimpleDateFormat("yyyy-MM-dd").parse(value);
-		}else{
-			return null;
-		}
-		}catch(ParseException e){
-			throw new ServletException(e);
-		}
-	}
+
 }
