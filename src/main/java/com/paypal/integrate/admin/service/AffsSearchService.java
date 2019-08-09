@@ -25,7 +25,12 @@ public class AffsSearchService {
 
 		 DatastoreService ds=createDatastoreService();
 		 
-		 Query query=createQuery(startDate, endDate, country, experiment, packageName);
+		 
+		 
+		 String experiment=affsSearchForm.getExperiments().isEmpty()?null:affsSearchForm.getExperiments().iterator().next();
+		 String packageName=affsSearchForm.getPackageNames().isEmpty()?null:affsSearchForm.getPackageNames().iterator().next();;
+		 
+		 Query query=createQuery(affsSearchForm.getStartDate(), affsSearchForm.getStartDate(), affsSearchForm.getCountryCode(),experiment, packageName);
 		 PreparedQuery preparedQuery = ds.prepare(query);
 		 
 		 QueryResultList<Entity> results;
@@ -53,7 +58,7 @@ public class AffsSearchService {
 		 
 		logger.log(Level.WARNING,"Sum="+sum);
 		
-		int count=(getAffsSearchCount(startDate, endDate, country, experiment, packageName));
+		int count=(getAffsSearchCount(affsSearchForm.getStartDate(), affsSearchForm.getStartDate(), affsSearchForm.getCountryCode(),experiment, packageName));
 		logger.log(Level.WARNING,"Records #="+count);
 		if(count!=0){
 		  BigDecimal avr=sum.divide(new BigDecimal(count),4, BigDecimal.ROUND_HALF_UP);

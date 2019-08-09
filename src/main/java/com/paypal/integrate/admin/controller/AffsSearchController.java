@@ -34,8 +34,7 @@ public class AffsSearchController implements Controller{
 		
 
         final AffsSearchForm form=AffsSearchForm.parse(req);
-		System.out.println(form.getExperiments());
-		System.out.println(form.getPackageNames());
+
 		ThreadManager.createBackgroundThread(new Runnable() {
 				@Override
 				public void run() {
