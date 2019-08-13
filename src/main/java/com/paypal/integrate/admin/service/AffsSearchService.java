@@ -1,6 +1,8 @@
 package com.paypal.integrate.admin.service;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -13,6 +15,9 @@ import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.FetchOptions;
 import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
+import com.google.appengine.api.datastore.Query.CompositeFilter;
+import com.google.appengine.api.datastore.Query.CompositeFilterOperator;
+import com.google.appengine.api.datastore.Query.Filter;
 import com.google.appengine.api.datastore.Query.FilterOperator;
 import com.google.appengine.api.datastore.Query.FilterPredicate;
 import com.google.appengine.api.datastore.QueryResultList;
@@ -30,7 +35,7 @@ public class AffsSearchService {
 		 String experiment=affsSearchForm.getExperiments().isEmpty()?null:affsSearchForm.getExperiments().iterator().next();
 		 String packageName=affsSearchForm.getPackageNames().isEmpty()?null:affsSearchForm.getPackageNames().iterator().next();;
 		 
-		 Query query=createQuery(affsSearchForm.getStartDate(), affsSearchForm.getStartDate(), affsSearchForm.getCountryCode(),experiment, packageName);
+		 Query query=createQuery(affsSearchForm.getStartDate(), affsSearchForm.getEndDate(), affsSearchForm.getCountryCode(),experiment, packageName);
 		 PreparedQuery preparedQuery = ds.prepare(query);
 		 
 		 QueryResultList<Entity> results;
@@ -58,7 +63,7 @@ public class AffsSearchService {
 		 
 		logger.log(Level.WARNING,"Sum="+sum);
 		
-		int count=(getAffsSearchCount(affsSearchForm.getStartDate(), affsSearchForm.getStartDate(), affsSearchForm.getCountryCode(),experiment, packageName));
+		int count=(getAffsSearchCount(affsSearchForm.getStartDate(), affsSearchForm.getEndDate(), affsSearchForm.getCountryCode(),experiment, packageName));
 		logger.log(Level.WARNING,"Records #="+count);
 		if(count!=0){
 		  BigDecimal avr=sum.divide(new BigDecimal(count),4, BigDecimal.ROUND_HALF_UP);
@@ -79,7 +84,7 @@ public class AffsSearchService {
 	 */
 	
 	private DatastoreService createDatastoreService(){
-		 double deadline = 15.0;
+		 double deadline = 15.0; //seconds
 		 // Construct a read policy for eventual consistency
 		 ReadPolicy policy = new ReadPolicy(ReadPolicy.Consistency.EVENTUAL);
 
@@ -91,23 +96,32 @@ public class AffsSearchService {
 		 return DatastoreServiceFactory.getDatastoreService(datastoreConfig);
 	}
 	private Query createQuery(Date startDate,Date endDate,String country,String experiment,String packageName){
+		logger.log(Level.WARNING,"Query on - "+startDate+":"+endDate+":"+country+":"+experiment+":"+packageName);
+		
 		Query query = new Query("affs");
+		Collection<Filter> predicates=new ArrayList<>();
+		
 		if(startDate!=null){
-			query.setFilter(new FilterPredicate("date", FilterOperator.GREATER_THAN, startDate));
+			predicates.add(new FilterPredicate("date", FilterOperator.GREATER_THAN, startDate));
 		}
 		if(endDate!=null){
-			query.setFilter(new FilterPredicate("date", FilterOperator.LESS_THAN , endDate));
+			predicates.add(new FilterPredicate("date", FilterOperator.LESS_THAN , endDate));
 		}
 		if(country!=null){
-			query.setFilter(new FilterPredicate("country_code", FilterOperator.EQUAL , country));
+			predicates.add(new FilterPredicate("country_code", FilterOperator.EQUAL , country));
 		}
 		if(experiment!=null){
-			query.setFilter(new FilterPredicate("experiment", FilterOperator.EQUAL , experiment));
+			predicates.add(new FilterPredicate("experiment", FilterOperator.EQUAL , experiment));
 		}
 		if(packageName!=null){
-			query.setFilter(new FilterPredicate("package_name", FilterOperator.EQUAL , packageName));
+			predicates.add(new FilterPredicate("package_name", FilterOperator.EQUAL , packageName));
 		}
-		
+		if(predicates.size()>1){
+			CompositeFilter filter=new CompositeFilter(CompositeFilterOperator.AND, predicates);
+			query.setFilter(filter);			
+		}else{
+			query.setFilter(predicates.iterator().next());
+		}
 		
 		return query;
 	}

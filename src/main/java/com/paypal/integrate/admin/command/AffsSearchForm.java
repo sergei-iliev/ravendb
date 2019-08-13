@@ -14,14 +14,17 @@ public class AffsSearchForm {
 	private Date startDate, endDate;
 	private String countryCode;
 	private Collection<String> experiments=new HashSet<>(), packageNames=new HashSet<>();
-
+    private boolean groupByExperiment;
+    
 	public static AffsSearchForm parse(ServletRequest req) throws ServletException{
 		AffsSearchForm form = new AffsSearchForm();
 		form.setStartDate(parseDate(req.getParameter("startDate")));
 		form.setEndDate(parseDate(req.getParameter("endDate")));
         
 		form.setCountryCode((req.getParameter("country").length() == 0 ? null : req.getParameter("country")));
-		
+		if(req.getParameter("groupByExperiment")!=null){
+			form.groupByExperiment=true;
+		}
 		if(req.getParameterValues("experiments")!=null){
 			form.setExperiments(req.getParameterValues("experiments"));
 		}
@@ -84,4 +87,9 @@ public class AffsSearchForm {
 	public boolean isEmpty(){
 		return experiments.isEmpty()&&packageNames.isEmpty()&&countryCode.length()==1&&startDate==null&&endDate==null;
 	}
+	
+	public boolean getGroupByExperiment(){
+		return groupByExperiment;
+	}
+	 
 }

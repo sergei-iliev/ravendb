@@ -1,7 +1,8 @@
 package com.paypal.integrate.admin;
 
 import java.io.IOException;
-import java.io.PrintWriter;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -16,7 +17,8 @@ import javax.servlet.http.HttpServletResponse;
 import com.paypal.integrate.admin.api.route.Router;
 
 public class AdminFilter implements Filter {
-	 
+	private final Logger logger = Logger.getLogger(AdminFilter.class.getName());
+	
     public AdminFilter() {
     }
  
@@ -29,11 +31,10 @@ public class AdminFilter implements Filter {
             throws IOException, ServletException {
         HttpServletRequest request = (HttpServletRequest) req;
         HttpServletResponse response = (HttpServletResponse) resp;
- 
-        String servletPath = request.getServletPath();
+
                 
         String loginedUser = (String) request.getSession().getAttribute("login");
-        System.out.println("Current session:"+loginedUser);
+        logger.log(Level.WARNING, "Current session:"+loginedUser);
  
         //let resource go on
         if(request.getRequestURI().matches(".*(css|jpg|png|gif|js)")){        	
@@ -41,7 +42,7 @@ public class AdminFilter implements Filter {
             return;
         }
         if (request.getRequestURI().startsWith("/administration/login")) {        	
-            Router.INSTANCE.execute(request.getRequestURI(), request, response);
+            Router.INSTANCE.execute("/administration/login", request, response);
         	return;
         }
         if (request.getRequestURI().startsWith("/administration/logout")) {            

@@ -27,15 +27,6 @@
       <filter-name>AdminFilter</filter-name>
       <url-pattern>/administration/*</url-pattern>
     </filter-mapping>
-<!-- 
-    <servlet>
-      <servlet-name>Administration</servlet-name>
-      <servlet-class>com.paypal.integrate.admin.AdminServlet</servlet-class>
-    </servlet>
-	<servlet-mapping>
-    	<servlet-name>Administration</servlet-name>
-    	<url-pattern>/administration/*</url-pattern>
-	</servlet-mapping>
- -->
+
 </web-app>
 <!-- [END webxml] -->

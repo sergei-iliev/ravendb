@@ -19,6 +19,7 @@ import com.google.appengine.api.datastore.Query.Filter;
 import com.google.appengine.api.datastore.Query.FilterPredicate;
 import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
+import com.paypal.integrate.admin.command.AffsSearchForm;
 import com.paypal.integrate.admin.service.AffsSearchService;
 
 
@@ -75,7 +76,12 @@ public class DBTestCase{
 	@Test
 	public void searchAffsEntityTest() throws Exception{
 		 DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
-		 for(int i=0;i<2004;i++){
+		 
+		 AffsSearchForm form=new AffsSearchForm();
+		 form.setCountryCode("US");
+		 form.setStartDate(new Date());
+		 
+		 for(int i=0;i<4;i++){
 			 
 		 Entity affs=new Entity("affs");
 		  affs.setProperty("id", i);
@@ -84,15 +90,31 @@ public class DBTestCase{
 		  affs.setIndexedProperty("country_code","US");
 		  affs.setIndexedProperty("experiment","preview_images");
 		  affs.setIndexedProperty("package_name","com.moregames.makemoney");
-		  if(i==1000){
+
+		  if(i==2){
 			  affs.setIndexedProperty("country_code","BG");
-			  affs.setIndexedProperty("package_name","boo");
+			  affs.setIndexedProperty("package_name","com.moregames.stuff");
 		  }
+
+		  if(i==3){
+			  affs.setIndexedProperty("country_code","BG");
+			  affs.setIndexedProperty("package_name","com.boo.stuff");
+		  }
+		  
 		  ds.put(affs);
 		 }
-		
-         AffsSearchService affsSearchService=new AffsSearchService();
-         affsSearchService.processAffsSearch(null, new Date(),null, null, "boo");
+
+	        Query query = new Query("affs");
+	        Filter filter1 = new FilterPredicate("package_name", FilterOperator.EQUAL ,"com.boo.stuff");
+	        Filter filter2 = new FilterPredicate("package_name", FilterOperator.EQUAL ,"com.moregames.stuff");
+	        
+	        
+	        query.setFilter(Query.CompositeFilterOperator.or(filter1, filter2));
+	        
+	        System.out.println( ds.prepare(query).countEntities( FetchOptions.Builder.withDefaults()));
+	        
+         //AffsSearchService affsSearchService=new AffsSearchService();
+         //affsSearchService.processAffsSearch(form);
 	     
 	}
 

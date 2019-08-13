@@ -26,7 +26,7 @@
             <a class="nav-link" href="/administration">Home <span class="sr-only">(current)</span></a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="#">Link</a>
+            <a class="nav-link" href="#">Reserved</a>
           </li>
 
         </ul>
@@ -95,7 +95,20 @@
                           </div>
                           </div>
                         </div>
-
+  						<div class="form-label-group mt-3">
+  						  <div class="col-md-12">
+  							 <div class="row">                        	
+                              <div class="col-md-12">
+                              <div class="form-check-inline">
+  								<label class="form-check-label">
+    								<input type="checkbox" name="groupByExperiment" class="form-check-input" >Group by experiment
+  								</label>
+							  </div>
+  								    							
+    						</div>
+    						</div>
+    						</div>
+  						</div>
                         <div class="form-label-group mt-3">
                         <div class="col-md-12">
                         	<div class="row">
