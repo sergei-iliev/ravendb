@@ -92,4 +92,13 @@ public class AffsSearchForm {
 		return groupByExperiment;
 	}
 	 
+	@Override
+	public String toString() {
+		StringBuilder sb=new StringBuilder();
+		sb.append("startDate:"+startDate+", endDate:"+endDate+", country"+countryCode+"\r\n");
+		sb.append("experiment:"+experiments+"\r\n");
+		sb.append("group by experiment:"+groupByExperiment+"\r\n");
+		sb.append("packageName:"+packageNames+"\r\n");
+		return super.toString();
+	}
 }

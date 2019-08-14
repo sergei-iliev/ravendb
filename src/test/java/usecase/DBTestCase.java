@@ -1,6 +1,7 @@
 package usecase;
 
 import java.io.Closeable;
+import java.util.Arrays;
 import java.util.Date;
 
 import org.junit.After;
@@ -78,10 +79,15 @@ public class DBTestCase{
 		 DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
 		 
 		 AffsSearchForm form=new AffsSearchForm();
-		 form.setCountryCode("US");
+		 //form.setCountryCode("US");
+		 //form.getPackageNames().add("com.moregames.stuff");
+		 //form.getPackageNames().add("com.boo.stuff");
+		 form.getPackageNames().add("com.moregames.makemoney");
+		 form.getExperiments().add("preview_images");
+		 form.getExperiments().add("redesign");
 		 form.setStartDate(new Date());
 		 
-		 for(int i=0;i<4;i++){
+		 for(int i=0;i<10;i++){
 			 
 		 Entity affs=new Entity("affs");
 		  affs.setProperty("id", i);
@@ -93,28 +99,35 @@ public class DBTestCase{
 
 		  if(i==2){
 			  affs.setIndexedProperty("country_code","BG");
+			  affs.setIndexedProperty("experiment","redesign");
 			  affs.setIndexedProperty("package_name","com.moregames.stuff");
 		  }
 
 		  if(i==3){
-			  affs.setIndexedProperty("country_code","BG");
+			  affs.setIndexedProperty("country_code","US");
 			  affs.setIndexedProperty("package_name","com.boo.stuff");
 		  }
 		  
 		  ds.put(affs);
 		 }
 
-	        Query query = new Query("affs");
-	        Filter filter1 = new FilterPredicate("package_name", FilterOperator.EQUAL ,"com.boo.stuff");
-	        Filter filter2 = new FilterPredicate("package_name", FilterOperator.EQUAL ,"com.moregames.stuff");
-	        
-	        
-	        query.setFilter(Query.CompositeFilterOperator.or(filter1, filter2));
-	        
-	        System.out.println( ds.prepare(query).countEntities( FetchOptions.Builder.withDefaults()));
-	        
-         //AffsSearchService affsSearchService=new AffsSearchService();
-         //affsSearchService.processAffsSearch(form);
+//	        Query query = new Query("affs");
+//	        Filter filter1 = new FilterPredicate("package_name", FilterOperator.EQUAL ,"com.boo.stuff");
+//	        Filter filter2 = new FilterPredicate("package_name", FilterOperator.EQUAL ,"com.moregames.stuff");
+//	        
+//	        Filter ff=new FilterPredicate("country_code",FilterOperator.IN,Arrays.asList("BG","US"));
+//	        
+//	        Filter q=Query.CompositeFilterOperator.or(filter1, filter2);
+//	        
+//	        
+//	        query.setFilter(Query.CompositeFilterOperator.and(ff, q));
+//	        
+//	        System.out.println( ds.prepare(query).countEntities( FetchOptions.Builder.withDefaults()));
+	    
+	     
+		 
+         AffsSearchService affsSearchService=new AffsSearchService();
+         affsSearchService.processAffsSearch(form);
 	     
 	}
 
