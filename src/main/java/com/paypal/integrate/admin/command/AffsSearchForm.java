@@ -13,7 +13,8 @@ import javax.servlet.ServletRequest;
 public class AffsSearchForm {
 	private Date startDate, endDate;
 	private String countryCode;
-	private Collection<String> experiments=new HashSet<>(), packageNames=new HashSet<>();
+	private Collection<String> experiments=new HashSet<>();
+	private String packageName;
     private boolean groupByExperiment;
     
 	public static AffsSearchForm parse(ServletRequest req) throws ServletException{
@@ -28,9 +29,10 @@ public class AffsSearchForm {
 		if(req.getParameterValues("experiments")!=null){
 			form.setExperiments(req.getParameterValues("experiments"));
 		}
-		if(req.getParameterValues("packageNames")!=null){
-			form.setPackageNames(req.getParameterValues("packageNames"));
-		}
+		form.setCountryCode((req.getParameter("country").length() == 0 ? null : req.getParameter("country")));
+		form.setPackageName((req.getParameter("packageName").length() == 0 ? null : req.getParameter("packageName")));
+		
+
 		return form;
 	}
 	private static Date parseDate(String value)throws ServletException{
@@ -76,16 +78,16 @@ public class AffsSearchForm {
 		this.experiments.addAll(Arrays.asList(experiments));
 	}
 
-	public Collection<String> getPackageNames() {
-		return packageNames;
+	public String getPackageName() {
+		return packageName;
 	}
 
-	public void setPackageNames(String[] packageNames) {
-		this.packageNames.addAll(Arrays.asList(packageNames));
+	public void setPackageName(String packageName) {
+		this.packageName=packageName;
 	}
 
 	public boolean isEmpty(){
-		return experiments.isEmpty()&&packageNames.isEmpty()&&countryCode.length()==1&&startDate==null&&endDate==null;
+		return experiments.isEmpty()&&packageName==null&&countryCode.length()==1&&startDate==null&&endDate==null;
 	}
 	
 	public boolean getGroupByExperiment(){
@@ -98,7 +100,7 @@ public class AffsSearchForm {
 		sb.append("startDate:"+startDate+", endDate:"+endDate+", country"+countryCode+"\r\n");
 		sb.append("experiment:"+experiments+"\r\n");
 		sb.append("group by experiment:"+groupByExperiment+"\r\n");
-		sb.append("packageName:"+packageNames+"\r\n");
-		return super.toString();
+		sb.append("packageName:"+packageName+"\r\n");
+		return sb.toString();
 	}
 }

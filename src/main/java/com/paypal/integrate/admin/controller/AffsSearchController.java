@@ -1,12 +1,10 @@
 package com.paypal.integrate.admin.controller;
 
 import java.io.IOException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Date;
 import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -18,6 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.google.appengine.api.ThreadManager;
 import com.paypal.integrate.admin.api.route.Controller;
 import com.paypal.integrate.admin.command.AffsSearchForm;
+import com.paypal.integrate.admin.command.AffsSearchResult;
 import com.paypal.integrate.admin.service.AffsSearchService;
 
 public class AffsSearchController implements Controller{
@@ -42,8 +41,23 @@ public class AffsSearchController implements Controller{
 				        try  {												
 					    	  logger.log(Level.WARNING, "*************************Task in the background started ********************");
 					  		  AffsSearchService affsSearchService=new AffsSearchService();
-							  affsSearchService.processAffsSearch(form);
-					    	  logger.log(Level.WARNING ,"*************************Background task finished*****************");
+					  		  Collection<AffsSearchResult> affsSearchResults=affsSearchService.processAffsSearch(form);
+							  for(AffsSearchResult result:affsSearchResults){
+								logger.log(Level.WARNING,"experiment="+result.getExperiment());
+								logger.log(Level.WARNING,"totalAdRev="+result.getTotalAdRev());
+								logger.log(Level.WARNING,"offerwallRev="+result.getOfferwallRev());
+								
+							    logger.log(Level.WARNING,"Records #="+result.getCount());
+							    if(result.getCount()!=0){
+							      BigDecimal avrTotalAdRev=result.getTotalAdRev().divide(new BigDecimal(result.getCount()),4, BigDecimal.ROUND_HALF_UP);
+							      logger.log(Level.WARNING,"avrTotalAdRev="+avrTotalAdRev);
+							      
+							      BigDecimal avrOfferwallRev=result.getOfferwallRev().divide(new BigDecimal(result.getCount()),4, BigDecimal.ROUND_HALF_UP);
+							      logger.log(Level.WARNING,"avrOfferwallRev="+avrOfferwallRev);
+							    }			 			 
+							 }
+					  		  
+					  		  logger.log(Level.WARNING ,"*************************Background task finished*****************");
 				   		
 				   		}catch(Exception e){
 								logger.log(Level.SEVERE, "affs search service:", e);							  

@@ -111,23 +111,8 @@
   						</div>
                         <div class="form-label-group mt-3">
                         <div class="col-md-12">
-                        	<div class="row">
-                        	
-                            <div class="col-md-5">
-                               <label for="packageNameId">Package Name</label>
-                               <input id="packageNameId"  type="text" placeholder="Package Name" class="form-control">
-                            </div>
-                            <div class="col-md-2">
-                              <button class="btn" id="p-add-btn"><i class="fa fa-arrow-right"></i></button>
-                              <button class="btn" id="p-remove-btn"><i class="fa fa-arrow-left"></i></button>
-                            </div>
-                             
-                            <div class="col-md-5">  
-                                <select class="form-control" name="packageNames" id="packageNamesId" multiple>
-                                
-                                </select>                            									
-                            </div>
-                          </div>  
+                           	<label for="packageNameId">Package Name</label>                                
+                            <input name="packageName" class="form-control" id="packageNameId">      						      					    	
                         </div>
                         </div>
                         <div class="form-group">

@@ -27,7 +27,7 @@ jQuery(document).ready(function(){
 	 $('#search-form').on('submit', function(e) { 
 	       // e.preventDefault();  
 	        $("#experimentsId option").prop("selected", "selected");
-	        $("#packageNamesId option").prop("selected", "selected");
+	        //$("#packageNamesId option").prop("selected", "selected");
 	        
 	 });
 });

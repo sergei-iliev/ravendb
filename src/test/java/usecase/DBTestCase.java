@@ -2,6 +2,7 @@ package usecase;
 
 import java.io.Closeable;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
 
 import org.junit.After;
@@ -21,6 +22,7 @@ import com.google.appengine.api.datastore.Query.FilterPredicate;
 import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 import com.paypal.integrate.admin.command.AffsSearchForm;
+import com.paypal.integrate.admin.command.AffsSearchResult;
 import com.paypal.integrate.admin.service.AffsSearchService;
 
 
@@ -82,7 +84,7 @@ public class DBTestCase{
 		 //form.setCountryCode("US");
 		 //form.getPackageNames().add("com.moregames.stuff");
 		 //form.getPackageNames().add("com.boo.stuff");
-		 form.getPackageNames().add("com.moregames.makemoney");
+		 form.setPackageName("com.moregames.makemoney");
 		 form.getExperiments().add("preview_images");
 		 form.getExperiments().add("redesign");
 		 form.setStartDate(new Date());
@@ -127,8 +129,8 @@ public class DBTestCase{
 	     
 		 
          AffsSearchService affsSearchService=new AffsSearchService();
-         affsSearchService.processAffsSearch(form);
-	     
+         Collection<AffsSearchResult> r= affsSearchService.processAffsSearch(form);
+	     System.out.println(r);
 	}
 
 	

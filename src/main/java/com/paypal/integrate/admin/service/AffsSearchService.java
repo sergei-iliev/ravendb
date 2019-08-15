@@ -15,8 +15,6 @@ import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.FetchOptions;
 import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
-import com.google.appengine.api.datastore.Query.CompositeFilter;
-import com.google.appengine.api.datastore.Query.CompositeFilterOperator;
 import com.google.appengine.api.datastore.Query.Filter;
 import com.google.appengine.api.datastore.Query.FilterOperator;
 import com.google.appengine.api.datastore.Query.FilterPredicate;
@@ -27,50 +25,35 @@ import com.paypal.integrate.admin.command.AffsSearchResult;
 
 public class AffsSearchService {
 	private final Logger logger = Logger.getLogger(AffsSearchService.class.getName());
+	private static final int CURSOR_SIZE=1000;
 	
-	public void processAffsSearch(AffsSearchForm affsSearchForm){
+	public Collection<AffsSearchResult> processAffsSearch(AffsSearchForm affsSearchForm){
+		
 		 logger.log(Level.WARNING,affsSearchForm.toString());
+		 
+		 Collection<AffsSearchResult> affsSearchResults=new ArrayList<>();
+		 
 		 if(affsSearchForm.getExperiments().size()>0){
-			 Collection<AffsSearchResult> results=new ArrayList<>();
-			 for(String experiment:affsSearchForm.getExperiments()){
-				 String packageName=affsSearchForm.getPackageNames().isEmpty()?null:affsSearchForm.getPackageNames().iterator().next();; 			 
-			     
-				 AffsSearchResult result=processAffsSearch(affsSearchForm.getStartDate(), affsSearchForm.getEndDate(), affsSearchForm.getCountryCode(),experiment, packageName); 
-	 			 results.add(result);
-	 			 				 
-			 }
-			 for(AffsSearchResult result:results){
-			    logger.log(Level.WARNING,"Sum="+result.getSum());
-				
-			    logger.log(Level.WARNING,"Records #="+result.getCount());
-			    if(result.getCount()!=0){
-			      BigDecimal avr=result.getSum().divide(new BigDecimal(result.getCount()),4, BigDecimal.ROUND_HALF_UP);
-			      logger.log(Level.WARNING,"Avr="+avr);
-			    }			 			 
-			 }
-		 }else{
-			 String experiment=affsSearchForm.getExperiments().isEmpty()?null:affsSearchForm.getExperiments().iterator().next();
-			 String packageName=affsSearchForm.getPackageNames().isEmpty()?null:affsSearchForm.getPackageNames().iterator().next();; 			 
-		     
-			 AffsSearchResult result=processAffsSearch(affsSearchForm.getStartDate(), affsSearchForm.getEndDate(), affsSearchForm.getCountryCode(),experiment, packageName); 
- 			 logger.log(Level.WARNING,"Sum="+result.getSum());
-				
-			 logger.log(Level.WARNING,"Records #="+result.getCount());
-			 if(result.getCount()!=0){
-			  BigDecimal avr=result.getSum().divide(new BigDecimal(result.getCount()),4, BigDecimal.ROUND_HALF_UP);
-			  logger.log(Level.WARNING,"Avr="+avr);
+			 
+			 for(String experiment:affsSearchForm.getExperiments()){				  					     
+				 AffsSearchResult result=processAffsSearch(affsSearchForm.getStartDate(), affsSearchForm.getEndDate(), affsSearchForm.getCountryCode(),experiment, affsSearchForm.getPackageName()); 
+				 affsSearchResults.add(result);	 							 
 			 }
 
+		 }else{
+			 String experiment=affsSearchForm.getExperiments().isEmpty()?null:affsSearchForm.getExperiments().iterator().next();		 
+		     
+			 AffsSearchResult result=processAffsSearch(affsSearchForm.getStartDate(), affsSearchForm.getEndDate(), affsSearchForm.getCountryCode(),experiment, affsSearchForm.getPackageName()); 
+			 affsSearchResults.add(result);	
+
+
 		 }
-		 
+		 return affsSearchResults;
 	}
 	public AffsSearchResult processAffsSearch(Date startDate,Date endDate,String country,String experiment,String packageName){
 	
 		 DatastoreService ds=createDatastoreService();
-		 
-		 
-		
-		 
+		 	 
 		 Query query=createQuery(startDate, endDate,country, experiment, packageName);
 		 
 		 PreparedQuery preparedQuery = ds.prepare(query);
@@ -78,27 +61,33 @@ public class AffsSearchService {
 		 QueryResultList<Entity> results;
 		 
 		 Cursor cursor=null;
-	     BigDecimal sum=BigDecimal.ZERO;
+	     BigDecimal totalAdRev=BigDecimal.ZERO;
+	     BigDecimal offerwallRev=BigDecimal.ZERO;
+	     
 	     int count=0;
 		 do{
 	    	 FetchOptions fetchOptions;	 
 	    	 if(cursor!=null){	 
-	    		 fetchOptions = FetchOptions.Builder.withLimit(3).startCursor(cursor);
+	    		 fetchOptions = FetchOptions.Builder.withLimit(CURSOR_SIZE).startCursor(cursor);
 	    	 }else{
-	    		 fetchOptions = FetchOptions.Builder.withLimit(3);	 
+	    		 fetchOptions = FetchOptions.Builder.withLimit(CURSOR_SIZE);	 
 	    	 }
    	     	    	 
 	    	 results = preparedQuery.asQueryResultList(fetchOptions);
 	     
 	    	 for(Entity e:results){
-	    		BigDecimal amount=BigDecimal.valueOf(e.getProperty("total_ad_rev")==null?0:(double)e.getProperty("total_ad_rev"));
-	    		sum=sum.add(amount); 
+	    		BigDecimal _totalAdRev=BigDecimal.valueOf(e.getProperty("total_ad_rev")==null?0:(double)e.getProperty("total_ad_rev"));	    		
+	    		totalAdRev=totalAdRev.add(_totalAdRev); 
+	    		
+	    		BigDecimal _offerwallRev=BigDecimal.valueOf(e.getProperty("offerwall_rev")==null?0:(double)e.getProperty("offerwall_rev"));
+	    		offerwallRev=offerwallRev.add(_offerwallRev); 
+	    		
 	    	 }
 	    	 count+=results.size();
 		     cursor=results.getCursor();		    		    	
 	     }while(results.size()>0);
 		 		
-		return new AffsSearchResult(sum, count);
+		return new AffsSearchResult(experiment,totalAdRev,offerwallRev, count);
 		
 	}
 //	public int getAffsSearchCount(Date startDate,Date endDate,String country,String experiment,String packageName){
