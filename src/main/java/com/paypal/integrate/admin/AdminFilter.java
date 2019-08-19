@@ -32,7 +32,13 @@ public class AdminFilter implements Filter {
         HttpServletRequest request = (HttpServletRequest) req;
         HttpServletResponse response = (HttpServletResponse) resp;
 
-                
+        
+        if(!request.isSecure()){
+        	resp.getWriter().print("HTTPS required!");
+        	resp.flushBuffer();
+        	return;
+        }
+        
         String loginedUser = (String) request.getSession().getAttribute("login");
         logger.log(Level.WARNING, "Current session:"+loginedUser);
  

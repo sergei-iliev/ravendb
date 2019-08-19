@@ -15,7 +15,6 @@ public class AffsSearchForm {
 	private String countryCode;
 	private Collection<String> experiments=new HashSet<>();
 	private String packageName;
-    private boolean groupByExperiment;
     
 	public static AffsSearchForm parse(ServletRequest req) throws ServletException{
 		AffsSearchForm form = new AffsSearchForm();
@@ -23,9 +22,7 @@ public class AffsSearchForm {
 		form.setEndDate(parseDate(req.getParameter("endDate")));
         
 		form.setCountryCode((req.getParameter("country").length() == 0 ? null : req.getParameter("country")));
-		if(req.getParameter("groupByExperiment")!=null){
-			form.groupByExperiment=true;
-		}
+
 		if(req.getParameterValues("experiments")!=null){
 			form.setExperiments(req.getParameterValues("experiments"));
 		}
@@ -90,17 +87,17 @@ public class AffsSearchForm {
 		return experiments.isEmpty()&&packageName==null&&countryCode.length()==1&&startDate==null&&endDate==null;
 	}
 	
-	public boolean getGroupByExperiment(){
-		return groupByExperiment;
-	}
+
 	 
 	@Override
 	public String toString() {
 		StringBuilder sb=new StringBuilder();
-		sb.append("startDate:"+startDate+", endDate:"+endDate+", country"+countryCode+"\r\n");
+		
+		sb.append("startDate:"+(startDate==null?"":startDate)+"\r\n");
+		sb.append("endDate:"+(endDate==null?"":endDate)+"\r\n");
+		sb.append("country:"+(countryCode==null?"":countryCode)+"\r\n");
 		sb.append("experiment:"+experiments+"\r\n");
-		sb.append("group by experiment:"+groupByExperiment+"\r\n");
-		sb.append("packageName:"+packageName+"\r\n");
+		sb.append("packageName:"+(packageName==null?"":packageName)+"\r\n");
 		return sb.toString();
 	}
 }

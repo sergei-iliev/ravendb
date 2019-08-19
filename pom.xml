@@ -59,7 +59,19 @@
     	<artifactId>appengine-api-1.0-sdk</artifactId>
     	<version>1.9.71</version>
 	</dependency>
-
+	<dependency>
+  		<groupId>com.google.cloud</groupId>
+  		<artifactId>google-cloud-storage</artifactId>
+  		<!-- 
+         	<exclusions>
+            	<exclusion>
+                	<groupId>io.opencensus</groupId>
+                	<artifactId>opencensus-api</artifactId>
+            </exclusion>
+        </exclusions>  
+         -->
+  		<version>1.29.0</version>
+	</dependency>
     <!-- [START_EXCLUDE] -->
     <!-- Test Dependencies -->
     <dependency>

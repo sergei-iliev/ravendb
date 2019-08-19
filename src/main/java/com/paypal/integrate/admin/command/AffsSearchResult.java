@@ -18,7 +18,22 @@ public class AffsSearchResult {
 	   this.count=count;
 	   this.offerwallRev=offerwallRev;
 	}
-
+	public BigDecimal getAvrTotalAdRev(){
+		if(count!=0){
+          return getTotalAdRev().divide(new BigDecimal(getCount()),4, BigDecimal.ROUND_HALF_EVEN);
+		}else{
+		  return BigDecimal.ZERO;	
+		}
+	}
+	public BigDecimal getAvrOfferwallRev(){
+		if(count!=0){
+		  return getOfferwallRev().divide(new BigDecimal(getCount()),4, BigDecimal.ROUND_HALF_EVEN);
+		}else{
+		  return BigDecimal.ZERO;	
+		}
+		
+	}
+	
 	public BigDecimal getTotalAdRev() {
 		return totalAdRev;
 	}

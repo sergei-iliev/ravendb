@@ -1,6 +1,8 @@
 package usecase;
 
 import java.io.Closeable;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
@@ -23,6 +25,7 @@ import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestC
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 import com.paypal.integrate.admin.command.AffsSearchForm;
 import com.paypal.integrate.admin.command.AffsSearchResult;
+import com.paypal.integrate.admin.repository.CloudStorageRepository;
 import com.paypal.integrate.admin.service.AffsSearchService;
 
 
@@ -128,9 +131,16 @@ public class DBTestCase{
 	    
 	     
 		 
-         AffsSearchService affsSearchService=new AffsSearchService();
-         Collection<AffsSearchResult> r= affsSearchService.processAffsSearch(form);
-	     System.out.println(r);
+         
+ 		  AffsSearchService affsSearchService=new AffsSearchService();
+ 		  Collection<AffsSearchResult> affsSearchResults=affsSearchService.processAffsSearch(form);
+		
+  		  try(Writer writer=new StringWriter()){
+	  		    affsSearchService.createFile(writer,form, affsSearchResults);
+	  		  
+			    CloudStorageRepository cloudStorageRepository=new CloudStorageRepository();
+			    cloudStorageRepository.save(writer,"affs_ad_rev_search "+new Date());
+	  	  }
 	}
 
 	

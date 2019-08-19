@@ -1,7 +1,10 @@
 package com.paypal.integrate.admin.service;
 
+import java.io.IOException;
+import java.io.Writer;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.logging.Level;
@@ -22,10 +25,46 @@ import com.google.appengine.api.datastore.QueryResultList;
 import com.google.appengine.api.datastore.ReadPolicy;
 import com.paypal.integrate.admin.command.AffsSearchForm;
 import com.paypal.integrate.admin.command.AffsSearchResult;
+import com.paypal.integrate.admin.impex.GenerateCSV;
 
 public class AffsSearchService {
 	private final Logger logger = Logger.getLogger(AffsSearchService.class.getName());
+	
 	private static final int CURSOR_SIZE=1000;
+	
+	private Collection<String> header=Arrays.asList("experiment","count","sum_total_ad_rev","avr_total_ad_rev", "sum_offerwall_rev","avr_offerwall_rev");
+	
+	public void createFile(Writer writer,AffsSearchForm form,Collection<AffsSearchResult> content)throws IOException{
+		
+		//set header
+		writer.append(form.toString()+"\n");
+		//field names
+		convertHeaderToCSV(writer,header);
+		//set content
+		convertContentToCSV(writer,content);
+		
+	}
+	private void convertHeaderToCSV(Writer writer,Collection<String> header)throws IOException{
+		GenerateCSV.INSTANCE.writeLine(writer, header);
+	}
+	
+	private void convertContentToCSV(Writer writer,Collection<AffsSearchResult> list)throws IOException{
+		Collection<String> line=new ArrayList<String>();
+		
+		for(AffsSearchResult item:list){		    
+			//item
+			line.add(item.getExperiment());
+			line.add(String.valueOf(item.getCount()));
+			line.add(item.getTotalAdRev().setScale(4, BigDecimal.ROUND_HALF_EVEN).toString());
+			line.add(item.getAvrTotalAdRev().setScale(4, BigDecimal.ROUND_HALF_EVEN).toString());
+			
+			line.add(item.getOfferwallRev().setScale(4, BigDecimal.ROUND_HALF_EVEN).toString());
+			line.add(item.getAvrOfferwallRev().setScale(4, BigDecimal.ROUND_HALF_EVEN).toString());
+
+			GenerateCSV.INSTANCE.writeLine(writer, line);
+			line.clear();
+		}
+	}
 	
 	public Collection<AffsSearchResult> processAffsSearch(AffsSearchForm affsSearchForm){
 		
