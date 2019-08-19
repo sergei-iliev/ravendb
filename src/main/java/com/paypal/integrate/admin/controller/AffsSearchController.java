@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.math.BigDecimal;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -52,7 +55,7 @@ public class AffsSearchController implements Controller{
 					  		    affsSearchService.createFile(writer,form, affsSearchResults);
 					  		  
 							    CloudStorageRepository cloudStorageRepository=new CloudStorageRepository();
-							    cloudStorageRepository.save(writer,"affs_ad_rev_search/search"+new Date());
+							    cloudStorageRepository.save(writer,"affs_ad_rev_search/search"+formatDate(new Date()));
 					  		  }
 					  		  
 //					  		  for(AffsSearchResult result:affsSearchResults){
@@ -85,6 +88,12 @@ public class AffsSearchController implements Controller{
 		req.getRequestDispatcher("/jsp/index.jsp").forward(req, resp);
 	}
 
+	private String formatDate(Date date){
+	    
+	    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy_MM_dd_hh_mm_ss");
+	    ZonedDateTime sd = date.toInstant().atZone(ZoneId.systemDefault());	    
+	    return formatter.format(sd);		
+	}
 	
 	private Collection<String> getCountries(){
 		String[] locales = Locale.getISOCountries();
@@ -96,11 +105,6 @@ public class AffsSearchController implements Controller{
 		}
 
 		return countries;
-	}
-	
-	private Collection<String> getPackagesName(){
-		return Arrays.asList("com.moregames.makemoney", "com.coinmachine.app",
-		"com.matchmine.app");		
 	}
 
 
