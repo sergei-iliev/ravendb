@@ -3,6 +3,9 @@ package usecase;
 import java.io.Closeable;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
@@ -143,7 +146,12 @@ public class DBTestCase{
 	  	  }
 	}
 
-	
-
+	@Test
+	public void dateFormatTest() throws Exception{
+	    DateTimeFormatter TICKET_DATE_FORMATTER = DateTimeFormatter.ofPattern("MM_dd_yyyy_hh_mm_ss");
+	    ZonedDateTime sd = (new Date()).toInstant().atZone(ZoneId.of("GMT+8"));
+	    
+	    System.out.println(TICKET_DATE_FORMATTER.format(sd));
+	}
 		
 }

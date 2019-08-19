@@ -38,8 +38,8 @@
 
     <div class="container">
     <div class="row">
-        <div class="col-md-5 offset-md-3">
-            <div class="well well-sm">
+        <div class="col-md-12">
+            <div class="card card-body bg-light">
              <c:if test="${success!=null}">
 				<div class="alert alert-success" role="alert">
   					${success}
@@ -51,20 +51,20 @@
                         <legend class="text-center header">Contact us</legend>
  -->
   				<div class="form-label-group">
-  					<div class="col-6">
+  					<div class="col-3">
   					    <label for="startDateId">Start Date</label>
     					<input class="form-control" type="date"  data-date-format="MM/DD/YYYY"  name="startDate" id="startDateId">
   					</div>
 				</div>
  				<div class="form-label-group">
-  					<div class="col-6">
+  					<div class="col-3">
   					<label for="endDateId">End Date</label>
     					<input class="form-control" type="date" data-date-format="MM/DD/YYYY" name="endDate" id="endDateId">
   					</div>  					
 				</div>
                         <div class="form-label-group">
                             
-                            <div class="col-md-12">
+                            <div class="col-md-3">
                             	<label for="countryId">Country</label>                                
                                 <select name="country" class="form-control" id="countryId">
       						
@@ -76,22 +76,25 @@
                         </div>
                         <div class="form-label-group mt-3">
                         <div class="col-md-12">
-                        	<div class="row">
+                           <div class="row">
                         	
-                            <div class="col-md-5">
+                             <div class="col-md-12">
                                <label for="experimentId">Experiment</label>
                                <input id="experimentId"  type="text" placeholder="Experiment" class="form-control">
+                             </div>
                             </div>
+                            <div class="row mt-3">
                             <div class="col-md-2">
-                              <button class="btn" id="add-btn"><i class="fa fa-arrow-right"></i></button>
-                              <button class="btn" id="remove-btn"><i class="fa fa-arrow-left"></i></button>
+                              <button class="btn" id="add-btn"><i class="fa fa-arrow-down"></i></button>
+                              <button class="btn" id="remove-btn"><i class="fa fa-arrow-up"></i></button>
                             </div>
-                             
-                            <div class="col-md-5">  
+                             </div>
+                             <div class="row mt-3">
+                              <div class="col-md-12">  
                                 <select class="form-control" name="experiments" id="experimentsId" multiple>
                                 
                                 </select>                            									
-                            </div>
+                              </div>                            
                           </div>
                           </div>
                         </div>
@@ -112,7 +115,7 @@
   						</div>
   						 -->
                         <div class="form-label-group mt-3">
-                        <div class="col-md-12">
+                        <div class="col-md-3">
                            	<label for="packageNameId">Package Name</label>                                
                             <input name="packageName" class="form-control" id="packageNameId">      						      					    	
                         </div>
