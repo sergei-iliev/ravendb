@@ -6,13 +6,13 @@
   <packaging>war</packaging>            <!-- REQUIRED -->
 
   <groupId>com.paypal.integration.admin</groupId>
-  <artifactId>luee-wally-dev-admin</artifactId>    <!-- Name of your project -->
+  <artifactId>luee-wally-dev-admin_v1</artifactId>    <!-- Name of your project -->
   <version>1.0</version>       <!-- xx.xx.xx -SNAPSHOT means development -->
 
 
   <properties>
     <!-- [START config] -->
-    <projectID>luee-wally-dev-admin</projectID> <!-- set w/ -DprojectID=myProjectID on command line -->
+    <projectID>luee-wally-dev-admin_v1</projectID> <!-- set w/ -DprojectID=myProjectID on command line -->
 
 
     <appengine.maven.plugin>1.3.2</appengine.maven.plugin>

@@ -113,7 +113,7 @@ public class CampaignSearchService {
 		Collection<Filter> predicates=new ArrayList<>();
 		
 		if(startDate!=null){
-			predicates.add(new FilterPredicate("date", FilterOperator.GREATER_THAN, startDate));
+			predicates.add(new FilterPredicate("date", FilterOperator.GREATER_THAN_OR_EQUAL, startDate));
 		}
 		if(endDate!=null){
 			predicates.add(new FilterPredicate("date", FilterOperator.LESS_THAN , endDate));

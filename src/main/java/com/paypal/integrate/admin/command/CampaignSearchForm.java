@@ -28,7 +28,7 @@ public class CampaignSearchForm implements WebForm{
 			form.setAdNetworks(req.getParameterValues("adnetworks"));
 		}
 		if(req.getParameterValues("campaigns")!=null){
-			form.setSources(req.getParameterValues("campaigns"));
+			form.setCompaigns(req.getParameterValues("campaigns"));
 		}
 		if(req.getParameterValues("sources")!=null){
 			form.setSources(req.getParameterValues("sources"));

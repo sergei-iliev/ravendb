@@ -146,35 +146,28 @@ public class AffsSearchService {
 		DatastoreService ds = createDatastoreService();
 		Query query = new Query("affs");
 		Collection<Filter> predicates = new ArrayList<>();
-		
-		for (String gaid : gaids) {
-			predicates.add(new FilterPredicate("gaid", FilterOperator.EQUAL, gaid));
-		}
-
-		if (predicates.size() > 1) {
-			query.setFilter(Query.CompositeFilterOperator.or(predicates));
-		} else {
-			query.setFilter(predicates.iterator().next());
-		}
-		
 		BigDecimal totalAdRev = BigDecimal.ZERO;
 		BigDecimal offerwallRev = BigDecimal.ZERO;
-		
-		PreparedQuery preparedQuery = ds.prepare(query);
-		QueryResultList<Entity> results = preparedQuery.asQueryResultList(FetchOptions.Builder.withDefaults());
-		
-		for (Entity e : results) {
-			BigDecimal _totalAdRev = BigDecimal
-					.valueOf(e.getProperty("total_ad_rev") == null ? 0 : (double) e.getProperty("total_ad_rev"));
-			totalAdRev = totalAdRev.add(_totalAdRev);
+		int count = 0;
+		// loop for each guid
+		for (String gaid : gaids) {
+			query.setFilter(new FilterPredicate("gaid", FilterOperator.EQUAL, gaid));
 
-			BigDecimal _offerwallRev = BigDecimal
-					.valueOf(e.getProperty("offerwall_rev") == null ? 0 : (double) e.getProperty("offerwall_rev"));
-			offerwallRev = offerwallRev.add(_offerwallRev);
+			PreparedQuery preparedQuery = ds.prepare(query);
+			QueryResultList<Entity> results = preparedQuery.asQueryResultList(FetchOptions.Builder.withDefaults());
 
+			for (Entity e : results) {
+				BigDecimal _totalAdRev = BigDecimal
+						.valueOf(e.getProperty("total_ad_rev") == null ? 0 : (double) e.getProperty("total_ad_rev"));
+				totalAdRev = totalAdRev.add(_totalAdRev);
+
+				BigDecimal _offerwallRev = BigDecimal
+						.valueOf(e.getProperty("offerwall_rev") == null ? 0 : (double) e.getProperty("offerwall_rev"));
+				offerwallRev = offerwallRev.add(_offerwallRev);
+				count+=results.size();
+			}
 		}
-		
-		return new AffsSearchResult(null, totalAdRev, offerwallRev, results.size());
+		return new AffsSearchResult(null, totalAdRev, offerwallRev, count);
 	}
 	// public int getAffsSearchCount(Date startDate,Date endDate,String
 	// country,String experiment,String packageName){
