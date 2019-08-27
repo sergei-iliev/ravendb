@@ -10,7 +10,7 @@ public class AffsSearchResult {
 	
 	private final BigDecimal offerwallRev;
 	
-	private final String experiment;
+	private String experiment;
 	
 	public AffsSearchResult(String experiment,BigDecimal totalAdRev,BigDecimal offerwallRev,int count) {
 	   this.experiment=experiment;
@@ -32,6 +32,10 @@ public class AffsSearchResult {
 		  return BigDecimal.ZERO;	
 		}
 		
+	}
+	
+	public void setExperiment(String experiment){
+		this.experiment=experiment;
 	}
 	
 	public BigDecimal getTotalAdRev() {

@@ -1,7 +1,10 @@
 package com.paypal.integrate.admin.service;
 
+import java.io.IOException;
+import java.io.Writer;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.logging.Level;
@@ -20,6 +23,7 @@ import com.google.appengine.api.datastore.ReadPolicy;
 import com.google.appengine.api.datastore.Query.Filter;
 import com.google.appengine.api.datastore.Query.FilterOperator;
 import com.google.appengine.api.datastore.Query.FilterPredicate;
+import com.paypal.integrate.admin.command.AffsSearchForm;
 import com.paypal.integrate.admin.command.AffsSearchResult;
 import com.paypal.integrate.admin.command.CampaignSearchForm;
 
@@ -28,34 +32,52 @@ public class CampaignSearchService {
 	
 	private static final int CURSOR_SIZE=1000;
 	
+	private Collection<String> header = Arrays.asList("experiment", "count", "sum_total_ad_rev", "avr_total_ad_rev",
+			"sum_offerwall_rev", "avr_offerwall_rev");
+
+	public void createFile(Writer writer, AffsSearchForm form, Collection<AffsSearchResult> content)
+			throws IOException {
+
+		// set header
+		writer.append(form.toString() + "\n");
+		// field names
+		//convertHeaderToCSV(writer, header);
+		// set content
+		//convertContentToCSV(writer, content);
+
+	}
+	
 	public Collection<AffsSearchResult> processCampaignSearch(CampaignSearchForm campaignSearchForm){
 		logger.log(Level.WARNING,campaignSearchForm.toString());
 		
 		 Collection<AffsSearchResult> campaignSearchResults=new ArrayList<>();
 		 if(campaignSearchForm.getAdNetworks().size()>1){  //multi search
 			 for(String adNetwork:campaignSearchForm.getAdNetworks()){
-				 Collection<AffsSearchResult> affsSearchResult= this.processCampaignSearch(campaignSearchForm.getStartDate(), campaignSearchForm.getEndDate(),campaignSearchForm.getCountryCode(), campaignSearchForm.getPackageName(),adNetwork,campaignSearchForm.getCampaignsFirst(),campaignSearchForm.getSourcesFirst());  
-				 campaignSearchResults.addAll(affsSearchResult);				 
+				 AffsSearchResult affsSearchResult= this.processCampaignSearch(campaignSearchForm.getStartDate(), campaignSearchForm.getEndDate(),campaignSearchForm.getCountryCode(), campaignSearchForm.getPackageName(),adNetwork,campaignSearchForm.getCampaignsFirst(),campaignSearchForm.getSourcesFirst());  
+				 affsSearchResult.setExperiment(adNetwork);
+				 campaignSearchResults.add(affsSearchResult);				 
 			 }			 
 		 }else if(campaignSearchForm.getSources().size()>1){
 			 for(String source:campaignSearchForm.getSources()){
-				 Collection<AffsSearchResult> affsSearchResult= this.processCampaignSearch(campaignSearchForm.getStartDate(), campaignSearchForm.getEndDate(),campaignSearchForm.getCountryCode(), campaignSearchForm.getPackageName(),campaignSearchForm.getAdNetworksFirst(),campaignSearchForm.getCampaignsFirst(),source); 
-				 campaignSearchResults.addAll(affsSearchResult);				 
+				 AffsSearchResult affsSearchResult= this.processCampaignSearch(campaignSearchForm.getStartDate(), campaignSearchForm.getEndDate(),campaignSearchForm.getCountryCode(), campaignSearchForm.getPackageName(),campaignSearchForm.getAdNetworksFirst(),campaignSearchForm.getCampaignsFirst(),source); 
+				 affsSearchResult.setExperiment(source);
+				 campaignSearchResults.add(affsSearchResult);				 
 			 }			 
 		 }else if(campaignSearchForm.getCampaigns().size()>1){
 			 for(String campaign:campaignSearchForm.getCampaigns()){
-				 Collection<AffsSearchResult> affsSearchResult= this.processCampaignSearch(campaignSearchForm.getStartDate(), campaignSearchForm.getEndDate(),campaignSearchForm.getCountryCode(), campaignSearchForm.getPackageName(),campaignSearchForm.getAdNetworksFirst(),campaign,campaignSearchForm.getSourcesFirst()); 
-				 campaignSearchResults.addAll(affsSearchResult);				 
+				 AffsSearchResult affsSearchResult= this.processCampaignSearch(campaignSearchForm.getStartDate(), campaignSearchForm.getEndDate(),campaignSearchForm.getCountryCode(), campaignSearchForm.getPackageName(),campaignSearchForm.getAdNetworksFirst(),campaign,campaignSearchForm.getSourcesFirst()); 
+				 affsSearchResult.setExperiment(campaign);
+				 campaignSearchResults.add(affsSearchResult);				 
 			 }
 		 }else{   //single pass
-			 Collection<AffsSearchResult> affsSearchResult= this.processCampaignSearch(campaignSearchForm.getStartDate(), campaignSearchForm.getEndDate(),campaignSearchForm.getCountryCode(), campaignSearchForm.getPackageName(),campaignSearchForm.getAdNetworksFirst(),campaignSearchForm.getCampaignsFirst(),campaignSearchForm.getSourcesFirst()); 
-			 campaignSearchResults.addAll(affsSearchResult);
+			 AffsSearchResult affsSearchResult= this.processCampaignSearch(campaignSearchForm.getStartDate(), campaignSearchForm.getEndDate(),campaignSearchForm.getCountryCode(), campaignSearchForm.getPackageName(),campaignSearchForm.getAdNetworksFirst(),campaignSearchForm.getCampaignsFirst(),campaignSearchForm.getSourcesFirst()); 
+			 campaignSearchResults.add(affsSearchResult);
 		 }
 		 
 	 	 return campaignSearchResults;
 	}
-	public Collection<AffsSearchResult>  processCampaignSearch(Date startDate,Date endDate,String country,String packageName,String addNetwork,String campaignId,String sourceId){
-		Collection<AffsSearchResult> campaignSearchResults=new ArrayList<>(); 
+	public AffsSearchResult  processCampaignSearch(Date startDate,Date endDate,String country,String packageName,String addNetwork,String campaignId,String sourceId){
+		
 		DatastoreService ds=createDatastoreService();
 	 	 
 		 Query query=createCampaignQuery(startDate, endDate,country,  packageName,addNetwork,campaignId,sourceId);
@@ -69,6 +91,10 @@ public class CampaignSearchService {
 	     Collection<String> affsIds=new ArrayList<>();
 	     AffsSearchService affsSearchService=new AffsSearchService();
 	     
+		 BigDecimal totalAdRev = BigDecimal.ZERO;
+		 BigDecimal offerwallRev = BigDecimal.ZERO;
+ 		 int count = 0;
+			
 		 do{
 	    	 FetchOptions fetchOptions;	 
 	    	 if(cursor!=null){	 
@@ -86,13 +112,15 @@ public class CampaignSearchService {
 	    	  * calculate affs data by id
 	    	  */
 	    	 if(affsIds.size()>0){
-	    		 AffsSearchResult affsSearchResult= affsSearchService.processAffsSearch(affsIds);
-	    		 campaignSearchResults.add(affsSearchResult);
+	    		 AffsSearchResult affsSearchResult= affsSearchService.processAffsSearch(affsIds);	 								
+					totalAdRev = totalAdRev.add(affsSearchResult.getTotalAdRev());					
+					offerwallRev = offerwallRev.add(affsSearchResult.getOfferwallRev());
+					count+=affsSearchResult.getCount();
 	    	 }
 		     cursor=results.getCursor();		    		    	
 	     }while(results.size()>0);
-
-		 return campaignSearchResults;
+		 
+		 return new AffsSearchResult(null, totalAdRev, offerwallRev, count);
 	}
 	
 	private DatastoreService createDatastoreService(){

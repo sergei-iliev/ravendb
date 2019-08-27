@@ -49,6 +49,7 @@ public class CampaignSearchController implements Controller {
 //					  		  }
 					  		  
 					  		  for(AffsSearchResult result:affsSearchResults){
+					  			logger.log(Level.WARNING,result.getExperiment());  
 								logger.log(Level.WARNING,"totalAdRev="+result.getTotalAdRev());
 								logger.log(Level.WARNING,"offerwallRev="+result.getOfferwallRev());
 								
