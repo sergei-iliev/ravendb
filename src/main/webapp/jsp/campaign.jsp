@@ -8,12 +8,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 </head>
-<script src="../js/jquery/jquery.min.js"></script> 
+<script src="/js/jquery/jquery.min.js"></script> 
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-<link rel="stylesheet" href="../css/bootstrap/bootstrap.min.css">         
-<script src="../js/bootstrap/bootstrap.min.js"></script> 
-<script src="../js/jsp/index.js"></script> 
+<link rel="stylesheet" href="/css/bootstrap/bootstrap.min.css">         
+<script src="/js/bootstrap/bootstrap.min.js"></script> 
+<script src="/js/jsp/campaign.js"></script> 
 <body>
     <nav class="navbar navbar-expand-md navbar-dark bg-dark mb-4">
       <a class="navbar-brand" href="#">Backed Soft</a>
@@ -22,11 +22,11 @@
       </button>
       <div class="collapse navbar-collapse" id="navbarCollapse">
         <ul class="navbar-nav mr-auto">
-          <li class="nav-item active">
+          <li class="nav-item">
             <a class="nav-link" href="/administration">Affs Revenue</a>
           </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">Campaign Revenue<span class="sr-only">(current)</span></a>
+          <li class="nav-item active">
+            <a class="nav-link" href="/administration/campaign">Campaign Revenue</a>
           </li>
 
         </ul>
@@ -38,33 +38,33 @@
 
     <div class="container">
     <div class="row">
-        <div class="col-md-5 offset-md-3">
-            <div class="well well-sm">
+        <div class="col-md-12">
+            <div class="card card-body bg-light">
              <c:if test="${success!=null}">
 				<div class="alert alert-success" role="alert">
   					${success}
 				</div>	
 			 </c:if> 
-                <form class="form-horizontal" id="search-form" method="post" action="/administration/search">
+                <form class="form-horizontal" id="search-form" method="post" action="/administration/campaign/search">
                     <fieldset>
                     <!-- 
                         <legend class="text-center header">Contact us</legend>
  -->
   				<div class="form-label-group">
-  					<div class="col-6">
+  					<div class="col-3">
   					    <label for="startDateId">Start Date</label>
     					<input class="form-control" type="date"  data-date-format="MM/DD/YYYY"  name="startDate" id="startDateId">
   					</div>
 				</div>
  				<div class="form-label-group">
-  					<div class="col-6">
+  					<div class="col-3">
   					<label for="endDateId">End Date</label>
     					<input class="form-control" type="date" data-date-format="MM/DD/YYYY" name="endDate" id="endDateId">
   					</div>  					
 				</div>
                         <div class="form-label-group">
                             
-                            <div class="col-md-12">
+                            <div class="col-md-3">
                             	<label for="countryId">Country</label>                                
                                 <select name="country" class="form-control" id="countryId">
       						
@@ -75,48 +75,88 @@
                             </div>
                         </div>
                         <div class="form-label-group mt-3">
-                        <div class="col-md-12">
-                        	<div class="row">
-                        	
-                            <div class="col-md-5">
-                               <label for="experimentId">Experiment</label>
-                               <input id="experimentId"  type="text" placeholder="Experiment" class="form-control">
-                            </div>
-                            <div class="col-md-2">
-                              <button class="btn" id="add-btn"><i class="fa fa-arrow-right"></i></button>
-                              <button class="btn" id="remove-btn"><i class="fa fa-arrow-left"></i></button>
-                            </div>
-                             
-                            <div class="col-md-5">  
-                                <select class="form-control" name="experiments" id="experimentsId" multiple>
-                                
-                                </select>                            									
-                            </div>
-                          </div>
-                          </div>
-                        </div>
-                        <!-- 
-  						<div class="form-label-group mt-3">
-  						  <div class="col-md-12">
-  							 <div class="row">                        	
-                              <div class="col-md-12">
-                              <div class="form-check-inline">
-  								<label class="form-check-label">
-    								<input type="checkbox" name="groupByExperiment" class="form-check-input" >Group by experiment
-  								</label>
-							  </div>
-  								    							
-    						</div>
-    						</div>
-    						</div>
-  						</div>
-  						 -->
-                        <div class="form-label-group mt-3">
-                        <div class="col-md-12">
+                        <div class="col-md-3">
                            	<label for="packageNameId">Package Name</label>                                
                             <input name="packageName" class="form-control" id="packageNameId">      						      					    	
                         </div>
+                        </div>                        
+                        <div class="form-label-group mt-3">
+                        <div class="col-md-12">
+                        <div class="card card-body">
+                           <div class="row">
+                        	
+                             <div class="col-md-12">
+                               <label for="adnetworkId">AdNetwork</label>
+                               <input id="adnetworkId"  type="text" class="form-control">
+                             </div>
+                            </div>
+                            <div class="row mt-3">
+                            <div class="col-md-2">
+                              <button class="btn" id="add-btn"><i class="fa fa-arrow-down"></i></button>
+                              <button class="btn" id="remove-btn"><i class="fa fa-arrow-up"></i></button>
+                            </div>
+                             </div>
+                             <div class="row mt-3">
+                              <div class="col-md-12">  
+                                <select class="form-control" name="adnetworks" id="adnetworksId" multiple>
+                                
+                                </select>                            									
+                              </div>   
+                              </div>                         
+                          </div>
+                          </div>
+                          </div>
+                        <div class="form-label-group mt-3">
+                        <div class="col-md-12">
+                        <div class="card card-body">
+                           <div class="row">
+                        	
+                             <div class="col-md-12">
+                               <label for="campaignId">Tenjin Campaign Id</label>
+                               <input id="campaignId"  type="text" class="form-control">
+                             </div>
+                            </div>
+                            <div class="row mt-3">
+                            <div class="col-md-2">
+                              <button class="btn" id="add-btn-campaign"><i class="fa fa-arrow-down"></i></button>
+                              <button class="btn" id="remove-btn-campaign"><i class="fa fa-arrow-up"></i></button>
+                            </div>
+                             </div>
+                             <div class="row mt-3">
+                              <div class="col-md-12">  
+                                <select class="form-control" name="campaigns" id="campaignsId" multiple>
+                                
+                                </select>                            									
+                              </div>                            
+                          </div>
+                          </div>
+                          </div>
                         </div>
+                        <div class="form-label-group mt-3">
+                        <div class="col-md-12">
+                            <div class="card card-body">
+                            <div class="row">                        	
+                             <div class="col-md-12">
+                               <label for="sourceId">Source Id</label>
+                               <input id="sourceId"  type="text" class="form-control">
+                             </div>
+                            </div>
+                            <div class="row mt-3">
+                            <div class="col-md-2">
+                              <button class="btn" id="add-btn-source"><i class="fa fa-arrow-down"></i></button>
+                              <button class="btn" id="remove-btn-source"><i class="fa fa-arrow-up"></i></button>
+                            </div>
+                             </div>
+                             <div class="row mt-3">
+                              <div class="col-md-12">  
+                                <select class="form-control" name="sources" id="sourcesId" multiple>
+                                
+                                </select>                            									
+                              </div>                            
+                             </div>
+                             </div>
+                          </div>
+                        </div>                        
                         <div class="form-group">
                             <div class="col-md-12 text-center">
                                 <button type="submit" class="btn btn-primary btn-lg mt-5">Search</button>
@@ -128,6 +168,7 @@
         </div>
     </div>
     </div>
+
 
 
   </body>

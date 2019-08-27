@@ -95,17 +95,6 @@ public class AffsSearchController implements Controller{
 	    return formatter.format(sd);		
 	}
 	
-	private Collection<String> getCountries(){
-		String[] locales = Locale.getISOCountries();
-		Collection<String> countries=new ArrayList<String>();
-		countries.add("");
-		for (String countryCode : locales) {
-			Locale locale = new Locale("", countryCode);
-			countries.add(locale.getCountry());
-		}
-
-		return countries;
-	}
 
 
 }

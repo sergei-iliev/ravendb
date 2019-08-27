@@ -10,7 +10,7 @@ import java.util.HashSet;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 
-public class AffsSearchForm {
+public class AffsSearchForm implements WebForm{
 	private Date startDate, endDate;
 	private String countryCode;
 	private Collection<String> experiments=new HashSet<>();
@@ -18,8 +18,8 @@ public class AffsSearchForm {
     
 	public static AffsSearchForm parse(ServletRequest req) throws ServletException{
 		AffsSearchForm form = new AffsSearchForm();
-		form.setStartDate(parseDate(req.getParameter("startDate")));
-		form.setEndDate(parseDate(req.getParameter("endDate")));
+		form.setStartDate(form.parseDate(req.getParameter("startDate")));
+		form.setEndDate(form.parseDate(req.getParameter("endDate")));
         
 		form.setCountryCode((req.getParameter("country").length() == 0 ? null : req.getParameter("country")));
 
@@ -32,17 +32,7 @@ public class AffsSearchForm {
 
 		return form;
 	}
-	private static Date parseDate(String value)throws ServletException{
-		try{
-		if(value!= null && value.length() != 0 ){	
-			return new SimpleDateFormat("yyyy-MM-dd").parse(value);
-		}else{
-			return null;
-		}
-		}catch(ParseException e){
-			throw new ServletException(e);
-		}
-	}
+
 	public Date getStartDate() {
 		return startDate;
 	}

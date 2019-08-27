@@ -33,7 +33,7 @@ public class AdminFilter implements Filter {
         HttpServletResponse response = (HttpServletResponse) resp;
 
         
-        if(!request.isSecure()){
+        if(request.isSecure()){
         	resp.getWriter().print("HTTPS required!");
         	resp.flushBuffer();
         	return;

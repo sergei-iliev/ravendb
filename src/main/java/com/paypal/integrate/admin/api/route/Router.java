@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.paypal.integrate.admin.controller.AffsSearchController;
+import com.paypal.integrate.admin.controller.CampaignSearchController;
 import com.paypal.integrate.admin.controller.LoginController;
 /*
  * Based on
@@ -37,8 +38,10 @@ INSTANCE;
     	 httpGetRouteList.put("/administration/login", new Route(new LoginController(),"index"));
     	 httpGetRouteList.put("/administration", new Route(new AffsSearchController(),"index"));
     	 httpGetRouteList.put("/administration/logout", new Route(new LoginController(),"logout"));
-    	//post
+    	 httpGetRouteList.put("/administration/campaign", new Route(new CampaignSearchController(),"index"));
+    	 //post
     	 httpPostRouteList.put("/administration/search", new Route(new AffsSearchController(),"search"));
+    	 httpPostRouteList.put("/administration/campaign/search", new Route(new CampaignSearchController(),"search"));
     	 httpPostRouteList.put("/administration/login", new Route(new LoginController(),"login"));
 
     }

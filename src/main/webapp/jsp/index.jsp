@@ -26,7 +26,7 @@
             <a class="nav-link" href="/administration">Affs Revenue<span class="sr-only">(current)</span></a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="#">Campaign Revenue</a>
+            <a class="nav-link" href="/administration/campaign">Campaign Revenue</a>
           </li>
 
         </ul>
