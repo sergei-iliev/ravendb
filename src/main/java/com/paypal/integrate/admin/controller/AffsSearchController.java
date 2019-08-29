@@ -88,12 +88,6 @@ public class AffsSearchController implements Controller{
 		req.getRequestDispatcher("/jsp/index.jsp").forward(req, resp);
 	}
 
-	private String formatDate(Date date){
-	    
-	    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy_MM_dd_hh_mm_ss");
-	    ZonedDateTime sd = date.toInstant().atZone(ZoneId.systemDefault());	    
-	    return formatter.format(sd);		
-	}
 	
 
 

@@ -26,25 +26,46 @@ import com.google.appengine.api.datastore.Query.FilterPredicate;
 import com.paypal.integrate.admin.command.AffsSearchForm;
 import com.paypal.integrate.admin.command.AffsSearchResult;
 import com.paypal.integrate.admin.command.CampaignSearchForm;
+import com.paypal.integrate.admin.impex.GenerateCSV;
 
 public class CampaignSearchService {
 	private final Logger logger = Logger.getLogger(CampaignSearchService.class.getName());
 	
 	private static final int CURSOR_SIZE=1000;
 	
-	private Collection<String> header = Arrays.asList("experiment", "count", "sum_total_ad_rev", "avr_total_ad_rev",
+	private Collection<String> header = Arrays.asList("*", "count", "sum_total_ad_rev", "avr_total_ad_rev",
 			"sum_offerwall_rev", "avr_offerwall_rev");
 
-	public void createFile(Writer writer, AffsSearchForm form, Collection<AffsSearchResult> content)
+	public void createFile(Writer writer, CampaignSearchForm form, Collection<AffsSearchResult> content)
 			throws IOException {
 
 		// set header
 		writer.append(form.toString() + "\n");
 		// field names
-		//convertHeaderToCSV(writer, header);
+		convertHeaderToCSV(writer, header);
 		// set content
-		//convertContentToCSV(writer, content);
+		convertContentToCSV(writer, content);
 
+	}
+	private void convertContentToCSV(Writer writer, Collection<AffsSearchResult> list) throws IOException {
+		Collection<String> line = new ArrayList<String>();
+
+		for (AffsSearchResult item : list) {
+			// item
+			line.add(item.getExperiment());
+			line.add(String.valueOf(item.getCount()));
+			line.add(item.getTotalAdRev().setScale(4, BigDecimal.ROUND_HALF_EVEN).toString());
+			line.add(item.getAvrTotalAdRev().setScale(4, BigDecimal.ROUND_HALF_EVEN).toString());
+
+			line.add(item.getOfferwallRev().setScale(4, BigDecimal.ROUND_HALF_EVEN).toString());
+			line.add(item.getAvrOfferwallRev().setScale(4, BigDecimal.ROUND_HALF_EVEN).toString());
+
+			GenerateCSV.INSTANCE.writeLine(writer, line);
+			line.clear();
+		}
+	}	
+	private void convertHeaderToCSV(Writer writer, Collection<String> header) throws IOException {
+		GenerateCSV.INSTANCE.writeLine(writer, header);
 	}
 	
 	public Collection<AffsSearchResult> processCampaignSearch(CampaignSearchForm campaignSearchForm){
@@ -112,7 +133,7 @@ public class CampaignSearchService {
 	    	  * calculate affs data by id
 	    	  */
 	    	 if(affsIds.size()>0){
-	    		 AffsSearchResult affsSearchResult= affsSearchService.processAffsSearch(affsIds);	 								
+	    		 AffsSearchResult affsSearchResult= affsSearchService.processAffsSearch(affsIds,startDate,endDate);	 								
 					totalAdRev = totalAdRev.add(affsSearchResult.getTotalAdRev());					
 					offerwallRev = offerwallRev.add(affsSearchResult.getOfferwallRev());
 					count+=affsSearchResult.getCount();

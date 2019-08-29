@@ -45,7 +45,7 @@ public class CampaignSearchController implements Controller {
 //					  		    affsSearchService.createFile(writer,form, affsSearchResults);
 //					  		  
 //							    CloudStorageRepository cloudStorageRepository=new CloudStorageRepository();
-//							    cloudStorageRepository.save(writer,"affs_ad_rev_search/search"+formatDate(new Date()));
+//							    cloudStorageRepository.save(writer,"campaign_ad_rev_search/search"+formatDate(new Date()));
 //					  		  }
 					  		  
 					  		  for(AffsSearchResult result:affsSearchResults){

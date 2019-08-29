@@ -142,16 +142,16 @@ public class AffsSearchService {
 	/*
 	 * Find affs by guid ID, TEST OR operation
 	 */
-	public AffsSearchResult processAffsSearch(Collection<String> gaids) {
+	public AffsSearchResult processAffsSearch(Collection<String> gaids,Date startDate,Date endDate) {
 		DatastoreService ds = createDatastoreService();
-		Query query = new Query("affs");
-		Collection<Filter> predicates = new ArrayList<>();
+
+		
 		BigDecimal totalAdRev = BigDecimal.ZERO;
 		BigDecimal offerwallRev = BigDecimal.ZERO;
 		int count = 0;
 		// loop for each guid
-		for (String gaid : gaids) {
-			query.setFilter(new FilterPredicate("gaid", FilterOperator.EQUAL, gaid));
+		for (String gaid : gaids) {			
+			Query query=createQuery(startDate, endDate, gaid);
 
 			PreparedQuery preparedQuery = ds.prepare(query);
 			QueryResultList<Entity> results = preparedQuery.asQueryResultList(FetchOptions.Builder.withDefaults());
@@ -194,14 +194,39 @@ public class AffsSearchService {
 		// Get Datastore service with the given configuration
 		return DatastoreServiceFactory.getDatastoreService(datastoreConfig);
 	}
+	
+	private Query createQuery(Date startDate, Date endDate, String gaid) {
+		Query query = new Query("affs");
+		Collection<Filter> predicates = new ArrayList<>();
 
+	
+		
+		if (startDate != null) {
+			predicates.add(new FilterPredicate("date", FilterOperator.GREATER_THAN_OR_EQUAL, startDate));
+		}
+		if (endDate != null) {
+			predicates.add(new FilterPredicate("date", FilterOperator.LESS_THAN, endDate));
+		}
+		if (gaid != null) {
+			predicates.add(new FilterPredicate("gaid", FilterOperator.EQUAL, gaid));
+		}
+
+
+		if (predicates.size() > 1) {
+			query.setFilter(Query.CompositeFilterOperator.and(predicates));
+		} else {
+			query.setFilter(predicates.iterator().next());
+		}
+
+		return query;
+	}
 	private Query createQuery(Date startDate, Date endDate, String country, String experiment, String packageName) {
 
 		Query query = new Query("affs");
 		Collection<Filter> predicates = new ArrayList<>();
 
 		if (startDate != null) {
-			predicates.add(new FilterPredicate("date", FilterOperator.GREATER_THAN, startDate));
+			predicates.add(new FilterPredicate("date", FilterOperator.GREATER_THAN_OR_EQUAL, startDate));
 		}
 		if (endDate != null) {
 			predicates.add(new FilterPredicate("date", FilterOperator.LESS_THAN, endDate));
