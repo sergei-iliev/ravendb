@@ -18,6 +18,7 @@ import com.paypal.integrate.admin.api.route.Controller;
 import com.paypal.integrate.admin.command.AffsSearchForm;
 import com.paypal.integrate.admin.command.AffsSearchResult;
 import com.paypal.integrate.admin.command.CampaignSearchForm;
+import com.paypal.integrate.admin.command.CampaignSearchResult;
 import com.paypal.integrate.admin.repository.CloudStorageRepository;
 import com.paypal.integrate.admin.service.AffsSearchService;
 import com.paypal.integrate.admin.service.CampaignSearchService;
@@ -39,29 +40,29 @@ public class CampaignSearchController implements Controller {
 				        try  {												
 					    	  logger.log(Level.WARNING, "*************************Campaign Search Task in the background started ********************");
 					    	  CampaignSearchService affsSearchService=new CampaignSearchService();
-					  		  Collection<AffsSearchResult> affsSearchResults=affsSearchService.processCampaignSearch(form);
+					  		  Collection<CampaignSearchResult> campaignSearchResults=affsSearchService.processCampaignSearch(form);
 							  
-//					  		  try(Writer writer=new StringWriter()){
-//					  		    affsSearchService.createFile(writer,form, affsSearchResults);
-//					  		  
-//							    CloudStorageRepository cloudStorageRepository=new CloudStorageRepository();
-//							    cloudStorageRepository.save(writer,"campaign_ad_rev_search/search"+formatDate(new Date()));
-//					  		  }
+					  		  try(Writer writer=new StringWriter()){
+					  		    affsSearchService.createFile(writer,form, campaignSearchResults);
 					  		  
-					  		  for(AffsSearchResult result:affsSearchResults){
-					  			logger.log(Level.WARNING,result.getExperiment());  
-								logger.log(Level.WARNING,"totalAdRev="+result.getTotalAdRev());
-								logger.log(Level.WARNING,"offerwallRev="+result.getOfferwallRev());
-								
-							    logger.log(Level.WARNING,"Records #="+result.getCount());
-							    if(result.getCount()!=0){
-							      BigDecimal avrTotalAdRev=result.getTotalAdRev().divide(new BigDecimal(result.getCount()),4, BigDecimal.ROUND_HALF_EVEN);
-							      logger.log(Level.WARNING,"avrTotalAdRev="+avrTotalAdRev);
-							      
-							      BigDecimal avrOfferwallRev=result.getOfferwallRev().divide(new BigDecimal(result.getCount()),4, BigDecimal.ROUND_HALF_EVEN);
-							      logger.log(Level.WARNING,"avrOfferwallRev="+avrOfferwallRev);
-							    }			 			 
-							 }
+							    CloudStorageRepository cloudStorageRepository=new CloudStorageRepository();
+							    cloudStorageRepository.save(writer,"campaign_ad_rev_search/search"+formatDate(new Date()));
+					  		  }
+					  		  
+//					  		  for(CampaignSearchResult result:campaignSearchResults){
+//					  			logger.log(Level.WARNING,result.getGroupValue());  
+//								logger.log(Level.WARNING,"totalAdRev="+result.getTotalAdRev());
+//								logger.log(Level.WARNING,"offerwallRev="+result.getOfferwallRev());
+//								logger.log(Level.WARNING,"Campaign Records #="+result.getCampaignCount());
+//							    logger.log(Level.WARNING,"Affs Records #="+result.getAffsCount());
+//							    if(result.getAffsCount()!=0){
+//							      BigDecimal avrTotalAdRev=result.getTotalAdRev().divide(new BigDecimal(result.getAffsCount()),4, BigDecimal.ROUND_HALF_EVEN);
+//							      logger.log(Level.WARNING,"avrTotalAdRev="+avrTotalAdRev);
+//							      
+//							      BigDecimal avrOfferwallRev=result.getOfferwallRev().divide(new BigDecimal(result.getAffsCount()),4, BigDecimal.ROUND_HALF_EVEN);
+//							      logger.log(Level.WARNING,"avrOfferwallRev="+avrOfferwallRev);
+//							    }			 			 
+//							 }
 					  		  
 					  		  logger.log(Level.WARNING ,"*************************Campaign Search Task finished*****************");
 				   		
