@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.luee.wally.admin.controller.AffsSearchController;
 import com.luee.wally.admin.controller.CampaignSearchController;
+import com.luee.wally.admin.controller.ImportController;
 import com.luee.wally.admin.controller.LoginController;
 
 /*
@@ -40,10 +41,14 @@ INSTANCE;
     	 httpGetRouteList.put("/administration", new Route(new AffsSearchController(),"index"));
     	 httpGetRouteList.put("/administration/logout", new Route(new LoginController(),"logout"));
     	 httpGetRouteList.put("/administration/campaign", new Route(new CampaignSearchController(),"index"));
+    	 httpGetRouteList.put("/administration/import/user/revenue/2019", new Route(new ImportController(),"importUserRevenue2019"));
+    	 httpGetRouteList.put("/administration/import/user/revenue/2019/background", new Route(new ImportController(),"importUserRevenue2019InBackground"));
+
     	 //post
     	 httpPostRouteList.put("/administration/search", new Route(new AffsSearchController(),"search"));
     	 httpPostRouteList.put("/administration/campaign/search", new Route(new CampaignSearchController(),"search"));
     	 httpPostRouteList.put("/administration/login", new Route(new LoginController(),"login"));
+    	 httpPostRouteList.put("/administration/import/user/revenue/2019/background", new Route(new ImportController(),"importUserRevenue2019InBackground"));
 
     }
     

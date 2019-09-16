@@ -15,26 +15,9 @@
 <script src="../js/bootstrap/bootstrap.min.js"></script> 
 <script src="../js/jsp/index.js"></script> 
 <body>
-    <nav class="navbar navbar-expand-md navbar-dark bg-dark mb-4">
-      <a class="navbar-brand" href="#">Backed Soft</a>
-      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarCollapse">
-        <ul class="navbar-nav mr-auto">
-          <li class="nav-item active">
-            <a class="nav-link" href="/administration">Affs Revenue<span class="sr-only">(current)</span></a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/administration/campaign">Campaign Revenue</a>
-          </li>
-
-        </ul>
-        
-        <a class="btn btn-outline-primary" href="/administration/logout">Sign out</a>
-        
-      </div>
-    </nav>
+	<jsp:include page="/jsp/fragments/header.jsp">
+		<jsp:param name="activeMenuItem" value="index" />
+	</jsp:include>
 
     <div class="container">
     <div class="row">

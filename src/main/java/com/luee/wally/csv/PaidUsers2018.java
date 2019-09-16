@@ -10,6 +10,7 @@ import com.google.cloud.Timestamp;
 public class PaidUsers2018 {
 	private String userGuid;
 	private String countryCode;
+	private String currencyCode;
 	private String payedAmount;
 	private String paymentMethod;
 	private String date;
@@ -45,12 +46,23 @@ public class PaidUsers2018 {
 		this.date = date;
 	}
 	
+	public String getCurrencyCode() {
+		return currencyCode;
+	}
+	
+	public void setCurrencyCode(String currencyCode) {
+		this.currencyCode = currencyCode;
+	}
+	
 	public Timestamp getDateToTimestamp() throws ParseException {		
 		Date _date=new SimpleDateFormat("MM/dd/yyyy").parse(this.date); 
-		System.out.println(date+"::"+_date);;
 		return Timestamp.of(_date);		
 	}
 	
-	
+	public String getFormatedDate(String format) throws ParseException{		 
+		Date _date=new SimpleDateFormat("MM/dd/yyyy").parse(this.date); 
+		SimpleDateFormat formater = new SimpleDateFormat(format);//("yyyy-MM-dd");
+		return formater.format(_date);
+	}
 	
 }

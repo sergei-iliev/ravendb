@@ -12,6 +12,7 @@ INSTANCE;
 
 	private final String USER_AGENT = "BackedSoft";
 	
+	
 	public  String getJSON(String urlStr) throws MalformedURLException,IOException  {
 		URL url = new URL(urlStr);
 		HttpURLConnection conn = (HttpURLConnection) url.openConnection();

@@ -21,7 +21,7 @@
     
     <filter>
       <filter-name>AdminFilter</filter-name>
-      <filter-class>com.paypal.integrate.admin.AdminFilter</filter-class>
+      <filter-class>com.luee.wally.admin.AdminFilter</filter-class>
     </filter>
     <filter-mapping>
       <filter-name>AdminFilter</filter-name>

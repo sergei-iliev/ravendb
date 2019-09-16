@@ -39,17 +39,38 @@ public class ImportService {
 	private static final String IMPRESSIONS="Impressions";
 	
 	private final Logger logger = Logger.getLogger(ExportService.class.getName());
+	
 	public static final String IMPORT_CSV_FILE = "csv/paid_users_2018.csv";
+	public static final String IMPORT_CSV_FILE_2019_eur_amount = "csv/paid_users_2019_eur_amount.csv";
+	public static final String IMPORT_CSV_FILE_2019_currency_amount = "csv/paid_users_2019_currency_amount.csv";
+	
 	public static final String BUCKET_NAME="luee-wally-v2-cpc.appspot.com";
+	
+	
 	
 	public Collection<PaidUsers2018> importCSVFile()throws Exception{
 		
 		List<List<String>> list=readFile(IMPORT_CSV_FILE);		
 		return convertToObject(list);
 	}
+	/*
+	 * 2 variations are possible
+	 * 1.currency in EUR
+	 * 2.currency in anything else
+	 */
+	public Collection<PaidUsers2018> importCSVFile2019(String filePath,boolean isEURCurrency)throws Exception{
+		
+		List<List<String>> list=readFile(filePath);		
+		if(isEURCurrency){
+		   return convertToObject2019EUR(list);
+		}else{
+		   return convertToObject2019Currency(list);	
+		}
+	}
 	
 	public List<List<String>>  readFile(String fileName) throws Exception{
-		  InputStream inputStream = new FileInputStream(new File(fileName));
+		  InputStream inputStream = getClass().getClassLoader().getResourceAsStream(fileName);
+		  //InputStream inputStream = new FileInputStream(new File(fileName));
 
 		  try (BufferedReader br = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"))) {
 			 return GenerateCSV.INSTANCE.readLines(br);
@@ -134,4 +155,32 @@ public class ImportService {
 		}
 		return result;
 	}
+	private Collection<PaidUsers2018> convertToObject2019EUR(List<List<String>> lines){
+		Collection<PaidUsers2018> result=new ArrayList<>();
+		for(List<String> line:lines){			
+			PaidUsers2018 user=new PaidUsers2018();
+			user.setDate(line.get(0));
+			user.setUserGuid(line.get(1));
+			user.setCountryCode(line.get(2));
+			user.setCurrencyCode("EUR");
+			user.setPayedAmount(line.get(3));
+			user.setPaymentMethod(line.get(6));
+			result.add(user);			
+		}
+		return result;
+	}
+	private Collection<PaidUsers2018> convertToObject2019Currency(List<List<String>> lines){
+		Collection<PaidUsers2018> result=new ArrayList<>();
+		for(List<String> line:lines){
+			PaidUsers2018 user=new PaidUsers2018();
+			user.setDate(line.get(0));
+			user.setUserGuid(line.get(1));
+			user.setCurrencyCode(line.get(2));
+			user.setPayedAmount(line.get(3));
+			user.setPaymentMethod(line.get(4));
+			result.add(user);
+		}
+		return result;
+	}	
+	
 }

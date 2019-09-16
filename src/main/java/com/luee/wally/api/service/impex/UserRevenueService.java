@@ -20,7 +20,7 @@ import java.util.logging.Logger;
 
 import com.google.appengine.api.datastore.EmbeddedEntity;
 import com.google.appengine.api.datastore.Entity;
-import com.luee.wally.DB;
+import com.luee.wally.db.DB;
 import com.luee.wally.api.ConnectionMgr;
 import com.luee.wally.command.PackageURLGroup;
 import com.luee.wally.csv.UserLevelRevenue;
