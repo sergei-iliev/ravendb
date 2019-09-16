@@ -1,4 +1,4 @@
-package com.paypal.integrate.admin;
+package com.luee.wally.admin;
 
 import java.io.IOException;
 import java.util.logging.Level;
@@ -14,7 +14,9 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.paypal.integrate.admin.api.route.Router;
+import com.luee.wally.api.route.Router;
+
+
 
 public class AdminFilter implements Filter {
 	private final Logger logger = Logger.getLogger(AdminFilter.class.getName());
