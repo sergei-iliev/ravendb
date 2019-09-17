@@ -130,8 +130,6 @@ public class ImportController implements Controller {
 		ImportService importService = new ImportService();
 		ExchangeRateVO exchangeRateVO = importService.getExchangeRates(user.getFormatedDate("YYYY-MM-dd"), "EUR");
 		Double rate = exchangeRateVO.getRates().get(user.getCurrencyCode());
-System.out.println(user.getCurrencyCode());
-System.out.println(rate);
 		BigDecimal currentValue = new BigDecimal(user.getPayedAmount());
 		BigDecimal rateValue = BigDecimal.valueOf(rate);
 		BigDecimal paidAmount = currentValue.multiply(rateValue);
