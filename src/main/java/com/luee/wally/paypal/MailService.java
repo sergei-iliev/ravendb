@@ -24,6 +24,7 @@ import javax.mail.internet.MimeMultipart;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.luee.wally.command.Attachment;
+import com.luee.wally.constants.Constants;
 import com.sendgrid.Content;
 import com.sendgrid.Mail;
 import com.sendgrid.Method;

@@ -25,12 +25,14 @@ import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
 import com.luee.wally.api.ConnectionMgr;
 import com.luee.wally.command.Attachment;
+import com.luee.wally.constants.Constants;
 import com.luee.wally.csv.PaidUsers2018;
 import com.luee.wally.csv.UserLevelRevenue;
 import com.luee.wally.json.ExchangeRateVO;
 import com.luee.wally.json.JSONUtils;
 import com.luee.wally.paypal.InvoiceService;
 import com.luee.wally.paypal.PdfAttachment;
+import com.luee.wally.utils.Utilities;
 
 public class ImportService {
 	private final Logger logger = Logger.getLogger(ExportService.class.getName());
@@ -44,11 +46,6 @@ public class ImportService {
 	private static final String IMPRESSIONS="Impressions";
 	
 	
-	public static final String IMPORT_CSV_FILE = "csv/paid_users_2018.csv";
-	public static final String IMPORT_CSV_FILE_2019_eur_amount = "csv/paid_users_2019_eur_amount.csv";
-	public static final String IMPORT_CSV_FILE_2019_currency_amount = "csv/paid_users_2019_currency_amount.csv";
-	
-	public static final String BUCKET_NAME="luee-wally-v2-cpc.appspot.com";
 	
 	
 	public ExchangeRateVO getExchangeRates(String date,String currency)throws Exception{
@@ -58,7 +55,7 @@ public class ImportService {
 	
 	public Collection<PaidUsers2018> importCSVFile()throws Exception{
 		
-		List<List<String>> list=readFile(IMPORT_CSV_FILE);		
+		List<List<String>> list=readFile(Constants.IMPORT_CSV_FILE);		
 		return convertToObject(list);
 	}
 	/*
@@ -134,7 +131,7 @@ public class ImportService {
 		Storage storage = StorageOptions.getDefaultInstance().getService();
 
 		// Upload a blob to the newly created bucket
-		BlobId blobId = BlobId.of(BUCKET_NAME,attachment.getFileName());
+		BlobId blobId = BlobId.of(Utilities.getBucketName(),attachment.getFileName());
 		BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType(attachment.getContentType()).build();
 		Blob blob = storage.create(blobInfo,attachment.getBuffer());		
 	}

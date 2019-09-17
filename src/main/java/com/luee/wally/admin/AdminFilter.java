@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.luee.wally.api.route.Router;
+import com.luee.wally.utils.Utilities;
 
 
 
@@ -35,14 +36,13 @@ public class AdminFilter implements Filter {
         HttpServletResponse response = (HttpServletResponse) resp;
 
         
-        if(request.isSecure()){
+        if(!request.isSecure()){
         	resp.getWriter().print("HTTPS required!");
         	resp.flushBuffer();
         	return;
         }
         
         String loginedUser = (String) request.getSession().getAttribute("login");
-        logger.log(Level.WARNING, "Current session:"+loginedUser);
  
         //let resource go on
         if(request.getRequestURI().matches(".*(css|jpg|png|gif|js)")){        	
@@ -63,48 +63,10 @@ public class AdminFilter implements Filter {
         if(loginedUser==null){					
 			response.sendRedirect("/administration/login");        	
         	return;
-        }
+        }        
+        
+        Utilities.domain= request.getServerName();
 
-//        HttpServletRequest wrapRequest = request;
-// 
-//        if (loginedUser != null) {
-//            // User Name
-//            String userName = loginedUser.getUserName();
-// 
-//            // Roles
-//            List<String> roles = loginedUser.getRoles();
-// 
-//            // Wrap old request by a new Request with userName and Roles information.
-//            wrapRequest = new UserRoleRequestWrapper(userName, roles, request);
-//        }
-// 
-//        // Pages must be signed in.
-//        if (SecurityUtils.isSecurityPage(request)) {
-// 
-//            // If the user is not logged in,
-//            // Redirect to the login page.
-//            if (loginedUser == null) {
-// 
-//                String requestUri = request.getRequestURI();
-// 
-//                // Store the current page to redirect to after successful login.
-//                int redirectId = AppUtils.storeRedirectAfterLoginUrl(request.getSession(), requestUri);
-// 
-//                response.sendRedirect(wrapRequest.getContextPath() + "/login?redirectId=" + redirectId);
-//                return;
-//            }
-// 
-//            // Check if the user has a valid role?
-//            boolean hasPermission = SecurityUtils.hasPermission(wrapRequest);
-//            if (!hasPermission) {
-// 
-//                RequestDispatcher dispatcher //
-//                        = request.getServletContext().getRequestDispatcher("/WEB-INF/views/accessDeniedView.jsp");
-// 
-//                dispatcher.forward(request, response);
-//                return;
-//            }
-//        }
         if(Router.INSTANCE.hasPath(request.getMethod(),request.getRequestURI())){
           Router.INSTANCE.execute(request.getRequestURI(), request, response);
         }else{
