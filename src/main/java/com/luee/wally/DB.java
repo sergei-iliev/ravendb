@@ -1,4 +1,4 @@
-package com.luee.wally.db;
+package com.luee.wally;
 
 import java.util.Collection;
 import java.util.Collections;

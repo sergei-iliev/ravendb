@@ -12,10 +12,10 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.google.appengine.api.ThreadManager;
 import com.google.appengine.api.datastore.Entity;
+import com.luee.wally.DB;
 import com.luee.wally.api.route.Controller;
 import com.luee.wally.api.service.impex.ImportService;
 import com.luee.wally.csv.PaidUsers2018;
-import com.luee.wally.db.DB;
 import com.luee.wally.json.ExchangeRateVO;
 
 public class ImportController implements Controller {

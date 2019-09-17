@@ -12,7 +12,7 @@ import java.util.logging.Logger;
 
 import com.google.appengine.api.datastore.Entity;
 import com.google.cloud.Timestamp;
-import com.luee.wally.db.DB;
+import com.luee.wally.DB;
 
 
 
