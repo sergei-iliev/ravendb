@@ -12,6 +12,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -22,13 +23,17 @@ import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Bucket;
 import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
+import com.luee.wally.api.ConnectionMgr;
 import com.luee.wally.command.Attachment;
 import com.luee.wally.csv.PaidUsers2018;
 import com.luee.wally.csv.UserLevelRevenue;
+import com.luee.wally.json.ExchangeRateVO;
+import com.luee.wally.json.JSONUtils;
 import com.luee.wally.paypal.InvoiceService;
 import com.luee.wally.paypal.PdfAttachment;
 
 public class ImportService {
+	private final Logger logger = Logger.getLogger(ExportService.class.getName());
 	
 	private static final String AD_UNIT_ID="Ad Unit ID";
 	private static final String PLACEMENT="Placement";
@@ -38,7 +43,6 @@ public class ImportService {
 	private static final String REVENUE="Revenue";
 	private static final String IMPRESSIONS="Impressions";
 	
-	private final Logger logger = Logger.getLogger(ExportService.class.getName());
 	
 	public static final String IMPORT_CSV_FILE = "csv/paid_users_2018.csv";
 	public static final String IMPORT_CSV_FILE_2019_eur_amount = "csv/paid_users_2019_eur_amount.csv";
@@ -47,6 +51,10 @@ public class ImportService {
 	public static final String BUCKET_NAME="luee-wally-v2-cpc.appspot.com";
 	
 	
+	public ExchangeRateVO getExchangeRates(String date,String currency)throws Exception{
+		String json=ConnectionMgr.INSTANCE.getJSON("https://api.exchangeratesapi.io/"+date+"?base="+currency);
+		return JSONUtils.readObject(json, ExchangeRateVO.class);
+	}
 	
 	public Collection<PaidUsers2018> importCSVFile()throws Exception{
 		
@@ -130,8 +138,7 @@ public class ImportService {
 		BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType(attachment.getContentType()).build();
 		Blob blob = storage.create(blobInfo,attachment.getBuffer());		
 	}
-	
-	public void createPDFInCloudStore(Entity redeemingRequest,PaidUsers2018 paidUsers2018,String invoiceNumber)throws Exception{
+	public void createPDFInCloudStore(Entity redeemingRequest,PaidUsers2018 paidUsers2018,String namePrefix,String invoiceNumber)throws Exception{
         PdfAttachment attachment=new PdfAttachment();
         attachment.setFileName("user_credit_notes_2018_with_id/PaidUsers2018_"+invoiceNumber+".pdf");
         attachment.setContentType("application/pdf");       
@@ -140,6 +147,10 @@ public class ImportService {
 	
         this.saveFile(attachment);
         
+	}
+	
+	public void createPDFInCloudStore(Entity redeemingRequest,PaidUsers2018 paidUsers2018,String invoiceNumber)throws Exception{
+        this.createPDFInCloudStore(redeemingRequest, paidUsers2018,"user_credit_notes_2018_with_id/PaidUsers2018_", invoiceNumber);        
 	}
 	
 	private Collection<PaidUsers2018> convertToObject(List<List<String>> lines){
