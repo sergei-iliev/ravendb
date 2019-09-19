@@ -12,6 +12,7 @@ import java.io.Writer;
 import java.math.BigDecimal;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -27,6 +28,7 @@ import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Bucket;
 import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
+import com.luee.wally.admin.repository.CloudStorageRepository;
 import com.luee.wally.api.ConnectionMgr;
 import com.luee.wally.command.AffsSearchForm;
 import com.luee.wally.command.AffsSearchResult;
@@ -51,12 +53,16 @@ public class ImportService {
 	private static final String REVENUE="Revenue";
 	private static final String IMPRESSIONS="Impressions";
 	
+	private Collection<String> header = Arrays.asList("date","internal user id","country code","full name","paid currency","paid amount","amount in eur","payment method","credit note id");
 	
 	public void createCSVFile(Writer writer, Collection<Pair<PaidUsers2018, Entity>> entities)
-			throws IOException {				
+			throws IOException {
+		convertHeaderToCSV(writer, header);
 		convertContentToCSV(writer, entities);
 	}
-	
+	private void convertHeaderToCSV(Writer writer, Collection<String> header) throws IOException {
+		GenerateCSV.INSTANCE.writeLine(writer, header);
+	}
 	private void convertContentToCSV(Writer writer,Collection<Pair<PaidUsers2018, Entity>> entities) throws IOException {
 		Collection<String> line = new ArrayList<String>();
 
@@ -67,15 +73,16 @@ public class ImportService {
 			line.add((String)entity.getRight().getProperty("country_code"));
 			line.add((String)entity.getRight().getProperty("full_name"));
 			if(entity.getLeft().getUserCurrencyCode().equals("EUR")){
-				line.add(entity.getLeft().getPayedAmount());
 				line.add("EUR");
-			}else{
+				line.add(entity.getLeft().getPayedAmount());				
+			}else{				
+				line.add(entity.getLeft().getUserCurrencyCode());
 				line.add(entity.getLeft().getUserPayedAmount());
-				line.add(entity.getLeft().getUserCurrencyCode());				
 			}			
 			line.add(entity.getLeft().getPayedAmount());
 			line.add((String)entity.getLeft().getPaymentMethod());
 			line.add((String)entity.getLeft().getInvoiceNumber());
+			
 			GenerateCSV.INSTANCE.writeLine(writer, line);
 			line.clear();
 		}
@@ -159,22 +166,16 @@ public class ImportService {
 	
 	
 	
-	public void saveFile(Attachment attachment){
-		Storage storage = StorageOptions.getDefaultInstance().getService();
-
-		// Upload a blob to the newly created bucket
-		BlobId blobId = BlobId.of(Utilities.getBucketName(),attachment.getFileName());
-		BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType(attachment.getContentType()).build();
-		Blob blob = storage.create(blobInfo,attachment.getBuffer());		
-	}
 	public void createPDFInCloudStore(Entity redeemingRequest,PaidUsers2018 paidUsers2018,String namePrefix,String invoiceNumber)throws Exception{
         PdfAttachment attachment=new PdfAttachment();
         attachment.setFileName("user_credit_notes_2018_with_id/PaidUsers2018_"+invoiceNumber+".pdf");
         attachment.setContentType("application/pdf");       
         InvoiceService invoiceService = new InvoiceService();
         attachment.readFromStream(invoiceService.createInvoice(redeemingRequest,paidUsers2018,invoiceNumber)); 
-	
-        this.saveFile(attachment);
+        
+	    CloudStorageRepository cloudStorageRepository=new CloudStorageRepository();
+	    cloudStorageRepository.saveFile(attachment);
+        
         
 	}
 	
