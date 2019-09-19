@@ -14,6 +14,7 @@ public class PaidUsers2018 {
 	private String payedAmount;
 	private String paymentMethod;
 	private String date;
+	private String invoiceNumber;
 	
 	private String userCurrencyCode="EUR";
 	private String userPayedAmount;
@@ -68,6 +69,14 @@ public class PaidUsers2018 {
 	}
 	public void setUserPayedAmount(String userPayedAmount) {
 		this.userPayedAmount = userPayedAmount;
+	}
+	
+	public String getInvoiceNumber() {
+		return invoiceNumber;
+	}
+	
+	public void setInvoiceNumber(String invoiceNumber) {
+		this.invoiceNumber = invoiceNumber;
 	}
 	public Timestamp getDateToTimestamp() throws ParseException {		
 		Date _date=new SimpleDateFormat("MM/dd/yyyy").parse(this.date); 

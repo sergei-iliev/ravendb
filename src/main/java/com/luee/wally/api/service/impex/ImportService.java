@@ -4,9 +4,11 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringReader;
+import java.io.Writer;
 import java.math.BigDecimal;
 import java.net.URL;
 import java.util.ArrayList;
@@ -16,6 +18,8 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.apache.commons.lang3.tuple.Pair;
+
 import com.google.appengine.api.datastore.Entity;
 import com.google.cloud.storage.Blob;
 import com.google.cloud.storage.BlobId;
@@ -24,6 +28,8 @@ import com.google.cloud.storage.Bucket;
 import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
 import com.luee.wally.api.ConnectionMgr;
+import com.luee.wally.command.AffsSearchForm;
+import com.luee.wally.command.AffsSearchResult;
 import com.luee.wally.command.Attachment;
 import com.luee.wally.constants.Constants;
 import com.luee.wally.csv.PaidUsers2018;
@@ -46,8 +52,34 @@ public class ImportService {
 	private static final String IMPRESSIONS="Impressions";
 	
 	
+	public void createCSVFile(Writer writer, Collection<Pair<PaidUsers2018, Entity>> entities)
+			throws IOException {				
+		convertContentToCSV(writer, entities);
+	}
 	
-	
+	private void convertContentToCSV(Writer writer,Collection<Pair<PaidUsers2018, Entity>> entities) throws IOException {
+		Collection<String> line = new ArrayList<String>();
+
+		for (Pair<PaidUsers2018, Entity> entity : entities) {
+			// item
+			line.add(entity.getLeft().getDate());
+			line.add(entity.getLeft().getUserGuid());
+			line.add((String)entity.getRight().getProperty("country_code"));
+			line.add((String)entity.getRight().getProperty("full_name"));
+			if(entity.getLeft().getUserCurrencyCode().equals("EUR")){
+				line.add(entity.getLeft().getPayedAmount());
+				line.add("EUR");
+			}else{
+				line.add(entity.getLeft().getUserPayedAmount());
+				line.add(entity.getLeft().getUserCurrencyCode());				
+			}			
+			line.add(entity.getLeft().getPayedAmount());
+			line.add((String)entity.getLeft().getPaymentMethod());
+			line.add((String)entity.getLeft().getInvoiceNumber());
+			GenerateCSV.INSTANCE.writeLine(writer, line);
+			line.clear();
+		}
+	}
 	public ExchangeRateVO getExchangeRates(String date,String currency)throws Exception{
 		String json=ConnectionMgr.INSTANCE.getJSON("https://api.exchangeratesapi.io/"+date+"?base="+currency);
 		return JSONUtils.readObject(json, ExchangeRateVO.class);

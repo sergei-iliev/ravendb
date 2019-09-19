@@ -1,12 +1,18 @@
 package usecase;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.InputStream;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -90,5 +96,38 @@ public class UserRevenueTest {
 	    FileUtils.copyInputStreamToFile(in, targetFile);
 	}
 	
+	@Test
+	public void createCSVFile() throws Exception {
+		ImportService invoiceService=new ImportService();
+		Entity redeemingRequest=new Entity("affs");
+		redeemingRequest.setProperty("date", new Date());
+		Thread.currentThread().sleep(1000);
+		redeemingRequest.setProperty("creation_date", new Date());
+		redeemingRequest.setProperty("full_name","Sergey Iliev");
+		
+		redeemingRequest.setProperty("full_address","Baba Tonka 7");
+		redeemingRequest.setProperty("country_code","5900");
+		redeemingRequest.setProperty("email","1@1.com");
+		redeemingRequest.setProperty("user_guid","01923456789");
+		redeemingRequest.setProperty("type","PayPal");
+		
+		PaidUsers2018 paidUsers2018=new PaidUsers2018();
+		paidUsers2018.setCurrencyCode("EUR");
+		paidUsers2018.setPayedAmount("23.89");
+		paidUsers2018.setDate("8/13/2019");
+		
+		paidUsers2018.setUserCurrencyCode("USD");
+		paidUsers2018.setUserPayedAmount("25.00");
+		paidUsers2018.setInvoiceNumber("000222");
+		
+		Collection<Pair<PaidUsers2018, Entity>> entities=new ArrayList<Pair<PaidUsers2018,Entity>>();
+		entities.add(new ImmutablePair<>(paidUsers2018, redeemingRequest)); 
+	  	try(Writer writer=new StringWriter();FileWriter fw = new FileWriter("D://file.csv")){
+			invoiceService.createCSVFile(writer, entities);
+			fw.write(writer.toString());    
+			
+	  	}
+
+	}
 	
 }
