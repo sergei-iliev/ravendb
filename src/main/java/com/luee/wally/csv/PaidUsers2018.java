@@ -89,4 +89,9 @@ public class PaidUsers2018 {
 		return formater.format(_date);
 	}
 	
+	public Date toDate() throws ParseException{		 	    
+		return new SimpleDateFormat("MM/dd/yyyy").parse(this.date); 		
+	}
+	
+	
 }

@@ -14,6 +14,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -28,6 +29,7 @@ import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Bucket;
 import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
+import com.luee.wally.DB;
 import com.luee.wally.admin.repository.CloudStorageRepository;
 import com.luee.wally.api.ConnectionMgr;
 import com.luee.wally.command.AffsSearchForm;
@@ -55,6 +57,37 @@ public class ImportService {
 	
 	private Collection<String> header = Arrays.asList("date","internal user id","country code","full name","paid currency","paid amount","amount in eur","payment method","credit note id");
 	
+	
+	/*
+	 * Find closest date in a collection of user redeeming requests 
+	 */
+	public Entity getRedeemingRequestFromGuid(String userGuid,Date date){
+		List<Entity> list= DB.getRedeemingRequestFromGuid(userGuid);
+		if(list.size()==0){
+			return null;
+		}
+		if(list.size()==1){
+			return list.get(0);
+		}
+		
+		list.sort((d1,d2) -> ((Date)d1.getProperty("date")).compareTo((Date)d2.getProperty("date")));
+		list.forEach(l->System.out.println(l.getProperty("date")));
+		Entity lowerDateEntity=null,upperDateEntity=null;
+		for(Entity entity:list){
+		   Date entityDate=(Date)entity.getProperty("date");
+		   if(entityDate.before(date)){
+			   lowerDateEntity=entity;
+		   }else{
+			   upperDateEntity=entity;
+			   break;
+		   }		   		   
+		}
+		
+		if(lowerDateEntity!=null)
+		  return lowerDateEntity;
+		else
+		  return upperDateEntity;
+	}
 	public void createCSVFile(Writer writer, Collection<Pair<PaidUsers2018, Entity>> entities)
 			throws IOException {
 		convertHeaderToCSV(writer, header);

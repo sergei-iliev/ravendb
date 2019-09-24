@@ -61,7 +61,7 @@ public class ImportController implements Controller {
 
 					for (PaidUsers2018 user : users2019EUR) {
 						
-						Entity redeemingRequest = DB.getRedeemingRequestFromGuid(user.getUserGuid());
+						Entity redeemingRequest = importService.getRedeemingRequestFromGuid(user.getUserGuid(),user.toDate());
 						if (redeemingRequest != null) {
 							invoiceNumber=prefix + String.valueOf(count++);
 							user.setInvoiceNumber(invoiceNumber);
@@ -79,7 +79,7 @@ public class ImportController implements Controller {
 							// convert to EUR
 							resetUserCurrency(user);
 						}
-						Entity redeemingRequest = DB.getRedeemingRequestFromGuid(user.getUserGuid());
+						Entity redeemingRequest = importService.getRedeemingRequestFromGuid(user.getUserGuid(),user.toDate());
 						if (redeemingRequest != null) {
 							invoiceNumber=prefix + String.valueOf(count++);
 							user.setInvoiceNumber(invoiceNumber);

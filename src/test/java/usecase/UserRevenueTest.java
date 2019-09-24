@@ -7,6 +7,7 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 
@@ -17,9 +18,12 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.google.appengine.api.datastore.DatastoreService;
+import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
+import com.luee.wally.DB;
 import com.luee.wally.admin.controller.ImportController;
 import com.luee.wally.api.ConnectionMgr;
 import com.luee.wally.api.service.impex.ImportService;
@@ -128,6 +132,82 @@ public class UserRevenueTest {
 			
 	  	}
 
+	}
+	
+	@Test
+	public void findMultiUserTest() throws Exception {
+		DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
+		
+		PaidUsers2018 user=new PaidUsers2018();
+		user.setDate("8/8/2019");
+		
+		Entity redeemingRequest=new Entity("redeeming_requests_new");
+		redeemingRequest.setProperty("id", 1);
+		redeemingRequest.setProperty("date", new Date());		
+		redeemingRequest.setProperty("creation_date", new Date());
+		redeemingRequest.setProperty("full_name","Sergey Iliev");
+		
+		redeemingRequest.setProperty("full_address","Baba Tonka 7");
+		redeemingRequest.setProperty("country_code","5900");
+		redeemingRequest.setProperty("email","1@1.com");
+		redeemingRequest.setProperty("user_guid","01923456789");
+		redeemingRequest.setProperty("type","PayPal");
+		ds.put(redeemingRequest);
+		
+		Calendar cal = Calendar.getInstance();
+	    cal.clear();
+
+	    cal.set(Calendar.YEAR, 2019);
+	    cal.set(Calendar.MONTH, 10);
+	    cal.set(Calendar.DATE, 3);
+	    Date utilDate = cal.getTime();
+
+	   
+	    redeemingRequest=new Entity("redeeming_requests_new");	    
+	    redeemingRequest.setProperty("id", 2);
+		redeemingRequest.setProperty("date", utilDate);		
+		redeemingRequest.setProperty("creation_date", utilDate);
+		redeemingRequest.setProperty("full_name","Sergey Iliev");
+		
+		redeemingRequest.setProperty("full_address","Baba Tonka 7");
+		redeemingRequest.setProperty("country_code","5900");
+		redeemingRequest.setProperty("email","1@1.com");
+		redeemingRequest.setProperty("user_guid","01923456789");
+		redeemingRequest.setProperty("type","PayPal");
+		ds.put(redeemingRequest);
+	    
+		
+		
+	    cal.clear();
+
+	    cal.set(Calendar.YEAR, 2018);
+	    cal.set(Calendar.MONTH, 10);
+	    cal.set(Calendar.DATE, 20);
+
+	    utilDate = cal.getTime();
+	    
+	    
+	    redeemingRequest=new Entity("redeeming_requests_new");	    
+	    redeemingRequest.setProperty("id", 3);
+		redeemingRequest.setProperty("date", utilDate);		
+		redeemingRequest.setProperty("creation_date", utilDate);
+		redeemingRequest.setProperty("full_name","Sergey Iliev");
+		
+		redeemingRequest.setProperty("full_address","Baba Tonka 7");
+		redeemingRequest.setProperty("country_code","5900");
+		redeemingRequest.setProperty("email","1@1.com");
+		redeemingRequest.setProperty("user_guid","01923456789");
+		redeemingRequest.setProperty("type","PayPal");
+		ds.put(redeemingRequest);
+	    
+		
+		ImportService importService=new ImportService();
+		Entity entity = importService.getRedeemingRequestFromGuid("01923456789",user.toDate());
+		
+		
+		
+		System.out.println(entity);
+		
 	}
 	
 }
