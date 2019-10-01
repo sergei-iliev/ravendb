@@ -50,7 +50,7 @@ public class InvoiceService {
 		PdfPTable topTable = new PdfPTable(2);
 		topTable.setHorizontalAlignment(Element.ALIGN_RIGHT);
 		topTable.setWidthPercentage(160 / 4f);
-		topTable.addCell(getIRDCell("Credit Voice No"));
+		topTable.addCell(getIRDCell("Credit Note No"));
 		topTable.addCell(getIRDCell("Date"));
 		topTable.addCell(getIRDCell(invoiceNumber)); // pass invoice number
 		topTable.addCell(getIRDCell(paidUsers2018.getDate())); // pass invoice date	
@@ -67,7 +67,7 @@ public class InvoiceService {
 		
 		addressTable.addCell(getCell((String) redeemingRequest.getProperty("full_name"),10, PdfPCell.ALIGN_LEFT));
 		addressTable.addCell(getCell("",12, PdfPCell.ALIGN_LEFT, Font.BOLD));
-		addressTable.addCell(getCell("Soft Baked Apps UG (haftungsbeschränkt)",10, PdfPCell.ALIGN_LEFT));
+		addressTable.addCell(getCell("Soft Baked Apps GmbH (haftungsbeschränkt)",10, PdfPCell.ALIGN_LEFT));
 		
 		addressTable.addCell(getCell(Objects.toString("Address: "+(String) redeemingRequest.getProperty("full_address"), ""),10, PdfPCell.ALIGN_LEFT));
 		addressTable.addCell(getCell("",12, PdfPCell.ALIGN_LEFT, Font.BOLD));
@@ -177,7 +177,7 @@ public class InvoiceService {
 		PdfPTable topTable = new PdfPTable(2);
 		topTable.setHorizontalAlignment(Element.ALIGN_RIGHT);
 		topTable.setWidthPercentage(160 / 4f);
-		topTable.addCell(getIRDCell("Credit Voice No"));
+		topTable.addCell(getIRDCell("Credit Note No"));
 		topTable.addCell(getIRDCell("Date"));
 		topTable.addCell(getIRDCell(invoiceNumber)); // pass invoice number
 		topTable.addCell(getIRDCell(today)); // pass invoice date	
@@ -194,7 +194,7 @@ public class InvoiceService {
 		
 		addressTable.addCell(getCell((String) user.getProperty("full_name"),10, PdfPCell.ALIGN_LEFT));
 		addressTable.addCell(getCell("",12, PdfPCell.ALIGN_LEFT, Font.BOLD));
-		addressTable.addCell(getCell("Soft Baked Apps UG (haftungsbeschränkt)",10, PdfPCell.ALIGN_LEFT));
+		addressTable.addCell(getCell("Soft Baked Apps GmbH (haftungsbeschränkt)",10, PdfPCell.ALIGN_LEFT));
 		
 		addressTable.addCell(getCell(Objects.toString((String) user.getProperty("full_address"), ""),10, PdfPCell.ALIGN_LEFT));
 		addressTable.addCell(getCell("",12, PdfPCell.ALIGN_LEFT, Font.BOLD));
