@@ -41,12 +41,11 @@ public class PaymentEligibleUserForm implements WebForm{
         
 		form.setCountryCode((req.getParameter("country").length() == 0 ? null : req.getParameter("country")));
 		
-		if(req.getParameterValues("packageNames")!=null){
-			form.setPackageNames(req.getParameterValues("packageNames"));
-		}
-		if(req.getParameterValues("types")!=null){
-			form.setTypes(req.getParameterValues("types"));
-		}
+		
+		form.setPackageNames(req.getParameter("packageNames"));
+
+	    form.setTypes(req.getParameter("types"));
+		
 		return form;
 	}
 
@@ -101,8 +100,11 @@ public class PaymentEligibleUserForm implements WebForm{
 		return types.stream().collect(Collectors.joining(","));
 	}
 
-	public void setTypes(String[] types) {
-		this.types.addAll(Arrays.asList(types));
+	public void setTypes(String types) {
+		if(types!=null&&types.length()>0){
+			String[] items=types.split(","); 
+			this.types.addAll(Arrays.asList(items));	
+		}	
 	}
 
 
@@ -113,8 +115,11 @@ public class PaymentEligibleUserForm implements WebForm{
     	return packageNames.stream().collect(Collectors.joining(","));    	
     }
    
-	public void setPackageNames(String[] packageNames) {
-		this.packageNames.addAll(Arrays.asList(packageNames));
+	public void setPackageNames(String packageNames) {
+		if(packageNames!=null&&packageNames.length()>0){
+			String[] items=packageNames.split(","); 
+			this.packageNames.addAll(Arrays.asList(items));	
+		}		
 	}
 	
 	

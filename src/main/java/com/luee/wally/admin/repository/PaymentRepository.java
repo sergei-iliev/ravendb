@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.LinkedList;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import com.google.appengine.api.datastore.Cursor;
@@ -21,6 +22,8 @@ import com.luee.wally.constants.Constants;
 import com.luee.wally.entity.RedeemingRequests;
 
 public class PaymentRepository extends AbstractRepository{
+	private final Logger logger = Logger.getLogger(PaymentRepository.class.getName());
+	
 		public Collection<RedeemingRequests> findEligibleUsers(String type,Date startDate,Date endDate,String packageName,String countryCode){
 			DatastoreService  ds= createDatastoreService(Consistency.EVENTUAL);
 			
@@ -53,6 +56,8 @@ public class PaymentRepository extends AbstractRepository{
 		private Query createEligibleUsersQuery(String type,Date startDate,Date endDate,String packageName,String countryCode){
 			Query query = new Query("redeeming_requests_new");
 			Collection<Filter> predicates=new ArrayList<>();
+			
+			predicates.add(new FilterPredicate("is_paid", FilterOperator.EQUAL, false));	
 			
 			if(startDate!=null){
 				predicates.add(new FilterPredicate("date", FilterOperator.GREATER_THAN_OR_EQUAL, startDate));
