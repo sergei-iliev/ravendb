@@ -27,12 +27,12 @@ import com.luee.wally.command.AffsSearchForm;
 import com.luee.wally.command.AffsSearchResult;
 import com.luee.wally.command.CampaignSearchForm;
 import com.luee.wally.command.CampaignSearchResult;
+import com.luee.wally.constants.Constants;
 import com.luee.wally.api.service.impex.GenerateCSV;
 
 public class CampaignSearchService {
 	private final Logger logger = Logger.getLogger(CampaignSearchService.class.getName());
 	
-	private static final int CURSOR_SIZE=1000;
 	
 	private Collection<String> header = Arrays.asList("*","campaign_count", "affs_count", "sum_total_ad_rev", "avr_total_ad_rev",
 			"sum_offerwall_rev", "avr_offerwall_rev");
@@ -124,9 +124,9 @@ public class CampaignSearchService {
 		 do{
 	    	 FetchOptions fetchOptions;	 
 	    	 if(cursor!=null){	 
-	    		 fetchOptions = FetchOptions.Builder.withLimit(CURSOR_SIZE).startCursor(cursor);
+	    		 fetchOptions = FetchOptions.Builder.withLimit(Constants.CURSOR_SIZE).startCursor(cursor);
 	    	 }else{
-	    		 fetchOptions = FetchOptions.Builder.withLimit(CURSOR_SIZE);	 
+	    		 fetchOptions = FetchOptions.Builder.withLimit(Constants.CURSOR_SIZE);	 
 	    	 }
   	     	    	 
 	    	 results = preparedQuery.asQueryResultList(fetchOptions);

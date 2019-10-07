@@ -22,6 +22,15 @@
           		<a class="dropdown-item" href="/administration/import/user/revenue/2019">User Revenue 2019</a>          	
         	</div>
       	</li>
+          <li class="nav-item dropdown">
+        	<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          		Payments
+        	</a>
+        	<div class="dropdown-menu" aria-labelledby="navbarDropdown">
+          		<a class="dropdown-item" href="/administration/payment/eligibleusers">Eligible Users</a>
+          		<a class="dropdown-item" href="/administration/payment/payedusers">Payed Users</a>          	
+        	</div>
+      	</li>      	
        </ul>
         
         <a class="btn btn-outline-primary" href="/administration/logout">Sign out</a>

@@ -26,4 +26,9 @@ public interface Constants {
 	
 	public static final String BUCKET_NAME_DEV="luee-wally-v2-cpc.appspot.com";
 	public static final String BUCKET_NAME_PROD="luee-wally.com";
+	
+	public static final String EMAIL="1@1";
+	public static final String PASSWORD="1";
+	
+	public static final int CURSOR_SIZE=1000;
 }

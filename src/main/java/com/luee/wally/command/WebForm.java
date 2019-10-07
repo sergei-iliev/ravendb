@@ -19,4 +19,9 @@ public interface WebForm {
 			throw new ServletException(e);
 		}
 	}
+	
+	public default String formatedDate(Date date,String format){		 
+		  SimpleDateFormat formater = new SimpleDateFormat(format);//("yyyy-MM-dd");
+		  return formater.format(date);
+	}
 }

@@ -27,9 +27,12 @@ import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 import com.luee.wally.admin.repository.CloudStorageRepository;
 import com.luee.wally.api.service.AffsSearchService;
 import com.luee.wally.api.service.CampaignSearchService;
+import com.luee.wally.api.service.PaymentService;
 import com.luee.wally.command.AffsSearchForm;
 import com.luee.wally.command.AffsSearchResult;
 import com.luee.wally.command.CampaignSearchForm;
+import com.luee.wally.command.PaymentEligibleUserForm;
+import com.luee.wally.entity.RedeemingRequests;
 
 public class DBTestCase {
 	private Closeable session;
@@ -220,6 +223,41 @@ public class DBTestCase {
 //		    System.out.println(listq.size());
 //		}
 		// }
+	}
+	private void createRedeemingRequestEntity(String userGuid,String amount,Date date,String packageName,String type,String paypalAccount,String countryCode){
+		DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
+	
+		Entity redeeming = new Entity("redeeming_requests_new");		
+		redeeming.setIndexedProperty("amount", amount);
+		redeeming.setIndexedProperty("user_guid",userGuid);
+		redeeming.setIndexedProperty("package_name", packageName);
+		redeeming.setIndexedProperty("date",date);		
+		redeeming.setIndexedProperty("type", type);
+		redeeming.setIndexedProperty("paypal_account", paypalAccount);
+		redeeming.setIndexedProperty("country_code", countryCode);
+
+		ds.put(redeeming);
+
+		
+	}
+	@Test
+	public void paymentRedeemingRequestTest() throws Exception {
+
+		
+		createRedeemingRequestEntity("48bb2675-a072-4b6b-ab66-cb599a29147d", "12", new Date(), "com.moregames.makemoney", "PayPal", "gil.mincberg@gmail.com", "US");
+		createRedeemingRequestEntity("ffff2675-a072-4b6b-ab66-cb599a29147d", "14", new Date(), "com.moregames.makemoney", "PayPal", "gil1.mincberg@gmail.com", "US");
+		createRedeemingRequestEntity("aaaa2675-a072-4b6b-ab66-cb599a29147d", "24", new Date(), "com.moregames.makemoney", "Amazon", "gil2.mincberg@gmail.com", "US");
+		createRedeemingRequestEntity("bbbb2675-a072-4b6b-ab66-cb599a29147d", "27", new Date(), "com.moregames.makemoney", "Amazon", "gil2.mincberg@gmail.com", "BG");
+		createRedeemingRequestEntity("bbbb2675-a072-4b6b-ab66-cb599a29147d", "3", new Date(), "com.moregames.makemoney", "Creon", "gil2.mincberg@gmail.com", "BG");
+
+
+	   PaymentEligibleUserForm form=new PaymentEligibleUserForm();
+	   form.getTypes().add("PayPal");
+	   form.getTypes().add("Creon");
+	   PaymentService paymentService=new PaymentService();
+	   Collection<RedeemingRequests> r=paymentService.searchEligibleUsers(form);
+	   System.out.println(r);
+	   
 	}
 
 }
