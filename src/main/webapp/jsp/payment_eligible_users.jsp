@@ -106,6 +106,7 @@
 				<table class="table">
 					<thead>
 						<tr>
+						    <th scope="col">Find</th>
 							<th scope="col">user_guid</th>
 							<th scope="col">date</th>
 							<th scope="col">amount</th>
@@ -113,12 +114,13 @@
 							<th scope="col">email</th>
 							<th scope="col">country</th>
 							<th scope="col">paypal_account</th>
-							<th scope="col">link</th>
+							<th scope="col">Paid</th>
 						</tr>
 					</thead>
 					<tbody>
 					<c:forEach var="entity" items="${entities}">
-						<tr>							
+						<tr>						
+						    <td><a href="${entity.link1}" class="btn btn-primary btn-sm active" role="button" aria-pressed="true" target="_blank">Find</a></td>	
 							<td>${entity.userGuid}</td>
 							<td>${entity.date}</td>
 							<td>${entity.amount}</td>
@@ -126,8 +128,7 @@
 							<td>${entity.email}</td>
 							<td>${entity.countryCode}</td>
 							<td>${entity.paypalAccount}</td>														
-							<td><span class="display:inline-block;">
-							   <a href="${entity.link1}" class="btn btn-primary btn-sm active" role="button" aria-pressed="true" target="_blank">Find</a>
+							<td>							 
 							   <a href="${entity.link2}" class="btn btn-primary btn-sm active" role="button" aria-pressed="true" target="_blank">Paid</a>
 							</span></td>
 						</tr>
