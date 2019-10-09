@@ -107,6 +107,7 @@
 					<thead>
 						<tr>
 							<th scope="col">user_guid</th>
+							<th scope="col">date</th>
 							<th scope="col">amount</th>
 							<th scope="col">type</th>
 							<th scope="col">email</th>
@@ -119,14 +120,15 @@
 					<c:forEach var="entity" items="${entities}">
 						<tr>							
 							<td>${entity.userGuid}</td>
+							<td>${entity.date}</td>
 							<td>${entity.amount}</td>
 							<td>${entity.type}</td>
 							<td>${entity.email}</td>
 							<td>${entity.countryCode}</td>
 							<td>${entity.paypalAccount}</td>														
 							<td><span class="display:inline-block;">
-							   <a href="${entity.link1}" class="btn btn-primary btn-sm active" role="button" aria-pressed="true" target="_blank">Link</a>
-							   <a href="${entity.link2}" class="btn btn-primary btn-sm active" role="button" aria-pressed="true" target="_blank">Link</a>
+							   <a href="${entity.link1}" class="btn btn-primary btn-sm active" role="button" aria-pressed="true" target="_blank">Find</a>
+							   <a href="${entity.link2}" class="btn btn-primary btn-sm active" role="button" aria-pressed="true" target="_blank">Paid</a>
 							</span></td>
 						</tr>
 					</c:forEach>

@@ -16,6 +16,7 @@ import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.Query.Filter;
 import com.google.appengine.api.datastore.Query.FilterOperator;
 import com.google.appengine.api.datastore.Query.FilterPredicate;
+import com.google.appengine.api.datastore.Query.SortDirection;
 import com.google.appengine.api.datastore.QueryResultList;
 import com.google.appengine.api.datastore.ReadPolicy.Consistency;
 import com.luee.wally.constants.Constants;
@@ -83,6 +84,6 @@ public class PaymentRepository extends AbstractRepository{
 				query.setFilter(predicates.iterator().next());
 			}
 			
-			return query;	
+			return query.addSort("date",SortDirection.ASCENDING);	
 		}
 }

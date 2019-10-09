@@ -235,6 +235,7 @@ public class DBTestCase {
 		redeeming.setIndexedProperty("type", type);
 		redeeming.setIndexedProperty("paypal_account", paypalAccount);
 		redeeming.setIndexedProperty("country_code", countryCode);
+		redeeming.setIndexedProperty("is_paid", false);
 
 		ds.put(redeeming);
 
@@ -245,18 +246,22 @@ public class DBTestCase {
 
 		
 		createRedeemingRequestEntity("48bb2675-a072-4b6b-ab66-cb599a29147d", "12", new Date(), "com.moregames.makemoney", "PayPal", "gil.mincberg@gmail.com", "US");
+		Thread.currentThread().sleep(2000);
 		createRedeemingRequestEntity("ffff2675-a072-4b6b-ab66-cb599a29147d", "14", new Date(), "com.moregames.makemoney", "PayPal", "gil1.mincberg@gmail.com", "US");
+		Thread.currentThread().sleep(3000);
 		createRedeemingRequestEntity("aaaa2675-a072-4b6b-ab66-cb599a29147d", "24", new Date(), "com.moregames.makemoney", "Amazon", "gil2.mincberg@gmail.com", "US");
+		Thread.currentThread().sleep(4000);
 		createRedeemingRequestEntity("bbbb2675-a072-4b6b-ab66-cb599a29147d", "27", new Date(), "com.moregames.makemoney", "Amazon", "gil2.mincberg@gmail.com", "BG");
 		createRedeemingRequestEntity("bbbb2675-a072-4b6b-ab66-cb599a29147d", "3", new Date(), "com.moregames.makemoney", "Creon", "gil2.mincberg@gmail.com", "BG");
 
 
 	   PaymentEligibleUserForm form=new PaymentEligibleUserForm();
-	   form.getTypes().add("PayPal");
-	   form.getTypes().add("Creon");
+	   //form.getTypes().add("PayPal");
+	   //form.getTypes().add("Creon");
 	   PaymentService paymentService=new PaymentService();
 	   Collection<RedeemingRequests> r=paymentService.searchEligibleUsers(form);
-	   System.out.println(r);
+	   r.forEach(a->{ System.out.println(a.getDate());});
+	  
 	   
 	}
 

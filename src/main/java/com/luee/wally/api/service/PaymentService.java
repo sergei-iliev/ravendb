@@ -2,7 +2,9 @@ package com.luee.wally.api.service;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import com.luee.wally.admin.repository.PaymentRepository;
 import com.luee.wally.command.PaymentEligibleUserForm;
@@ -24,8 +26,9 @@ public class PaymentService {
     	  		  result.addAll(paymentRepository.findEligibleUsers(type,form.getStartDate(),form.getEndDate(),null,form.getCountryCode()));
     		}
     	}
+    	//sort by date
+    	return result.stream().sorted(Comparator.comparing(RedeemingRequests::getDate)).collect(Collectors.toList());
     	
-    	return result;
     	
 //    	PaymentRepository paymentRepository=new PaymentRepository();
 //        paymentRepository.findEligibleUsers();

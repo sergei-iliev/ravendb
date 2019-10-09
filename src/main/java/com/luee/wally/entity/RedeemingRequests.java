@@ -1,5 +1,7 @@
 package com.luee.wally.entity;
 
+import java.util.Date;
+
 import com.google.appengine.api.datastore.Entity;
 
 public class RedeemingRequests {
@@ -8,6 +10,7 @@ public class RedeemingRequests {
 	private String type;
 	private String email;
 	private String countryCode;
+	private Date date;
 	private String paypalAccount;
 	private String link1,link2;
 	
@@ -17,6 +20,7 @@ public class RedeemingRequests {
 		redeemingRequests.setAmount((String)entity.getProperty("amount"));
 		redeemingRequests.setUserGuid((String)entity.getProperty("user_guid"));
 		redeemingRequests.setType((String)entity.getProperty("type"));
+		redeemingRequests.setDate((Date)entity.getProperty("date"));
 		redeemingRequests.setPaypalAccount((String)entity.getProperty("paypal_account"));
 		redeemingRequests.setCountryCode((String)entity.getProperty("country_code"));
 		redeemingRequests.setLink1("https://luee-wally-v2-cpc.appspot.com/paid_user?amount="+redeemingRequests.amount+"&user_guid="+redeemingRequests.userGuid);
@@ -24,6 +28,16 @@ public class RedeemingRequests {
 		return redeemingRequests;
 	}
 	
+
+	public Date getDate() {
+		return date;
+	}
+
+
+	public void setDate(Date date) {
+		this.date = date;
+	}
+
 
 	public String getAmount() {
 		return amount;
