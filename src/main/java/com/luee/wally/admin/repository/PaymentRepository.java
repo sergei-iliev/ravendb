@@ -25,10 +25,10 @@ import com.luee.wally.entity.RedeemingRequests;
 public class PaymentRepository extends AbstractRepository{
 	private final Logger logger = Logger.getLogger(PaymentRepository.class.getName());
 	
-		public Collection<RedeemingRequests> findEligibleUsers(String type,Date startDate,Date endDate,String packageName,String countryCode){
+		public Collection<RedeemingRequests> findEligibleUsers(String type,Date startDate,Date endDate,String packageName,String countryCode,Boolean confirmedEmail){
 			DatastoreService  ds= createDatastoreService(Consistency.EVENTUAL);
 			
-			PreparedQuery pq = ds.prepare(createEligibleUsersQuery(type,startDate,endDate,packageName, countryCode));
+			PreparedQuery pq = ds.prepare(createEligibleUsersQuery(type,startDate,endDate,packageName, countryCode,confirmedEmail));
 			
 			Collection<Entity> entities=new LinkedList<>();
 			QueryResultList<Entity> results;
@@ -54,11 +54,15 @@ public class PaymentRepository extends AbstractRepository{
 			return entities.stream().map(RedeemingRequests::valueOf).collect(Collectors.toList());			
 		}
 		
-		private Query createEligibleUsersQuery(String type,Date startDate,Date endDate,String packageName,String countryCode){
+		private Query createEligibleUsersQuery(String type,Date startDate,Date endDate,String packageName,String countryCode,Boolean confirmedEmail){
 			Query query = new Query("redeeming_requests_new");
 			Collection<Filter> predicates=new ArrayList<>();
 			
 			predicates.add(new FilterPredicate("is_paid", FilterOperator.EQUAL, false));	
+			
+			if(confirmedEmail!=null){
+				predicates.add(new FilterPredicate("confirmed_email", FilterOperator.EQUAL, confirmedEmail));	
+			}
 			
 			if(startDate!=null){
 				predicates.add(new FilterPredicate("date", FilterOperator.GREATER_THAN_OR_EQUAL, startDate));

@@ -39,46 +39,13 @@ public class PaymentController implements Controller{
 	public void search(HttpServletRequest req, HttpServletResponse resp)throws ServletException, IOException{
 		 PaymentService paymentService=new PaymentService();
 		 PaymentEligibleUserForm form=PaymentEligibleUserForm.parse(req);
-		 
-//		 for(int i=0;i<3;i++){
-//			final String id="Thread #"+i; 
-//			ThreadManager.createBackgroundThread(new Runnable() {
-//				@Override
-//				public void run() {
-//
-//				        try  {												
-//					    	  logger.log(Level.WARNING, "************************* Search Task in the background started ********************");
-//					    	  for(int i=0;i<1000;i++){
-//					    		  Thread.currentThread().sleep(1000);
-//					    		  System.out.println("Hello from "+id +":"+result);
-//					    		  Integer count=result.get(id);
-//					    		  if(count==null){
-//					    			  result.put(id,i);
-//					    		  }else{
-//					    			  result.put(id,count.intValue()+1);
-//					    		  }
-//					    	  }
-//
-//					  		  System.out.println("dump from  id:"+id+":"+result);
-//					  		  logger.log(Level.WARNING ,"************************* Search Task finished*****************");
-//				   		
-//				   		}catch(Exception e){
-//								logger.log(Level.SEVERE, "affs search service:", e);							  
-//					    }
-//				        
-//				        
-//				}
-//			}).start();	
-//		 }
-		 
+		 System.out.println("----------"+form.toString());		 		 
 		 
 		 Collection<RedeemingRequests> entities= paymentService.searchEligibleUsers(form);
 		 req.setAttribute("webform", form);
 		 req.setAttribute("entities", entities);	
 		 req.setAttribute("countries", this.getCountries());		
 		 req.getRequestDispatcher("/jsp/payment_eligible_users.jsp").forward(req, resp);	
-
-
 		
 	}
 }

@@ -12,14 +12,15 @@ import javax.servlet.ServletRequest;
 public class PaymentEligibleUserForm implements WebForm{
 
 	private Date startDate, endDate;
-	private String countryCode;
+	private Collection<String> countryCodes=new HashSet<>();
 	private Collection<String> types=new HashSet<>();
 	private Collection<String> packageNames=new HashSet<>();
+	private Boolean  confirmedEmail;
 	
 	public PaymentEligibleUserForm() {
 	    types.add("PayPal");
 	    types.add("Amazon");
-	    countryCode="US";
+	    countryCodes.add("US");
 	    packageNames.add("com.moregames.makemoney");
 	    packageNames.add("com.matchmine.app");
 	    packageNames.add("com.gametrix.app");
@@ -27,7 +28,7 @@ public class PaymentEligibleUserForm implements WebForm{
 	    	startDate=parseDate("2019-09-20");
 	    	endDate=parseDate("2019-09-21");
 	    }catch(Exception e){
-	    	
+	    	e.printStackTrace();
 	    }
 	}
 	
@@ -35,12 +36,16 @@ public class PaymentEligibleUserForm implements WebForm{
 		PaymentEligibleUserForm form = new PaymentEligibleUserForm();
 		form.types.clear();
 		form.packageNames.clear();
+		form.setConfirmedEmail(req.getParameter("confirmedEmail"));
 		
 		form.setStartDate(form.parseDate(req.getParameter("startDate")));
 		form.setEndDate(form.parseDate(req.getParameter("endDate")));
         
-		form.setCountryCode((req.getParameter("country").length() == 0 ? null : req.getParameter("country")));
+		//form.setCountryCode((req.getParameter("country").length() == 0 ? null : req.getParameter("country")));
 		
+		if(req.getParameterValues("countries")!=null){
+			form.setCountryCodes(req.getParameterValues("countries"));
+		}
 		
 		form.setPackageNames(req.getParameter("packageNames"));
 
@@ -49,6 +54,19 @@ public class PaymentEligibleUserForm implements WebForm{
 		return form;
 	}
 
+
+	public Boolean getConfirmedEmail() {
+		return confirmedEmail;
+	}
+
+	public void setConfirmedEmail(String confirmedEmail) {
+		if(confirmedEmail.equalsIgnoreCase("true")||confirmedEmail.equalsIgnoreCase("false")){
+			this.confirmedEmail=Boolean.parseBoolean(confirmedEmail);
+		}else{
+			this.confirmedEmail = null;
+		}
+		
+	}
 
 	public Date getStartDate() {
 		return startDate;
@@ -82,13 +100,13 @@ public class PaymentEligibleUserForm implements WebForm{
 	}
 
 
-	public String getCountryCode() {
-		return countryCode;
+	public Collection<String> getCountryCodes() {
+		return countryCodes;
 	}
 
 
-	public void setCountryCode(String countryCode) {
-		this.countryCode = countryCode;
+	public void setCountryCodes(String[] countryCodes) {
+		this.countryCodes.addAll(Arrays.asList(countryCodes));
 	}
 
 
@@ -124,9 +142,8 @@ public class PaymentEligibleUserForm implements WebForm{
 	
 	
 	@Override
-	public String toString() {
-		
-		return packageNames+":"+countryCode+":"+types; 
+	public String toString() {		
+		return packageNames+":"+countryCodes+":"+types+":"+confirmedEmail; 
 	}
 	
 }

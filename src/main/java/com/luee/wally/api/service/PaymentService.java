@@ -20,10 +20,14 @@ public class PaymentService {
     	for(String type:form.getTypes()){    		
     		if(form.getPackageNames().size()>0){
     			for(String packageName:form.getPackageNames()){
-    			  result.addAll(paymentRepository.findEligibleUsers(type,form.getStartDate(),form.getEndDate(),packageName,form.getCountryCode())); 			
+    				for(String countryCode:form.getCountryCodes()){	
+    			      result.addAll(paymentRepository.findEligibleUsers(type,form.getStartDate(),form.getEndDate(),packageName,countryCode,form.getConfirmedEmail()));
+    				}
     			}
-    		}else{    			
-    	  		  result.addAll(paymentRepository.findEligibleUsers(type,form.getStartDate(),form.getEndDate(),null,form.getCountryCode()));
+    		}else{  
+				for(String countryCode:form.getCountryCodes()){	  			      
+  			      result.addAll(paymentRepository.findEligibleUsers(type,form.getStartDate(),form.getEndDate(),null,countryCode,form.getConfirmedEmail()));
+  				}    	  		 
     		}
     	}
     	//sort by date
