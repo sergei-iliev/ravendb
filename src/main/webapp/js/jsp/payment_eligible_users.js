@@ -5,7 +5,17 @@ payment.PaymentEligibleUsersView = Backbone.View.extend({
   el: '#contentid',
   // It's the first function called when this view it's instantiated.
   initialize: function(){
-	  $('[data-toggle="tooltip"]').tooltip();	  
+	  $('[data-toggle="tooltip"]').tooltip();	
+
+	  
+	  $('[data-button="true"]').click(function(e) {	  
+		  e.preventDefault();
+		  var url = $(this).data('href');
+		  $(e.target).prop('disabled', true);
+		  $(e.target.parentNode.parentNode).css('background-color','#c9cbcf');
+		  window.open(url, '_blank');
+	      
+	  } );
   },
   events: {
 	  "submit #search-form":"onSubmit",
@@ -13,38 +23,8 @@ payment.PaymentEligibleUsersView = Backbone.View.extend({
 	  "click  #remove-btn" : "onRemove",
 	  "click  #save-template-btn" : "onSaveTemplate",
 	  "click  #load-template-btn" : "onLoadTemplate",
-	 // "click  #saveSearchTemplateBtn" :"onSaveSearchTemplate"
   },
-//  onSaveSearchTemplate:function(e){
-//	  var formData = {name:"ravi",age:"31"};
-//	  $.ajax({
-//		    url: '/administration/search/template',
-//		    type: 'post',
-//		    data:formData,		    
-//		    success: function( data, textStatus, jQxhr ){
-//		        console.log(data);
-//		    },
-//		    error: function( jqXhr, textStatus, errorThrown ){
-//		        console.log( errorThrown );
-//		    }
-//		});
-//
-//  },
-//	toJSONString:function(form) {
-//		var obj = {};
-//		var elements = form.querySelectorAll( "input, select, textarea" );
-//		for( var i = 0; i < elements.length; ++i ) {
-//			var element = elements[i];
-//			var name = element.name;
-//			var value = element.value;
-//
-//			if( name ) {
-//				obj[ name ] = value;
-//			}
-//		}
-//
-//		return JSON.stringify( obj );
-//  },
+
   onSaveTemplate:function(e){
 	  e.preventDefault();
 	  var self=this;

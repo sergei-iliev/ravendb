@@ -70,6 +70,7 @@ public class PaymentController implements Controller{
 		 Collection<RedeemingRequests> entities= paymentService.searchEligibleUsers(form);
 		 
 //		 RedeemingRequests r=new RedeemingRequests();
+//		 r.setLink2("https://sergeicpc.com/paid_user?amount=10&user_guid=11122313123");
 //		 r.setAmount("10");
 //		 r.setCountryCode("US");
 //		 r.setDate(new Date());
@@ -78,12 +79,14 @@ public class PaymentController implements Controller{
 //		 entities.add(r);
 //
 //		 r=new RedeemingRequests();
+//		 r.setLink2("https://sergeicpc.com/paid_user?amount=10&user_guid=9999999123");
 //		 r.setAmount("10");
 //		 r.setCountryCode("US");
 //		 r.setDate(new Date());
 //		 r.setEmail("eee@ee.com");
 //		 r.setUserGuid("9999999123");
 //		 entities.add(r);
+		 
 		 
 		 req.setAttribute("webform", form);
 		 req.setAttribute("entities", entities);	

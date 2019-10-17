@@ -166,17 +166,10 @@
 		</div>
 
 
-		<script type="text/javascript">
-			'use strict';
-
-			new payment.PaymentEligibleUsersView();
-		</script>
-
-
 		<!-- Table  -->
 		<c:if test="${entities!=null}">
 			<div class="row mt-5">
-				<table class="table">
+				<table class="table" id="searchResultTable">
 					<thead>
 						<tr>
 							<th scope="col">Find</th>
@@ -203,9 +196,9 @@
 								<td>${entity.email}</td>
 								<td>${entity.countryCode}</td>
 								<td>${entity.paypalAccount}</td>
-								<td><a href="${entity.link2}"
-									class="btn btn-primary btn-sm active" role="button"
-									aria-pressed="true" target="_blank">Paid</a></td>
+								<td><button type="button" class="btn btn-primary btn-sm" data-href="${entity.link2}"
+									 data-button="true">Paid</button>																									
+									</td>
 							</tr>
 						</c:forEach>
 					</tbody>
@@ -294,6 +287,11 @@
       </div>
     </div>
   </div>
-</div>		
+</div>	
+		<script type="text/javascript">
+			'use strict';
+
+			new payment.PaymentEligibleUsersView();
+		</script>	
 </body>
 </html>
