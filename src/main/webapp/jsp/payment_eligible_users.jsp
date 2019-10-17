@@ -12,8 +12,10 @@
 <script src="/js/jquery/jquery.min.js"></script>
 <link rel="stylesheet"
 	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+		
 <link rel="stylesheet" href="/css/bootstrap/bootstrap.min.css">
 
+<script src="/js/bootstrap/popper.min.js"></script>
 <script src="/js/bootstrap/bootstrap.min.js"></script>
 
 
@@ -27,9 +29,19 @@
 	</jsp:include>
 
 	<div class="container" id="contentid">
+	<div class="card card-body bg-light">
+		<div class="row mt-3">
+		  <div class="col-md-2">
+			<button class="btn" id="save-template-btn" data-toggle="tooltip" data-placement="top" title="Save search template">
+					<i class="fa fa-floppy-o"></i>
+			</button>
+			<button class="btn" id="load-template-btn" data-toggle="tooltip" data-placement="top" title="Load search template">
+			  <i class="fa fa-search"></i>
+			</button>
+	   	  </div>
+		</div>
 		<div class="row">
 			<div class="col-md-12">
-				<div class="card card-body bg-light">
 					<c:if test="${success!=null}">
 						<div class="alert alert-success" role="alert">${success}</div>
 					</c:if>
@@ -89,7 +101,9 @@
 											<div class="col-md-12">
 												<select class="form-control" name="countries"
 													id="countriesId" multiple>
-
+													<c:forEach var="item" items="${webform.countryCodes}">
+														<option ${item}>${item}</option>
+													</c:forEach>
 												</select>
 											</div>
 										</div>
@@ -110,18 +124,30 @@
 							<div class="form-check">
 								<input class="form-check-input" type="radio"
 									name="confirmedEmail" id="confirmedEmail1" value="none"
-									checked> <label class="form-check-label"
+									
+									<c:if test="${webform.confirmedEmail == null}">
+										checked
+									</c:if>
+									> <label class="form-check-label"
 									for="confirmedEmail1"> None </label>
 							</div>
 							<div class="form-check">
 								<input class="form-check-input" type="radio"
-									name="confirmedEmail" id="confirmedEmail2" value="true">
+									name="confirmedEmail" id="confirmedEmail2" value="true"
+									<c:if test="${webform.confirmedEmail}">
+										checked
+									</c:if>									
+									>
 								<label class="form-check-label" for="confirmedEmail2">
 									True </label>
 							</div>
 							<div class="form-check disabled">
 								<input class="form-check-input" type="radio"
-									name="confirmedEmail" id="confirmedEmail3" value="false"> 
+									name="confirmedEmail" id="confirmedEmail3" value="false"
+									<c:if test="${(webform.confirmedEmail != null)&&(!webform.confirmedEmail)}">
+										checked
+									</c:if>										
+									> 
 									<label class="form-check-label"
 									for="confirmedEmail3"> False </label>
 							</div>
@@ -179,7 +205,7 @@
 								<td>${entity.paypalAccount}</td>
 								<td><a href="${entity.link2}"
 									class="btn btn-primary btn-sm active" role="button"
-									aria-pressed="true" target="_blank">Paid</a> </span></td>
+									aria-pressed="true" target="_blank">Paid</a></td>
 							</tr>
 						</c:forEach>
 					</tbody>
@@ -209,5 +235,65 @@
 			</div>
 		</div>
 	</div>
+	<!-- Save Search Template -->
+	<div class="modal fade" id="saveSearchTemplateDialog" tabindex="-1" role="dialog" aria-labelledby="saveSearchTemplateLabel" aria-hidden="true">
+  	<div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="saveSearchTemplateLabel">Save Search Template</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+		<div class="row mt-3">
+				<div class="col-md-5">
+					<label for="searchTemplateNameId">Search Template name</label> 
+				</div>
+				<div class="col-md-7">
+					<input name="types"
+										class="form-control" id="searchTemplateNameId"
+								value="">
+				</div>
+		</div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" id="saveSearchTemplateBtn">Save</button>
+      </div>
+    </div>
+  </div>
+</div>	
+	<!-- Save Search Template -->
+<div class="modal fade" id="loadSearchTemplateDialog" tabindex="-1" role="dialog" aria-labelledby="loadSearchTemplateLabel" aria-hidden="true">
+  	<div class="modal-dialog modal-lg"  role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="loadSearchTemplateLabel">Load Search Template</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+      <div class="container">
+        <table id="templatesTableId" 
+        class='table table-bordered table-condensed table-striped table-hover' data-height="460" width="100%">
+        <thead>
+            <tr>
+                <th data-field="id">Name</th>
+                <th data-field="name">Date</th>              
+            </tr>
+        </thead>
+        <tbody id="templatesTableBodyId">
+        </tbody>
+     </table>
+    </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>        
+      </div>
+    </div>
+  </div>
+</div>		
 </body>
 </html>

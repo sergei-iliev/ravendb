@@ -9,6 +9,9 @@ import java.util.stream.Collectors;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class PaymentEligibleUserForm implements WebForm{
 
 	private Date startDate, endDate;
@@ -16,6 +19,7 @@ public class PaymentEligibleUserForm implements WebForm{
 	private Collection<String> types=new HashSet<>();
 	private Collection<String> packageNames=new HashSet<>();
 	private Boolean  confirmedEmail;
+	
 	
 	public PaymentEligibleUserForm() {
 	    types.add("PayPal");
@@ -31,20 +35,23 @@ public class PaymentEligibleUserForm implements WebForm{
 	    	e.printStackTrace();
 	    }
 	}
-	
+	@JsonIgnore
 	public static PaymentEligibleUserForm parse(ServletRequest req) throws ServletException{
 		PaymentEligibleUserForm form = new PaymentEligibleUserForm();
 		form.types.clear();
 		form.packageNames.clear();
+		form.countryCodes.clear();
+		
 		form.setConfirmedEmail(req.getParameter("confirmedEmail"));
 		
 		form.setStartDate(form.parseDate(req.getParameter("startDate")));
 		form.setEndDate(form.parseDate(req.getParameter("endDate")));
-        
-		//form.setCountryCode((req.getParameter("country").length() == 0 ? null : req.getParameter("country")));
-		
+
 		if(req.getParameterValues("countries")!=null){
 			form.setCountryCodes(req.getParameterValues("countries"));
+		}else if(req.getParameterValues("countries[]")!=null){
+				form.setCountryCodes(req.getParameterValues("countries[]"));
+			
 		}
 		
 		form.setPackageNames(req.getParameter("packageNames"));
@@ -53,12 +60,69 @@ public class PaymentEligibleUserForm implements WebForm{
 		
 		return form;
 	}
+	
+	public void setCountryCodes(Collection<String> countryCodes) {
+		this.countryCodes = countryCodes;
+	}
+	@JsonProperty
+	public Collection<String> getCountryCodes() {
+		return countryCodes;
+	}
 
-
+	@JsonIgnore
+	public void setCountryCodes(String[] countryCodes) {
+		this.countryCodes.addAll(Arrays.asList(countryCodes));
+	}
+	
+	public void setTypes(Collection<String> types) {
+		this.types = types;
+	}
+	@JsonProperty
+	public Collection<String> getTypes() {
+		return types;
+	}
+	
+	@JsonIgnore
+	public String getTypesAsText() {
+		return types.stream().collect(Collectors.joining(","));
+	}
+	
+	@JsonIgnore
+	public void setTypes(String types) {
+		if(types!=null&&types.length()>0){
+			String[] items=types.split(","); 
+			this.types.addAll(Arrays.asList(items));	
+		}	
+	}	
+	
+	public void setPackageNames(Collection<String> packageNames) {
+		this.packageNames = packageNames;
+	}
+	@JsonProperty
+	public Collection<String> getPackageNames() {
+		return packageNames;
+	}
+	
+	@JsonIgnore
+    public String getPackageNamesAsText(){
+    	return packageNames.stream().collect(Collectors.joining(","));    	
+    }
+	@JsonIgnore
+	public void setPackageNames(String packageNames) {
+		if(packageNames!=null&&packageNames.length()>0){
+			String[] items=packageNames.split(","); 
+			this.packageNames.addAll(Arrays.asList(items));	
+		}		
+	}
+	@JsonProperty
 	public Boolean getConfirmedEmail() {
 		return confirmedEmail;
 	}
-
+	public void setConfirmedEmail(Boolean confirmedEmail){
+		this.confirmedEmail=confirmedEmail;
+	}
+	
+	@JsonIgnore
 	public void setConfirmedEmail(String confirmedEmail) {
 		if(confirmedEmail.equalsIgnoreCase("true")||confirmedEmail.equalsIgnoreCase("false")){
 			this.confirmedEmail=Boolean.parseBoolean(confirmedEmail);
@@ -67,11 +131,14 @@ public class PaymentEligibleUserForm implements WebForm{
 		}
 		
 	}
-
+	@JsonProperty
 	public Date getStartDate() {
 		return startDate;
 	}
-
+	public void setStartDate(Date startDate) {
+		this.startDate = startDate;
+	}
+	@JsonIgnore
 	public String getStartDateAsText() {
 		if(startDate!=null){
 			return formatedDate(startDate, "yyyy-MM-dd");
@@ -80,70 +147,28 @@ public class PaymentEligibleUserForm implements WebForm{
 		return null;
 	}
 	
-	public void setStartDate(Date startDate) {
-		this.startDate = startDate;
-	}
 
 
+	@JsonProperty
 	public Date getEndDate() {
 		return endDate;
 	}
+	public void setEndDate(Date endDate) {
+		this.endDate = endDate;
+	}
+	@JsonIgnore
 	public String getEndDateAsText() {
 		if(endDate!=null){
 			return formatedDate(endDate, "yyyy-MM-dd");
 		}		
 		return null;
 	}
-
-	public void setEndDate(Date endDate) {
-		this.endDate = endDate;
-	}
-
-
-	public Collection<String> getCountryCodes() {
-		return countryCodes;
-	}
-
-
-	public void setCountryCodes(String[] countryCodes) {
-		this.countryCodes.addAll(Arrays.asList(countryCodes));
-	}
-
-
-	public Collection<String> getTypes() {
-		return types;
-	}
 	
-	public String getTypesAsText() {
-		return types.stream().collect(Collectors.joining(","));
-	}
-
-	public void setTypes(String types) {
-		if(types!=null&&types.length()>0){
-			String[] items=types.split(","); 
-			this.types.addAll(Arrays.asList(items));	
-		}	
-	}
-
-
-	public Collection<String> getPackageNames() {
-		return packageNames;
-	}
-    public String getPackageNamesAsText(){
-    	return packageNames.stream().collect(Collectors.joining(","));    	
-    }
-   
-	public void setPackageNames(String packageNames) {
-		if(packageNames!=null&&packageNames.length()>0){
-			String[] items=packageNames.split(","); 
-			this.packageNames.addAll(Arrays.asList(items));	
-		}		
-	}
-	
-	
+	@JsonIgnore
 	@Override
 	public String toString() {		
 		return packageNames+":"+countryCodes+":"+types+":"+confirmedEmail; 
 	}
+
 	
 }

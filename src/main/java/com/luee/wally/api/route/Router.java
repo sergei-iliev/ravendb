@@ -15,6 +15,7 @@ import com.luee.wally.admin.controller.CampaignSearchController;
 import com.luee.wally.admin.controller.ImportController;
 import com.luee.wally.admin.controller.LoginController;
 import com.luee.wally.admin.controller.PaymentController;
+import com.luee.wally.admin.controller.SearchFilterTemplateController;
 
 /*
  * Based on
@@ -45,6 +46,8 @@ INSTANCE;
     	 httpGetRouteList.put("/administration/import/user/revenue/2019", new Route(new ImportController(),"importUserRevenue2019"));
     	 httpGetRouteList.put("/administration/import/user/revenue/2019/background", new Route(new ImportController(),"importUserRevenue2019InBackground"));
     	 httpGetRouteList.put("/administration/payment/eligibleusers", new Route(new PaymentController(),"index"));
+    	 httpGetRouteList.put("/administration/search/templates", new Route(new SearchFilterTemplateController(),"getSearchFilterTemplates"));
+    	 httpGetRouteList.put("/administration/search/template/filter", new Route(new PaymentController(),"searchByFilterTemplate"));
 
     	 //post
     	 httpPostRouteList.put("/administration/search", new Route(new AffsSearchController(),"search"));
@@ -52,6 +55,7 @@ INSTANCE;
     	 httpPostRouteList.put("/administration/login", new Route(new LoginController(),"login"));
     	 httpPostRouteList.put("/administration/import/user/revenue/2019/background", new Route(new ImportController(),"importUserRevenue2019InBackground"));
     	 httpPostRouteList.put("/administration/payment/eligibleusers/search", new Route(new PaymentController(),"search"));
+    	 httpPostRouteList.put("/administration/search/template", new Route(new SearchFilterTemplateController(),"saveSearchFilterTemplate"));
     }
     
     public boolean hasPath(String httpMethod,String url){

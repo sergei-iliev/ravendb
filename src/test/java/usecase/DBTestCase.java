@@ -33,6 +33,7 @@ import com.luee.wally.command.AffsSearchResult;
 import com.luee.wally.command.CampaignSearchForm;
 import com.luee.wally.command.PaymentEligibleUserForm;
 import com.luee.wally.entity.RedeemingRequests;
+import com.luee.wally.json.JSONUtils;
 
 public class DBTestCase {
 	private Closeable session;
@@ -263,6 +264,17 @@ public class DBTestCase {
 	   r.forEach(a->{ System.out.println(a.getDate());});
 	  
 	   
+	}
+	
+	@Test
+	public void searchFilterTemplateTest() throws Exception {
+		PaymentEligibleUserForm form=new PaymentEligibleUserForm();
+		form.setEndDate(new Date());
+		form.getTypes().add("Sega");
+		
+		String v=JSONUtils.writeObject(form, PaymentEligibleUserForm.class);
+		
+		
 	}
 
 }

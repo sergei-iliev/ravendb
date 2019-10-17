@@ -22,12 +22,16 @@ public class JSONUtils {
     public static <T> T readObject(String map,Class<T> clazz) throws JsonParseException, JsonMappingException, IOException{
         return mapper.readValue(map, clazz);
     }
-    
+	public static <T> String writeObject(T object,Class<T> clazz)throws JsonProcessingException{
+	    return mapper.writeValueAsString(object);	
+	}
+	
+    public static <T> T convertToObject(String value, Class<T> clazz) {
+        return mapper.convertValue(value, clazz); 
+    }
     public static String writeObject(Map<?,?> map)throws JsonProcessingException{        
         return mapper.writeValueAsString(map);       
     }
-
-
 
 
 
