@@ -20,14 +20,22 @@ public class PaymentService {
     	for(String type:form.getTypes()){    		
     		if(form.getPackageNames().size()>0){
     			for(String packageName:form.getPackageNames()){
-    				for(String countryCode:form.getCountryCodes()){	
-    			      result.addAll(paymentRepository.findEligibleUsers(type,form.getStartDate(),form.getEndDate(),packageName,countryCode,form.getConfirmedEmail()));
+    				if(form.getCountryCodes().size()>0){
+    				   for(String countryCode:form.getCountryCodes()){	
+    			        result.addAll(paymentRepository.findEligibleUsers(type,form.getStartDate(),form.getEndDate(),packageName,countryCode,form.getConfirmedEmail()));
+    				   }
+    				}else{
+    					result.addAll(paymentRepository.findEligibleUsers(type,form.getStartDate(),form.getEndDate(),packageName,null,form.getConfirmedEmail()));
     				}
     			}
     		}else{  
-				for(String countryCode:form.getCountryCodes()){	  			      
-  			      result.addAll(paymentRepository.findEligibleUsers(type,form.getStartDate(),form.getEndDate(),null,countryCode,form.getConfirmedEmail()));
-  				}    	  		 
+    			if(form.getCountryCodes().size()>0){
+    				for(String countryCode:form.getCountryCodes()){	  			      
+    					result.addAll(paymentRepository.findEligibleUsers(type,form.getStartDate(),form.getEndDate(),null,countryCode,form.getConfirmedEmail()));
+    				}    	  		 
+    			}else{
+    				    result.addAll(paymentRepository.findEligibleUsers(type,form.getStartDate(),form.getEndDate(),null,null,form.getConfirmedEmail()));
+    			}
     		}
     	}
     	//sort by date
