@@ -31,7 +31,16 @@ import com.luee.wally.entity.SearchFilterTemplate;
 public class PaymentController implements Controller{
 	private final Logger logger = Logger.getLogger(CampaignSearchController.class.getName());
 	
-	
+	public void test(HttpServletRequest req, HttpServletResponse resp)throws ServletException, IOException{
+		resp.setContentType("application/json");
+        resp.setCharacterEncoding("UTF-8");
+		String json="{"+
+				"\"paid_successfully\": false,"+
+				"\"email_sent_successfully\": true"+
+				"}";
+		
+		resp.getWriter().write(json);
+	}
 	public void index(HttpServletRequest req, HttpServletResponse resp)throws ServletException, IOException{
 		
 		PaymentEligibleUserForm form=new PaymentEligibleUserForm();
@@ -70,7 +79,7 @@ public class PaymentController implements Controller{
 		 Collection<RedeemingRequests> entities= paymentService.searchEligibleUsers(form);
 		 
 //		 RedeemingRequests r=new RedeemingRequests();
-//		 r.setLink2("https://sergeicpc.com/paid_user?amount=10&user_guid=11122313123");
+//		 r.setLink2("/administration/payment/test");
 //		 r.setAmount("10");
 //		 r.setCountryCode("US");
 //		 r.setDate(new Date());
@@ -79,7 +88,7 @@ public class PaymentController implements Controller{
 //		 entities.add(r);
 //
 //		 r=new RedeemingRequests();
-//		 r.setLink2("https://sergeicpc.com/paid_user?amount=10&user_guid=9999999123");
+//		 r.setLink2("/administration/payment/test");
 //		 r.setAmount("10");
 //		 r.setCountryCode("US");
 //		 r.setDate(new Date());

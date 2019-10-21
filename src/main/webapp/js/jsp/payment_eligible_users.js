@@ -11,10 +11,27 @@ payment.PaymentEligibleUsersView = Backbone.View.extend({
 	  $('[data-button="true"]').click(function(e) {	  
 		  e.preventDefault();
 		  var url = $(this).data('href');
-		  $(e.target).prop('disabled', true);
-		  $(e.target.parentNode.parentNode).css('background-color','#c9cbcf');
-		  window.open(url, '_blank');
-	      
+		  //console.log(url);
+		  //window.open(url, '_blank');
+		  $.ajax({
+			    url: url,
+			    type: 'get',			    	   
+			    success: function(data, textStatus, jQxhr ){			        
+			        //var result=JSON.parse(data);
+			        var result=data
+			    	if(result.email_sent_successfully&&result.paid_successfully){
+			  		  $(e.target).prop('disabled', true);
+			  		  $(e.target.parentNode.parentNode).css('background-color','#c9cbcf');	
+			        }else{
+			          $(e.target.parentNode.parentNode).css('background-color','#ff0000');
+			          alert("paid_successfully: "+result.paid_successfully+"\r\n"+"email_sent_successfully: "+result.email_sent_successfully);
+			        }			        
+			    },
+			    error: function( jqXhr, textStatus, errorThrown ){
+			        console.log( errorThrown );
+			    }
+			  
+			});
 	  } );
   },
   events: {

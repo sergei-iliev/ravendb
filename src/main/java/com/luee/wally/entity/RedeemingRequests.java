@@ -3,6 +3,7 @@ package com.luee.wally.entity;
 import java.util.Date;
 
 import com.google.appengine.api.datastore.Entity;
+import com.luee.wally.utils.Utilities;
 
 public class RedeemingRequests {
 	private String userGuid;
@@ -24,10 +25,15 @@ public class RedeemingRequests {
 		redeemingRequests.setPaypalAccount((String)entity.getProperty("paypal_account"));
 		redeemingRequests.setCountryCode((String)entity.getProperty("country_code"));
 		redeemingRequests.setEmail((String)entity.getProperty("email"));
-		//redeemingRequests.setLink1("https://luee-wally-v2-cpc.appspot.com/paid_user?amount="+redeemingRequests.amount+"&user_guid="+redeemingRequests.userGuid);
-		//redeemingRequests.setLink2("https://luee-wally-v2-cpc.appspot.com/paid_user?amount="+redeemingRequests.amount+"&user_guid="+redeemingRequests.userGuid);
+		//redeemingRequests.setLink1("/administration/payment/test?amount="+redeemingRequests.amount+"&user_guid="+redeemingRequests.userGuid);
+		//redeemingRequests.setLink2("/administration/payment/test?amount="+redeemingRequests.amount+"&user_guid="+redeemingRequests.userGuid);
+				
 		redeemingRequests.setLink1("https://console.cloud.google.com/datastore/entities;kind=redeeming_requests_new;ns=__$DEFAULT$__/query/kind;filter=%5B%229%2Fuser_guid%7CSTR%7CEQ%7C36%2F"+redeemingRequests.userGuid+"%22%5D?project=luee-wally-v2-cpc");
-		redeemingRequests.setLink2("https://luee-wally-v2-cpc.appspot.com/paid_user?amount="+redeemingRequests.amount+"&user_guid="+redeemingRequests.userGuid);		
+		if(Utilities.isDevEnv()){
+			redeemingRequests.setLink2("https://luee-wally-dev.appspot.com/paid_user?amount="+redeemingRequests.amount+"&user_guid="+redeemingRequests.userGuid);
+		}else{
+			redeemingRequests.setLink2("https://luee-wally-v2-cpc.appspot.com/paid_user?amount="+redeemingRequests.amount+"&user_guid="+redeemingRequests.userGuid);
+		}
 		return redeemingRequests;
 	}
 	

@@ -48,6 +48,7 @@ INSTANCE;
     	 httpGetRouteList.put("/administration/payment/eligibleusers", new Route(new PaymentController(),"index"));
     	 httpGetRouteList.put("/administration/search/templates", new Route(new SearchFilterTemplateController(),"getSearchFilterTemplates"));
     	 httpGetRouteList.put("/administration/search/template/filter", new Route(new PaymentController(),"searchByFilterTemplate"));
+    	 httpGetRouteList.put("/administration/payment/test", new Route(new PaymentController(),"test"));
 
     	 //post
     	 httpPostRouteList.put("/administration/search", new Route(new AffsSearchController(),"search"));
