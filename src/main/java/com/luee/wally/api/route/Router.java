@@ -49,7 +49,7 @@ INSTANCE;
     	 httpGetRouteList.put("/administration/search/templates", new Route(new SearchFilterTemplateController(),"getSearchFilterTemplates"));
     	 httpGetRouteList.put("/administration/search/template/filter", new Route(new PaymentController(),"searchByFilterTemplate"));
     	 httpGetRouteList.put("/administration/payment/test", new Route(new PaymentController(),"test"));
-
+    	 
     	 //post
     	 httpPostRouteList.put("/administration/search", new Route(new AffsSearchController(),"search"));
     	 httpPostRouteList.put("/administration/campaign/search", new Route(new CampaignSearchController(),"search"));
@@ -57,6 +57,8 @@ INSTANCE;
     	 httpPostRouteList.put("/administration/import/user/revenue/2019/background", new Route(new ImportController(),"importUserRevenue2019InBackground"));
     	 httpPostRouteList.put("/administration/payment/eligibleusers/search", new Route(new PaymentController(),"search"));
     	 httpPostRouteList.put("/administration/search/template", new Route(new SearchFilterTemplateController(),"saveSearchFilterTemplate"));
+    	 httpPostRouteList.put("/administration/payment/removal/reason", new Route(new PaymentController(),"saveUserPaymentRemovalReason"));
+
     }
     
     public boolean hasPath(String httpMethod,String url){

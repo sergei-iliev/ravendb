@@ -10,7 +10,10 @@ import java.util.stream.Collectors;
 import com.google.appengine.api.datastore.Cursor;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.EntityNotFoundException;
 import com.google.appengine.api.datastore.FetchOptions;
+import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.Query.Filter;
@@ -21,9 +24,38 @@ import com.google.appengine.api.datastore.QueryResultList;
 import com.google.appengine.api.datastore.ReadPolicy.Consistency;
 import com.luee.wally.constants.Constants;
 import com.luee.wally.entity.RedeemingRequests;
+import com.luee.wally.entity.SearchFilterTemplate;
 
 public class PaymentRepository extends AbstractRepository{
 	private final Logger logger = Logger.getLogger(PaymentRepository.class.getName());
+	
+	  public void saveUserPaymentRemovalReason(String _key,String reason)throws EntityNotFoundException{
+	     Key key=KeyFactory.stringToKey(_key);
+	     DatastoreService ds = createDatastoreService(Consistency.STRONG);
+	     
+	     Entity entity=ds.get(key);	
+	     entity.setProperty("type","Removed");
+	     entity.setProperty("removal_reason", reason);
+	     ds.put(entity);	     
+	   }
+	  
+	   public Collection<String> getUserPaymentsRemovalReasons(){
+			Collection<String> list = new ArrayList<>();
+
+			DatastoreService ds = createDatastoreService(Consistency.STRONG);
+			Query query = new Query("user_payments_removal_reasons");
+			
+
+			PreparedQuery pq = ds.prepare(query);
+			QueryResultList<Entity> entities = pq.asQueryResultList(FetchOptions.Builder.withDefaults());
+
+			for (Entity entity : entities) {
+
+				list.add((String)entity.getProperty("removal_reason"));
+			}
+			
+			return list;
+	   }
 	
 		public Collection<RedeemingRequests> findEligibleUsers(String type,Date startDate,Date endDate,String packageName,String countryCode,Boolean confirmedEmail){
 			DatastoreService  ds= createDatastoreService(Consistency.EVENTUAL);

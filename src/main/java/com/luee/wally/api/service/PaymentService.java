@@ -6,6 +6,7 @@ import java.util.Comparator;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
+import com.google.appengine.api.datastore.EntityNotFoundException;
 import com.luee.wally.admin.repository.PaymentRepository;
 import com.luee.wally.command.PaymentEligibleUserForm;
 import com.luee.wally.entity.RedeemingRequests;
@@ -13,7 +14,10 @@ import com.luee.wally.entity.RedeemingRequests;
 public class PaymentService {
 	private final Logger logger = Logger.getLogger(PaymentService.class.getName());
 
-
+	public void saveUserPaymentRemovalReason(String key,String reason) throws EntityNotFoundException{
+		PaymentRepository paymentRepository=new PaymentRepository();
+		paymentRepository.saveUserPaymentRemovalReason(key, reason);
+	}
     public Collection<RedeemingRequests> searchEligibleUsers(PaymentEligibleUserForm form){
     	PaymentRepository paymentRepository=new PaymentRepository();
     	Collection<RedeemingRequests> result=new ArrayList<RedeemingRequests>();

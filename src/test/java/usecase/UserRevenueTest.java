@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -21,6 +22,9 @@ import org.junit.Test;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.FetchOptions;
+import com.google.appengine.api.datastore.PreparedQuery;
+import com.google.appengine.api.datastore.Query;
 import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 import com.luee.wally.DB;
@@ -208,6 +212,42 @@ public class UserRevenueTest {
 		
 		System.out.println(entity);
 		
+	}
+	
+	@Test
+	public void removeUserReasonReferenceTest() throws Exception {
+		DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
+		Entity reason = new Entity("user_payments_removal_reasons"); 
+		reason.setProperty("reason", "Unspecified user request");
+		ds.put(reason);
+		
+		
+		
+	    Entity redeemingRequest=new Entity("redeeming_requests_new");	    
+	    redeemingRequest.setProperty("id", 3);
+		redeemingRequest.setProperty("full_name","Sergey Iliev");
+		redeemingRequest.setProperty("reason",reason.getKey());
+		redeemingRequest.setProperty("full_address","Baba Tonka 7");
+		redeemingRequest.setProperty("country_code","5900");
+		redeemingRequest.setProperty("email","1@1.com");
+		redeemingRequest.setProperty("user_guid","01923456789");
+		redeemingRequest.setProperty("type","PayPal");
+		ds.put(redeemingRequest);
+
+		
+		Query q = new Query("redeeming_requests_new");
+	    Query.FilterPredicate projectFilter =
+	            new Query.FilterPredicate("reason",
+	                    Query.FilterOperator.EQUAL,
+	                    reason.getKey()
+	                    );
+	    q.setFilter(projectFilter);
+		System.out.println(q);
+		PreparedQuery pq = ds.prepare(q);
+		List<Entity> list= pq.asList(FetchOptions.Builder.withDefaults());
+		System.out.println(list);
+		
+	
 	}
 	
 }

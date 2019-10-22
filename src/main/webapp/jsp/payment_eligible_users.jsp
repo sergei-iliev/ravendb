@@ -196,8 +196,10 @@
 								<td>${entity.email}</td>
 								<td>${entity.countryCode}</td>
 								<td>${entity.paypalAccount}</td>
-								<td><button type="button" class="btn btn-primary btn-sm" data-href="${entity.link2}"
-									 data-button="true">Paid</button>																									
+								<td>
+								<button type="button" class="btn btn-primary btn-sm" data-href="${entity.link2}"
+									 data-button="true">Paid</button>
+								<button type="button" class="btn btn-primary btn-sm" data-entitykey="${entity.key}" remove-reason-button="true">Remove</button>									 																									
 									</td>
 							</tr>
 						</c:forEach>
@@ -251,8 +253,8 @@
 		</div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
         <button type="button" class="btn btn-primary" id="saveSearchTemplateBtn">Save</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>       
       </div>
     </div>
   </div>
@@ -284,6 +286,37 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>        
+      </div>
+    </div>
+  </div>
+</div>	
+<!-- Removal Reason -->
+<div class="modal fade" id="removalReasonDialog" tabindex="-1" role="dialog" aria-labelledby="removalReasonDialogLabel" aria-hidden="true">
+  	<div class="modal-dialog"  role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="removalReasonDialogLabel">Removal Reason</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+      <div class="container">
+        	<div class="row">
+				<div class="col-md-12">
+					<select
+						name="removeReason" class="form-control" id="removeReasonId">
+			 			 <c:forEach var="reason" items="${reasons}">
+								<option>${reason}</option>
+						 </c:forEach>
+					</select>
+				</div>
+		   </div>
+      </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" id="saveRemovalReasonBtn">Save</button> 
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>    
       </div>
     </div>
   </div>

@@ -33,6 +33,38 @@ payment.PaymentEligibleUsersView = Backbone.View.extend({
 			  
 			});
 	  } );
+	  
+	  $('[remove-reason-button="true"]').click(function(e) {	  
+		  e.preventDefault();
+		  var key = $(this).data('entitykey');
+		 
+		  $('#removalReasonDialog').modal('show');	 
+		  //disconnect event handler
+		  $('#saveRemovalReasonBtn').off();
+		  $('#saveRemovalReasonBtn').on( "click", function() {			  
+
+			  var formData={
+					  reason:$("#removeReasonId").val(),
+					  key:key,
+			  };
+			  
+			  $.ajax({
+			    url: '/administration/payment/removal/reason',
+			    type: 'post',
+			    data:formData,	    
+			    success: function(data, textStatus, jQxhr ){
+			        console.log(data);
+			    },
+			    error: function( jqXhr, textStatus, errorThrown ){
+			        console.log( errorThrown );
+			    }
+			  
+			});
+			  
+			  $('#removalReasonDialog').modal('hide');
+			});		  
+		  
+	  } );	  
   },
   events: {
 	  "submit #search-form":"onSubmit",
