@@ -83,6 +83,7 @@ public class AffsSearchController implements Controller{
 				}
 			}).start();		
 			
+		req.setAttribute("webform", form);
 		req.setAttribute("countries", this.getCountries());
 		req.setAttribute("success", "Job successfully posted.");
 		req.getRequestDispatcher("/jsp/index.jsp").forward(req, resp);

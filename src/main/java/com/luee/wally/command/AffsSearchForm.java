@@ -10,6 +10,8 @@ import java.util.HashSet;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 public class AffsSearchForm implements WebForm{
 	private Date startDate, endDate;
 	private String countryCode;
@@ -33,6 +35,19 @@ public class AffsSearchForm implements WebForm{
 		return form;
 	}
 
+	public String getEndDateAsText() {
+		if(endDate!=null){
+			return formatedDate(endDate, "yyyy-MM-dd");
+		}		
+		return null;
+	}
+	public String getStartDateAsText() {
+		if(startDate!=null){
+			return formatedDate(startDate, "yyyy-MM-dd");
+		}
+		
+		return null;
+	}
 	public Date getStartDate() {
 		return startDate;
 	}

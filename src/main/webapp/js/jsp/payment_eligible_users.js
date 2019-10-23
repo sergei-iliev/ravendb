@@ -13,14 +13,14 @@ payment.PaymentEligibleUsersView = Backbone.View.extend({
 		  var url = $(this).data('href');
 		  //console.log(url);
 		  //window.open(url, '_blank');
+	      $(e.target).prop('disabled', true);
 		  $.ajax({
 			    url: url,
 			    type: 'get',			    	   
 			    success: function(data, textStatus, jQxhr ){			        
 			        //var result=JSON.parse(data);
-			        var result=data
+			        var result=data;
 			    	if(result.email_sent_successfully&&result.paid_successfully){
-			  		  $(e.target).prop('disabled', true);
 			  		  $(e.target.parentNode.parentNode).css('background-color','#c9cbcf');	
 			        }else{
 			          $(e.target.parentNode.parentNode).css('background-color','#ff0000');
@@ -34,15 +34,19 @@ payment.PaymentEligibleUsersView = Backbone.View.extend({
 			});
 	  } );
 	  
-	  $('[remove-reason-button="true"]').click(function(e) {	  
+	  $('[remove-reason-button="true"]').click(function(e) {		  
 		  e.preventDefault();
+	
 		  var key = $(this).data('entitykey');
-		 
+
 		  $('#removalReasonDialog').modal('show');	 
+		  
 		  //disconnect event handler
 		  $('#saveRemovalReasonBtn').off();
 		  $('#saveRemovalReasonBtn').on( "click", function() {			  
-
+			  if($("#removeReasonId").val().length==0){
+				  return;
+			  }
 			  var formData={
 					  reason:$("#removeReasonId").val(),
 					  key:key,
@@ -53,10 +57,12 @@ payment.PaymentEligibleUsersView = Backbone.View.extend({
 			    type: 'post',
 			    data:formData,	    
 			    success: function(data, textStatus, jQxhr ){
+			    	$(e.target.parentNode.parentNode).css('background-color','#ffff00');
 			        console.log(data);
 			    },
 			    error: function( jqXhr, textStatus, errorThrown ){
 			        console.log( errorThrown );
+			        $(e.target.parentNode.parentNode).css('background-color','#ffff00');
 			    }
 			  
 			});

@@ -188,7 +188,11 @@
 							<tr>
 								<td><a href="${entity.link1}"
 									class="btn btn-primary btn-sm active" role="button"
-									aria-pressed="true" target="_blank">Find</a></td>
+									aria-pressed="true" target="_blank">Find</a>
+									
+									<button type="button" class="btn btn-primary btn-sm" data-entitykey="${entity.key}" remove-reason-button="true">Remove</button>									 																									
+									
+									</td>
 								<td>${entity.userGuid}</td>
 								<td>${entity.date}</td>
 								<td>${entity.amount}</td>
@@ -199,8 +203,7 @@
 								<td>
 								<button type="button" class="btn btn-primary btn-sm" data-href="${entity.link2}"
 									 data-button="true">Paid</button>
-								<button type="button" class="btn btn-primary btn-sm" data-entitykey="${entity.key}" remove-reason-button="true">Remove</button>									 																									
-									</td>
+								</td>
 							</tr>
 						</c:forEach>
 					</tbody>

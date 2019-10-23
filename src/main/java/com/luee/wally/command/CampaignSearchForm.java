@@ -39,7 +39,19 @@ public class CampaignSearchForm implements WebForm{
 		return form;
 	}
 
-
+	public String getEndDateAsText() {
+		if(endDate!=null){
+			return formatedDate(endDate, "yyyy-MM-dd");
+		}		
+		return null;
+	}
+	public String getStartDateAsText() {
+		if(startDate!=null){
+			return formatedDate(startDate, "yyyy-MM-dd");
+		}
+		
+		return null;
+	}
 	public Date getStartDate() {
 		return startDate;
 	}

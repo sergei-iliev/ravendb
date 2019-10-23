@@ -36,13 +36,13 @@
   				<div class="form-label-group">
   					<div class="col-3">
   					    <label for="startDateId">Start Date</label>
-    					<input class="form-control" type="date"  data-date-format="MM/DD/YYYY"  name="startDate" id="startDateId">
+    					<input class="form-control" type="date"  value="${webform.startDateAsText}" data-date-format="MM/DD/YYYY"  name="startDate" id="startDateId">
   					</div>
 				</div>
  				<div class="form-label-group">
   					<div class="col-3">
   					<label for="endDateId">End Date</label>
-    					<input class="form-control" type="date" data-date-format="MM/DD/YYYY" name="endDate" id="endDateId">
+    					<input class="form-control" type="date" value="${webform.endDateAsText}" data-date-format="MM/DD/YYYY" name="endDate" id="endDateId">
   					</div>  					
 				</div>
                         <div class="form-label-group">
@@ -52,7 +52,7 @@
                                 <select name="country" class="form-control" id="countryId">
       						
       					    	<c:forEach var="item" items="${countries}">
-                                	<option>${item}</option>
+                                	<option <c:if test="${webform.countryCode.equals(item)}">selected</c:if>>${item}</option>
                             	</c:forEach>
     							</select>
                             </div>
@@ -75,32 +75,18 @@
                              <div class="row mt-3">
                               <div class="col-md-12">  
                                 <select class="form-control" name="experiments" id="experimentsId" multiple>
-                                
+                                	  <c:forEach var="item" items="${webform.experiments}">
+											<option ${item}>${item}</option>
+									  </c:forEach>
                                 </select>                            									
                               </div>                            
                           </div>
                           </div>
                         </div>
-                        <!-- 
-  						<div class="form-label-group mt-3">
-  						  <div class="col-md-12">
-  							 <div class="row">                        	
-                              <div class="col-md-12">
-                              <div class="form-check-inline">
-  								<label class="form-check-label">
-    								<input type="checkbox" name="groupByExperiment" class="form-check-input" >Group by experiment
-  								</label>
-							  </div>
-  								    							
-    						</div>
-    						</div>
-    						</div>
-  						</div>
-  						 -->
                         <div class="form-label-group mt-3">
                         <div class="col-md-3">
                            	<label for="packageNameId">Package Name</label>                                
-                            <input name="packageName" class="form-control" id="packageNameId">      						      					    	
+                            <input name="packageName" class="form-control" id="packageNameId" value="${webform.packageName}">      						      					    	
                         </div>
                         </div>
                         <div class="form-group">

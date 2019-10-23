@@ -73,7 +73,8 @@ public class CampaignSearchController implements Controller {
 				        
 				}
 			}).start();	
-			
+
+		 req.setAttribute("webform", form);	
 		 req.setAttribute("countries", this.getCountries());
 		 req.setAttribute("success", "Job successfully posted.");
 		 req.getRequestDispatcher("/jsp/campaign.jsp").forward(req, resp);			

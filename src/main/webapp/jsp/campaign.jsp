@@ -36,23 +36,22 @@
   				<div class="form-label-group">
   					<div class="col-3">
   					    <label for="startDateId">Start Date</label>
-    					<input class="form-control" type="date"  data-date-format="MM/DD/YYYY"  name="startDate" id="startDateId">
+    					<input class="form-control" type="date" value="${webform.startDateAsText}" data-date-format="MM/DD/YYYY"  name="startDate" id="startDateId">
   					</div>
 				</div>
  				<div class="form-label-group">
   					<div class="col-3">
   					<label for="endDateId">End Date</label>
-    					<input class="form-control" type="date" data-date-format="MM/DD/YYYY" name="endDate" id="endDateId">
+    					<input class="form-control" type="date" value="${webform.endDateAsText}" data-date-format="MM/DD/YYYY" name="endDate" id="endDateId">
   					</div>  					
 				</div>
                         <div class="form-label-group">
                             
                             <div class="col-md-3">
                             	<label for="countryId">Country</label>                                
-                                <select name="country" class="form-control" id="countryId">
-      						
+                                <select name="country" class="form-control" id="countryId">      						
       					    	<c:forEach var="item" items="${countries}">
-                                	<option>${item}</option>
+                                	<option <c:if test="${webform.countryCode.equals(item)}">selected</c:if>>${item}</option>
                             	</c:forEach>
     							</select>
                             </div>
@@ -60,7 +59,7 @@
                         <div class="form-label-group mt-3">
                         <div class="col-md-3">
                            	<label for="packageNameId">Package Name</label>                                
-                            <input name="packageName" class="form-control" id="packageNameId">      						      					    	
+                            <input name="packageName" class="form-control" id="packageNameId" value="${webform.packageName}" >      						      					    	
                         </div>
                         </div>                        
                         <div class="form-label-group mt-3">
@@ -82,7 +81,9 @@
                              <div class="row mt-3">
                               <div class="col-md-12">  
                                 <select class="form-control" name="adnetworks" id="adnetworksId" multiple>
-                                
+                                      <c:forEach var="item" items="${webform.adNetworks}">
+											<option ${item}>${item}</option>
+									  </c:forEach>
                                 </select>                            									
                               </div>   
                               </div>                         
@@ -108,7 +109,9 @@
                              <div class="row mt-3">
                               <div class="col-md-12">  
                                 <select class="form-control" name="campaigns" id="campaignsId" multiple>
-                                
+                                      <c:forEach var="item" items="${webform.campaigns}">
+											<option ${item}>${item}</option>
+									  </c:forEach>                                
                                 </select>                            									
                               </div>                            
                           </div>
@@ -133,7 +136,9 @@
                              <div class="row mt-3">
                               <div class="col-md-12">  
                                 <select class="form-control" name="sources" id="sourcesId" multiple>
-                                
+                                      <c:forEach var="item" items="${webform.sources}">
+											<option ${item}>${item}</option>
+									  </c:forEach>                                 
                                 </select>                            									
                               </div>                            
                              </div>
