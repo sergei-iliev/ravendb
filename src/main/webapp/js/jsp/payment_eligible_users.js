@@ -44,7 +44,7 @@ payment.PaymentEligibleUsersView = Backbone.View.extend({
 		  //disconnect event handler
 		  $('#saveRemovalReasonBtn').off();
 		  $('#saveRemovalReasonBtn').on( "click", function() {			  
-			  if($("#removeReasonId").val().length==0){
+			  if($("#removeReasonId").val().trim().length==0){
 				  return;
 			  }
 			  var formData={

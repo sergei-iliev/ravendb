@@ -1,8 +1,11 @@
 package com.luee.wally.admin.controller;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -60,11 +63,6 @@ public class PaymentController implements Controller {
 		PaymentRepository paymentRepository = new PaymentRepository();
 		Collection<String> reasons = paymentRepository.getUserPaymentsRemovalReasons();
 
-		reasons.add("suspected fraud");
-		reasons.add("payments through website only");
-		reasons.add("no paypal account found");
-		reasons.add("no amazon account found");
-
 		req.setAttribute("webform", form);
 		req.setAttribute("entities", entities);
 		req.setAttribute("reasons", reasons);
@@ -88,6 +86,7 @@ public class PaymentController implements Controller {
 //		reasons.add("no paypal account found");
 //		reasons.add("no amazon account found");
 //
+//		
 //		RedeemingRequests r = new RedeemingRequests();
 //		r.setKey("11122313123");
 //		r.setLink2("/administration/payment/test");
@@ -108,9 +107,12 @@ public class PaymentController implements Controller {
 //		r.setUserGuid("9999999123");
 //		entities.add(r);
 
+		List<String> removalReasons=new LinkedList<String>(reasons);
+		removalReasons.add(0,"");
+		
 		req.setAttribute("webform", form);
 		req.setAttribute("entities", entities);
-		req.setAttribute("reasons", reasons);
+		req.setAttribute("reasons", removalReasons);
 		req.setAttribute("countries", this.getCountries());
 		req.getRequestDispatcher("/jsp/payment_eligible_users.jsp").forward(req, resp);
 
