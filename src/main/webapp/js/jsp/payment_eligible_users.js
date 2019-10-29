@@ -8,8 +8,73 @@ payment.PaymentEligibleUsersView = Backbone.View.extend({
 	  $('[data-toggle="tooltip"]').tooltip();	
 
 	  
-	  $('[data-button="true"]').click(function(e) {	  
+	  $('[paid-button="true"]').click(function(e) {	  
 		  e.preventDefault();
+		  $('#paidUserDialog').modal('show');	
+		  var paymentType = $(this).data('paymenttype');
+		  var key = $(this).data('entitykey');
+		  var url = $(this).data('href');
+		  
+		
+		  $("#paidTypesId").val(paymentType);
+		  $("#amountId").val('');
+		  
+		  //disconnect event handler
+		  $('#savePaidUserBtn').off();
+		  $('#savePaidUserBtn').on( "click", function() {	
+			  if($("#amountId").val().length==0){
+				  console.log('empty field');
+				  return;
+			  }
+			  
+			  
+		      $(e.target).prop('disabled', true);
+			  $.ajax({
+				    url: url,
+				    type: 'get',			    	   
+				    success: function(data, textStatus, jQxhr ){			        				       
+				        var result=data;
+						var formData={
+								  amount:$("#amountId").val(),
+								  key:key,
+								  paymentType:$("#paidTypesId").val(),
+								  currencyCode:$("#paidCurrencyCodeId").val(),
+								  email_sent_success:result.email_sent_successfully,
+								  paid_user_success:result.paid_successfully,  
+						};
+						
+			    		//1.register record in paid_user table
+						  $.ajax({
+							    url: '/administration/payment/user/pay',
+							    type: 'post',
+							    data:formData,	    
+							    success: function(data, textStatus, jQxhr ){
+							       $('#paidUserDialog').modal('hide');									        
+							    },
+							    error: function( jqXhr, textStatus, errorThrown ){
+							       console.log( errorThrown );
+							    }
+							  
+							});
+						//2.mark table row  
+				    	if(result.email_sent_successfully&&result.paid_successfully){				    	 
+				    	  $(e.target.parentNode.parentNode).css('background-color','#4DDF0B');
+				        }else{
+				          $(e.target.parentNode.parentNode).css('background-color','#ff0000');
+				          alert("paid_successfully: "+result.paid_successfully+"\r\n"+"email_sent_successfully: "+result.email_sent_successfully);
+				        }
+				    	
+				    },
+				    error: function( jqXhr, textStatus, errorThrown ){
+				        console.log( errorThrown );
+				    }
+				  
+				});			  
+			  
+			  
+		  });
+		  
+/*		  
 		  var url = $(this).data('href');
 		  //console.log(url);
 		  //window.open(url, '_blank');
@@ -32,6 +97,7 @@ payment.PaymentEligibleUsersView = Backbone.View.extend({
 			    }
 			  
 			});
+*/			
 	  } );
 	  
 	  $('[remove-reason-button="true"]').click(function(e) {		  

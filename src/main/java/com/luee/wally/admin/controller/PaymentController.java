@@ -1,6 +1,7 @@
 package com.luee.wally.admin.controller;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -18,9 +19,14 @@ import com.luee.wally.admin.repository.PaymentRepository;
 import com.luee.wally.admin.repository.SearchFilterTemplateRepository;
 import com.luee.wally.api.route.Controller;
 import com.luee.wally.api.service.PaymentService;
+import com.luee.wally.api.service.impex.ImportService;
+import com.luee.wally.command.PaidUserForm;
 import com.luee.wally.command.PaymentEligibleUserForm;
+import com.luee.wally.command.WebForm;
 import com.luee.wally.entity.RedeemingRequests;
 import com.luee.wally.entity.SearchFilterTemplate;
+import com.luee.wally.json.ExchangeRateVO;
+import com.luee.wally.utils.Utilities;
 
 public class PaymentController implements Controller {
 	private final Logger logger = Logger.getLogger(CampaignSearchController.class.getName());
@@ -28,11 +34,35 @@ public class PaymentController implements Controller {
 	public void test(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		resp.setContentType("application/json");
 		resp.setCharacterEncoding("UTF-8");
-		String json = "{" + "\"paid_successfully\": false," + "\"email_sent_successfully\": true" + "}";
+		String json = "{" + "\"paid_successfully\": true," + "\"email_sent_successfully\": true" + "}";
 
 		resp.getWriter().write(json);
 	}
-
+	public void pay(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		
+		PaidUserForm form=PaidUserForm.parse(req);		
+		
+		ImportService importService=new ImportService();
+		
+				
+		BigDecimal rateValue=BigDecimal.ONE;
+		try{
+			if(!form.getCurrencyCode().equals("EUR")){
+			 String formatedDate=Utilities.formatedDate(new Date(),"yyyy-MM-dd");
+			 ExchangeRateVO rate=importService.getExchangeRates(formatedDate,"EUR",form.getCurrencyCode());
+			 rateValue = BigDecimal.valueOf(rate.getRates().get(form.getCurrencyCode()));
+			}
+		}catch(Exception e){
+			throw new ServletException(e);
+		}
+		BigDecimal currentValue = new BigDecimal(form.getAmount());		
+		BigDecimal eurAmount = currentValue.divide(rateValue,2, BigDecimal.ROUND_HALF_EVEN);
+	
+		PaymentRepository paymentRepository=new PaymentRepository();
+		paymentRepository.saveUserPayment(form,eurAmount);
+		
+		resp.getWriter().write("OK");
+	}
 	public void index(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
 		PaymentEligibleUserForm form = new PaymentEligibleUserForm();
@@ -66,12 +96,15 @@ public class PaymentController implements Controller {
 		req.setAttribute("webform", form);
 		req.setAttribute("entities", entities);
 		req.setAttribute("reasons", reasons);
+		req.setAttribute("paymentTypes",paymentService.getDefaultPaymentTypes());
+		req.setAttribute("defaultCurrencyCodes",paymentService.getDefaultCurrencyCodes());
 		req.setAttribute("countries", this.getCountries());
 		req.getRequestDispatcher("/jsp/payment_eligible_users.jsp").forward(req, resp);
 
 	}
 
 	public void search(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		
 		PaymentService paymentService = new PaymentService();
 
 		PaymentEligibleUserForm form = PaymentEligibleUserForm.parse(req);
@@ -92,6 +125,7 @@ public class PaymentController implements Controller {
 //		r.setLink2("/administration/payment/test");
 //		r.setAmount("10");
 //		r.setCountryCode("US");
+//		r.setType("Google Play");
 //		r.setDate(new Date());
 //		r.setEmail("eee@ee.com");
 //		r.setUserGuid("11122313123");
@@ -102,6 +136,7 @@ public class PaymentController implements Controller {
 //		r.setLink2("/administration/payment/test");
 //		r.setAmount("10");
 //		r.setCountryCode("US");
+//		r.setType("Amazon");
 //		r.setDate(new Date());
 //		r.setEmail("eee@ee.com");
 //		r.setUserGuid("9999999123");
@@ -113,6 +148,8 @@ public class PaymentController implements Controller {
 		req.setAttribute("webform", form);
 		req.setAttribute("entities", entities);
 		req.setAttribute("reasons", removalReasons);
+		req.setAttribute("paymentTypes",paymentService.getDefaultPaymentTypes());
+		req.setAttribute("defaultCurrencyCodes",paymentService.getDefaultCurrencyCodes());
 		req.setAttribute("countries", this.getCountries());
 		req.getRequestDispatcher("/jsp/payment_eligible_users.jsp").forward(req, resp);
 

@@ -124,7 +124,10 @@ public class ImportService {
 		String json=ConnectionMgr.INSTANCE.getJSON("https://api.exchangeratesapi.io/"+date+"?base="+currency);
 		return JSONUtils.readObject(json, ExchangeRateVO.class);
 	}
-	
+	public ExchangeRateVO getExchangeRates(String date,String currency,String symbols)throws Exception{
+		String json=ConnectionMgr.INSTANCE.getJSON("https://api.exchangeratesapi.io/"+date+"?base="+currency+"&symbols="+symbols);
+		return JSONUtils.readObject(json, ExchangeRateVO.class);
+	}
 	public Collection<PaidUsers2018> importCSVFile()throws Exception{
 		
 		List<List<String>> list=readFile(Constants.IMPORT_CSV_FILE);		

@@ -58,6 +58,7 @@ INSTANCE;
     	 httpPostRouteList.put("/administration/payment/eligibleusers/search", new Route(new PaymentController(),"search"));
     	 httpPostRouteList.put("/administration/search/template", new Route(new SearchFilterTemplateController(),"saveSearchFilterTemplate"));
     	 httpPostRouteList.put("/administration/payment/removal/reason", new Route(new PaymentController(),"saveUserPaymentRemovalReason"));
+    	 httpPostRouteList.put("/administration/payment/user/pay", new Route(new PaymentController(),"pay"));
 
     }
     

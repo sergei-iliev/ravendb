@@ -1,6 +1,7 @@
 package com.luee.wally.api.service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.logging.Logger;
@@ -14,6 +15,13 @@ import com.luee.wally.entity.RedeemingRequests;
 public class PaymentService {
 	private final Logger logger = Logger.getLogger(PaymentService.class.getName());
 
+	
+	public Collection<String> getDefaultPaymentTypes(){
+		return Arrays.asList("PayPal","Amazon","Google Play");
+	}
+	public Collection<String> getDefaultCurrencyCodes(){
+		return Arrays.asList("USD","EUR","CAD","AUD","GBP");
+	}
 	public void saveUserPaymentRemovalReason(String key,String reason) throws EntityNotFoundException{
 		PaymentRepository paymentRepository=new PaymentRepository();
 		paymentRepository.saveUserPaymentRemovalReason(key, reason);

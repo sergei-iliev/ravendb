@@ -48,9 +48,7 @@
 					<form class="form-horizontal" id="search-form" method="post"
 						action="/administration/payment/eligibleusers/search">
 						<fieldset>
-							<!-- 
-                        <legend class="text-center header">Contact us</legend>
- -->
+
 							<div class="form-label-group mt-3">
 								<div class="col-md-3">
 									<label for="typesId">Payment type</label> <input name="types"
@@ -202,7 +200,7 @@
 								<td>${entity.paypalAccount}</td>
 								<td>
 								<button type="button" class="btn btn-primary btn-sm" data-href="${entity.link2}"
-									 data-button="true">Paid</button>
+									 paid-button="true" data-paymentType="${entity.type}" data-entitykey="${entity.key}">Paid</button>
 								</td>
 							</tr>
 						</c:forEach>
@@ -224,11 +222,40 @@
 						<span aria-hidden="true">&times;</span>
 					</button>
 				</div>
-				<div class="modal-body">...</div>
+				<div class="modal-body">
+				<div class="row mt-3">							
+						<div class="col-md-6">
+							<label for="paidTypesId">Payment type</label> 
+					         <select
+						      class="form-control" id="paidTypesId">
+			 			       <c:forEach var="item" items="${paymentTypes}">
+								<option>${item}</option>
+						       </c:forEach>
+					        </select>									
+					  </div>
+				</div>
+				<div class="row mt-3">	
+						<div class="col-md-6">
+							<label for="paidCurrencyCodeId">Currency</label> 
+					         <select
+						      class="form-control" id="paidCurrencyCodeId">
+			 			       <c:forEach var="item" items="${defaultCurrencyCodes}">
+								<option>${item}</option>
+						       </c:forEach>
+					        </select>									
+					  </div>					  
+				</div>				
+				<div class="row mt-3">	
+						<div class="col-md-6">
+							<label for="amountId">Amount</label> 
+								<input class="form-control" id="amountId">									
+					  </div>					  
+				</div>				
+				</div>
 				<div class="modal-footer">
+					<button type="button" class="btn btn-primary" id="savePaidUserBtn">Save</button>
 					<button type="button" class="btn btn-secondary"
 						data-dismiss="modal">Close</button>
-					<button type="button" class="btn btn-primary">Search</button>
 				</div>
 			</div>
 		</div>
@@ -324,6 +351,7 @@
     </div>
   </div>
 </div>	
+
 		<script type="text/javascript">
 			'use strict';
 

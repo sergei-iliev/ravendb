@@ -1,5 +1,6 @@
 package com.luee.wally.admin.repository;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -22,6 +23,7 @@ import com.google.appengine.api.datastore.Query.FilterPredicate;
 import com.google.appengine.api.datastore.Query.SortDirection;
 import com.google.appengine.api.datastore.QueryResultList;
 import com.google.appengine.api.datastore.ReadPolicy.Consistency;
+import com.luee.wally.command.PaidUserForm;
 import com.luee.wally.constants.Constants;
 import com.luee.wally.entity.RedeemingRequests;
 import com.luee.wally.entity.SearchFilterTemplate;
@@ -29,6 +31,35 @@ import com.luee.wally.entity.SearchFilterTemplate;
 public class PaymentRepository extends AbstractRepository{
 	private final Logger logger = Logger.getLogger(PaymentRepository.class.getName());
 	
+	  public Entity getRedeemingRequestsByKey(String _key){
+		     Key key=KeyFactory.stringToKey(_key);
+		     DatastoreService ds = createDatastoreService(Consistency.STRONG);		     
+		     try{
+		         return ds.get(key);			  
+		     }catch(EntityNotFoundException e){
+		    	 return null;
+		     }
+	  }
+	  
+	  public void saveUserPayment(PaidUserForm form,BigDecimal eurAmount){	
+		   //get redeeming request by key 
+		   Entity redeemingRequests=this.getRedeemingRequestsByKey(form.getKey());
+		   
+		   DatastoreService ds = createDatastoreService(Consistency.STRONG);
+		   Entity entity=new Entity("paid_users");	
+		   entity.setProperty("date", new Date());
+		   entity.setProperty("user_guid",redeemingRequests.getProperty("user_guid"));
+		   entity.setProperty("paid_currency", form.getCurrencyCode());
+		   entity.setProperty("amount", form.getAmount());
+		   entity.setProperty("type", form.getPaymentType());
+		   entity.setProperty("eur_currency", eurAmount);
+		   entity.setProperty("email_address",redeemingRequests.getProperty("email"));
+		   entity.setProperty("paypal_account",redeemingRequests.getProperty("paypal_account"));
+		   entity.setProperty("paid_user_success", form.isPaidUserSuccess());
+		   entity.setProperty("email_sent_success",form.isEmailSentSuccess());
+	   
+		   ds.put(entity);
+	  }
 	  public void saveUserPaymentRemovalReason(String _key,String reason)throws EntityNotFoundException{
 	     Key key=KeyFactory.stringToKey(_key);
 	     DatastoreService ds = createDatastoreService(Consistency.STRONG);
