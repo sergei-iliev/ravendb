@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -41,9 +42,15 @@ public class PaymentRepository extends AbstractRepository{
 		     }
 	  }
 	  
-	  public void saveUserPayment(PaidUserForm form,BigDecimal eurAmount){	
-		   //get redeeming request by key 
-		   Entity redeemingRequests=this.getRedeemingRequestsByKey(form.getKey());
+	  public Entity getPaidUserByGuid(String user_guid){
+		     DatastoreService ds = createDatastoreService(Consistency.STRONG);		     
+		     Query query = new Query("paid_users");
+		     query.setFilter(new FilterPredicate("user_guid", FilterOperator.EQUAL, user_guid));
+			 PreparedQuery pq = ds.prepare(query);
+			 return pq.asSingleEntity();			 
+	  }
+	  
+	  public void saveUserPayment(PaidUserForm form,Entity redeemingRequests,BigDecimal eurAmount){	
 		   
 		   DatastoreService ds = createDatastoreService(Consistency.STRONG);
 		   Entity entity=new Entity("paid_users");	
@@ -52,12 +59,12 @@ public class PaymentRepository extends AbstractRepository{
 		   entity.setProperty("paid_currency", form.getCurrencyCode());
 		   entity.setProperty("amount", form.getAmount());
 		   entity.setProperty("type", form.getPaymentType());
-		   entity.setProperty("eur_currency", eurAmount);
+		   entity.setProperty("eur_currency", eurAmount.doubleValue());
 		   entity.setProperty("email_address",redeemingRequests.getProperty("email"));
 		   entity.setProperty("paypal_account",redeemingRequests.getProperty("paypal_account"));
 		   entity.setProperty("paid_user_success", form.isPaidUserSuccess());
 		   entity.setProperty("email_sent_success",form.isEmailSentSuccess());
-	   
+		   entity.setProperty("redeeming_request_key",redeemingRequests.getKey());
 		   ds.put(entity);
 	  }
 	  public void saveUserPaymentRemovalReason(String _key,String reason)throws EntityNotFoundException{

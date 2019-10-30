@@ -28,9 +28,9 @@ public class RedeemingRequests {
 		redeemingRequests.setCountryCode((String) entity.getProperty("country_code"));
 		redeemingRequests.setEmail((String) entity.getProperty("email"));
 		
-//		redeemingRequests.setLink1("/administration/payment/test?amount="+redeemingRequests.amount+"&user_guid="+redeemingRequests.userGuid);
-//		redeemingRequests.setLink2("/administration/payment/test?amount="+redeemingRequests.amount+"&user_guid="+redeemingRequests.userGuid);
-
+		redeemingRequests.setLink1("/administration/payment/test?amount="+redeemingRequests.amount+"&user_guid="+redeemingRequests.userGuid);
+		redeemingRequests.setLink2("/administration/payment/test?amount="+redeemingRequests.amount+"&user_guid="+redeemingRequests.userGuid);
+/*
 		redeemingRequests.setLink1(
 				"https://console.cloud.google.com/datastore/entities;kind=redeeming_requests_new;ns=__$DEFAULT$__/query/kind;filter=%5B%229%2Fuser_guid%7CSTR%7CEQ%7C36%2F"
 						+ redeemingRequests.userGuid + "%22%5D?project=luee-wally-v2-cpc");
@@ -41,7 +41,7 @@ public class RedeemingRequests {
 			redeemingRequests.setLink2("https://luee-wally-v2-cpc.appspot.com/paid_user?amount="
 					+ redeemingRequests.amount + "&user_guid=" + redeemingRequests.userGuid);
 		}
-
+*/
 		return redeemingRequests;
 	}
 

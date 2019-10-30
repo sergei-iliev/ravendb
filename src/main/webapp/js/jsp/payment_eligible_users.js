@@ -10,6 +10,7 @@ payment.PaymentEligibleUsersView = Backbone.View.extend({
 	  
 	  $('[paid-button="true"]').click(function(e) {	  
 		  e.preventDefault();
+		  $('#savePaidUserBtn').prop('disabled', false);
 		  $('#paidUserDialog').modal('show');	
 		  var paymentType = $(this).data('paymenttype');
 		  var key = $(this).data('entitykey');
@@ -19,16 +20,21 @@ payment.PaymentEligibleUsersView = Backbone.View.extend({
 		  $("#paidTypesId").val(paymentType);
 		  $("#amountId").val('');
 		  
-		  //disconnect event handler
+		  //disconnect event handler and enable it		  
 		  $('#savePaidUserBtn').off();
-		  $('#savePaidUserBtn').on( "click", function() {	
+		  $('#savePaidUserBtn').on( "click", function(ee) {	
 			  if($("#amountId").val().length==0){
 				  console.log('empty field');
 				  return;
 			  }
 			  
+			  if(isNaN($("#amountId").val())){
+				  console.log($("#amountId").val()+' is not a number');
+				  return; 
+			  }
 			  
-		      $(e.target).prop('disabled', true);
+			  $('#savePaidUserBtn').prop('disabled', true);
+			  $(e.target).prop('disabled', true);
 			  $.ajax({
 				    url: url,
 				    type: 'get',			    	   
@@ -49,6 +55,24 @@ payment.PaymentEligibleUsersView = Backbone.View.extend({
 							    type: 'post',
 							    data:formData,	    
 							    success: function(data, textStatus, jQxhr ){
+							       if(!data.startsWith("OK")){
+							    	   var response=JSON.parse(data);
+							    	   
+							    	   var text="Could not add user payment because user payment already exists:\r\n"+
+							    		   "date: "+response.properties.date+"\r\n"+
+							    		   "user_guid: "+response.properties.user_guid+"\r\n"+
+							    		   "paid_currency: "+response.properties.paid_currency+"\r\n"+
+							    		   "amount: "+response.properties.amount+"\r\n"+
+							    		   "type: "+response.properties.type+"\r\n"+
+							    		   "eur_currency: "+response.properties.eur_currency+"\r\n"+
+							    		   "email_address: "+response.properties.email_address+"\r\n"+
+							    		   "paypal_account: "+response.properties.paypal_account+"\r\n"+
+							    		   "paid_user_success: "+response.properties.paid_user_success+"\r\n"+
+							    		   "email_sent_success: "+response.properties.email_sent_success+"\r\n";							    	   
+
+							    	   
+							    	   alert(text);
+							       }	
 							       $('#paidUserDialog').modal('hide');									        
 							    },
 							    error: function( jqXhr, textStatus, errorThrown ){

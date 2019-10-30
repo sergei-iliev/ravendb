@@ -14,6 +14,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.EntityNotFoundException;
 import com.luee.wally.admin.repository.PaymentRepository;
 import com.luee.wally.admin.repository.SearchFilterTemplateRepository;
@@ -26,6 +27,7 @@ import com.luee.wally.command.WebForm;
 import com.luee.wally.entity.RedeemingRequests;
 import com.luee.wally.entity.SearchFilterTemplate;
 import com.luee.wally.json.ExchangeRateVO;
+import com.luee.wally.json.JSONUtils;
 import com.luee.wally.utils.Utilities;
 
 public class PaymentController implements Controller {
@@ -38,30 +40,29 @@ public class PaymentController implements Controller {
 
 		resp.getWriter().write(json);
 	}
-	public void pay(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+	public void pay(HttpServletRequest req, HttpServletResponse resp) throws Exception {
 		
-		PaidUserForm form=PaidUserForm.parse(req);		
+		PaidUserForm form=PaidUserForm.parse(req);	
 		
-		ImportService importService=new ImportService();
-		
-				
-		BigDecimal rateValue=BigDecimal.ONE;
-		try{
-			if(!form.getCurrencyCode().equals("EUR")){
-			 String formatedDate=Utilities.formatedDate(new Date(),"yyyy-MM-dd");
-			 ExchangeRateVO rate=importService.getExchangeRates(formatedDate,"EUR",form.getCurrencyCode());
-			 rateValue = BigDecimal.valueOf(rate.getRates().get(form.getCurrencyCode()));
-			}
-		}catch(Exception e){
-			throw new ServletException(e);
-		}
-		BigDecimal currentValue = new BigDecimal(form.getAmount());		
-		BigDecimal eurAmount = currentValue.divide(rateValue,2, BigDecimal.ROUND_HALF_EVEN);
-	
 		PaymentRepository paymentRepository=new PaymentRepository();
-		paymentRepository.saveUserPayment(form,eurAmount);
+		//get redeeming request by key 
+		Entity redeemingRequests=paymentRepository.getRedeemingRequestsByKey(form.getKey());		
+		Entity paidUser=paymentRepository.getPaidUserByGuid((String)redeemingRequests.getProperty("user_guid"));
+		if(paidUser!=null){
+		  //****DEBUG*****
+		  //Entity paidUser=new Entity("3456364346");
+		  //paidUser.setProperty("name","Geologia");
+		  //paidUser.setProperty("type","Amazon");
+			
+			JSONUtils.writeObject(paidUser, Entity.class);
+			resp.getWriter().write(JSONUtils.writeObject(paidUser, Entity.class));
+			return;
+		}
 		
-		resp.getWriter().write("OK");
+		PaymentService paymentService=new PaymentService();
+		paymentService.pay(form,redeemingRequests);
+		resp.getWriter().write("OK");	
+
 	}
 	public void index(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
