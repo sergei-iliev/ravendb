@@ -48,6 +48,9 @@ public class PaymentController implements Controller {
 		//get redeeming request by key 
 		Entity redeemingRequests=paymentRepository.getRedeemingRequestsByKey(form.getKey());		
 		Entity paidUser=paymentRepository.getPaidUserByGuid((String)redeemingRequests.getProperty("user_guid"));
+		/*
+		 * Don't pay if already paid up
+		 */
 		if(paidUser!=null){
 		  //****DEBUG*****
 		  //Entity paidUser=new Entity("3456364346");
