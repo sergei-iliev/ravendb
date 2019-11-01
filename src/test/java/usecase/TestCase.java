@@ -1,6 +1,7 @@
 package usecase;
 
 import java.io.Closeable;
+import java.io.FileOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
@@ -21,12 +22,15 @@ import org.springframework.test.context.junit4.SpringRunner;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.appengine.tools.development.testing.LocalMemcacheServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
+import com.google.cloud.Timestamp;
 import com.google.cloud.datastore.DatastoreOptions;
 import com.googlecode.objectify.ObjectifyFactory;
 import com.googlecode.objectify.ObjectifyService;
 
 import net.paypal.integrate.AppEngineMemcacheClientService;
 import net.paypal.integrate.PaypalApplication;
+import net.paypal.integrate.command.PdfAttachment;
+import net.paypal.integrate.command.csv.PaidUsers2018;
 import net.paypal.integrate.command.csv.UserLevelRevenue;
 import net.paypal.integrate.command.json.JSONUtils;
 import net.paypal.integrate.command.json.RevenueLinkVO;
@@ -113,8 +117,43 @@ public class TestCase{
 	public void processUserRevenueAggregatedTest() throws Exception{
 	    userRevenueService.processUserRevenueAggregated("2019-06-13");	
 	}	
-
+	@Test
+	public void createPdfTest() throws Exception{
+        RedeemingRequests redeemingRequests=new RedeemingRequests();
+        redeemingRequests.setDate(Timestamp.of(new Date()));
+        
+        Thread.sleep(1000);
+        redeemingRequests.setAmount("12");
+        redeemingRequests.setCountryCode("USD");
+        redeemingRequests.setEmail("pegi@yahoo.lcom");
+        redeemingRequests.setFrom("Belarus");
+        redeemingRequests.setFullAddress("Baba Tonka 7");
+        redeemingRequests.setFullName("Benjamin Franclin");        
+        redeemingRequests.setCreationDate(Timestamp.of(new Date()));
+		redeemingRequests.setUserGuid("c59ef40b-b4d8-4d62-a3d4-bee3646d4932");
+        
+        PaidUsers2018 paidUsers2018=new PaidUsers2018();
+        paidUsers2018.setDate("19-19-2012");
+        paidUsers2018.setPayedAmount("23");
+        
+        PdfAttachment attachment=new PdfAttachment();
+		
+		InvoiceService invoiceService=new InvoiceService();
+		
+		String invoiceNumber="0000012334";
+		
+        attachment.setFileName("PaidUsers2018_"+invoiceNumber+".pdf");
+        attachment.setContentType("application/pdf");  
+        
+        
+        attachment.readFromStream(invoiceService.createInvoice(redeemingRequests,paidUsers2018,invoiceNumber)); 
 	
+        try (FileOutputStream fos = new FileOutputStream("D:\\"+attachment.getFileName())) {
+        	   fos.write(attachment.getBuffer());        	   
+        }
+     
+       
+	}        
 	@Test
 	public void connectionMgrTest() throws Exception{
 //		String result=ConnectionMgr.INSTANCE.getJSON(u);
