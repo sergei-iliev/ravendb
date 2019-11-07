@@ -2,6 +2,7 @@ package com.luee.wally.entity;
 
 import java.util.Date;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.luee.wally.utils.Utilities;
@@ -10,27 +11,30 @@ public class RedeemingRequests {
 	private String userGuid;
 	private String amount;
 	private String type;
-	private String email;
+	private String email, fullName;
 	private String countryCode;
 	private Date date;
 	private String paypalAccount;
 	private String link1, link2;
-	private String key;
+	private String key, redeemingRequestId, packageName;
 
 	public static RedeemingRequests valueOf(Entity entity) {
 		RedeemingRequests redeemingRequests = new RedeemingRequests();
 		redeemingRequests.key = KeyFactory.keyToString(entity.getKey());
 		redeemingRequests.setAmount((String) entity.getProperty("amount"));
+		redeemingRequests.setFullName((String) entity.getProperty("full_name"));
 		redeemingRequests.setUserGuid((String) entity.getProperty("user_guid"));
+		redeemingRequests.setRedeemingRequestId((String) entity.getProperty("redeeming_request_id"));
 		redeemingRequests.setType((String) entity.getProperty("type"));
 		redeemingRequests.setDate((Date) entity.getProperty("date"));
 		redeemingRequests.setPaypalAccount((String) entity.getProperty("paypal_account"));
 		redeemingRequests.setCountryCode((String) entity.getProperty("country_code"));
 		redeemingRequests.setEmail((String) entity.getProperty("email"));
-		
-		redeemingRequests.setLink1("/administration/payment/test?amount="+redeemingRequests.amount+"&user_guid="+redeemingRequests.userGuid);
-		redeemingRequests.setLink2("/administration/payment/test?amount="+redeemingRequests.amount+"&user_guid="+redeemingRequests.userGuid);
-/*
+		redeemingRequests.setPackageName((String) entity.getProperty("package_name"));
+
+		// redeemingRequests.setLink1("/administration/payment/test?amount="+redeemingRequests.amount+"&user_guid="+redeemingRequests.userGuid);
+		// redeemingRequests.setLink2("/administration/payment/test?amount="+redeemingRequests.amount+"&user_guid="+redeemingRequests.userGuid);
+
 		redeemingRequests.setLink1(
 				"https://console.cloud.google.com/datastore/entities;kind=redeeming_requests_new;ns=__$DEFAULT$__/query/kind;filter=%5B%229%2Fuser_guid%7CSTR%7CEQ%7C36%2F"
 						+ redeemingRequests.userGuid + "%22%5D?project=luee-wally-v2-cpc");
@@ -41,7 +45,7 @@ public class RedeemingRequests {
 			redeemingRequests.setLink2("https://luee-wally-v2-cpc.appspot.com/paid_user?amount="
 					+ redeemingRequests.amount + "&user_guid=" + redeemingRequests.userGuid);
 		}
-*/
+
 		return redeemingRequests;
 	}
 
@@ -51,6 +55,40 @@ public class RedeemingRequests {
 
 	public void setKey(String key) {
 		this.key = key;
+	}
+
+	public String getPackageName() {
+		return packageName;
+	}
+
+	public void setPackageName(String packageName) {
+		this.packageName = packageName;
+	}
+
+	public String getRedeemingRequestId() {
+		return redeemingRequestId;
+	}
+
+	public void setRedeemingRequestId(String redeemingRequestId) {
+		this.redeemingRequestId = redeemingRequestId;
+	}
+
+	public String getFirstName() {
+		String[] s = fullName.split(" ");
+		return s[0];
+	}
+
+	public String getLastName() {
+		String[] s = fullName.split(" ");
+		return s.length > 1 ? s[1] : null;
+	}
+
+	public void setFullName(String fullName) {
+		this.fullName = fullName;
+	}
+
+	public String getFullName() {
+		return fullName;
 	}
 
 	public Date getDate() {
@@ -125,4 +163,8 @@ public class RedeemingRequests {
 		this.link2 = link2;
 	}
 
+	@JsonIgnore
+	public boolean isAmazonType() {
+		return type.equalsIgnoreCase("amazon");
+	}
 }

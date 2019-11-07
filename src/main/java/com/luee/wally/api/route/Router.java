@@ -59,7 +59,7 @@ INSTANCE;
     	 httpPostRouteList.put("/administration/search/template", new Route(new SearchFilterTemplateController(),"saveSearchFilterTemplate"));
     	 httpPostRouteList.put("/administration/payment/removal/reason", new Route(new PaymentController(),"saveUserPaymentRemovalReason"));
     	 httpPostRouteList.put("/administration/payment/user/pay", new Route(new PaymentController(),"pay"));
-
+    	 httpPostRouteList.put("/administration/payment/user/giftcard", new Route(new PaymentController(),"sendGiftCard"));
     }
     
     public boolean hasPath(String httpMethod,String url){

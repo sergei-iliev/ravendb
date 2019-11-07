@@ -1,10 +1,7 @@
 package com.luee.wally.admin.controller;
 
 import java.io.IOException;
-import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
@@ -20,15 +17,12 @@ import com.luee.wally.admin.repository.PaymentRepository;
 import com.luee.wally.admin.repository.SearchFilterTemplateRepository;
 import com.luee.wally.api.route.Controller;
 import com.luee.wally.api.service.PaymentService;
-import com.luee.wally.api.service.impex.ImportService;
 import com.luee.wally.command.PaidUserForm;
 import com.luee.wally.command.PaymentEligibleUserForm;
-import com.luee.wally.command.WebForm;
 import com.luee.wally.entity.RedeemingRequests;
 import com.luee.wally.entity.SearchFilterTemplate;
-import com.luee.wally.json.ExchangeRateVO;
+import com.luee.wally.exception.RestResponseException;
 import com.luee.wally.json.JSONUtils;
-import com.luee.wally.utils.Utilities;
 
 public class PaymentController implements Controller {
 	private final Logger logger = Logger.getLogger(CampaignSearchController.class.getName());
@@ -40,33 +34,48 @@ public class PaymentController implements Controller {
 
 		resp.getWriter().write(json);
 	}
+
+	public void sendGiftCard(HttpServletRequest req, HttpServletResponse resp) throws Exception {
+		String key = (String) req.getParameter("key");
+
+		PaymentService paymentService = new PaymentService();
+		try {
+			paymentService.sendGiftCard(key);
+			resp.getWriter().write("OK");
+		} catch (RestResponseException re) {
+			resp.getWriter().write(re.getResponseCode());
+			resp.getWriter().write(" ");
+			resp.getWriter().write(re.getResponseMessage());
+		}
+		catch(Exception e){
+			logger.log(Level.SEVERE,"",e);
+			resp.getWriter().write("Server error, check logs for details.");		
+		}
+	}
+
 	public void pay(HttpServletRequest req, HttpServletResponse resp) throws Exception {
-		
-		PaidUserForm form=PaidUserForm.parse(req);	
-		
-		PaymentRepository paymentRepository=new PaymentRepository();
-		//get redeeming request by key 
-		Entity redeemingRequests=paymentRepository.getRedeemingRequestsByKey(form.getKey());		
-		Entity paidUser=paymentRepository.getPaidUserByGuid((String)redeemingRequests.getProperty("user_guid"));
+
+		PaidUserForm form = PaidUserForm.parse(req);
+
+		PaymentRepository paymentRepository = new PaymentRepository();
+		// get redeeming request by key
+		Entity redeemingRequests = paymentRepository.getRedeemingRequestsByKey(form.getKey());
+		Entity paidUser = paymentRepository.getPaidUserByGuid((String) redeemingRequests.getProperty("user_guid"));
 		/*
 		 * Don't pay if already paid up
 		 */
-		if(paidUser!=null){
-		  //****DEBUG*****
-		  //Entity paidUser=new Entity("3456364346");
-		  //paidUser.setProperty("name","Geologia");
-		  //paidUser.setProperty("type","Amazon");
-			
+		if (paidUser != null) {
 			JSONUtils.writeObject(paidUser, Entity.class);
 			resp.getWriter().write(JSONUtils.writeObject(paidUser, Entity.class));
 			return;
 		}
-		
-		PaymentService paymentService=new PaymentService();
-		paymentService.pay(form,redeemingRequests);
-		resp.getWriter().write("OK");	
+
+		PaymentService paymentService = new PaymentService();
+		paymentService.pay(form, redeemingRequests);
+		resp.getWriter().write("OK");
 
 	}
+
 	public void index(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
 		PaymentEligibleUserForm form = new PaymentEligibleUserForm();
@@ -75,7 +84,6 @@ public class PaymentController implements Controller {
 		req.setAttribute("countries", this.getCountries());
 		req.getRequestDispatcher("/jsp/payment_eligible_users.jsp").forward(req, resp);
 	}
-
 
 	public void searchByFilterTemplate(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
@@ -100,15 +108,15 @@ public class PaymentController implements Controller {
 		req.setAttribute("webform", form);
 		req.setAttribute("entities", entities);
 		req.setAttribute("reasons", reasons);
-		req.setAttribute("paymentTypes",paymentService.getDefaultPaymentTypes());
-		req.setAttribute("defaultCurrencyCodes",paymentService.getDefaultCurrencyCodes());
+		req.setAttribute("paymentTypes", paymentService.getDefaultPaymentTypes());
+		req.setAttribute("defaultCurrencyCodes", paymentService.getDefaultCurrencyCodes());
 		req.setAttribute("countries", this.getCountries());
 		req.getRequestDispatcher("/jsp/payment_eligible_users.jsp").forward(req, resp);
 
 	}
 
 	public void search(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		
+
 		PaymentService paymentService = new PaymentService();
 
 		PaymentEligibleUserForm form = PaymentEligibleUserForm.parse(req);
@@ -118,59 +126,32 @@ public class PaymentController implements Controller {
 		PaymentRepository paymentRepository = new PaymentRepository();
 		Collection<String> reasons = paymentRepository.getUserPaymentsRemovalReasons();
 
-//		reasons.add("suspected fraud");
-//		reasons.add("payments through website only");
-//		reasons.add("no paypal account found");
-//		reasons.add("no amazon account found");
-//
-//		
-//		RedeemingRequests r = new RedeemingRequests();
-//		r.setKey("11122313123");
-//		r.setLink2("/administration/payment/test");
-//		r.setAmount("10");
-//		r.setCountryCode("US");
-//		r.setType("Google Play");
-//		r.setDate(new Date());
-//		r.setEmail("eee@ee.com");
-//		r.setUserGuid("11122313123");
-//		entities.add(r);
-//
-//		r = new RedeemingRequests();	
-//		r.setKey("9999999123");
-//		r.setLink2("/administration/payment/test");
-//		r.setAmount("10");
-//		r.setCountryCode("US");
-//		r.setType("Amazon");
-//		r.setDate(new Date());
-//		r.setEmail("eee@ee.com");
-//		r.setUserGuid("9999999123");
-//		entities.add(r);
+		List<String> removalReasons = new LinkedList<String>(reasons);
+		removalReasons.add(0, "");
 
-		List<String> removalReasons=new LinkedList<String>(reasons);
-		removalReasons.add(0,"");
-		
 		req.setAttribute("webform", form);
 		req.setAttribute("entities", entities);
 		req.setAttribute("reasons", removalReasons);
-		req.setAttribute("paymentTypes",paymentService.getDefaultPaymentTypes());
-		req.setAttribute("defaultCurrencyCodes",paymentService.getDefaultCurrencyCodes());
+		req.setAttribute("paymentTypes", paymentService.getDefaultPaymentTypes());
+		req.setAttribute("defaultCurrencyCodes", paymentService.getDefaultCurrencyCodes());
 		req.setAttribute("countries", this.getCountries());
 		req.getRequestDispatcher("/jsp/payment_eligible_users.jsp").forward(req, resp);
 
 	}
-	
-	public void saveUserPaymentRemovalReason(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+
+	public void saveUserPaymentRemovalReason(HttpServletRequest req, HttpServletResponse resp)
+			throws ServletException, IOException {
 		PaymentService paymentService = new PaymentService();
-		String key=req.getParameter("key");
-		String reason=req.getParameter("reason");
-		
+		String key = req.getParameter("key");
+		String reason = req.getParameter("reason");
+
 		try {
-			paymentService.saveUserPaymentRemovalReason(key,reason);
-		} catch (EntityNotFoundException e) {			
-			logger.log(Level.SEVERE,"Unable to find entity",e);
-		    throw new ServletException(e);	
+			paymentService.saveUserPaymentRemovalReason(key, reason);
+		} catch (EntityNotFoundException e) {
+			logger.log(Level.SEVERE, "Unable to find entity", e);
+			throw new ServletException(e);
 		}
-		
+
 		resp.getWriter().write("OK");
 	}
 }

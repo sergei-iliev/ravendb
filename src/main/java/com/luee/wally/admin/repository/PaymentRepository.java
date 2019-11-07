@@ -30,8 +30,9 @@ import com.luee.wally.entity.RedeemingRequests;
 import com.luee.wally.entity.SearchFilterTemplate;
 
 public class PaymentRepository extends AbstractRepository{
-	private final Logger logger = Logger.getLogger(PaymentRepository.class.getName());
+	  private final Logger logger = Logger.getLogger(PaymentRepository.class.getName());
 	
+	  
 	  public Entity getRedeemingRequestsByKey(String _key){
 		     Key key=KeyFactory.stringToKey(_key);
 		     DatastoreService ds = createDatastoreService(Consistency.STRONG);		     
@@ -157,7 +158,6 @@ public class PaymentRepository extends AbstractRepository{
 			}else{
 				query.setFilter(predicates.iterator().next());
 			}
-			
 			return query.addSort("date",SortDirection.ASCENDING);	
 		}
 }

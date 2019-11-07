@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.luee.wally.api.route.Router;
+import com.luee.wally.utils.TestDatabase;
 import com.luee.wally.utils.Utilities;
 
 
@@ -23,6 +24,7 @@ public class AdminFilter implements Filter {
 	private final Logger logger = Logger.getLogger(AdminFilter.class.getName());
 	
     public AdminFilter() {
+      // TestDatabase.INSTANCE.generateDB();
     }
  
     @Override

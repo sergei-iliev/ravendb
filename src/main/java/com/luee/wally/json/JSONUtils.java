@@ -33,6 +33,8 @@ public class JSONUtils {
         return mapper.writeValueAsString(map);       
     }
 
-
+    public static  String convertToString(Object o) throws JsonProcessingException{
+        return mapper.writeValueAsString(o);
+    }
 
 }

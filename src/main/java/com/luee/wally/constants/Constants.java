@@ -31,4 +31,18 @@ public interface Constants {
 	public static final String PASSWORD="1";
 	
 	public static final int CURSOR_SIZE=1000;
+	
+	
+	/*****************Gift Card*********************************/
+	public static final String CUSTOMER_NAME="BackedSoft";	
+	public static final String ACCOUNT_NAME="BackedSoft";
+	
+	public static final String ACCOUNT_EMAIL="admin@softbakedapps.com";
+	
+	public static final String PLATFORM_IDENTIFIER ="SoftBakedAppsTest";
+	public static final String PLATFORM_KEY="cJouiuWlNHJQQgKYXRCDoejyepZ$jeGnVSEx$KD?DdW";
+	
+	public static final String EMAIL_TEMPLATE_SUBJECT ="Your reward from %s!";
+	public static final String EMAIL_TEMPLATE_MESSAGE ="Congratulations! You just received your reward from %s.";
+	
 }

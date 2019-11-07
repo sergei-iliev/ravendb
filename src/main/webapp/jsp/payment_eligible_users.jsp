@@ -194,7 +194,14 @@
 								<td>${entity.userGuid}</td>
 								<td>${entity.date}</td>
 								<td>${entity.amount}</td>
-								<td>${entity.type}</td>
+								<td>
+								${entity.type} 								
+								<c:if test="${entity.amazonType eq true}">
+								   <br>
+								   <button type="button" class="btn btn-primary btn-sm" 
+									  pay-gc-button="true" data-entitykey="${entity.key}" data-amount="${entity.amount}">Send GC</button>
+							    </c:if>								
+								</td>
 								<td>${entity.email}</td>
 								<td>${entity.countryCode}</td>
 								<td>${entity.paypalAccount}</td>

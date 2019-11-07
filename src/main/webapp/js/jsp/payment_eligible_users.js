@@ -7,6 +7,40 @@ payment.PaymentEligibleUsersView = Backbone.View.extend({
   initialize: function(){
 	  $('[data-toggle="tooltip"]').tooltip();	
 
+	  //********send gift card
+	  $('[pay-gc-button="true"]').click(function(e) {	
+		  e.preventDefault();
+		  var key = $(this).data('entitykey');
+		  var amount = Number($(this).data('amount'));
+		  if(amount>50){
+			  var result = confirm("Are you sure you want to send the user a gift card of 50");
+		      if(!result){
+		    	  return;
+		      }
+		  }
+		  $(e.target).prop('disabled', true);
+		  var formData={
+			   key:key					
+		  };
+		  $.ajax({
+			    url:'/administration/payment/user/giftcard',
+			    type:'post',
+			    data:formData,
+			    success: function(data, textStatus, jQxhr ){			        
+			        var result=data;
+			        $(e.target).css("background-color","green");
+			        if(!data.startsWith("OK")){
+			        	alert(data);
+			        }
+			    },
+			    error: function( jqXhr, textStatus, errorThrown ){
+			    	$(e.target).css("background-color","red");
+			        console.log( errorThrown );
+			    }
+			  
+			});
+		
+	  });
 	  
 	  $('[paid-button="true"]').click(function(e) {	  
 		  e.preventDefault();
@@ -97,31 +131,7 @@ payment.PaymentEligibleUsersView = Backbone.View.extend({
 			  
 			  
 		  });
-		  
-/*		  
-		  var url = $(this).data('href');
-		  //console.log(url);
-		  //window.open(url, '_blank');
-	      $(e.target).prop('disabled', true);
-		  $.ajax({
-			    url: url,
-			    type: 'get',			    	   
-			    success: function(data, textStatus, jQxhr ){			        
-			        //var result=JSON.parse(data);
-			        var result=data;
-			    	if(result.email_sent_successfully&&result.paid_successfully){
-			  		  $(e.target.parentNode.parentNode).css('background-color','#c9cbcf');	
-			        }else{
-			          $(e.target.parentNode.parentNode).css('background-color','#ff0000');
-			          alert("paid_successfully: "+result.paid_successfully+"\r\n"+"email_sent_successfully: "+result.email_sent_successfully);
-			        }			        
-			    },
-			    error: function( jqXhr, textStatus, errorThrown ){
-			        console.log( errorThrown );
-			    }
-			  
-			});
-*/			
+		  			
 	  } );
 	  
 	  $('[remove-reason-button="true"]').click(function(e) {		  

@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.UUID;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -13,13 +14,21 @@ import javax.servlet.ServletException;
 
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.EntityNotFoundException;
+import com.luee.wally.admin.repository.GiftCardRepository;
 import com.luee.wally.admin.repository.PaymentRepository;
 import com.luee.wally.api.service.impex.ImportService;
 import com.luee.wally.command.PaidUserForm;
 import com.luee.wally.command.PaymentEligibleUserForm;
+import com.luee.wally.constants.Constants;
+import com.luee.wally.entity.GiftCardCountryCode;
 import com.luee.wally.entity.RedeemingRequests;
+import com.luee.wally.exception.RestResponseException;
 import com.luee.wally.json.ExchangeRateVO;
 import com.luee.wally.utils.Utilities;
+import com.tangocard.raas.exceptions.RaasGenericException;
+import com.tangocard.raas.models.CreateOrderRequestModel;
+import com.tangocard.raas.models.NameEmailModel;
+import com.tangocard.raas.models.OrderModel;
 
 public class PaymentService {
 	private final Logger logger = Logger.getLogger(PaymentService.class.getName());
@@ -30,6 +39,27 @@ public class PaymentService {
 	}
 	public Collection<String> getDefaultCurrencyCodes(){
 		return Arrays.asList("USD","EUR","CAD","AUD","GBP");
+	}
+	
+	public void sendGiftCard(String key) throws RestResponseException{
+		PaymentRepository paymentRepository=new PaymentRepository();
+		GiftCardRepository giftCardRepository=new GiftCardRepository();
+		
+		Entity entity=paymentRepository.getRedeemingRequestsByKey(key);
+		RedeemingRequests redeemingRequests=RedeemingRequests.valueOf(entity);
+		
+		
+		entity=giftCardRepository.getGiftCardCountryCodeMapping(redeemingRequests.getCountryCode());
+		GiftCardCountryCode giftCardCountryCode=GiftCardCountryCode.valueOf(entity);
+		
+		entity=giftCardRepository.getPackageNameTitleMapping(redeemingRequests.getPackageName());
+		if(entity==null){
+			throw new RestResponseException(100, "No title in package to title mapping table.");			
+		}
+		
+		GiftCardService giftCardService=new GiftCardService();		
+		OrderModel order=giftCardService.sendGiftCard(redeemingRequests, giftCardCountryCode.getUnitid(),(String)entity.getProperty("title"));
+		
 	}
 	
 	public void pay(PaidUserForm form,Entity redeemingRequests) throws Exception{
