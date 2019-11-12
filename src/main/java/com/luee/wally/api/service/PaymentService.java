@@ -56,10 +56,16 @@ public class PaymentService {
 		if(entity==null){
 			throw new RestResponseException(100, "No title in package to title mapping table.");			
 		}
+		//check if gift card already sent
+		Entity giftCardOrder=giftCardRepository.getGiftCardOrder(redeemingRequests.getRedeemingRequestId());
+		if(giftCardOrder!=null){
+			throw new RestResponseException(100, "Gift card already sent!");				
+		}
 		
-		GiftCardService giftCardService=new GiftCardService();		
+		GiftCardService giftCardService=new GiftCardService();				
 		OrderModel order=giftCardService.sendGiftCard(redeemingRequests, giftCardCountryCode.getUnitid(),(String)entity.getProperty("title"));
-		
+		//save gift card order reference id
+		giftCardRepository.saveGiftCardOrder(redeemingRequests.getRedeemingRequestId(), order.getReferenceOrderID());
 	}
 	
 	public void pay(PaidUserForm form,Entity redeemingRequests) throws Exception{

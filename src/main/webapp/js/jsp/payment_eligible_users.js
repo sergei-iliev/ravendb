@@ -28,9 +28,12 @@ payment.PaymentEligibleUsersView = Backbone.View.extend({
 			    data:formData,
 			    success: function(data, textStatus, jQxhr ){			        
 			        var result=data;
-			        $(e.target).css("background-color","green");
+			        
 			        if(!data.startsWith("OK")){
+			        	$(e.target).css("background-color","red");
 			        	alert(data);
+			        }else{
+			        	$(e.target).css("background-color","green");
 			        }
 			    },
 			    error: function( jqXhr, textStatus, errorThrown ){

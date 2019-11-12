@@ -48,13 +48,15 @@ public class GiftCardService {
 	    createOrderRequestModel.setEmailSubject(String.format(Constants.EMAIL_TEMPLATE_SUBJECT,from));
 
 	    NameEmailModel senderNameEmailModel = new NameEmailModel();
-	    senderNameEmailModel.setFirstName("Gil");
-	    senderNameEmailModel.setLastName("Gil");
+	    senderNameEmailModel.setFirstName(from);
+	    senderNameEmailModel.setLastName("");
 	    senderNameEmailModel.setEmail(Constants.ACCOUNT_EMAIL);
 	    createOrderRequestModel.setSender(senderNameEmailModel);
 	    
 		try {
-			return raasClient.getOrders().createOrder(createOrderRequestModel);		
+			OrderModel orderModel= raasClient.getOrders().createOrder(createOrderRequestModel);
+			
+			return orderModel;
 		} catch (Throwable e) {
 			if(e instanceof RaasGenericException){
 			  try{

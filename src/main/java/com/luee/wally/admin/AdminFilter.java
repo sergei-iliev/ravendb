@@ -24,7 +24,7 @@ public class AdminFilter implements Filter {
 	private final Logger logger = Logger.getLogger(AdminFilter.class.getName());
 	
     public AdminFilter() {
-      // TestDatabase.INSTANCE.generateDB();
+       TestDatabase.INSTANCE.generateDB();
     }
  
     @Override

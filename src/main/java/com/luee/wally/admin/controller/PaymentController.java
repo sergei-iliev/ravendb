@@ -43,8 +43,8 @@ public class PaymentController implements Controller {
 			paymentService.sendGiftCard(key);
 			resp.getWriter().write("OK");
 		} catch (RestResponseException re) {
-			resp.getWriter().write(re.getResponseCode());
-			resp.getWriter().write(" ");
+			resp.getWriter().write(String.valueOf(re.getResponseCode()));
+			resp.getWriter().write(":");
 			resp.getWriter().write(re.getResponseMessage());
 		}
 		catch(Exception e){

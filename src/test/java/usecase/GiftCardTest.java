@@ -159,13 +159,13 @@ public class GiftCardTest {
 //       }
        
        
-       String externalRefId = UUID.randomUUID().toString();
+       String externalRefId = "U100001";//UUID.randomUUID().toString();
        
        NameEmailModel recipientNameEmailModel = new NameEmailModel();
        recipientNameEmailModel.setFirstName("Gil");
        recipientNameEmailModel.setLastName("Iliev");
-       //recipientNameEmailModel.setEmail("sergei.iliev@gmail.com");
-       recipientNameEmailModel.setEmail("gil.mincberg@gmail.com");
+       recipientNameEmailModel.setEmail("sergei.iliev@gmail.com");
+       //recipientNameEmailModel.setEmail("gil.mincberg@gmail.com");
        
        CreateOrderRequestModel createOrderRequestModel = new CreateOrderRequestModel();
        createOrderRequestModel.setExternalRefID(externalRefId);

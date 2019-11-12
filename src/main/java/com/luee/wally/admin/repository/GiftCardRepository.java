@@ -1,5 +1,7 @@
 package com.luee.wally.admin.repository;
 
+import java.util.Date;
+
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.PreparedQuery;
@@ -25,5 +27,25 @@ public class GiftCardRepository extends AbstractRepository {
 			 PreparedQuery pq = ds.prepare(query);
 			 return pq.asSingleEntity();			 
 	  }
+	  
+	  public void saveGiftCardOrder(String redeemingRequestId,String referenceOrderId){
+		     DatastoreService ds = createDatastoreService(Consistency.STRONG);
+		  	         
+			 Entity entity=new Entity("tango_cards_purchased");				 
+			 entity.setIndexedProperty("redeeming_request_id",redeemingRequestId);
+			 entity.setProperty("date", new Date());
+			 entity.setIndexedProperty("reference_order_id",referenceOrderId);
+			 ds.put(entity);
+	  }
+	  
+	  public Entity getGiftCardOrder(String redeemingRequestId){
+		     DatastoreService ds = createDatastoreService(Consistency.STRONG);
+			 
+		     Query query = new Query("tango_cards_purchased");
+		     query.setFilter(new FilterPredicate("redeeming_request_id", FilterOperator.EQUAL, redeemingRequestId));
+			 PreparedQuery pq = ds.prepare(query);
+			 return pq.asSingleEntity();
+	  }
+	  
 	  
 }
