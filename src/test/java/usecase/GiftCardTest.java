@@ -74,19 +74,28 @@ public class GiftCardTest {
 
 		helper.tearDown();
 	}
-	
+	@Test
+	public void getCatalogTest() throws Throwable {
+		   RaasClient raasClient=new  RaasClient(Constants.PLATFORM_IDENTIFIER,Constants.PLATFORM_KEY);
+		   CatalogModel catalogModel = raasClient.getCatalog().getCatalog();
+		   
+	       System.out.println(json(catalogModel));
+
+	}
 	@Test
 	public void createUserGiftCardTest() throws Throwable {
 	   RaasClient raasClient=new  RaasClient(Constants.PLATFORM_IDENTIFIER,Constants.PLATFORM_KEY);
-//	   CatalogModel catalogModel = raasClient.getCatalog().getCatalog();
-//       System.out.println(catalogModel.getCatalogName());
-//       catalogModel.getBrands().forEach(a->{
-//    	   System.out.println(a.getBrandName()+","+a.getImageUrls());
-//    	   a.getItems().forEach(i->{
-//    		   System.out.println("---"+i.getUtid());  
-//    	   });
-//    	  
-//       });
+	   CatalogModel catalogModel = raasClient.getCatalog().getCatalog();
+       System.out.println(catalogModel.getCatalogName());
+       catalogModel.getBrands().forEach(a->{
+    	   System.out.println(a.getBrandName()+","+a.getImageUrls());
+    	   a.getItems().forEach(i->{
+    		   System.out.println("---"+i.getUtid());  
+    	   });
+    	  
+       });
+       
+       
 //     //create customers
 //       String customerIdentifier = Constants.CUSTOMER_NAME;
 //       

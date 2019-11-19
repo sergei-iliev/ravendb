@@ -197,9 +197,11 @@
 								<td>
 								${entity.type} 								
 								<c:if test="${entity.amazonType eq true}">
-								   <br>
-								   <button type="button" class="btn btn-primary btn-sm" 
+								  <c:if test="${isSendGCVisible eq true}">
+								    <br>
+								    <button type="button" class="btn btn-primary btn-sm" 
 									  pay-gc-button="true" data-entitykey="${entity.key}" data-amount="${entity.amount}">Send GC</button>
+								  </c:if>	   
 							    </c:if>								
 								</td>
 								<td>${entity.email}</td>

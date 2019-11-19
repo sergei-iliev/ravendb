@@ -13,6 +13,7 @@ public enum TestDatabase {
 		createRedeemingRequests();
 		createAmazonGiftCardMap();
 		createPackageNameTitleMapping();
+		createApplicationSettings();
 	}
 	private  void createRedeemingRequests(){
 		createRedeemingRequestEntity("Sergey Iliev","15b5-4e3a-b398-8792a9a9f530","48bb2675-a072-4b6b-ab66-cb599a29147d", "12", new Date(), "com.moregames.makemoney", "PayPal", "sergei_iliev@yahoo.com", "US");		
@@ -109,7 +110,7 @@ public enum TestDatabase {
 
 	}
 	
-	public static void createPackageNameTitleMapping(){
+	public  void createPackageNameTitleMapping(){
 		DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
 		Entity entity = new Entity("package_name_title_mapping");	
 		entity.setIndexedProperty("package_name","com.moregames.makemoney");
@@ -124,6 +125,14 @@ public enum TestDatabase {
 		entity = new Entity("package_name_title_mapping");	
 		entity.setIndexedProperty("package_name","com.matchmine.app");
 		entity.setIndexedProperty("title","Match Mine");
+		ds.put(entity);
+	}
+	
+	public  void createApplicationSettings(){
+		DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
+		Entity entity = new Entity("application_settings");	
+		entity.setIndexedProperty("name","SHOW_TANGO_GIFT_CARD");
+		entity.setIndexedProperty("value","false");
 		ds.put(entity);
 	}
 }

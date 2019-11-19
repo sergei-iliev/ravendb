@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -13,6 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.EntityNotFoundException;
+import com.luee.wally.admin.repository.ApplicationSettingsRepository;
 import com.luee.wally.admin.repository.PaymentRepository;
 import com.luee.wally.admin.repository.SearchFilterTemplateRepository;
 import com.luee.wally.api.route.Controller;
@@ -105,6 +107,10 @@ public class PaymentController implements Controller {
 		PaymentRepository paymentRepository = new PaymentRepository();
 		Collection<String> reasons = paymentRepository.getUserPaymentsRemovalReasons();
 
+		ApplicationSettingsRepository applicationSettingsRepository=new ApplicationSettingsRepository();
+		Map<String,String> map=applicationSettingsRepository.getApplicationSettings();
+		
+		req.setAttribute("isSendGCVisible", Boolean.valueOf(map.get(ApplicationSettingsRepository.SHOW_TANGO_GIFT_CARD)));
 		req.setAttribute("webform", form);
 		req.setAttribute("entities", entities);
 		req.setAttribute("reasons", reasons);
@@ -129,6 +135,11 @@ public class PaymentController implements Controller {
 		List<String> removalReasons = new LinkedList<String>(reasons);
 		removalReasons.add(0, "");
 
+		ApplicationSettingsRepository applicationSettingsRepository=new ApplicationSettingsRepository();
+		Map<String,String> map=applicationSettingsRepository.getApplicationSettings();
+
+		
+		req.setAttribute("isSendGCVisible", Boolean.valueOf(map.get(ApplicationSettingsRepository.SHOW_TANGO_GIFT_CARD)));		
 		req.setAttribute("webform", form);
 		req.setAttribute("entities", entities);
 		req.setAttribute("reasons", removalReasons);
