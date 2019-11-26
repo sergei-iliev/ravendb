@@ -18,7 +18,7 @@ import com.tangocard.raas.models.NameEmailModel;
 import com.tangocard.raas.models.OrderModel;
 
 public class GiftCardService {
-	private final Logger logger = Logger.getLogger(GiftCardService.class.getName());
+	private final static Logger logger = Logger.getLogger(GiftCardService.class.getName());
 
 	
 	public OrderModel sendGiftCard(RedeemingRequests redeemingRequests,String unitid,String from)throws RestResponseException{

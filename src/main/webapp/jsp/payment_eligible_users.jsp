@@ -202,7 +202,15 @@
 								    <button type="button" class="btn btn-primary btn-sm" 
 									  pay-gc-button="true" data-entitykey="${entity.key}" data-amount="${entity.amount}">Send GC</button>
 								  </c:if>	   
-							    </c:if>								
+							    </c:if>
+								<c:if test="${entity.payPalType eq true}">
+								  
+								    <br>
+								    <button type="button" class="btn btn-primary btn-sm" 
+									  pay-paypal-button="true" data-entitykey="${entity.key}" data-amount="${entity.amount}">PayPal</button>
+								 	   
+							    </c:if>
+							    								
 								</td>
 								<td>${entity.email}</td>
 								<td>${entity.countryCode}</td>

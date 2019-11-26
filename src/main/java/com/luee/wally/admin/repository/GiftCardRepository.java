@@ -27,7 +27,7 @@ public class GiftCardRepository extends AbstractRepository {
 			 PreparedQuery pq = ds.prepare(query);
 			 return pq.asSingleEntity();			 
 	  }
-	  
+	  /*
 	  public void saveGiftCardOrder(String redeemingRequestId,String referenceOrderId){
 		     DatastoreService ds = createDatastoreService(Consistency.STRONG);
 		  	         
@@ -37,7 +37,8 @@ public class GiftCardRepository extends AbstractRepository {
 			 entity.setIndexedProperty("reference_order_id",referenceOrderId);
 			 ds.put(entity);
 	  }
-	  
+	  */
+	  /*
 	  public Entity getGiftCardOrder(String redeemingRequestId){
 		     DatastoreService ds = createDatastoreService(Consistency.STRONG);
 			 
@@ -46,6 +47,6 @@ public class GiftCardRepository extends AbstractRepository {
 			 PreparedQuery pq = ds.prepare(query);
 			 return pq.asSingleEntity();
 	  }
-	  
+	  */
 	  
 }

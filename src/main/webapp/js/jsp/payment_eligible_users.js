@@ -7,6 +7,35 @@ payment.PaymentEligibleUsersView = Backbone.View.extend({
   initialize: function(){
 	  $('[data-toggle="tooltip"]').tooltip();	
 
+	  //********PayPal
+	  $('[pay-paypal-button="true"]').click(function(e) {
+		  e.preventDefault();
+		  var key = $(this).data('entitykey');
+		  $(e.target).prop('disabled', true);
+		  var formData={
+			   key:key					
+		  };
+		  $.ajax({
+			    url:'/administration/payment/user/paypal',
+			    type:'post',
+			    data:formData,
+			    success: function(data, textStatus, jQxhr ){			        
+			        var result=data;
+			        
+			        if(!data.startsWith("OK")){
+			        	$(e.target).css("background-color","red");
+			        	alert(data);
+			        }else{
+			        	$(e.target).css("background-color","green");
+			        }
+			    },
+			    error: function( jqXhr, textStatus, errorThrown ){
+			    	$(e.target).css("background-color","red");
+			        console.log( errorThrown );
+			    }
+			  
+			});
+	  });
 	  //********send gift card
 	  $('[pay-gc-button="true"]').click(function(e) {	
 		  e.preventDefault();

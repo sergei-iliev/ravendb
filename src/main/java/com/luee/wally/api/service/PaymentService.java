@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.UUID;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -57,19 +58,28 @@ public class PaymentService {
 			throw new RestResponseException(100, "No title in package to title mapping table.");			
 		}
 		//check if gift card already sent
-		Entity giftCardOrder=giftCardRepository.getGiftCardOrder(redeemingRequests.getRedeemingRequestId());
+		Entity giftCardOrder=paymentRepository.getPaidUserByRedeemingRequestId(redeemingRequests.getRedeemingRequestId());
 		if(giftCardOrder!=null){
 			throw new RestResponseException(100, "Gift card already sent!");				
 		}
 		
 		GiftCardService giftCardService=new GiftCardService();				
 		OrderModel order=giftCardService.sendGiftCard(redeemingRequests, giftCardCountryCode.getUnitid(),(String)entity.getProperty("title"));
+		//convert currency to EUR
+		BigDecimal eurAmount;
+		try{
+			eurAmount = paymentRepository.convert(Double.parseDouble(redeemingRequests.getAmount()), giftCardCountryCode.getCurrency());
+		}catch(Exception e){
+			logger.log(Level.SEVERE,"Currency converter for : "+giftCardCountryCode.getCurrency(),e);
+			throw new RestResponseException(100, "Unable to convert currency");	
+		}
 		//save gift card order reference id
-		giftCardRepository.saveGiftCardOrder(redeemingRequests.getRedeemingRequestId(), order.getReferenceOrderID());
+		paymentRepository.saveGiftCardPayment(redeemingRequests, giftCardCountryCode.getCurrency(), eurAmount, order.getReferenceOrderID());
 	}
 	
 	public void pay(PaidUserForm form,Entity redeemingRequests) throws Exception{
 		PaymentRepository paymentRepository=new PaymentRepository();
+		/*
 		BigDecimal rateValue=BigDecimal.ONE;
 		
 		if(!form.getCurrencyCode().equals("EUR")){
@@ -81,7 +91,8 @@ public class PaymentService {
 		
 		BigDecimal currentValue = new BigDecimal(form.getAmount());		
 		BigDecimal eurAmount = currentValue.divide(rateValue,2, BigDecimal.ROUND_HALF_EVEN);
-
+		*/
+		BigDecimal eurAmount = paymentRepository.convert(form.getAmount(), form.getCurrencyCode());
 		paymentRepository.saveUserPayment(form,redeemingRequests,eurAmount);
 
 	}
@@ -117,21 +128,6 @@ public class PaymentService {
     	//sort by date
     	return result.stream().sorted(Comparator.comparing(RedeemingRequests::getDate)).collect(Collectors.toList());
     	
-    	
-//    	PaymentRepository paymentRepository=new PaymentRepository();
-//        paymentRepository.findEligibleUsers();
-//        
-//        Collection<RedeemingRequests> r=new ArrayList<RedeemingRequests>();
-//        
-//        RedeemingRequests req=new RedeemingRequests();
-//        req.setAmount("23");
-//        req.setCountryCode("US");
-//        req.setEmail("garcia");
-//        req.setPaypalAccount("serto@ggg.com");
-//        req.setType("PayPal");
-//        req.setUserGuid("3453434567547567");
-//        r.add(req);
-//        return r;
     }
 
 

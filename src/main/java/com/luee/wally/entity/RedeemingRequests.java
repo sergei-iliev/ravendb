@@ -167,4 +167,8 @@ public class RedeemingRequests {
 	public boolean isAmazonType() {
 		return type.equalsIgnoreCase("amazon");
 	}
+	@JsonIgnore
+	public boolean isPayPalType() {
+		return type.equalsIgnoreCase("paypal");
+	}	
 }

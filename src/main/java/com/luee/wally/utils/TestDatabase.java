@@ -14,13 +14,14 @@ public enum TestDatabase {
 		createAmazonGiftCardMap();
 		createPackageNameTitleMapping();
 		createApplicationSettings();
+		createPayPalCurrencyMap();
 	}
 	private  void createRedeemingRequests(){
-		createRedeemingRequestEntity("Sergey Iliev","15b5-4e3a-b398-8792a9a9f530","48bb2675-a072-4b6b-ab66-cb599a29147d", "12", new Date(), "com.moregames.makemoney", "PayPal", "sergei_iliev@yahoo.com", "US");		
-		createRedeemingRequestEntity("Minko","696f-4258-baef-55b6aa6550b1","ffff2675-a072-4b6b-ab66-cb599a29147d", "14", new Date(), "com.moregames.makemoney", "PayPal", "sergei_iliev@yahoo.com", "US");
-		createRedeemingRequestEntity("Viola","e701-4678-8d39-0c2485204f3b","aaaa2675-a072-4b6b-ab66-cb599a29147d", "24", new Date(), "com.moregames.makemoney", "Amazon", "sergei_iliev@yahoo.com", "GB");		
-		createRedeemingRequestEntity("Spas","90dd-47a1-9b47-a8892a20c7e9","bbbb2675-a072-4b6b-ab66-cb599a29147d", "27", new Date(), "com.moregames.makemoney", "Amazon", "sergei.iliev@gmail.com", "US");
-		createRedeemingRequestEntity("Gurmen","8957-48bb-a08c-de0adca6a91e","cccc1675-a072-4b6b-ab66-cb599a29147d", "3", new Date(), "com.moregames.makemoney", "Amazon", "sergei.iliev@gmail.com", "DE");		
+		createRedeemingRequestEntity("Sergey Iliev","15b5-4e3a-b398-8792a9a9f530","48bb2675-a072-4b6b-ab66-cb599a29147d", "1.1", new Date(), "com.moregames.makemoney", "PayPal", "sergei.iliev-facilitator@gmail.com", "US");		
+		createRedeemingRequestEntity("Minko","696f-4258-baef-55b6aa6550b1","ffff2675-a072-4b6b-ab66-cb599a29147d", "1.1", new Date(), "com.moregames.makemoney", "PayPal", "sergei.iliev-facilitator@gmail.com", "US");
+		createRedeemingRequestEntity("Viola","e701-4678-8d39-0c2485204f3b","aaaa2675-a072-4b6b-ab66-cb599a29147d", "1.1", new Date(), "com.moregames.makemoney", "Amazon", "sergei_iliev@yahoo.com", "GB");		
+		createRedeemingRequestEntity("Spas","90dd-47a1-9b47-a8892a20c7e9","bbbb2675-a072-4b6b-ab66-cb599a29147d", "1.1", new Date(), "com.moregames.makemoney", "Amazon", "sergei.iliev@gmail.com", "US");
+		createRedeemingRequestEntity("Gurmen","8957-48bb-a08c-de0adca6a91e","cccc1675-a072-4b6b-ab66-cb599a29147d", "1.1", new Date(), "com.moregames.makemoney", "Amazon", "sergei.iliev@gmail.com", "DE");		
 	}
 	private  void createRedeemingRequestEntity(String fullName,String redeemingRequestId,String userGuid,String amount,Date date,String packageName,String type,String paypalAccount,String countryCode){
 		DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
@@ -42,7 +43,54 @@ public enum TestDatabase {
 
 		
 	}
-	
+	private  void createPayPalCurrencyMap(){
+		DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
+		Entity entity = new Entity("paypal_country_code_mapping");	
+		entity.setIndexedProperty("country_code","US");
+		entity.setIndexedProperty("currency","USD");
+		ds.put(entity);
+		
+		entity = new Entity("paypal_country_code_mapping");	
+		entity.setIndexedProperty("country_code","GB");
+		entity.setIndexedProperty("currency","GBP");
+		ds.put(entity);
+		
+		entity = new Entity("paypal_country_code_mapping");	
+		entity.setIndexedProperty("country_code","UK");
+		entity.setIndexedProperty("currency","GBP");
+		ds.put(entity);
+
+		entity = new Entity("paypal_country_code_mapping");	
+		entity.setIndexedProperty("country_code","CA");
+		entity.setIndexedProperty("currency","CAD");
+		ds.put(entity);
+		
+		entity = new Entity("paypal_country_code_mapping");	
+		entity.setIndexedProperty("country_code","DE");
+		entity.setIndexedProperty("currency","EUR");
+		ds.put(entity);
+		
+		entity = new Entity("paypal_country_code_mapping");	
+		entity.setIndexedProperty("country_code","FR");
+		entity.setIndexedProperty("currency","EUR");
+		ds.put(entity);
+
+		entity = new Entity("paypal_country_code_mapping");	
+		entity.setIndexedProperty("country_code","ES");
+		entity.setIndexedProperty("currency","EUR");
+		ds.put(entity);
+
+		entity = new Entity("paypal_country_code_mapping");	
+		entity.setIndexedProperty("country_code","IT");
+		entity.setIndexedProperty("currency","EUR");
+		ds.put(entity);
+		
+		entity = new Entity("paypal_country_code_mapping");	
+		entity.setIndexedProperty("country_code","RU");
+		entity.setIndexedProperty("currency","USD");
+		ds.put(entity);		
+
+	}
 	private  void createAmazonGiftCardMap(){
 		DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
 		Entity entity = new Entity("tango_card_country_code_mapping");	
@@ -132,7 +180,7 @@ public enum TestDatabase {
 		DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
 		Entity entity = new Entity("application_settings");	
 		entity.setIndexedProperty("name","SHOW_TANGO_GIFT_CARD");
-		entity.setIndexedProperty("value","false");
+		entity.setIndexedProperty("value","true");
 		ds.put(entity);
 	}
 }

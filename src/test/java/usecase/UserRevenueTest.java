@@ -30,10 +30,10 @@ import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 import com.luee.wally.DB;
 import com.luee.wally.admin.controller.ImportController;
 import com.luee.wally.api.ConnectionMgr;
+import com.luee.wally.api.service.InvoiceService;
 import com.luee.wally.api.service.impex.ImportService;
 import com.luee.wally.csv.PaidUsers2018;
 import com.luee.wally.json.ExchangeRateVO;
-import com.luee.wally.paypal.InvoiceService;
 
 public class UserRevenueTest {
 

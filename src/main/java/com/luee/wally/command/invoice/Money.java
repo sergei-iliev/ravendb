@@ -1,4 +1,4 @@
-package com.luee.wally.paypal;
+package com.luee.wally.command.invoice;
 
 public class Money {
 	

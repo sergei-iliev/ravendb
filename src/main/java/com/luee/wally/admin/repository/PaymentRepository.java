@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -24,14 +23,54 @@ import com.google.appengine.api.datastore.Query.FilterPredicate;
 import com.google.appengine.api.datastore.Query.SortDirection;
 import com.google.appengine.api.datastore.QueryResultList;
 import com.google.appengine.api.datastore.ReadPolicy.Consistency;
+import com.luee.wally.api.service.impex.ImportService;
 import com.luee.wally.command.PaidUserForm;
 import com.luee.wally.constants.Constants;
 import com.luee.wally.entity.RedeemingRequests;
-import com.luee.wally.entity.SearchFilterTemplate;
+import com.luee.wally.json.ExchangeRateVO;
+import com.luee.wally.utils.Utilities;
 
 public class PaymentRepository extends AbstractRepository{
 	  private final Logger logger = Logger.getLogger(PaymentRepository.class.getName());
 	
+	  public BigDecimal convert(double amount,String currencyCode) throws Exception{
+			BigDecimal rateValue=BigDecimal.ONE;
+			
+			if(!currencyCode.equals("EUR")){
+				 String formatedDate=Utilities.formatedDate(new Date(),"yyyy-MM-dd");
+				 ImportService importService=new ImportService();
+				 ExchangeRateVO rate=importService.getExchangeRates(formatedDate,"EUR",currencyCode);
+				 rateValue = BigDecimal.valueOf(rate.getRates().get(currencyCode));
+			}
+			
+			BigDecimal currentValue = new BigDecimal(amount);
+			BigDecimal eurAmount = currentValue.divide(rateValue,2, BigDecimal.ROUND_HALF_EVEN);
+			
+			return eurAmount;
+	  }
+	  public String getPayPalCurrencyCode(String countryCode){		     
+		     DatastoreService ds = createDatastoreService(Consistency.STRONG);
+		     Query query = new Query("paypal_country_code_mapping");
+		     query.setFilter(new FilterPredicate("country_code", FilterOperator.EQUAL, countryCode));
+			 PreparedQuery pq = ds.prepare(query);
+			 
+			 return (String)pq.asSingleEntity().getProperty("currency");			 
+	  }
+	  
+	  public  Entity getRedeemingRequestsByUserGuid(String userGuid) {
+		  DatastoreService ds = createDatastoreService(Consistency.EVENTUAL);	
+
+
+			Filter userGuidFilter = new FilterPredicate("user_guid",
+	                FilterOperator.EQUAL,
+	                userGuid);
+
+			Query q = new Query("redeeming_requests_new");
+			q.setFilter(userGuidFilter);
+			PreparedQuery pq = ds.prepare(q);
+			Entity e = pq.asSingleEntity();
+			return e;
+	  }
 	  
 	  public Entity getRedeemingRequestsByKey(String _key){
 		     Key key=KeyFactory.stringToKey(_key);
@@ -43,14 +82,69 @@ public class PaymentRepository extends AbstractRepository{
 		     }
 	  }
 	  
-	  public Entity getPaidUserByGuid(String user_guid){
+	  public Entity getPaidUserByGuid(String userGuid){
 		     DatastoreService ds = createDatastoreService(Consistency.STRONG);		     
 		     Query query = new Query("paid_users");
-		     query.setFilter(new FilterPredicate("user_guid", FilterOperator.EQUAL, user_guid));
+		     query.setFilter(new FilterPredicate("user_guid", FilterOperator.EQUAL, userGuid));
 			 PreparedQuery pq = ds.prepare(query);
 			 return pq.asSingleEntity();			 
 	  }
+	  public Entity getPaidUserByRedeemingRequestId(String redeemingRequestId){
+		     DatastoreService ds = createDatastoreService(Consistency.STRONG);			 
+		     Query query = new Query("paid_users");
+		     query.setFilter(new FilterPredicate("redeeming_request_id", FilterOperator.EQUAL, redeemingRequestId));
+			 PreparedQuery pq = ds.prepare(query);
+			 return pq.asSingleEntity();
+	  }
 	  
+	  public void savePayPalPayment(RedeemingRequests redeemingRequests,String currencyCode,BigDecimal eurAmount,String invoiceNumber,String payoutBatchId){	
+//		    DatastoreService ds = createDatastoreService(Consistency.STRONG);
+//	        Entity payPalPayment= new Entity("paypal_payments");
+//	        payPalPayment.setProperty("credit_note_num",invoiceNumber);
+//	        payPalPayment.setProperty("paypal_transaction_id",payoutBatchId);
+//	        payPalPayment.setProperty("user_guid",redeemingRequests.getUserGuid());
+//	        payPalPayment.setProperty("amount",redeemingRequests.getAmount());
+//	        payPalPayment.setProperty("country_code",redeemingRequests.getCountryCode());
+//	        payPalPayment.setProperty("date",new Date());
+//	        ds.put(payPalPayment);
+	        
+		   DatastoreService ds = createDatastoreService(Consistency.STRONG);
+		   Entity entity=new Entity("paid_users");	
+		   entity.setProperty("date", new Date());
+		   entity.setProperty("user_guid",redeemingRequests.getUserGuid());
+		   entity.setProperty("paid_currency",currencyCode);
+		   entity.setProperty("amount", redeemingRequests.getAmount());
+		   entity.setProperty("type", redeemingRequests.getType());
+		   entity.setProperty("eur_currency", eurAmount.doubleValue());
+		   entity.setProperty("email_address",redeemingRequests.getEmail());
+		   entity.setProperty("paypal_account",redeemingRequests.getPaypalAccount());
+		   entity.setProperty("paid_user_success", true);
+		   entity.setProperty("email_sent_success",true);
+		   entity.setProperty("redeeming_request_key",redeemingRequests.getKey());
+		   entity.setProperty("redeeming_request_id",redeemingRequests.getRedeemingRequestId());
+		   entity.setProperty("payment_reference_id",payoutBatchId);
+		   entity.setProperty("invoice_number",invoiceNumber);
+		   ds.put(entity);		  
+	  }
+	  public void saveGiftCardPayment(RedeemingRequests redeemingRequests,String currencyCode,BigDecimal eurAmount,String paymentReferenceId){	
+		   
+		   DatastoreService ds = createDatastoreService(Consistency.STRONG);
+		   Entity entity=new Entity("paid_users");	
+		   entity.setProperty("date", new Date());
+		   entity.setProperty("user_guid",redeemingRequests.getUserGuid());
+		   entity.setProperty("paid_currency",currencyCode);
+		   entity.setProperty("amount", redeemingRequests.getAmount());
+		   entity.setProperty("type", redeemingRequests.getType());
+		   entity.setProperty("eur_currency", eurAmount.doubleValue());
+		   entity.setProperty("email_address",redeemingRequests.getEmail());
+		   entity.setProperty("paypal_account",redeemingRequests.getPaypalAccount());
+		   entity.setProperty("paid_user_success", true);
+		   entity.setProperty("email_sent_success",true);
+		   entity.setProperty("redeeming_request_key",redeemingRequests.getKey());
+		   entity.setProperty("redeeming_request_id",redeemingRequests.getRedeemingRequestId());
+		   entity.setProperty("payment_reference_id",paymentReferenceId);
+		   ds.put(entity);
+	  }
 	  public void saveUserPayment(PaidUserForm form,Entity redeemingRequests,BigDecimal eurAmount){	
 		   
 		   DatastoreService ds = createDatastoreService(Consistency.STRONG);
@@ -66,6 +160,7 @@ public class PaymentRepository extends AbstractRepository{
 		   entity.setProperty("paid_user_success", form.isPaidUserSuccess());
 		   entity.setProperty("email_sent_success",form.isEmailSentSuccess());
 		   entity.setProperty("redeeming_request_key",redeemingRequests.getKey());
+		   entity.setProperty("redeeming_request_id",redeemingRequests.getProperty("redeeming_request_id"));
 		   ds.put(entity);
 	  }
 	  public void saveUserPaymentRemovalReason(String _key,String reason)throws EntityNotFoundException{

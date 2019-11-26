@@ -1,10 +1,14 @@
 package com.luee.wally.admin.controller;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -15,12 +19,20 @@ import javax.servlet.http.HttpServletResponse;
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.EntityNotFoundException;
 import com.luee.wally.admin.repository.ApplicationSettingsRepository;
+import com.luee.wally.admin.repository.InvoiceRepository;
 import com.luee.wally.admin.repository.PaymentRepository;
 import com.luee.wally.admin.repository.SearchFilterTemplateRepository;
 import com.luee.wally.api.route.Controller;
+import com.luee.wally.api.service.InvoiceService;
+import com.luee.wally.api.service.MailService;
+import com.luee.wally.api.service.PayPalService;
 import com.luee.wally.api.service.PaymentService;
+import com.luee.wally.command.Email;
 import com.luee.wally.command.PaidUserForm;
 import com.luee.wally.command.PaymentEligibleUserForm;
+import com.luee.wally.command.PdfAttachment;
+import com.luee.wally.command.invoice.PayoutResult;
+import com.luee.wally.constants.Constants;
 import com.luee.wally.entity.RedeemingRequests;
 import com.luee.wally.entity.SearchFilterTemplate;
 import com.luee.wally.exception.RestResponseException;
@@ -37,6 +49,70 @@ public class PaymentController implements Controller {
 		resp.getWriter().write(json);
 	}
 
+	public void sendPayPal(HttpServletRequest req, HttpServletResponse resp) throws Exception {
+		String key = (String) req.getParameter("key");
+		//find user to paypal to
+		PaymentRepository paymentRepository = new PaymentRepository();
+		Entity user = paymentRepository.getRedeemingRequestsByKey(key);
+		
+		RedeemingRequests redeemingRequests = RedeemingRequests.valueOf(user);
+		String currencyCode=paymentRepository.getPayPalCurrencyCode(redeemingRequests.getCountryCode());
+
+		//convert currency to EUR
+		BigDecimal eurAmount;
+		try{
+			eurAmount = paymentRepository.convert(Double.parseDouble(redeemingRequests.getAmount()), currencyCode);
+		}catch(Exception e){
+			logger.log(Level.SEVERE,"Currency converter for : "+currencyCode,e);
+			resp.getWriter().write("Unable to convert currency to EUR");
+			return;
+		}
+		//check if already paid
+		Entity paidUser = paymentRepository.getPaidUserByRedeemingRequestId(redeemingRequests.getRedeemingRequestId());
+		/*
+		 * Don't pay if already paid up
+		 */
+		if (paidUser != null) {
+			JSONUtils.writeObject(paidUser, Entity.class);
+			resp.getWriter().write(JSONUtils.writeObject(paidUser, Entity.class));
+			return;
+		}
+		
+		PayPalService payPalService = new PayPalService();
+		InvoiceService invoiceService = new InvoiceService();
+		MailService mailService = new MailService();
+
+		InvoiceRepository invoiceRepository = new InvoiceRepository();
+		try {
+			//payout
+			PayoutResult payoutResult = payPalService.payout(redeemingRequests,currencyCode);
+			//create invoice number
+			String invoiceNumber = Long.toString(invoiceRepository.createInvoiceNumber());			
+			
+			//save payment
+			paymentRepository.savePayPalPayment(redeemingRequests, currencyCode, eurAmount,invoiceNumber, payoutResult.getPayoutBatchId());
+            //create invoice
+			PdfAttachment attachment = new PdfAttachment();
+			attachment.readFromStream(invoiceService.createInvoice(payoutResult, user, invoiceNumber));
+			//send invoice
+			mailService.sendInvoice(Constants.toInvoiceMail, attachment);
+			resp.getWriter().write("OK");
+		} catch (Exception ex) {
+			logger.log(Level.SEVERE, "payment", ex);
+			StringWriter sw = new StringWriter();
+			PrintWriter pw = new PrintWriter(sw);
+			ex.printStackTrace(pw);
+			String sStackTrace = sw.toString();
+			Email email = new Email();
+			email.setSubject("Error alert!");
+			email.setContent((Objects.toString(ex.getMessage(), "")) + "/n/n" + sStackTrace);
+			email.setFrom(Constants.fromMail);
+			email.setTo(Constants.toInvoiceMail);
+			mailService.sendMail(email);		
+		}
+		    resp.getWriter().write("Server error, check logs for details.");
+	}
+
 	public void sendGiftCard(HttpServletRequest req, HttpServletResponse resp) throws Exception {
 		String key = (String) req.getParameter("key");
 
@@ -48,10 +124,9 @@ public class PaymentController implements Controller {
 			resp.getWriter().write(String.valueOf(re.getResponseCode()));
 			resp.getWriter().write(":");
 			resp.getWriter().write(re.getResponseMessage());
-		}
-		catch(Exception e){
-			logger.log(Level.SEVERE,"",e);
-			resp.getWriter().write("Server error, check logs for details.");		
+		} catch (Exception e) {
+			logger.log(Level.SEVERE, "", e);
+			resp.getWriter().write("Server error, check logs for details.");
 		}
 	}
 
@@ -107,10 +182,11 @@ public class PaymentController implements Controller {
 		PaymentRepository paymentRepository = new PaymentRepository();
 		Collection<String> reasons = paymentRepository.getUserPaymentsRemovalReasons();
 
-		ApplicationSettingsRepository applicationSettingsRepository=new ApplicationSettingsRepository();
-		Map<String,String> map=applicationSettingsRepository.getApplicationSettings();
-		
-		req.setAttribute("isSendGCVisible", Boolean.valueOf(map.get(ApplicationSettingsRepository.SHOW_TANGO_GIFT_CARD)));
+		ApplicationSettingsRepository applicationSettingsRepository = new ApplicationSettingsRepository();
+		Map<String, String> map = applicationSettingsRepository.getApplicationSettings();
+
+		req.setAttribute("isSendGCVisible",
+				Boolean.valueOf(map.get(ApplicationSettingsRepository.SHOW_TANGO_GIFT_CARD)));
 		req.setAttribute("webform", form);
 		req.setAttribute("entities", entities);
 		req.setAttribute("reasons", reasons);
@@ -135,11 +211,11 @@ public class PaymentController implements Controller {
 		List<String> removalReasons = new LinkedList<String>(reasons);
 		removalReasons.add(0, "");
 
-		ApplicationSettingsRepository applicationSettingsRepository=new ApplicationSettingsRepository();
-		Map<String,String> map=applicationSettingsRepository.getApplicationSettings();
+		ApplicationSettingsRepository applicationSettingsRepository = new ApplicationSettingsRepository();
+		Map<String, String> map = applicationSettingsRepository.getApplicationSettings();
 
-		
-		req.setAttribute("isSendGCVisible", Boolean.valueOf(map.get(ApplicationSettingsRepository.SHOW_TANGO_GIFT_CARD)));		
+		req.setAttribute("isSendGCVisible",
+				Boolean.valueOf(map.get(ApplicationSettingsRepository.SHOW_TANGO_GIFT_CARD)));
 		req.setAttribute("webform", form);
 		req.setAttribute("entities", entities);
 		req.setAttribute("reasons", removalReasons);

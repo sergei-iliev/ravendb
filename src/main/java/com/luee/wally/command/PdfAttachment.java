@@ -1,6 +1,4 @@
-package com.luee.wally.paypal;
-
-import com.luee.wally.command.Attachment;
+package com.luee.wally.command;
 
 public class PdfAttachment extends Attachment {
 

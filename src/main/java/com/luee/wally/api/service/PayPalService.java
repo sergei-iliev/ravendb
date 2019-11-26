@@ -1,12 +1,14 @@
-package com.luee.wally.paypal;
+package com.luee.wally.api.service;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.google.appengine.api.datastore.Entity;
+import com.luee.wally.command.invoice.Money;
+import com.luee.wally.command.invoice.PayoutResult;
 import com.luee.wally.constants.Constants;
+import com.luee.wally.entity.RedeemingRequests;
 import com.paypal.api.payments.Currency;
 import com.paypal.api.payments.Payout;
 import com.paypal.api.payments.PayoutBatch;
@@ -16,10 +18,12 @@ import com.paypal.base.rest.APIContext;
 import com.paypal.base.rest.PayPalRESTException;
 
 
+
+
 public class PayPalService {
 
 	
-	public PayoutResult payout(Entity payPalUser) throws PayPalRESTException {
+	public PayoutResult payout(RedeemingRequests payPalUser,String currencyCode) throws PayPalRESTException {
 		PayoutResult payoutResult=new PayoutResult();
 		
 		// ###Payout
@@ -41,14 +45,14 @@ public class PayPalService {
 
 		// ### Currency
 		Currency amount = new Currency();
-		amount.setValue((String) payPalUser.getProperty("amount")).setCurrency("USD");
+		amount.setValue(payPalUser.getAmount()).setCurrency(currencyCode);
 
 		// #### Sender Item
 		// Please note that if you are using single payout with sync mode, you
 		// can only pass one Item in the request
 		PayoutItem senderItem = new PayoutItem();
 		senderItem.setRecipientType("Email").setNote("Thanks for your service")
-				.setReceiver((String) payPalUser.getProperty("paypal_account")).setSenderItemId("201404324234").setAmount(amount);
+				.setReceiver(payPalUser.getPaypalAccount()).setSenderItemId("201404324234").setAmount(amount);
 
 		List<PayoutItem> items = new ArrayList<PayoutItem>();
 		items.add(senderItem);
@@ -71,15 +75,14 @@ public class PayPalService {
 			
 			
 			PayoutBatch pay= Payout.get(apiContext, batch.getBatchHeader().getPayoutBatchId());
-			
 			payoutResult.setAmount(new Money( pay.getBatchHeader().getAmount().getValue(),pay.getBatchHeader().getAmount().getCurrency()));
+			
+			payoutResult.setFee(new Money(pay.getBatchHeader().getFees().getValue(),pay.getBatchHeader().getFees().getCurrency())); 	
 
 			
-			payoutResult.setFee(new Money(pay.getBatchHeader().getFees().getValue(),pay.getBatchHeader().getFees().getCurrency())); 
 		return payoutResult;
 	}
-	
-	/*
+/*	
 	public PayoutResult payout(PayoutForm payoutForm) throws PayPalRESTException {
 		PayoutResult payoutResult=new PayoutResult();
 		
@@ -140,5 +143,6 @@ public class PayPalService {
 
 			
 		return payoutResult;
-	}*/
+	}
+	*/
 }

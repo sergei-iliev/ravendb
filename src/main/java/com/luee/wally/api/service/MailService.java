@@ -1,4 +1,4 @@
-package com.luee.wally.paypal;
+package com.luee.wally.api.service;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -24,6 +24,7 @@ import javax.mail.internet.MimeMultipart;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.luee.wally.command.Attachment;
+import com.luee.wally.command.Email;
 import com.luee.wally.constants.Constants;
 import com.sendgrid.Content;
 import com.sendgrid.Mail;
