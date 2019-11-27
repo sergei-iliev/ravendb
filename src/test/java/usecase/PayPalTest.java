@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.math.BigDecimal;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -110,10 +111,10 @@ public class PayPalTest {
         InvoiceRepository invoiceRepository=new InvoiceRepository();
         try {
         	
-        PayoutResult payoutResult = payPalService.payout(redeemingRequests);
+        PayoutResult payoutResult = payPalService.payout(redeemingRequests,"USD");
         
         String invoiceNumber=Long.toString(invoiceRepository.createInvoiceNumber());
-        paymentRepository.savePayPalPayment(redeemingRequests,invoiceNumber,payoutResult.getPayoutBatchId());
+        paymentRepository.savePayPalPayment(redeemingRequests,"USD",BigDecimal.ZERO,invoiceNumber,payoutResult.getPayoutBatchId());
 
 		
         PdfAttachment attachment=new PdfAttachment();

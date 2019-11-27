@@ -4,7 +4,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+import com.luee.wally.admin.repository.PaymentRepository;
 import com.luee.wally.command.invoice.Money;
 import com.luee.wally.command.invoice.PayoutResult;
 import com.luee.wally.constants.Constants;
@@ -21,7 +24,7 @@ import com.paypal.base.rest.PayPalRESTException;
 
 
 public class PayPalService {
-
+	private final Logger logger = Logger.getLogger(PayPalService.class.getName());
 	
 	public PayoutResult payout(RedeemingRequests payPalUser,String currencyCode) throws PayPalRESTException {
 		PayoutResult payoutResult=new PayoutResult();
@@ -76,6 +79,7 @@ public class PayPalService {
 			
 			PayoutBatch pay= Payout.get(apiContext, batch.getBatchHeader().getPayoutBatchId());
 			payoutResult.setAmount(new Money( pay.getBatchHeader().getAmount().getValue(),pay.getBatchHeader().getAmount().getCurrency()));
+			logger.log(Level.WARNING,pay.toJSON());
 			
 			payoutResult.setFee(new Money(pay.getBatchHeader().getFees().getValue(),pay.getBatchHeader().getFees().getCurrency())); 	
 

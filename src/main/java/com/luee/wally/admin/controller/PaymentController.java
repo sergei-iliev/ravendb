@@ -187,6 +187,8 @@ public class PaymentController implements Controller {
 
 		req.setAttribute("isSendGCVisible",
 				Boolean.valueOf(map.get(ApplicationSettingsRepository.SHOW_TANGO_GIFT_CARD)));
+		req.setAttribute("isPayPalVisible",
+				Boolean.valueOf(map.get(ApplicationSettingsRepository.SHOW_PAYPAL_PAY)));		
 		req.setAttribute("webform", form);
 		req.setAttribute("entities", entities);
 		req.setAttribute("reasons", reasons);
@@ -216,6 +218,9 @@ public class PaymentController implements Controller {
 
 		req.setAttribute("isSendGCVisible",
 				Boolean.valueOf(map.get(ApplicationSettingsRepository.SHOW_TANGO_GIFT_CARD)));
+		
+		req.setAttribute("isPayPalVisible",
+				Boolean.valueOf(map.get(ApplicationSettingsRepository.SHOW_PAYPAL_PAY)));
 		req.setAttribute("webform", form);
 		req.setAttribute("entities", entities);
 		req.setAttribute("reasons", removalReasons);

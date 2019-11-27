@@ -36,6 +36,8 @@ public class ApplicationSettingsRepository extends AbstractRepository{
 	  
 	  public static final String ACCOUNT_EMAIL_SETTING="ACCOUNT_EMAIL_SETTING";
 	  public static final String SHOW_TANGO_GIFT_CARD="SHOW_TANGO_GIFT_CARD";
+	  public static final String SHOW_PAYPAL_PAY="SHOW_PAYPAL_PAY";
+	  
 	  
 //	  //cache
 //	  Map<String,String> applicationSettings;
