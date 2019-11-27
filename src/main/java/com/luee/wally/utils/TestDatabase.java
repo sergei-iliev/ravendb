@@ -180,12 +180,12 @@ public enum TestDatabase {
 		DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
 		Entity entity = new Entity("application_settings");	
 		entity.setIndexedProperty("name","SHOW_TANGO_GIFT_CARD");
-		entity.setIndexedProperty("value","false");
+		entity.setIndexedProperty("value","true");
 		ds.put(entity);
 		
 		entity = new Entity("application_settings");	
 		entity.setIndexedProperty("name","SHOW_PAYPAL_PAY");
-		entity.setIndexedProperty("value","false");
+		entity.setIndexedProperty("value","true");
 		ds.put(entity);
 	}
 }

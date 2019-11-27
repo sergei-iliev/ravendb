@@ -73,7 +73,7 @@ public class PaymentController implements Controller {
 		 * Don't pay if already paid up
 		 */
 		if (paidUser != null) {
-			JSONUtils.writeObject(paidUser, Entity.class);
+			resp.getWriter().write("+");			
 			resp.getWriter().write(JSONUtils.writeObject(paidUser, Entity.class));
 			return;
 		}
@@ -142,7 +142,6 @@ public class PaymentController implements Controller {
 		 * Don't pay if already paid up
 		 */
 		if (paidUser != null) {
-			JSONUtils.writeObject(paidUser, Entity.class);
 			resp.getWriter().write(JSONUtils.writeObject(paidUser, Entity.class));
 			return;
 		}

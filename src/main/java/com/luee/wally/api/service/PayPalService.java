@@ -80,9 +80,11 @@ public class PayPalService {
 			PayoutBatch pay= Payout.get(apiContext, batch.getBatchHeader().getPayoutBatchId());
 			payoutResult.setAmount(new Money( pay.getBatchHeader().getAmount().getValue(),pay.getBatchHeader().getAmount().getCurrency()));
 			logger.log(Level.WARNING,pay.toJSON());
-			
-			payoutResult.setFee(new Money(pay.getBatchHeader().getFees().getValue(),pay.getBatchHeader().getFees().getCurrency())); 	
-
+			if(pay.getBatchHeader().getFees()!=null){
+			  payoutResult.setFee(new Money(pay.getBatchHeader().getFees().getValue(),pay.getBatchHeader().getFees().getCurrency())); 	
+			}else{
+			  payoutResult.setFee(new Money("0.0",pay.getBatchHeader().getFees().getCurrency()));	
+			}
 			
 		return payoutResult;
 	}

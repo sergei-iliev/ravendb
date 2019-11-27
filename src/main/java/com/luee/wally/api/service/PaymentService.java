@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 
 import javax.servlet.ServletException;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.EntityNotFoundException;
 import com.luee.wally.admin.repository.GiftCardRepository;
@@ -25,6 +26,7 @@ import com.luee.wally.entity.GiftCardCountryCode;
 import com.luee.wally.entity.RedeemingRequests;
 import com.luee.wally.exception.RestResponseException;
 import com.luee.wally.json.ExchangeRateVO;
+import com.luee.wally.json.JSONUtils;
 import com.luee.wally.utils.Utilities;
 import com.tangocard.raas.exceptions.RaasGenericException;
 import com.tangocard.raas.models.CreateOrderRequestModel;
@@ -42,7 +44,7 @@ public class PaymentService {
 		return Arrays.asList("USD","EUR","CAD","AUD","GBP");
 	}
 	
-	public void sendGiftCard(String key) throws RestResponseException{
+	public void sendGiftCard(String key) throws JsonProcessingException,RestResponseException{
 		PaymentRepository paymentRepository=new PaymentRepository();
 		GiftCardRepository giftCardRepository=new GiftCardRepository();
 		
@@ -59,8 +61,8 @@ public class PaymentService {
 		}
 		//check if gift card already sent
 		Entity giftCardOrder=paymentRepository.getPaidUserByRedeemingRequestId(redeemingRequests.getRedeemingRequestId());
-		if(giftCardOrder!=null){
-			throw new RestResponseException(100, "Gift card already sent!");				
+		if(giftCardOrder!=null){		   
+			throw new RestResponseException(200, JSONUtils.writeObject(giftCardOrder, Entity.class));				
 		}
 		
 		GiftCardService giftCardService=new GiftCardService();				

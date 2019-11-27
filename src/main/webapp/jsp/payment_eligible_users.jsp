@@ -199,14 +199,14 @@
 								<c:if test="${entity.amazonType eq true}">
 								  <c:if test="${isSendGCVisible eq true}">
 								    <br>
-								    <button type="button" class="btn btn-primary btn-sm" 
+								    <button type="button" class="btn btn-primary btn-sm" data-href="${entity.link2}" 
 									  pay-gc-button="true" data-entitykey="${entity.key}" data-amount="${entity.amount}">Send GC</button>
 								  </c:if>	   
 							    </c:if>
 								<c:if test="${entity.payPalType eq true}">
 								  <c:if test="${isPayPalVisible eq true}">
 								    <br>
-								    <button type="button" class="btn btn-primary btn-sm" 
+								    <button type="button" class="btn btn-primary btn-sm" data-href="${entity.link2}"
 									  pay-paypal-button="true" data-entitykey="${entity.key}" data-amount="${entity.amount}">PayPal</button>
 								   </c:if>	   
 							    </c:if>
@@ -216,7 +216,7 @@
 								<td>${entity.countryCode}</td>
 								<td>${entity.paypalAccount}</td>
 								<td>
-								<button type="button" class="btn btn-primary btn-sm" data-href="${entity.link2}"
+								<button type="button" class="btn btn-primary btn-sm" data-href="${entity.link2}" value="Paid"
 									 paid-button="true" data-paymentType="${entity.type}" data-entitykey="${entity.key}">Paid</button>
 								</td>
 							</tr>
