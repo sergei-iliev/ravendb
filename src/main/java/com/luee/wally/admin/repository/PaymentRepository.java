@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 
 import com.google.appengine.api.datastore.Cursor;
 import com.google.appengine.api.datastore.DatastoreService;
+import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.EntityNotFoundException;
 import com.google.appengine.api.datastore.FetchOptions;
@@ -23,6 +24,9 @@ import com.google.appengine.api.datastore.Query.FilterPredicate;
 import com.google.appengine.api.datastore.Query.SortDirection;
 import com.google.appengine.api.datastore.QueryResultList;
 import com.google.appengine.api.datastore.ReadPolicy.Consistency;
+import com.google.appengine.api.memcache.Expiration;
+import com.google.appengine.api.memcache.MemcacheService;
+import com.google.appengine.api.memcache.MemcacheServiceFactory;
 import com.luee.wally.api.service.impex.ImportService;
 import com.luee.wally.command.PaidUserForm;
 import com.luee.wally.constants.Constants;
@@ -37,10 +41,18 @@ public class PaymentRepository extends AbstractRepository{
 			BigDecimal rateValue=BigDecimal.ONE;
 			
 			if(!currencyCode.equals("EUR")){
-				 String formatedDate=Utilities.formatedDate(new Date(),"yyyy-MM-dd");
-				 ImportService importService=new ImportService();
-				 ExchangeRateVO rate=importService.getExchangeRates(formatedDate,"EUR",currencyCode);
-				 rateValue = BigDecimal.valueOf(rate.getRates().get(currencyCode));
+			     MemcacheService memcache = MemcacheServiceFactory.getMemcacheService();
+			     Double cachedValue = (Double) memcache.get(currencyCode);
+			     if(cachedValue==null){
+			    	 String formatedDate=Utilities.formatedDate(new Date(),"yyyy-MM-dd");
+			    	 ImportService importService=new ImportService();
+			    	 ExchangeRateVO rate=importService.getExchangeRates(formatedDate,"EUR",currencyCode);
+			    	 rateValue = BigDecimal.valueOf(rate.getRates().get(currencyCode));
+			    	 memcache.put(currencyCode,rate.getRates().get(currencyCode), Expiration.byDeltaSeconds(3600));
+			     }else{				 
+			    	 
+				     rateValue = BigDecimal.valueOf(cachedValue);
+			     }
 			}
 			
 			BigDecimal currentValue = new BigDecimal(amount);
