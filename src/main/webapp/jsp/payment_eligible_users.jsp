@@ -115,7 +115,20 @@
 										value="${webform.packageNamesAsText}">
 								</div>
 							</div>
-
+							<div class="form-label-group mt-3">
+							<div class="col-md-3">
+							    <label for="amount-row">Amount</label>
+ 								<div class="form-row" id="amount-row">
+    								<div class="col">
+      									<input type="text" name="amountFrom" class="form-control" value="${webform.amountFrom}">
+    								</div>
+    								<div class="col">
+      									<input type="text" name="amountTo" class="form-control" value="${webform.amountTo}">
+    								</div>
+  								</div>
+  							</div>
+							</div>
+					
 							<div class="form-label-group mt-3">
 							<div class="col-md-3">
 							<label>Confirmed Email</label> 

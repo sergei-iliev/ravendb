@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -127,9 +128,61 @@ public class PaymentService {
     			}
     		}
     	}
+    	//apply amount filter
+    	Collection<RedeemingRequests> list=applyAmountFilter(result, form.getAmountFrom(), form.getAmountTo());
     	//sort by date
-    	return result.stream().sorted(Comparator.comparing(RedeemingRequests::getDate)).collect(Collectors.toList());
+    	return list.stream().sorted(Comparator.comparing(RedeemingRequests::getDate)).collect(Collectors.toList());
     	
+    }
+    /*
+     * In memory filter
+     */
+    private Collection<RedeemingRequests> applyAmountFilter(Collection<RedeemingRequests> list,BigDecimal amountFrom,BigDecimal amountTo){
+    	if(amountFrom==null&&amountTo==null){
+    		return list;
+    	}
+    	Collection<RedeemingRequests> result;
+    	if(amountFrom!=null&&amountTo!=null){
+    		result=list.stream().filter(rr->{
+    			if(rr.getAmount()!=null){
+    				if((new BigDecimal(rr.getAmount())).compareTo(amountFrom)>=0&&(new BigDecimal(rr.getAmount())).compareTo(amountTo)<=0){
+    		            return true;    		            
+    		        }else{
+    		        	return false;
+    		        }
+    			}else{
+    				return true;
+    			}
+    			
+    		}).collect(Collectors.toList());
+    	}else if(amountFrom!=null){
+    		result=list.stream().filter(rr->{
+    			if(rr.getAmount()!=null){
+    				if((new BigDecimal(rr.getAmount())).compareTo(amountFrom)>=0){
+    		            return true;    		            
+    		        }else{
+    		        	return false;
+    		        }
+    			}else{
+    				return true;
+    			}
+    			
+    		}).collect(Collectors.toList());
+    	}else{
+    		result=list.stream().filter(rr->{
+    			if(rr.getAmount()!=null){
+    				if((new BigDecimal(rr.getAmount())).compareTo(amountTo)<=0){
+    		            return true;    		            
+    		        }else{
+    		        	return false;
+    		        }
+    			}else{
+    				return true;
+    			}    			
+    		}).collect(Collectors.toList());
+    	}
+    	
+    	return result;
     }
 
 

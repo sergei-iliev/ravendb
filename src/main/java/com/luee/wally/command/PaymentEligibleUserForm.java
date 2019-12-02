@@ -1,5 +1,6 @@
 package com.luee.wally.command;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
@@ -19,7 +20,7 @@ public class PaymentEligibleUserForm implements WebForm{
 	private Collection<String> types=new HashSet<>();
 	private Collection<String> packageNames=new HashSet<>();
 	private Boolean  confirmedEmail;
-	
+	private BigDecimal amountFrom,amountTo; 
 	
 	public PaymentEligibleUserForm() {
 	    types.add("PayPal");
@@ -43,6 +44,8 @@ public class PaymentEligibleUserForm implements WebForm{
 		form.countryCodes.clear();
 		
 		form.setConfirmedEmail(req.getParameter("confirmedEmail"));
+		form.setAmountFrom(req.getParameter("amountFrom"));
+		form.setAmountTo(req.getParameter("amountTo"));
 		
 		form.setStartDate(form.parseDate(req.getParameter("startDate")));
 		form.setEndDate(form.parseDate(req.getParameter("endDate")));
@@ -162,6 +165,29 @@ public class PaymentEligibleUserForm implements WebForm{
 			return formatedDate(endDate, "yyyy-MM-dd");
 		}		
 		return null;
+	}
+	@JsonIgnore
+	public void setAmountTo(String amountTo) {
+		if(amountTo!=null&&amountTo.length()>0){
+			this.amountTo=new BigDecimal(amountTo);
+		}else{
+			this.amountTo=null;
+		}
+	}	
+	@JsonIgnore
+	public void setAmountFrom(String amountFrom) {
+		if(amountFrom!=null&&amountFrom.length()>0){
+			this.amountFrom=new BigDecimal(amountFrom);
+		}else{
+			this.amountFrom=null;
+		}
+	}
+	public BigDecimal getAmountFrom() {
+		return amountFrom;
+	}
+
+	public BigDecimal getAmountTo() {
+		return amountTo;
 	}
 	
 	@JsonIgnore
