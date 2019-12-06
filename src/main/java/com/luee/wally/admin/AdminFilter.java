@@ -24,7 +24,7 @@ public class AdminFilter implements Filter {
 	private final Logger logger = Logger.getLogger(AdminFilter.class.getName());
 	
     public AdminFilter() {
-       TestDatabase.INSTANCE.generateDB();
+
     }
  
     @Override
@@ -38,18 +38,24 @@ public class AdminFilter implements Filter {
         HttpServletResponse response = (HttpServletResponse) resp;
 
         
-        if(request.isSecure()){
+        if(!request.isSecure()){
         	resp.getWriter().print("HTTPS required!");
         	resp.flushBuffer();
         	return;
         }
         
+        Utilities.domain= request.getServerName();
         String loginedUser = (String) request.getSession().getAttribute("login");
  
         //let resource go on
         if(request.getRequestURI().matches(".*(css|jpg|png|gif|js)")){        	
             chain.doFilter(request, response);
             return;
+        }
+        //skip security for jobs
+        if (request.getRequestURI().startsWith("/administration/job")) {        	
+        	Router.INSTANCE.execute(request.getRequestURI(), request, response);
+        	return;
         }
         if (request.getRequestURI().startsWith("/administration/login")) {        	
             Router.INSTANCE.execute("/administration/login", request, response);
@@ -67,8 +73,6 @@ public class AdminFilter implements Filter {
         	return;
         }        
         
-        Utilities.domain= request.getServerName();
-
         if(Router.INSTANCE.hasPath(request.getMethod(),request.getRequestURI())){
           Router.INSTANCE.execute(request.getRequestURI(), request, response);
         }else{

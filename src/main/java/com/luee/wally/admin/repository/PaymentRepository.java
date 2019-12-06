@@ -110,15 +110,6 @@ public class PaymentRepository extends AbstractRepository{
 	  }
 	  
 	  public void savePayPalPayment(RedeemingRequests redeemingRequests,String currencyCode,BigDecimal eurAmount,String invoiceNumber,String payoutBatchId){	
-//		    DatastoreService ds = createDatastoreService(Consistency.STRONG);
-//	        Entity payPalPayment= new Entity("paypal_payments");
-//	        payPalPayment.setProperty("credit_note_num",invoiceNumber);
-//	        payPalPayment.setProperty("paypal_transaction_id",payoutBatchId);
-//	        payPalPayment.setProperty("user_guid",redeemingRequests.getUserGuid());
-//	        payPalPayment.setProperty("amount",redeemingRequests.getAmount());
-//	        payPalPayment.setProperty("country_code",redeemingRequests.getCountryCode());
-//	        payPalPayment.setProperty("date",new Date());
-//	        ds.put(payPalPayment);
 	        
 		   DatastoreService ds = createDatastoreService(Consistency.STRONG);
 		   Entity entity=new Entity("paid_users");	
@@ -164,7 +155,7 @@ public class PaymentRepository extends AbstractRepository{
 		   entity.setProperty("date", new Date());
 		   entity.setProperty("user_guid",redeemingRequests.getProperty("user_guid"));
 		   entity.setProperty("paid_currency", form.getCurrencyCode());
-		   entity.setProperty("amount", form.getAmount());
+		   entity.setProperty("amount", Double.toString(form.getAmount()));
 		   entity.setProperty("type", form.getPaymentType());
 		   entity.setProperty("eur_currency", eurAmount.doubleValue());
 		   entity.setProperty("email_address",redeemingRequests.getProperty("email"));

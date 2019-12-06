@@ -44,5 +44,8 @@ public interface Constants {
 	
 	public static final String EMAIL_TEMPLATE_SUBJECT ="Your reward from %s!";
 	public static final String EMAIL_TEMPLATE_MESSAGE ="Congratulations! You just received your reward from %s.";
+	/******************Payment Report**************************/
 	
+	public static final String PAYMENT_REPORT_EMAIL_1="gil@softbakedapps.com";
+	public static final String PAYMENT_REPORT_EMAIL_2="laterz.app@softbakedapps.com";
 }

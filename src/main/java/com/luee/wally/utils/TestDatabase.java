@@ -1,5 +1,7 @@
 package com.luee.wally.utils;
 
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 
 import com.google.appengine.api.datastore.DatastoreService;
@@ -15,6 +17,8 @@ public enum TestDatabase {
 		createPackageNameTitleMapping();
 		createApplicationSettings();
 		createPayPalCurrencyMap();
+		crearePayedUsersEntity();
+		
 	}
 	private  void createRedeemingRequests(){
 		createRedeemingRequestEntity("Sergey Iliev","15b5-4e3a-b398-8792a9a9f530","48bb2675-a072-4b6b-ab66-cb599a29147d", "5.1", new Date(), "com.moregames.makemoney", "PayPal", "sergei.iliev-facilitator@gmail.com", "US");		
@@ -43,6 +47,51 @@ public enum TestDatabase {
 
 		
 	}
+	private void crearePayedUsersEntity(){
+		   DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
+		   
+		   ZonedDateTime now=ZonedDateTime.now();
+		   ZonedDateTime yesterday=now.minusDays(1);
+		   
+		   ZonedDateTime yesterdayStart=yesterday.truncatedTo(ChronoUnit.DAYS);
+		   ZonedDateTime yesterdayEnd=yesterdayStart.plusHours(24);
+		   
+		   Entity entity=new Entity("paid_users");	
+		   entity.setProperty("date", Date.from(yesterday.toInstant()));
+		   entity.setProperty("user_guid","48bb2675-a072-4b6b-ab66-cb599a29147d");
+		   entity.setProperty("paid_currency","USD");
+		   entity.setProperty("amount", "13.2");
+		   entity.setProperty("type", "PayPal");
+		   entity.setProperty("eur_currency",12.0);
+		   entity.setProperty("email_address","mikelo@yahoo.com");
+		   entity.setProperty("paypal_account","");
+		   entity.setProperty("paid_user_success", true);
+		   entity.setProperty("email_sent_success",true);
+		   entity.setProperty("redeeming_request_key","");
+		   entity.setProperty("redeeming_request_id","15b5-4e3a-b398-8792a9a9f530");
+		   entity.setProperty("payment_reference_id","ref-number");
+		   entity.setProperty("invoice_number","111");		
+		   ds.put(entity);
+		   
+		   entity=new Entity("paid_users");	
+		   entity.setProperty("date", Date.from(yesterday.toInstant()));
+		   entity.setProperty("user_guid","ffff2675-a072-4b6b-ab66-cb599a29147d");
+		   entity.setProperty("paid_currency","USD");
+		   entity.setProperty("amount", "3.2");
+		   entity.setProperty("type", "PayPal");
+		   entity.setProperty("eur_currency",2.0);
+		   entity.setProperty("email_address","mikelo@yahoo.com");
+		   entity.setProperty("paypal_account","");
+		   entity.setProperty("paid_user_success", true);
+		   entity.setProperty("email_sent_success",true);
+		   entity.setProperty("redeeming_request_key","");
+		   entity.setProperty("redeeming_request_id","15b5-4e3a-b398-8792a9a9f530");
+		   entity.setProperty("payment_reference_id","ref-number");
+		   entity.setProperty("invoice_number","111");		
+		   ds.put(entity);
+	}
+	
+	
 	private  void createPayPalCurrencyMap(){
 		DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
 		Entity entity = new Entity("paypal_country_code_mapping");	

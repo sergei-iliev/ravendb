@@ -1,5 +1,6 @@
 package com.luee.wally.utils;
 
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -25,4 +26,12 @@ public final class Utilities {
 		  SimpleDateFormat formater = new SimpleDateFormat(format);//("yyyy-MM-dd");
 		  return formater.format(date);
 	}
+	
+    public static String formatPrice(BigDecimal price) {
+        if (price == null) {
+            return BigDecimal.ZERO.toString();
+        }
+        return price.setScale(2, BigDecimal.ROUND_HALF_EVEN).toString();
+    }
+	
 }
