@@ -55,15 +55,15 @@ public class MailService {
             return attachment;
 	}*/
 
-	public void sendInvoice(String emailTo,Attachment attachment) {
+	public void sendInvoice(String emailTo,String emailFrom,Attachment attachment) {
 	    Properties props = new Properties();
 	    Session session = Session.getDefaultInstance(props, null);
 
 	    try {
 	      Message msg = new MimeMessage(session);
-	      msg.setFrom(new InternetAddress(Constants.fromMail, "Admin"));
+	      msg.setFrom(new InternetAddress(emailFrom, "Admin"));
 	      msg.addRecipient(Message.RecipientType.TO,
-	                       new InternetAddress(Constants.toInvoiceMail, "Mr. User"));
+	                       new InternetAddress(emailTo, "Mr. User"));
 	      msg.setSubject("Payout invoice");
 	      msg.setText("You have an invoice");
 
@@ -136,7 +136,7 @@ public class MailService {
 
 	    try {
 	      Message msg = new MimeMessage(session);
-	      msg.setFrom(new InternetAddress(Constants.fromMail, "Admin"));
+	      msg.setFrom(new InternetAddress(email.getFrom(), "Admin"));
 	      msg.addRecipient(Message.RecipientType.TO,
 	                       new InternetAddress(email.getTo(), "Mr. User"));
 	      msg.setSubject(email.getSubject());
@@ -212,7 +212,7 @@ public class MailService {
 
 	    try {
 	      Message msg = new MimeMessage(session);
-	      msg.setFrom(new InternetAddress(Constants.fromMail, "Admin"));
+	      msg.setFrom(new InternetAddress(email.getFrom(), "Admin"));
 	      msg.addRecipient(Message.RecipientType.TO,
 	                       new InternetAddress(email.getTo(), "Mr. User"));
 	      msg.setSubject(email.getSubject());

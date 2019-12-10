@@ -11,13 +11,14 @@ public interface Constants {
 //	public static final String mode = "live";
 
 	//google authorized -> see gae console settings tab
-	public static final String fromMail ="more.games.discovery@gmail.com";
+	//public static final String fromMail ="more.games.discovery@gmail.com";
 	//public static final String fromMail ="laterz.app@gmail.com";
 
-	public static final String toInvoiceMail ="sergei.iliev@gmail.com";  //"laterz.app@gmail.com";
+	//public static final String toInvoiceMail ="sergei.iliev@gmail.com";  //"laterz.app@gmail.com";
+	
 	public static final String SENDGRID_API_KEY = "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";
 	
-	public static final int INVOICE_BASE= 111111;
+	//public static final int INVOICE_BASE= 111111;
 
 	public static final String IMPORT_CSV_FILE = "csv/paid_users_2018.csv";
 	public static final String IMPORT_CSV_FILE_2019_eur_amount = "csv/paid_users_2019_eur_amount.csv";
@@ -27,25 +28,27 @@ public interface Constants {
 	public static final String BUCKET_NAME_DEV="luee-wally-v2-cpc.appspot.com";
 	public static final String BUCKET_NAME_PROD="luee-wally.com";
 	
-	public static final String EMAIL="1@1";
-	public static final String PASSWORD="1";
+	//public static final String EMAIL="1@1";
+	//public static final String PASSWORD="1";
 	
 	public static final int CURSOR_SIZE=1000;
 	
 	
 	/*****************Gift Card*********************************/
-	public static final String CUSTOMER_NAME="BackedSoft";	
-	public static final String ACCOUNT_NAME="BackedSoft";
+	//public static final String CUSTOMER_NAME="BackedSoft";	
+	//public static final String ACCOUNT_NAME="BackedSoft";
 	
-	public static final String ACCOUNT_EMAIL="admin@softbakedapps.com";
+	//public static final String ACCOUNT_EMAIL="admin@softbakedapps.com";
 	
-	public static final String PLATFORM_IDENTIFIER ="SoftBakedAppsTest";
-	public static final String PLATFORM_KEY="cJouiuWlNHJQQgKYXRCDoejyepZ$jeGnVSEx$KD?DdW";
+	//public static final String PLATFORM_IDENTIFIER ="SoftBakedAppsTest";
+	//public static final String PLATFORM_KEY="cJouiuWlNHJQQgKYXRCDoejyepZ$jeGnVSEx$KD?DdW";
 	
-	public static final String EMAIL_TEMPLATE_SUBJECT ="Your reward from %s!";
-	public static final String EMAIL_TEMPLATE_MESSAGE ="Congratulations! You just received your reward from %s.";
+	//public static final String EMAIL_TEMPLATE_SUBJECT ="Your reward from %s!";
+	//public static final String EMAIL_TEMPLATE_MESSAGE ="Congratulations! You just received your reward from %s.";
+	
+	
 	/******************Payment Report**************************/
 	
-	public static final String PAYMENT_REPORT_EMAIL_1="gil@softbakedapps.com";
-	public static final String PAYMENT_REPORT_EMAIL_2="laterz.app@softbakedapps.com";
+	//public static final String PAYMENT_REPORT_EMAIL_1="gil@softbakedapps.com";
+	//public static final String PAYMENT_REPORT_EMAIL_2="laterz.app@softbakedapps.com";
 }

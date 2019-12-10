@@ -17,12 +17,12 @@ public enum TestDatabase {
 		createPackageNameTitleMapping();
 		createApplicationSettings();
 		createPayPalCurrencyMap();
-		crearePayedUsersEntity();
+		//crearePayedUsersEntity();
 		
 	}
 	private  void createRedeemingRequests(){
-		createRedeemingRequestEntity("Sergey Iliev","15b5-4e3a-b398-8792a9a9f530","48bb2675-a072-4b6b-ab66-cb599a29147d", "5.1", new Date(), "com.moregames.makemoney", "PayPal", "sergei.iliev-facilitator@gmail.com", "US");		
-		createRedeemingRequestEntity("Minko","696f-4258-baef-55b6aa6550b1","ffff2675-a072-4b6b-ab66-cb599a29147d", "12.1", new Date(), "com.moregames.makemoney", "PayPal", "sergei.iliev-facilitator@gmail.com", "US");
+		createRedeemingRequestEntity("Sergey Iliev","15b5-4e3a-b398-8792a9a9f530","48bb2675-a072-4b6b-ab66-cb599a29147d", "1", new Date(), "com.moregames.makemoney", "PayPal", "sergeistupid@curilo.com", "US");		
+		createRedeemingRequestEntity("Minko","696f-4258-baef-55b6aa6550b1","ffff2675-a072-4b6b-ab66-cb599a29147d", "1", new Date(), "com.moregames.makemoney", "PayPal", "sergei.iliev-facilitator@gmail.com", "US");
 		createRedeemingRequestEntity("Viola","e701-4678-8d39-0c2485204f3b","aaaa2675-a072-4b6b-ab66-cb599a29147d", "0.1", new Date(), "com.moregames.makemoney", "Amazon", "sergei_iliev@yahoo.com", "GB");		
 		createRedeemingRequestEntity("Spas","90dd-47a1-9b47-a8892a20c7e9","bbbb2675-a072-4b6b-ab66-cb599a29147d", "1.1", new Date(), "com.moregames.makemoney", "Amazon", "sergei.iliev@gmail.com", "US");
 		createRedeemingRequestEntity("Gurmen","8957-48bb-a08c-de0adca6a91e","cccc1675-a072-4b6b-ab66-cb599a29147d", "1.1", new Date(), "com.moregames.makemoney", "Amazon", "sergei.iliev@gmail.com", "DE");		
@@ -235,6 +235,83 @@ public enum TestDatabase {
 		entity = new Entity("application_settings");	
 		entity.setIndexedProperty("name","SHOW_PAYPAL_PAY");
 		entity.setIndexedProperty("value","true");
+		ds.put(entity);
+		
+		entity = new Entity("application_settings");	
+		entity.setIndexedProperty("name","FROM_MAIL");
+		entity.setIndexedProperty("value","more.games.discovery@gmail.com");
+		ds.put(entity);
+		
+		entity = new Entity("application_settings");	
+		entity.setIndexedProperty("name","LOGIN_EMAIL");
+		entity.setIndexedProperty("value","1@1");
+		ds.put(entity);
+		
+		entity = new Entity("application_settings");	
+		entity.setIndexedProperty("name","LOGIN_PASSWORD");
+		entity.setIndexedProperty("value","1");
+		ds.put(entity);
+		
+		entity = new Entity("application_settings");	
+		entity.setIndexedProperty("name","FROM_MAIL");
+		entity.setIndexedProperty("value","more.games.discovery@gmail.com");
+		ds.put(entity);
+		
+		entity = new Entity("application_settings");	
+		entity.setIndexedProperty("name","TO_INVOICE_MAIL");
+		entity.setIndexedProperty("value","laterz.app@gmail.com");
+		ds.put(entity);
+		
+		entity = new Entity("application_settings");	
+		entity.setIndexedProperty("name","INVOICE_BASE");
+		entity.setIndexedProperty("value","111111");
+		ds.put(entity);
+		
+		entity = new Entity("application_settings");	
+		entity.setIndexedProperty("name","TANGO_CARD_CUSTOMER_NAME");
+		entity.setIndexedProperty("value","BackedSoft");
+		ds.put(entity);
+		
+		entity = new Entity("application_settings");	
+		entity.setIndexedProperty("name","TANGO_CARD_ACCOUNT_NAME");
+		entity.setIndexedProperty("value","BackedSoft");
+		ds.put(entity);
+		
+		
+		entity = new Entity("application_settings");	
+		entity.setIndexedProperty("name","TANGO_CARD_ACCOUNT_EMAIL");
+		entity.setIndexedProperty("value","admin@softbakedapps.com");
+		ds.put(entity);
+		
+		entity = new Entity("application_settings");	
+		entity.setIndexedProperty("name","TANGO_CARD_PLATFORM_IDENTIFIER");
+		entity.setIndexedProperty("value","SoftBakedAppsTest");
+		ds.put(entity);
+		
+		entity = new Entity("application_settings");	
+		entity.setIndexedProperty("name","TANGO_CARD_PLATFORM_KEY");
+		entity.setIndexedProperty("value","cJouiuWlNHJQQgKYXRCDoejyepZ$jeGnVSEx$KD?DdW");
+		ds.put(entity);
+		
+		
+		entity = new Entity("application_settings");	
+		entity.setIndexedProperty("name","TANGO_CARD_EMAIL_TEMPLATE_SUBJECT");
+		entity.setIndexedProperty("value","Your reward from %s!");
+		ds.put(entity);
+		
+		entity = new Entity("application_settings");	
+		entity.setIndexedProperty("name","TANGO_CARD_EMAIL_TEMPLATE_MESSAGE");
+		entity.setIndexedProperty("value","Congratulations! You just received your reward from %s.");
+		ds.put(entity);
+		
+		entity = new Entity("application_settings");	
+		entity.setIndexedProperty("name","PAYMENT_REPORT_EMAIL_1");
+		entity.setIndexedProperty("value","gil@softbakedapps.com");
+		ds.put(entity);
+		
+		entity = new Entity("application_settings");	
+		entity.setIndexedProperty("name","PAYMENT_REPORT_EMAIL_2");
+		entity.setIndexedProperty("value","laterz.app@gmail.com");
 		ds.put(entity);
 	}
 }

@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.luee.wally.admin.controller.AffsSearchController;
+import com.luee.wally.admin.controller.ApplicationSettingsController;
 import com.luee.wally.admin.controller.CampaignSearchController;
 import com.luee.wally.admin.controller.ImportController;
 import com.luee.wally.admin.controller.LoginController;
@@ -52,6 +53,8 @@ INSTANCE;
     	 httpGetRouteList.put("/administration/payment/test", new Route(new PaymentController(),"test"));
     	 httpGetRouteList.put("/administration/job/reports/payment/yesterday", new Route(new PaymentReportsController(),"getPaymentReportForYesterday"));
     	 
+    	 httpGetRouteList.put("/administration/settings", new Route(new ApplicationSettingsController(),"index"));
+    	 httpGetRouteList.put("/administration/settings/cache/clear", new Route(new ApplicationSettingsController(),"clearCache"));
     	 //post
     	 httpPostRouteList.put("/administration/search", new Route(new AffsSearchController(),"search"));
     	 httpPostRouteList.put("/administration/campaign/search", new Route(new CampaignSearchController(),"search"));

@@ -10,7 +10,9 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.luee.wally.admin.repository.ApplicationSettingsRepository;
 import com.luee.wally.api.route.Controller;
+import com.luee.wally.api.service.ApplicationSettingsService;
 import com.luee.wally.api.service.MailService;
 import com.luee.wally.api.service.PaymentReportsService;
 import com.luee.wally.command.Email;
@@ -43,17 +45,17 @@ public class PaymentReportsController implements Controller{
 		 for(Map.Entry<String,BigDecimal> entry: paymentAmount.getTotalAmountByTypeMap().entrySet()){
 			 sb.append(" "+entry.getKey()+" - "+Utilities.formatPrice(entry.getValue())+"\r\n");	 
 		 }
-
+         ApplicationSettingsService applicationSettingsService=new ApplicationSettingsService();
 		 //send mail
 		 Email email=new Email();
-		 email.setTo(Constants.PAYMENT_REPORT_EMAIL_1);
+		 email.setTo(applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.PAYMENT_REPORT_EMAIL_1));
 		 email.setContent(sb.toString());
 		 email.setSubject("Payment Report");
 		 
 		 MailService mailService=new MailService();
 		 mailService.sendMail(email);	
-		 
-		 email.setTo(Constants.PAYMENT_REPORT_EMAIL_2);
+		 		 
+		 email.setTo(applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.PAYMENT_REPORT_EMAIL_2));
 		 mailService.sendMail(email);
 		 
 		 logger.log(Level.WARNING, "*************************End Payment Reports Job ********************");

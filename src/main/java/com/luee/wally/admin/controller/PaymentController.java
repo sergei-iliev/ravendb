@@ -23,6 +23,7 @@ import com.luee.wally.admin.repository.InvoiceRepository;
 import com.luee.wally.admin.repository.PaymentRepository;
 import com.luee.wally.admin.repository.SearchFilterTemplateRepository;
 import com.luee.wally.api.route.Controller;
+import com.luee.wally.api.service.ApplicationSettingsService;
 import com.luee.wally.api.service.InvoiceService;
 import com.luee.wally.api.service.MailService;
 import com.luee.wally.api.service.PayPalService;
@@ -37,6 +38,9 @@ import com.luee.wally.entity.RedeemingRequests;
 import com.luee.wally.entity.SearchFilterTemplate;
 import com.luee.wally.exception.RestResponseException;
 import com.luee.wally.json.JSONUtils;
+import com.paypal.api.payments.ErrorDetails;
+import com.paypal.base.exception.PayPalException;
+import com.paypal.base.rest.PayPalRESTException;
 
 public class PaymentController implements Controller {
 	private final Logger logger = Logger.getLogger(CampaignSearchController.class.getName());
@@ -51,7 +55,9 @@ public class PaymentController implements Controller {
 
 	public void sendPayPal(HttpServletRequest req, HttpServletResponse resp) throws Exception {
 		String key = (String) req.getParameter("key");
-		//find user to paypal to
+
+		
+	    //find user to paypal to
 		PaymentRepository paymentRepository = new PaymentRepository();
 		Entity user = paymentRepository.getRedeemingRequestsByKey(key);
 		
@@ -81,7 +87,12 @@ public class PaymentController implements Controller {
 		PayPalService payPalService = new PayPalService();
 		InvoiceService invoiceService = new InvoiceService();
 		MailService mailService = new MailService();
-
+		String sStackTrace;
+		
+		ApplicationSettingsService applicationSettingsService=new ApplicationSettingsService();
+		String toInvoiceMail=applicationSettingsService.getApplicationSetting(ApplicationSettingsRepository.TO_INVOICE_MAIL);
+		String fromMail=applicationSettingsService.getApplicationSetting(ApplicationSettingsRepository.FROM_MAIL);
+		
 		InvoiceRepository invoiceRepository = new InvoiceRepository();
 		try {
 			//payout
@@ -95,22 +106,29 @@ public class PaymentController implements Controller {
 			PdfAttachment attachment = new PdfAttachment();
 			attachment.readFromStream(invoiceService.createInvoice(payoutResult, user, invoiceNumber));
 			//send invoice
-			mailService.sendInvoice(Constants.toInvoiceMail, attachment);
+			mailService.sendInvoice(toInvoiceMail,fromMail, attachment);
 			resp.getWriter().write("OK");
+		}catch(PayPalRESTException ppe){
+			logger.log(Level.SEVERE, "PayPal rest payment", ppe);
+			resp.getWriter().write("PayPal exception, check logs for details\r\n");
+			for(ErrorDetails errorDetails:ppe.getDetails().getDetails()){
+			  resp.getWriter().write(errorDetails.getIssue()+"r\n");
+			}
 		} catch (Exception ex) {
 			logger.log(Level.SEVERE, "payment", ex);
 			StringWriter sw = new StringWriter();
 			PrintWriter pw = new PrintWriter(sw);
 			ex.printStackTrace(pw);
-			String sStackTrace = sw.toString();
+			sStackTrace = sw.toString();
 			Email email = new Email();
 			email.setSubject("Error alert!");
 			email.setContent((Objects.toString(ex.getMessage(), "")) + "/n/n" + sStackTrace);
-			email.setFrom(Constants.fromMail);
-			email.setTo(Constants.toInvoiceMail);
-			mailService.sendMail(email);		
+			email.setFrom(fromMail);
+			email.setTo(toInvoiceMail);
+			mailService.sendMail(email);
+			resp.getWriter().write("Server error, check logs for details.");
 		}
-		    resp.getWriter().write("Server error, check logs for details.");
+		    
 	}
 
 	public void sendGiftCard(HttpServletRequest req, HttpServletResponse resp) throws Exception {

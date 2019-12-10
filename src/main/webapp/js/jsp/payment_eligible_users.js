@@ -14,7 +14,75 @@ payment.PaymentEligibleUsersView = Backbone.View.extend({
 		  var url = $(this).data('href');
 		  
 		  $(e.target).prop('disabled', true);
+			var formData={
+					   key:key					
+				  };
+			//1.register record in paid_user table
+			$.ajax({
+				url:'/administration/payment/user/paypal',
+				type:'post',
+				data:formData,
+				success: function(data, textStatus, jQxhr ){			          
+	    			if(!data.startsWith("OK")){
+	    				$(e.target).css("background-color","red");
+	    				 if(data.startsWith("+")){	//payment done!
+					 	   //disable Paid button
+						   var $tr = $(e.target).closest('tr');
+						   $tr.find($(':button[value="Paid"]')).prop('disabled', true);	 
+	    				   
+						   var response=JSON.parse(data.substring(1));
+				    	   								  
+				    	   var text="Could not add user payment because user payment already exists:\r\n"+
+				    		   "date: "+response.properties.date+"\r\n"+
+				    		   "user_guid: "+response.properties.user_guid+"\r\n"+
+				    		   "paid_currency: "+response.properties.paid_currency+"\r\n"+
+				    		   "amount: "+response.properties.amount+"\r\n"+
+				    		   "type: "+response.properties.type+"\r\n"+
+				    		   "eur_currency: "+response.properties.eur_currency+"\r\n"+
+				    		   "email_address: "+response.properties.email_address+"\r\n"+
+				    		   "paypal_account: "+response.properties.paypal_account+"\r\n"+
+				    		   "paid_user_success: "+response.properties.paid_user_success+"\r\n"+
+				    		   "email_sent_success: "+response.properties.email_sent_success+"\r\n";							    	    
+				    	       alert(text);	
+	    				 }else{
+	    					 alert(data);
+	    				 }
+	    			}else{
+	    				//register LINK
+	    				$.ajax({
+	    					    url: url,
+	    					    type: 'get',			    	   
+	    					    success: function(data, textStatus, jQxhr ){	
+	    					 		//disable Paid button
+	    					    	var $tr = $(e.target).closest('tr');
+	    							$tr.find($(':button[value="Paid"]')).prop('disabled', true);	
+	    		    				
+	    		    				$(e.target).css("background-color","green");
+	    					    },
+	    					    error: function( jqXhr, textStatus, errorThrown ){
+	    					        alert(errorThrown);
+	    					    	console.log( errorThrown );
+	    					    }
+	    					    });     
+	    		    }	
+				},
+				error: function( jqXhr, textStatus, errorThrown ){
+					$(e.target).css("background-color","red");
+					console.log( errorThrown );
+				}
+	  
+			});
 		  
+		  
+	  });
+	  /*
+	  $('[pay-paypal-button="true"]').click(function(e) {
+		  e.preventDefault();
+		  var key = $(this).data('entitykey');
+		  var url = $(this).data('href');
+		  
+		  $(e.target).prop('disabled', true);
+
 		  $.ajax({
 			    url: url,
 			    type: 'get',			    	   
@@ -73,6 +141,7 @@ payment.PaymentEligibleUsersView = Backbone.View.extend({
 		    }
 		});
 	  });
+	  */
 	  //********send gift card
 	  $('[pay-gc-button="true"]').click(function(e) {	
 		  e.preventDefault();

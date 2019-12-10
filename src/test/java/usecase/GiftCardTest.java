@@ -74,6 +74,7 @@ public class GiftCardTest {
 
 		helper.tearDown();
 	}
+	/*
 	@Test
 	public void getCatalogTest() throws Throwable {
 		   RaasClient raasClient=new  RaasClient(Constants.PLATFORM_IDENTIFIER,Constants.PLATFORM_KEY);
@@ -200,7 +201,7 @@ public class GiftCardTest {
     	   System.out.println(IOUtils.toString(e.getHttpContext().getResponse().getRawBody(),Charset.defaultCharset()));
        }
 	}
-	
+	*/
 	private String json(Object object) throws JsonProcessingException {
         
 		return objectMapper.writeValueAsString(object);

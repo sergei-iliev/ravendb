@@ -150,23 +150,23 @@ public class InvoiceService {
 		return  new ByteArrayInputStream(output.toByteArray());
 	}
 	
-	private long createInvoiceNumer(){
-		  ShardedSequence sequence=new ShardedSequence("SEQUENCE");		
-		  return sequence.next();
-	}
-
-	
-	public String generateInvoiceNumber(){
-		LocalDate date = LocalDate.now();
-		int year=date.getYear();
-		String result=String.valueOf(year);
-		
-		
-		long number= createInvoiceNumer();
-		result+=String.valueOf(Constants.INVOICE_BASE+number);
-		
-		return result;
-	}
+//	private long createInvoiceNumer(){
+//		  ShardedSequence sequence=new ShardedSequence("SEQUENCE");		
+//		  return sequence.next();
+//	}
+//
+//	
+//	public String generateInvoiceNumber(){
+//		LocalDate date = LocalDate.now();
+//		int year=date.getYear();
+//		String result=String.valueOf(year);
+//		
+//		
+//		long number= createInvoiceNumer();
+//		result+=String.valueOf(Constants.INVOICE_BASE+number);
+//		
+//		return result;
+//	}
 	public InputStream createInvoice(PayoutResult payoutResult,Entity user,String invoiceNumber) throws Exception{
 	    ByteArrayOutputStream output=new ByteArrayOutputStream();
 		Document document = new Document();

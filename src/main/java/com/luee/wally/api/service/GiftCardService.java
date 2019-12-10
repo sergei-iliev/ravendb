@@ -7,7 +7,7 @@ import java.util.logging.Logger;
 
 import org.apache.commons.io.IOUtils;
 
-import com.luee.wally.constants.Constants;
+import com.luee.wally.admin.repository.ApplicationSettingsRepository;
 import com.luee.wally.entity.RedeemingRequests;
 import com.luee.wally.exception.RestResponseException;
 import com.luee.wally.json.JSONUtils;
@@ -22,7 +22,9 @@ public class GiftCardService {
 
 	
 	public OrderModel sendGiftCard(RedeemingRequests redeemingRequests,String unitid,String from)throws RestResponseException{
-		RaasClient raasClient=new  RaasClient(Constants.PLATFORM_IDENTIFIER,Constants.PLATFORM_KEY);
+		ApplicationSettingsService applicationSettingsService=new ApplicationSettingsService();
+		
+		RaasClient raasClient=new  RaasClient(applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.TANGO_CARD_PLATFORM_IDENTIFIER),applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.TANGO_CARD_PLATFORM_KEY));
 	    String externalRefId = redeemingRequests.getRedeemingRequestId();
 	       
 	    NameEmailModel recipientNameEmailModel = new NameEmailModel();
@@ -33,24 +35,24 @@ public class GiftCardService {
 	    recipientNameEmailModel.setEmail(redeemingRequests.getEmail());
 
 	    
-
+        
 	    
 	    CreateOrderRequestModel createOrderRequestModel = new CreateOrderRequestModel();
 	    createOrderRequestModel.setExternalRefID(externalRefId);
-	    createOrderRequestModel.setCustomerIdentifier(Constants.CUSTOMER_NAME);
-	    createOrderRequestModel.setAccountIdentifier(Constants.ACCOUNT_NAME);
+	    createOrderRequestModel.setCustomerIdentifier(applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.TANGO_CARD_CUSTOMER_NAME));
+	    createOrderRequestModel.setAccountIdentifier(applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.TANGO_CARD_ACCOUNT_NAME));
 	    createOrderRequestModel.setRecipient(recipientNameEmailModel);
 	    createOrderRequestModel.setSendEmail(true);
 	    createOrderRequestModel.setUtid(unitid); // Amazon.com Variable item
 	    createOrderRequestModel.setAmount(Double.parseDouble(redeemingRequests.getAmount()));
 	    
-	    createOrderRequestModel.setMessage(String.format(Constants.EMAIL_TEMPLATE_MESSAGE,from));
-	    createOrderRequestModel.setEmailSubject(String.format(Constants.EMAIL_TEMPLATE_SUBJECT,from));
+	    createOrderRequestModel.setMessage(String.format(applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.TANGO_CARD_EMAIL_TEMPLATE_MESSAGE),from));
+	    createOrderRequestModel.setEmailSubject(String.format(applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.TANGO_CARD_EMAIL_TEMPLATE_SUBJECT),from));
 
 	    NameEmailModel senderNameEmailModel = new NameEmailModel();
 	    senderNameEmailModel.setFirstName(from);
 	    senderNameEmailModel.setLastName("");
-	    senderNameEmailModel.setEmail(Constants.ACCOUNT_EMAIL);
+	    senderNameEmailModel.setEmail(applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.TANGO_CARD_ACCOUNT_EMAIL));
 	    createOrderRequestModel.setSender(senderNameEmailModel);
 	    
 		try {
@@ -64,7 +66,6 @@ public class GiftCardService {
 				
 				logger.log(Level.SEVERE,msg);
 			  }catch(IOException ioe){
-				  System.out.println(333);
 				  logger.log(Level.SEVERE,"IOException",ioe);
 				  throw new RestResponseException(100, "Unable to convert Raas response body");
 			  }		

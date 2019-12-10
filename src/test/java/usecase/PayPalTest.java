@@ -120,7 +120,7 @@ public class PayPalTest {
         PdfAttachment attachment=new PdfAttachment();
         attachment.readFromStream(invoiceService.createInvoice(payoutResult,user,invoiceNumber));   
 
-        mailService.sendInvoice(Constants.toInvoiceMail,attachment);
+        //mailService.sendInvoice(Constants.toInvoiceMail,attachment);
 
         
         }
@@ -133,9 +133,9 @@ public class PayPalTest {
 			Email email=new Email();
 			email.setSubject("Error alert!");
 			email.setContent((Objects.toString(ex.getMessage(), ""))+"/n/n"+sStackTrace);
-			email.setFrom(Constants.fromMail);
-			email.setTo(Constants.toInvoiceMail);
-			mailService.sendMail(email);
+			//email.setFrom(Constants.fromMail);
+			//email.setTo(Constants.toInvoiceMail);
+			//mailService.sendMail(email);
         }		
 		
 	}
