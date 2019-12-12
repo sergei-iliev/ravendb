@@ -74,7 +74,7 @@ public class GiftCardTest {
 
 		helper.tearDown();
 	}
-	/*
+	
 	@Test
 	public void getCatalogTest() throws Throwable {
 		   RaasClient raasClient=new  RaasClient(Constants.PLATFORM_IDENTIFIER,Constants.PLATFORM_KEY);
@@ -83,6 +83,7 @@ public class GiftCardTest {
 	       System.out.println(json(catalogModel));
 
 	}
+	/*
 	@Test
 	public void createUserGiftCardTest() throws Throwable {
 	   RaasClient raasClient=new  RaasClient(Constants.PLATFORM_IDENTIFIER,Constants.PLATFORM_KEY);

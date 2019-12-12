@@ -77,6 +77,7 @@ public class ApplicationSettingsRepository extends AbstractRepository {
 		return map;
 	}
 	public String getApplicationSetting(String name) {
+		System.out.println(name);
 		DatastoreService ds = createDatastoreService(Consistency.EVENTUAL);
 		Query query = new Query("application_settings");
 	    query.setFilter(new FilterPredicate("name", FilterOperator.EQUAL, name));

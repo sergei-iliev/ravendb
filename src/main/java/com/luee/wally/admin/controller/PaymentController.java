@@ -112,7 +112,8 @@ public class PaymentController implements Controller {
 			logger.log(Level.SEVERE, "PayPal rest payment", ppe);
 			resp.getWriter().write("PayPal exception, check logs for details\r\n");
 			for(ErrorDetails errorDetails:ppe.getDetails().getDetails()){
-			  resp.getWriter().write(errorDetails.getIssue()+"r\n");
+			  resp.getWriter().write(errorDetails.getField()+"\r\n");
+			  resp.getWriter().write(errorDetails.getIssue()+"\r\n");
 			}
 		} catch (Exception ex) {
 			logger.log(Level.SEVERE, "payment", ex);
