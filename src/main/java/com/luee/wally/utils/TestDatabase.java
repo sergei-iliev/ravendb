@@ -309,5 +309,10 @@ public enum TestDatabase {
 		entity.setIndexedProperty("name","PAYMENT_REPORT_EMAIL_2");
 		entity.setIndexedProperty("value","laterz.app@gmail.com");
 		ds.put(entity);
+			
+		entity = new Entity("application_settings");	
+		entity.setIndexedProperty("name","TANGO_CARD_ENVIRONMENT");
+		entity.setIndexedProperty("value","sandbox");
+		ds.put(entity);		
 	}
 }

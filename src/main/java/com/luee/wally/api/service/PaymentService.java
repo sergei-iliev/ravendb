@@ -62,9 +62,9 @@ public class PaymentService {
 		}
 		//check if gift card already sent
 		Entity giftCardOrder=paymentRepository.getPaidUserByRedeemingRequestId(redeemingRequests.getRedeemingRequestId());
-		if(giftCardOrder!=null){		   
-			throw new RestResponseException(200, JSONUtils.writeObject(giftCardOrder, Entity.class));				
-		}
+		//if(giftCardOrder!=null){		   
+		//	throw new RestResponseException(200, JSONUtils.writeObject(giftCardOrder, Entity.class));				
+		//}
 		
 		GiftCardService giftCardService=new GiftCardService();				
 		OrderModel order=giftCardService.sendGiftCard(redeemingRequests, giftCardCountryCode.getUnitid(),(String)entity.getProperty("title"));

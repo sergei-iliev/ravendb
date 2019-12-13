@@ -48,7 +48,7 @@ public class PaymentController implements Controller {
 	public void test(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		resp.setContentType("application/json");
 		resp.setCharacterEncoding("UTF-8");
-		String json = "{" + "\"paid_successfully\": true," + "\"email_sent_successfully\": true" + "}";
+		String json = "{" + "\"paid_successfully\": true," + "\"email_sent_successfully\": false" + "}";
 
 		resp.getWriter().write(json);
 	}

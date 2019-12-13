@@ -35,6 +35,8 @@ public interface Constants {
 	
 	public static final int PAYPAL_LOOP_COUNT=25;
 	
+	public static final String TANGO_CARD_PRODUCTION="production";
+	
 	/*****************Gift Card*********************************/
 	public static final String CUSTOMER_NAME="BackedSoft";	
 	public static final String ACCOUNT_NAME="BackedSoft";
@@ -43,6 +45,12 @@ public interface Constants {
 	
 	public static final String PLATFORM_IDENTIFIER ="SoftBakedAppsTest";
 	public static final String PLATFORM_KEY="cJouiuWlNHJQQgKYXRCDoejyepZ$jeGnVSEx$KD?DdW";
+	
+	public static final String PROD_PLATFORM_IDENTIFIER ="SoftBakedAppsGmbH-920";
+	public static final String PROD_PLATFORM_KEY="ipPKTHdSRqtgJF!hIRsR$jFJDKEnmYdDJfD$tiBppoK";
+	public static final String PROD_PLATFORM_CUSTOMER ="G71971146";
+	public static final String PROD_PLATFORM_ACCOUNT ="A88393817";
+	
 	
 	//public static final String EMAIL_TEMPLATE_SUBJECT ="Your reward from %s!";
 	//public static final String EMAIL_TEMPLATE_MESSAGE ="Congratulations! You just received your reward from %s.";

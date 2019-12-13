@@ -8,9 +8,11 @@ import java.util.logging.Logger;
 import org.apache.commons.io.IOUtils;
 
 import com.luee.wally.admin.repository.ApplicationSettingsRepository;
+import com.luee.wally.constants.Constants;
 import com.luee.wally.entity.RedeemingRequests;
 import com.luee.wally.exception.RestResponseException;
 import com.luee.wally.json.JSONUtils;
+import com.tangocard.raas.Configuration;
 import com.tangocard.raas.RaasClient;
 import com.tangocard.raas.exceptions.RaasGenericException;
 import com.tangocard.raas.models.CreateOrderRequestModel;
@@ -24,6 +26,13 @@ public class GiftCardService {
 	public OrderModel sendGiftCard(RedeemingRequests redeemingRequests,String unitid,String from)throws RestResponseException{
 		ApplicationSettingsService applicationSettingsService=new ApplicationSettingsService();
 		
+		String environment=applicationSettingsService.getApplicationSetting(ApplicationSettingsRepository.TANGO_CARD_ENVIRONMENT);
+		if(environment.equalsIgnoreCase(Constants.TANGO_CARD_PRODUCTION)){
+			Configuration.environment=Configuration.environment.PRODUCTION;
+		}else{
+			Configuration.environment=Configuration.environment.SANDBOX;
+		}
+
 		RaasClient raasClient=new  RaasClient(applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.TANGO_CARD_PLATFORM_IDENTIFIER),applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.TANGO_CARD_PLATFORM_KEY));
 	    String externalRefId = redeemingRequests.getRedeemingRequestId();
 	       
@@ -34,9 +43,6 @@ public class GiftCardService {
 	    }
 	    recipientNameEmailModel.setEmail(redeemingRequests.getEmail());
 
-	    
-        
-	    
 	    CreateOrderRequestModel createOrderRequestModel = new CreateOrderRequestModel();
 	    createOrderRequestModel.setExternalRefID(externalRefId);
 	    createOrderRequestModel.setCustomerIdentifier(applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.TANGO_CARD_CUSTOMER_NAME));
@@ -57,19 +63,18 @@ public class GiftCardService {
 	    
 		try {
 			OrderModel orderModel= raasClient.getOrders().createOrder(createOrderRequestModel);
-			
 			return orderModel;
 		} catch (Throwable e) {
 			if(e instanceof RaasGenericException){
+			  String msg=null;
 			  try{
-				String msg=IOUtils.toString(((RaasGenericException)e).getHttpContext().getResponse().getRawBody(),Charset.defaultCharset());
-				
+				msg=IOUtils.toString(((RaasGenericException)e).getHttpContext().getResponse().getRawBody(),Charset.defaultCharset());				
 				logger.log(Level.SEVERE,msg);
 			  }catch(IOException ioe){
 				  logger.log(Level.SEVERE,"IOException",ioe);
 				  throw new RestResponseException(100, "Unable to convert Raas response body");
 			  }		
-			  throw new RestResponseException(e,((RaasGenericException)e).getResponseCode(),((RaasGenericException)e).getHttpPhrase()); 
+			  throw new RestResponseException(100,msg); 
 			  
 			}else{				
 				logger.log(Level.SEVERE,"Send GiftCard, not Raas exception",e); 

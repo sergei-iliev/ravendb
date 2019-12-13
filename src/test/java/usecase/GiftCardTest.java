@@ -40,6 +40,7 @@ import com.luee.wally.api.service.impex.ImportService;
 import com.luee.wally.constants.Constants;
 import com.luee.wally.csv.PaidUsers2018;
 import com.luee.wally.json.ExchangeRateVO;
+import com.tangocard.raas.Configuration;
 import com.tangocard.raas.RaasClient;
 import com.tangocard.raas.exceptions.RaasGenericException;
 import com.tangocard.raas.models.AccountModel;
@@ -82,6 +83,24 @@ public class GiftCardTest {
 		   
 	       System.out.println(json(catalogModel));
 
+	}
+	
+	@Test
+	public void getCustomersTest() throws Throwable {
+		   Configuration.environment=Configuration.environment.PRODUCTION;
+		   RaasClient raasClient=new  RaasClient(Constants.PROD_PLATFORM_IDENTIFIER,Constants.PROD_PLATFORM_KEY);
+
+		   List<CustomerModel> customers = raasClient.getCustomers().getAllCustomers();
+		   customers.forEach(c->{
+	          System.out.println(c.getCustomerIdentifier());
+	       });
+		   System.out.println(raasClient.getAccounts().getAccountsByCustomer("G71971146").get(0).getAccountIdentifier());
+//		   List<AccountModel> accounts = raasClient.getAccounts().getAllAccounts();
+//		   accounts.forEach(a->{
+//		          System.out.println(a.getDisplayName());
+//		       });
+		   
+		   
 	}
 	/*
 	@Test
