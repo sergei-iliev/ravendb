@@ -45,6 +45,7 @@ import com.tangocard.raas.RaasClient;
 import com.tangocard.raas.exceptions.RaasGenericException;
 import com.tangocard.raas.models.AccountModel;
 import com.tangocard.raas.models.BillingAddressModel;
+import com.tangocard.raas.models.BrandModel;
 import com.tangocard.raas.models.CatalogModel;
 import com.tangocard.raas.models.CreateAccountInput;
 import com.tangocard.raas.models.CreateAccountRequestModel;
@@ -53,6 +54,7 @@ import com.tangocard.raas.models.CreateCustomerRequestModel;
 import com.tangocard.raas.models.CreateOrderRequestModel;
 import com.tangocard.raas.models.CreditCardModel;
 import com.tangocard.raas.models.CustomerModel;
+import com.tangocard.raas.models.ItemModel;
 import com.tangocard.raas.models.NameEmailModel;
 import com.tangocard.raas.models.NewCreditCardModel;
 import com.tangocard.raas.models.OrderModel;
@@ -78,10 +80,17 @@ public class GiftCardTest {
 	
 	@Test
 	public void getCatalogTest() throws Throwable {
-		   RaasClient raasClient=new  RaasClient(Constants.PLATFORM_IDENTIFIER,Constants.PLATFORM_KEY);
+		   Configuration.environment=Configuration.environment.PRODUCTION;
+		   RaasClient raasClient=new  RaasClient(Constants.PROD_PLATFORM_IDENTIFIER,Constants.PROD_PLATFORM_KEY);
 		   CatalogModel catalogModel = raasClient.getCatalog().getCatalog();
-		   
-	       System.out.println(json(catalogModel));
+		   System.out.println(json(catalogModel));
+		   for(BrandModel brandModel:catalogModel.getBrands()){
+			   System.out.println(brandModel.getBrandName());
+			   for(ItemModel itemModel:brandModel.getItems()){
+				   System.out.println(json(itemModel));
+			     
+			   }
+		   }
 
 	}
 	
@@ -91,16 +100,12 @@ public class GiftCardTest {
 		   RaasClient raasClient=new  RaasClient(Constants.PROD_PLATFORM_IDENTIFIER,Constants.PROD_PLATFORM_KEY);
 
 		   List<CustomerModel> customers = raasClient.getCustomers().getAllCustomers();
-		   customers.forEach(c->{
-	          System.out.println(c.getCustomerIdentifier());
-	       });
-		   System.out.println(raasClient.getAccounts().getAccountsByCustomer("G71971146").get(0).getAccountIdentifier());
-//		   List<AccountModel> accounts = raasClient.getAccounts().getAllAccounts();
-//		   accounts.forEach(a->{
-//		          System.out.println(a.getDisplayName());
-//		       });
-		   
-		   
+		  for(CustomerModel customer:customers){
+	          System.out.println(customer.getCustomerIdentifier());
+	            
+	          System.out.println(raasClient.getAccounts().getAccountsByCustomer(customer.getCustomerIdentifier()).get(0).getAccountIdentifier());
+		   };
+ 
 	}
 	/*
 	@Test

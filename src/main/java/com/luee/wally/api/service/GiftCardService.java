@@ -69,7 +69,6 @@ public class GiftCardService {
 			  String msg=null;
 			  try{
 				msg=IOUtils.toString(((RaasGenericException)e).getHttpContext().getResponse().getRawBody(),Charset.defaultCharset());				
-				logger.log(Level.SEVERE,msg);
 			  }catch(IOException ioe){
 				  logger.log(Level.SEVERE,"IOException",ioe);
 				  throw new RestResponseException(100, "Unable to convert Raas response body");

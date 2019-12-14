@@ -44,7 +44,8 @@ public class ApplicationSettingsRepository extends AbstractRepository {
 	public static final String PAYMENT_REPORT_EMAIL_1="PAYMENT_REPORT_EMAIL_1";//"gil@softbakedapps.com";
 	public static final String PAYMENT_REPORT_EMAIL_2="PAYMENT_REPORT_EMAIL_2";//"laterz.app@gmail.com";
 
-
+	public static final String NO_REPLY_EMAIL="NO_REPLY_EMAIL";
+	
 	public Map<String, String> getApplicationSettings() {
 		Map<String, String> map = new HashMap<>();
 

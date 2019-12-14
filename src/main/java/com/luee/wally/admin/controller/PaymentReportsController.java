@@ -16,7 +16,6 @@ import com.luee.wally.api.service.ApplicationSettingsService;
 import com.luee.wally.api.service.MailService;
 import com.luee.wally.api.service.PaymentReportsService;
 import com.luee.wally.command.Email;
-import com.luee.wally.constants.Constants;
 import com.luee.wally.entity.PaymentAmount;
 import com.luee.wally.utils.Utilities;
 
@@ -50,6 +49,7 @@ public class PaymentReportsController implements Controller{
 		 Email email=new Email();
 		 email.setTo(applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.PAYMENT_REPORT_EMAIL_1));
 		 email.setContent(sb.toString());
+		 email.setFrom(applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.NO_REPLY_EMAIL));
 		 email.setSubject("Payment Report");
 		 
 		 MailService mailService=new MailService();

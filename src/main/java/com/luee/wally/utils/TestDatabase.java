@@ -313,6 +313,12 @@ public enum TestDatabase {
 		entity = new Entity("application_settings");	
 		entity.setIndexedProperty("name","TANGO_CARD_ENVIRONMENT");
 		entity.setIndexedProperty("value","sandbox");
-		ds.put(entity);		
+		ds.put(entity);	
+		
+		entity = new Entity("application_settings");	
+		entity.setIndexedProperty("name","NO_REPLY_EMAIL");
+		entity.setIndexedProperty("value","no-reply@softbakedapps.com");
+		ds.put(entity);	
+		
 	}
 }
