@@ -16,7 +16,7 @@ public interface Constants {
 
 	//public static final String toInvoiceMail ="sergei.iliev@gmail.com";  //"laterz.app@gmail.com";
 	
-	public static final String SENDGRID_API_KEY = "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";
+	public static final String SENDGRID_API_KEY = "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";
 	
 	//public static final int INVOICE_BASE= 111111;
 

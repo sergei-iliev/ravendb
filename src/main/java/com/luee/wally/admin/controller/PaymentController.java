@@ -43,7 +43,7 @@ import com.paypal.base.exception.PayPalException;
 import com.paypal.base.rest.PayPalRESTException;
 
 public class PaymentController implements Controller {
-	private final Logger logger = Logger.getLogger(CampaignSearchController.class.getName());
+	private final Logger logger = Logger.getLogger(PaymentController.class.getName());
 
 	public void test(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		resp.setContentType("application/json");
@@ -106,7 +106,7 @@ public class PaymentController implements Controller {
 			PdfAttachment attachment = new PdfAttachment();
 			attachment.readFromStream(invoiceService.createInvoice(payoutResult, user, invoiceNumber));
 			//send invoice
-			mailService.sendInvoice(toInvoiceMail,fromMail, attachment);
+			mailService.sendGridInvoice(toInvoiceMail,fromMail, attachment);
 			resp.getWriter().write("OK");
 		}catch(PayPalRESTException ppe){
 			logger.log(Level.SEVERE, "PayPal rest payment", ppe);

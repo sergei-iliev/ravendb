@@ -240,7 +240,7 @@ public class InvoiceService {
 		accounts.setWidthPercentage(100);
 		accounts.addCell(getAccountsCell("Subtotal:"));
 		accounts.addCell(getAccountsCellR(payoutResult.getAmount().getValue()+" "+ payoutResult.getAmount().getCurrency()));
-		accounts.addCell(getAccountsCell("Tax:"));
+		accounts.addCell(getAccountsCell("Fee:"));
 		accounts.addCell(getAccountsCellR(payoutResult.getFee().getValue()+" "+ payoutResult.getFee().getCurrency()));
 		accounts.addCell(getAccountsCell("Total:"));
 		accounts.addCell(getAccountsCellR(payoutResult.getTotal()+" "+ payoutResult.getFee().getCurrency()));			

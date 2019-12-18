@@ -15,6 +15,7 @@ import com.luee.wally.admin.controller.ApplicationSettingsController;
 import com.luee.wally.admin.controller.CampaignSearchController;
 import com.luee.wally.admin.controller.ImportController;
 import com.luee.wally.admin.controller.LoginController;
+import com.luee.wally.admin.controller.PaidUsersController;
 import com.luee.wally.admin.controller.PaymentController;
 import com.luee.wally.admin.controller.PaymentReportsController;
 import com.luee.wally.admin.controller.SearchFilterTemplateController;
@@ -52,6 +53,8 @@ INSTANCE;
     	 httpGetRouteList.put("/administration/search/template/filter", new Route(new PaymentController(),"searchByFilterTemplate"));
     	 httpGetRouteList.put("/administration/payment/test", new Route(new PaymentController(),"test"));
     	 httpGetRouteList.put("/administration/job/reports/payment/yesterday", new Route(new PaymentReportsController(),"getPaymentReportForYesterday"));
+    	 httpGetRouteList.put("/administration/payment/paidusers", new Route(new PaidUsersController(),"index"));
+
     	 
     	 httpGetRouteList.put("/administration/settings", new Route(new ApplicationSettingsController(),"index"));
     	 httpGetRouteList.put("/administration/settings/cache/clear", new Route(new ApplicationSettingsController(),"clearCache"));

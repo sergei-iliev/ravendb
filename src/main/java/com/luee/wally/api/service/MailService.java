@@ -4,9 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
+import java.util.Base64;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -22,10 +20,10 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
-import com.fasterxml.jackson.core.JsonFactory;
 import com.luee.wally.command.Attachment;
 import com.luee.wally.command.Email;
 import com.luee.wally.constants.Constants;
+import com.sendgrid.Attachments;
 import com.sendgrid.Content;
 import com.sendgrid.Mail;
 import com.sendgrid.Method;
@@ -42,19 +40,49 @@ import com.sendgrid.SendGrid;
 public class MailService {
 	private final Logger logger = Logger.getLogger(MailService.class.getName());
     
-	/*
-	public Attachment readAttachment(MultipartFile file) throws IOException{
-	        if (file.isEmpty()) {
-		        return null;   
-	        }
-	        Attachment attachment=new Attachment();
-	        attachment.setFileName(file.getOriginalFilename());
-	        attachment.setContentType(file.getContentType());
-            attachment.readFromStream(file.getInputStream());
+	public void sendGridInvoice(String emailTo,String emailFrom,Attachment attachment) throws IOException{
+		Mail mail = new Mail();
+		
+		com.sendgrid.Email from = new com.sendgrid.Email(emailFrom);
+	    from.setName("Admin");
+	    mail.setFrom(from);
+	    mail.setSubject("Payout invoice");
+	    
+	    com.sendgrid.Email to = new com.sendgrid.Email();
+	    
+	    Personalization personalization = new Personalization();
+	    to.setName("Mr. User");
+	    to.setEmail(emailTo);
+	    personalization.addTo(to);
+	
+	    mail.addPersonalization(personalization);
+	    
+	    Content content = new Content();
+	    content.setType("text/plain");
+	    content.setValue("You have an invoice");
+	    mail.addContent(content);	    
+	    
+	    String base64Content=Base64.getEncoder().encodeToString(attachment.getBuffer()); 
+        Attachments attachments = new Attachments();            
+        attachments.setContent(base64Content);
+        attachments.setType(attachment.getContentType());
+        attachments.setFilename(attachment.getFileName());
+        attachments.setDisposition("attachment");
+        attachments.setContentId("Invoice");
+        mail.addAttachments(attachments);	    
+	    
+	    SendGrid sg = new SendGrid(Constants.SENDGRID_API_KEY);
+	    Request request = new Request();
 
-            return attachment;
-	}*/
-
+	    
+	    request.setMethod(Method.POST);
+	    request.setEndpoint("mail/send");
+	    request.setBody(mail.build());
+	    
+	    Response response = sg.api(request);
+	    
+	}
+/*
 	public void sendInvoice(String emailTo,String emailFrom,Attachment attachment) {
 	    Properties props = new Properties();
 	    Session session = Session.getDefaultInstance(props, null);
@@ -90,6 +118,7 @@ public class MailService {
 	    	logger.log(Level.SEVERE,"email",e);
 	    }
 	 }
+	 */
 	/*
 	public void sendInvoice(PayoutForm form) {
 	    Properties props = new Properties();

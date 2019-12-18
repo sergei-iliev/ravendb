@@ -22,6 +22,7 @@ import com.luee.wally.entity.PaymentAmount;
 public class PaymentReportsRepository extends AbstractRepository{
 	  private final Logger logger = Logger.getLogger(PaymentReportsRepository.class.getName());
 	
+	    
 		public PaymentAmount getPaymentReports(Date startDate,Date endDate){
 			DatastoreService ds = createDatastoreService(Consistency.EVENTUAL);
 
