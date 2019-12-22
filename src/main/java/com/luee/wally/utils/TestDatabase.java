@@ -17,7 +17,7 @@ public enum TestDatabase {
 		createPackageNameTitleMapping();
 		createApplicationSettings();
 		createPayPalCurrencyMap();
-		//crearePayedUsersEntity();
+		crearePayedUsersEntity();
 		
 	}
 	private  void createRedeemingRequests(){
@@ -64,7 +64,7 @@ public enum TestDatabase {
 		   entity.setProperty("type", "PayPal");
 		   entity.setProperty("eur_currency",12.0);
 		   entity.setProperty("email_address","mikelo@yahoo.com");
-		   entity.setProperty("paypal_account","");
+		   entity.setProperty("paypal_account","hristo@yahoo.com");
 		   entity.setProperty("paid_user_success", true);
 		   entity.setProperty("email_sent_success",true);
 		   entity.setProperty("redeeming_request_key","");
@@ -80,8 +80,8 @@ public enum TestDatabase {
 		   entity.setProperty("amount", "3.2");
 		   entity.setProperty("type", "PayPal");
 		   entity.setProperty("eur_currency",2.0);
-		   entity.setProperty("email_address","mikelo@yahoo.com");
-		   entity.setProperty("paypal_account","");
+		   entity.setProperty("email_address","sergio@yahoo.com");
+		   entity.setProperty("paypal_account","mikelo@yahoo.com");
 		   entity.setProperty("paid_user_success", true);
 		   entity.setProperty("email_sent_success",true);
 		   entity.setProperty("redeeming_request_key","");

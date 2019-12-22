@@ -69,7 +69,12 @@ INSTANCE;
     	 httpPostRouteList.put("/administration/payment/user/pay", new Route(new PaymentController(),"pay"));
     	 httpPostRouteList.put("/administration/payment/user/giftcard", new Route(new PaymentController(),"sendGiftCard"));
     	 httpPostRouteList.put("/administration/payment/user/paypal", new Route(new PaymentController(),"sendPayPal"));
-    	
+    	 httpPostRouteList.put("/administration/payment/paidusers/search/general", new Route(new PaidUsersController(),"search")); 
+    	 httpPostRouteList.put("/administration/payment/paidusers/search/byemail", new Route(new PaidUsersController(),"searchByEmail"));
+    	 httpPostRouteList.put("/administration/payment/paidusers/search/byemail", new Route(new PaidUsersController(),"searchByEmail"));    	 
+    	 httpPostRouteList.put("/administration/payment/paidusers/search/byguid", new Route(new PaidUsersController(),"searchByGuid"));    	 
+
+    
     }
     
     public boolean hasPath(String httpMethod,String url){

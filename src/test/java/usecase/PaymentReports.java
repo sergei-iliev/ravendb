@@ -6,6 +6,7 @@ import org.junit.Test;
 
 import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
+import com.luee.wally.admin.repository.PaidUsersRepository;
 import com.luee.wally.api.service.PaymentReportsService;
 import com.luee.wally.utils.TestDatabase;
 
@@ -31,4 +32,11 @@ public class PaymentReports {
         PaymentReportsService paymentReportsService=new PaymentReportsService();
         paymentReportsService.getPaymentReportForYesterday();
 	}
+
+	@Test
+	public void getPayedUsersByEmailOrPayPalTest(){
+		TestDatabase.INSTANCE.generateDB();
+        PaidUsersRepository paidUsersRepository=new PaidUsersRepository();
+        System.out.println(paidUsersRepository.findPaidUsersByEmail("mikelo@yahoo.com","mikelo@yahoo.com"));
+	}	
 }

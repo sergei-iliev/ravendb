@@ -21,7 +21,7 @@ public class PaidUser {
 	private BigDecimal eurCurrency;
 	private String invoiceNumber;
 	private boolean paidUserSuccess,emailSentSuccess;
-	   
+	private String link;   
 
 	public static PaidUser valueOf(Entity entity) {
 		PaidUser paidUser = new PaidUser();
@@ -34,11 +34,14 @@ public class PaidUser {
 		paidUser.setPaypalAccount((String) entity.getProperty("paypal_account"));
 		paidUser.redeemingRequesKey=((String) entity.getProperty("redeeming_request_key"));
 		paidUser.paidCurrency=((String) entity.getProperty("paid_currency"));
-		paidUser.email=((String) entity.getProperty("email"));
+		paidUser.email=((String) entity.getProperty("email_address"));
 		paidUser.eurCurrency=BigDecimal.valueOf((double)entity.getProperty("eur_currency"));
 		paidUser.paidUserSuccess= ((Boolean)entity.getProperty("paid_user_success"));
 		paidUser.emailSentSuccess= ((Boolean)entity.getProperty("email_sent_success"));
 		paidUser.paymentReferenceId=((String) entity.getProperty("payment_reference_id"));
+		
+		paidUser.link="https://console.cloud.google.com/datastore/entities;kind=redeeming_requests_new;ns=__$DEFAULT$__/query/kind;filter=%5B%2220%2Fredeeming_request_id%7CSTR%7CEQ%7C36%2F"+paidUser.redeemingRequestId+"%22%5D?project=luee-wally-v2-cpc";
+		              		
 		return paidUser;
 	}
 
@@ -167,6 +170,10 @@ public class PaidUser {
 		this.emailSentSuccess = emailSentSuccess;
 	}
 
+	public String getLink() {
+			return link;
+	}
+	
 	@JsonIgnore
 	public boolean isAmazonType() {
 		return type.equalsIgnoreCase("amazon");

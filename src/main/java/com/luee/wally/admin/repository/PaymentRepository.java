@@ -162,7 +162,7 @@ public class PaymentRepository extends AbstractRepository{
 		   entity.setProperty("paypal_account",redeemingRequests.getProperty("paypal_account"));
 		   entity.setProperty("paid_user_success", form.isPaidUserSuccess());
 		   entity.setProperty("email_sent_success",form.isEmailSentSuccess());
-		   entity.setProperty("redeeming_request_key",redeemingRequests.getKey());
+		   entity.setProperty("redeeming_request_key",KeyFactory.keyToString(redeemingRequests.getKey()));
 		   entity.setProperty("redeeming_request_id",redeemingRequests.getProperty("redeeming_request_id"));
 		   ds.put(entity);
 	  }
