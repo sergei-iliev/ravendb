@@ -21,6 +21,7 @@ public class PaidUsersController implements Controller {
 		PaidUserSearchForm form = new PaidUserSearchForm();
 
 		req.setAttribute("webform", form);
+		req.setAttribute("countries", this.getCountries());
 		req.getRequestDispatcher("/jsp/paid_users.jsp").forward(req, resp);
 	}
 
@@ -30,12 +31,14 @@ public class PaidUsersController implements Controller {
 		form.setActiveTab(1);
 		
 		if(form.getStartDate()==null&&form.getEndDate()==null){
+		  
 		}else{	
 		  PaidUsersService paidUsersService=new PaidUsersService();
 		  req.setAttribute("entities", paidUsersService.search(form));
 		}
 		
 		req.setAttribute("webform", form);
+		req.setAttribute("countries", this.getCountries());
 		req.getRequestDispatcher("/jsp/paid_users.jsp").forward(req, resp);
 	}
 	
@@ -51,6 +54,7 @@ public class PaidUsersController implements Controller {
 		}
 
 		req.setAttribute("webform", form);
+		req.setAttribute("countries", this.getCountries());
 		req.getRequestDispatcher("/jsp/paid_users.jsp").forward(req, resp);
 	}
 	
@@ -66,6 +70,7 @@ public class PaidUsersController implements Controller {
 		}
 		
 		req.setAttribute("webform", form);
+		req.setAttribute("countries", this.getCountries());
 		req.getRequestDispatcher("/jsp/paid_users.jsp").forward(req, resp);
 	}
 	

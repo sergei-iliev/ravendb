@@ -70,7 +70,90 @@
       				<div class="col-md-12">
       				<form class="form-horizontal" id="search-general-form" method="post"
 						action="/administration/payment/paidusers/search/general">
+					<c:if test="${success!=null}">
+						<div class="alert alert-success" role="alert">${success}</div>
+					</c:if>
 						<fieldset>
+
+							<div class="form-label-group mt-3">
+								<div class="col-md-3">
+									<label for="typesId">Payment type</label> <input name="types"
+										class="form-control" id="typesId"
+										value="${webform.typesAsText}">
+								</div>
+							</div>
+							<div class="form-label-group">
+								<div class="col-3">
+									<label for="startDateId">Start Date</label> <input
+										class="form-control" type="date" data-date-format="MM/DD/YYYY"
+										name="startDate" value="${webform.startDateAsText}"
+										id="startDateId">
+								</div>
+							</div>
+							<div class="form-label-group">
+								<div class="col-3">
+									<label for="endDateId">End Date</label> <input
+										class="form-control" type="date" data-date-format="MM/DD/YYYY"
+										name="endDate" value="${webform.endDateAsText}" id="endDateId">
+								</div>
+							</div>
+							<div class="form-label-group mt-3">
+								<div class="col-3">
+									<div class="card card-body">
+										<div class="row">
+
+											<div class="col-md-12">
+												<label for="countryId">Country</label> <select
+													name="country" class="form-control" id="countryId">
+													<c:forEach var="item" items="${countries}">
+														<option ${item}>${item}</option>
+													</c:forEach>
+												</select>
+											</div>
+										</div>
+										<div class="row mt-3">
+											<div class="col-md-2">
+												<button class="btn" id="add-btn">
+													<i class="fa fa-arrow-down"></i>
+												</button>
+												<button class="btn" id="remove-btn">
+													<i class="fa fa-arrow-up"></i>
+												</button>
+											</div>
+										</div>
+										<div class="row mt-3">
+											<div class="col-md-12">
+												<select class="form-control" name="countries"
+													id="countriesId" multiple>
+													<c:forEach var="item" items="${webform.countryCodes}">
+														<option ${item}>${item}</option>
+													</c:forEach>
+												</select>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="form-label-group mt-3">
+								<div class="col-md-3">
+									<label for="packageNamesId">Package Name</label> <input
+										name="packageNames" class="form-control" id="packageNamesId"
+										value="${webform.packageNamesAsText}">
+								</div>
+							</div>
+							<div class="form-label-group mt-3">
+							<div class="col-md-3">
+							    <label for="amount-row">Amount</label>
+ 								<div class="form-row" id="amount-row">
+    								<div class="col">
+      									<input type="text" name="amountFrom" class="form-control" value="${webform.amountFrom}">
+    								</div>
+    								<div class="col">
+      									<input type="text" name="amountTo" class="form-control" value="${webform.amountTo}">
+    								</div>
+  								</div>
+  							</div>
+							</div>						
 						<!-- https://codepen.io/lehonti/pen/OzoXVa  -->
 						<!-- 	
 							 <div class="form-label-group mt-3">
@@ -94,27 +177,13 @@
                         		</div>
                         	</div>
                         	 --> 
-							<div class="form-label-group mt-3">
-								<div class="col-3">
-									<label for="startDateId">Start Date</label> <input
-										class="form-control" type="date" data-date-format="MM/DD/YYYY"
-										name="startDate" value="${webform.startDateAsText}"
-										id="startDateId">
-								</div>
-							</div>
-							<div class="form-label-group mt-3">
-								<div class="col-3">
-									<label for="endDateId">End Date</label> <input
-										class="form-control" type="date" data-date-format="MM/DD/YYYY"
-										name="endDate" value="${webform.endDateAsText}" id="endDateId">
-								</div>
-							</div>
 							<div class="form-group">
 								<div class="col-md-12 text-center">
 									<button type="submit" class="btn btn-primary btn-lg mt-5" >Search</button>
 								</div>
-							</div>							
-						</fieldset>
+							</div>												
+					
+					</fieldset>
 					</form>	
       				</div>
       			</div>

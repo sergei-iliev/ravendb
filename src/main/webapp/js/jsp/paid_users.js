@@ -13,9 +13,25 @@ payment.PaidUsersView = Backbone.View.extend({
 		});
   },
   events: {
-	
+	  "submit #search-general-form":"onSubmit",
+      "click  #add-btn" : "onAdd",	
+	  "click  #remove-btn" : "onRemove"	
   },
-
+  onSubmit:function(e){ 
+	  $("#countriesId option").prop("selected", "selected");
+  },
+  onAdd:function(e){
+	  e.preventDefault();
+	  var option=$('#countryId').val();
+	       $('#countriesId').append($('<option>', {
+	    	    value: option,
+	    	    text: option
+	    	}));
+  },
+  onRemove:function(e){
+	  e.preventDefault();
+	  $('#countriesId').find('option:selected').remove();	
+  }, 
   render: function(){
 	  
     //this.$el.html("Hello World");

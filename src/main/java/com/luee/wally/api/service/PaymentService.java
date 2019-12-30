@@ -44,7 +44,7 @@ public class PaymentService {
 	public Collection<String> getDefaultCurrencyCodes(){
 		return Arrays.asList("USD","EUR","CAD","AUD","GBP");
 	}
-	
+
 	public void sendGiftCard(String key) throws JsonProcessingException,RestResponseException{
 		PaymentRepository paymentRepository=new PaymentRepository();
 		GiftCardRepository giftCardRepository=new GiftCardRepository();

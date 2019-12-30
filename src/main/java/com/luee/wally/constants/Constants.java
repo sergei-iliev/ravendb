@@ -31,7 +31,7 @@ public interface Constants {
 	//public static final String EMAIL="1@1";
 	//public static final String PASSWORD="1";
 	
-	public static final int CURSOR_SIZE=1000;
+	public static final int CURSOR_SIZE=3;
 	
 	public static final int PAYPAL_LOOP_COUNT=25;
 	

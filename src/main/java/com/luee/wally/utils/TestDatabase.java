@@ -7,6 +7,7 @@ import java.util.Date;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.KeyFactory;
 
 public enum TestDatabase {
 	INSTANCE;
@@ -16,18 +17,29 @@ public enum TestDatabase {
 		createAmazonGiftCardMap();
 		createPackageNameTitleMapping();
 		createApplicationSettings();
-		createPayPalCurrencyMap();
-		crearePayedUsersEntity();
-		
+		createPayPalCurrencyMap();				
 	}
 	private  void createRedeemingRequests(){
-		createRedeemingRequestEntity("Sergey Iliev","15b5-4e3a-b398-8792a9a9f530","48bb2675-a072-4b6b-ab66-cb599a29147d", "1", new Date(), "com.moregames.makemoney", "PayPal", "sergei.iliev-facilitator@gmail.com", "US");		
-		createRedeemingRequestEntity("Minko","696f-4258-baef-55b6aa6550b1","ffff2675-a072-4b6b-ab66-cb599a29147d", "1", new Date(), "com.moregames.makemoney", "PayPal", "sergei.iliev-facilitator@gmail.com", "US");
+		Entity entity=createRedeemingRequestEntity("Sergey Iliev","15b5-4e3a-b398-8792a9a9f530","48bb2675-a072-4b6b-ab66-cb599a29147d", "2.1", new Date(), "com.moregames.makemoney1", "PayPal", "sergei.iliev-facilitator@gmail.com", "DE");		
+		crearePaiedUsersEntity(entity,1.8);
+		
+		entity=createRedeemingRequestEntity("Minko","696f-4258-baef-55b6aa6550b1","ffff2675-a072-4b6b-ab66-cb599a29147d", "1",new Date(), "com.moregames.makemoney", "PayPal", "sergei.iliev-facilitator@gmail.com", "US");
+		crearePaiedUsersEntity(entity,0.8);
+		
+		entity=createRedeemingRequestEntity("Minko1","696f-4258-baef-55b6aa6550b11","ffff2675-a072-4b6b-ab66-cb599a29147d1", "1", new Date(), "com.moregames.makemoney2", "PayPal", "sergei.iliev-facilitator@gmail.com", "US");
+		crearePaiedUsersEntity(entity,0.9);
+		
+		entity=createRedeemingRequestEntity("Minko2","696f-4258-baef-55b6aa6550b12","ffff2675-a072-4b6b-ab66-cb599a29147d2", "1", new Date(), "com.moregames.makemoney", "PayPal", "sergei.iliev-facilitator@gmail.com", "US");
+		crearePaiedUsersEntity(entity,0.9);
+		
 		createRedeemingRequestEntity("Viola","e701-4678-8d39-0c2485204f3b","aaaa2675-a072-4b6b-ab66-cb599a29147d", "0.1", new Date(), "com.moregames.makemoney", "Amazon", "sergei_iliev@yahoo.com", "GB");		
-		createRedeemingRequestEntity("Spas","90dd-47a1-9b47-a8892a20c7e9","bbbb2675-a072-4b6b-ab66-cb599a29147d", "1.1", new Date(), "com.moregames.makemoney", "Amazon", "sergei.iliev@gmail.com", "US");
+		
+		entity=createRedeemingRequestEntity("Spas","90dd-47a1-9b47-a8892a20c7e9","bbbb2675-a072-4b6b-ab66-cb599a29147d", "3.1", new Date(), "com.moregames.makemoney", "Amazon", "sergei.iliev@gmail.com", "US");
+		crearePaiedUsersEntity(entity,2.9);
+		
 		createRedeemingRequestEntity("Gurmen","8957-48bb-a08c-de0adca6a91e","cccc1675-a072-4b6b-ab66-cb599a29147d", "1.1", new Date(), "com.moregames.makemoney", "Amazon", "sergei.iliev@gmail.com", "DE");		
 	}
-	private  void createRedeemingRequestEntity(String fullName,String redeemingRequestId,String userGuid,String amount,Date date,String packageName,String type,String paypalAccount,String countryCode){
+	private  Entity createRedeemingRequestEntity(String fullName,String redeemingRequestId,String userGuid,String amount, Date date,String packageName,String type,String paypalAccount,String countryCode){
 		DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
 	
 		Entity redeeming = new Entity("redeeming_requests_new");		
@@ -42,12 +54,12 @@ public enum TestDatabase {
 		redeeming.setIndexedProperty("country_code", countryCode);
 		redeeming.setIndexedProperty("is_paid", false);
 		redeeming.setIndexedProperty("email", paypalAccount);
-		redeeming.setIndexedProperty("package_name","com.matchmine.app");
 		ds.put(redeeming);
-
+       
+		return redeeming;
 		
 	}
-	private void crearePayedUsersEntity(){
+	private void crearePaiedUsersEntity(Entity redeeminRequest,double eurCurrency){
 		   DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
 		   
 		   ZonedDateTime now=ZonedDateTime.now();
@@ -58,37 +70,37 @@ public enum TestDatabase {
 		   
 		   Entity entity=new Entity("paid_users");	
 		   entity.setProperty("date", Date.from(yesterday.toInstant()));
-		   entity.setProperty("user_guid","48bb2675-a072-4b6b-ab66-cb599a29147d");
+		   entity.setProperty("user_guid",redeeminRequest.getProperty("user_guid"));
 		   entity.setProperty("paid_currency","USD");
 		   entity.setProperty("amount", "13.2");
-		   entity.setProperty("type", "PayPal");
-		   entity.setProperty("eur_currency",12.0);
+		   entity.setProperty("type", redeeminRequest.getProperty("type"));
+		   entity.setProperty("eur_currency",eurCurrency);
 		   entity.setProperty("email_address","mikelo@yahoo.com");
 		   entity.setProperty("paypal_account","hristo@yahoo.com");
 		   entity.setProperty("paid_user_success", true);
 		   entity.setProperty("email_sent_success",true);
-		   entity.setProperty("redeeming_request_key","");
-		   entity.setProperty("redeeming_request_id","15b5-4e3a-b398-8792a9a9f530");
+		   entity.setProperty("redeeming_request_key",KeyFactory.keyToString(redeeminRequest.getKey()));
+		   entity.setProperty("redeeming_request_id",redeeminRequest.getProperty("redeeming_request_id"));
 		   entity.setProperty("payment_reference_id","ref-number");
-		   entity.setProperty("invoice_number","111");		
+		   entity.setProperty("invoice_number","1111");		
 		   ds.put(entity);
 		   
-		   entity=new Entity("paid_users");	
-		   entity.setProperty("date", Date.from(yesterday.toInstant()));
-		   entity.setProperty("user_guid","ffff2675-a072-4b6b-ab66-cb599a29147d");
-		   entity.setProperty("paid_currency","USD");
-		   entity.setProperty("amount", "3.2");
-		   entity.setProperty("type", "PayPal");
-		   entity.setProperty("eur_currency",2.0);
-		   entity.setProperty("email_address","sergio@yahoo.com");
-		   entity.setProperty("paypal_account","mikelo@yahoo.com");
-		   entity.setProperty("paid_user_success", true);
-		   entity.setProperty("email_sent_success",true);
-		   entity.setProperty("redeeming_request_key","");
-		   entity.setProperty("redeeming_request_id","15b5-4e3a-b398-8792a9a9f530");
-		   entity.setProperty("payment_reference_id","ref-number");
-		   entity.setProperty("invoice_number","111");		
-		   ds.put(entity);
+//		   entity=new Entity("paid_users");	
+//		   entity.setProperty("date", Date.from(yesterday.toInstant()));
+//		   entity.setProperty("user_guid","ffff2675-a072-4b6b-ab66-cb599a29147d");
+//		   entity.setProperty("paid_currency","USD");
+//		   entity.setProperty("amount", "3.2");
+//		   entity.setProperty("type", "PayPal");
+//		   entity.setProperty("eur_currency",2.0);
+//		   entity.setProperty("email_address","sergio@yahoo.com");
+//		   entity.setProperty("paypal_account","mikelo@yahoo.com");
+//		   entity.setProperty("paid_user_success", true);
+//		   entity.setProperty("email_sent_success",true);
+//		   entity.setProperty("redeeming_request_key","");
+//		   entity.setProperty("redeeming_request_id","15b5-4e3a-b398-8792a9a9f530");
+//		   entity.setProperty("payment_reference_id","ref-number");
+//		   entity.setProperty("invoice_number","111");		
+//		   ds.put(entity);
 	}
 	
 	
