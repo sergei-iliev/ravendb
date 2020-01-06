@@ -1,8 +1,5 @@
 package com.luee.wally.admin.repository;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.logging.Logger;
 
@@ -25,7 +22,7 @@ public class PaymentReportsRepository extends AbstractRepository{
 	    
 		public PaymentAmount getPaymentReports(Date startDate,Date endDate){
 			DatastoreService ds = createDatastoreService(Consistency.EVENTUAL);
-
+			PaymentRepository paymentRepository=new PaymentRepository();
 			
 			Query query = createQuery(startDate, endDate);
 
@@ -44,18 +41,26 @@ public class PaymentReportsRepository extends AbstractRepository{
 				}
 
 				results = preparedQuery.asQueryResultList(fetchOptions);
-
+			
 				for (Entity e : results) {
 					paymentAmount.addTotalAmountEur((double) e.getProperty("eur_currency"));
 					paymentAmount.addTotalAmountByCurrencyMap((String) e.getProperty("paid_currency"),(String) e.getProperty("amount"));
 					paymentAmount.addTotalAmountByTypeMap((String) e.getProperty("type"),(double) e.getProperty("eur_currency"));										
+				    paymentAmount.addTotalAmountByAmountMap((String) e.getProperty("amount"),(double) e.getProperty("eur_currency"));
+					
+				    Entity redeemingRequest=paymentRepository.getRedeemingRequestsByKey((String) e.getProperty("redeeming_request_key"));
+				    String countryCode=(String)redeemingRequest.getProperty("country_code");
+				    
+				    paymentAmount.addTotalAmountByCountryCodeMap(countryCode,(double) e.getProperty("eur_currency"));
 				}
 			
 				cursor = results.getCursor();
 			} while (results.size() > 0);
 			return paymentAmount;
 		}
-		
+		/*
+		 * Read redeeming_requests by foraign key
+		 */
 		private Query createQuery(Date startDate, Date endDate) {
 
 			Query query = new Query("paid_users");			

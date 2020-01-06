@@ -44,6 +44,17 @@ public class PaymentReportsController implements Controller{
 		 for(Map.Entry<String,BigDecimal> entry: paymentAmount.getTotalAmountByTypeMap().entrySet()){
 			 sb.append(" "+entry.getKey()+" - "+Utilities.formatPrice(entry.getValue())+"\r\n");	 
 		 }
+		 
+		 sb.append("4. Total amount paid per amount value.\r\n");
+		 for(Map.Entry<String,BigDecimal> entry: paymentAmount.getTotalAmountByAmountMap().entrySet()){
+			 sb.append(" "+entry.getKey()+" - "+Utilities.formatPrice(entry.getValue())+"\r\n");	 
+		 }
+
+		 sb.append("5. Total amount paid per country code.\r\n");
+		 for(Map.Entry<String,BigDecimal> entry: paymentAmount.getTotalAmountByCountryCodeMap().entrySet()){
+			 sb.append(" "+entry.getKey()+" - "+Utilities.formatPrice(entry.getValue())+"\r\n");	 
+		 }
+		 
          ApplicationSettingsService applicationSettingsService=new ApplicationSettingsService();
 		 //send mail
 		 Email email=new Email();

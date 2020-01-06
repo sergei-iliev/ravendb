@@ -36,7 +36,7 @@ public class PaymentReports {
 	public void getPayedUserYesterdayReportTest(){
 		TestDatabase.INSTANCE.generateDB();
         PaymentReportsService paymentReportsService=new PaymentReportsService();
-        paymentReportsService.getPaymentReportForYesterday();
+        System.out.println(paymentReportsService.getPaymentReportForYesterday().getTotalAmountByCountryCodeMap());
 	}
 
 	@Test
@@ -60,7 +60,7 @@ public class PaymentReports {
 		form.setStartDate(Date.from(yesterday.toInstant()));
 		
 		form.setAmountFrom("0.8");
-		form.setAmountTo("1");
+		form.setAmountTo("10");
 		form.getTypes().add("PayPal");
 		
 		//form.getPackageNames().add("com.moregames.makemoney1");

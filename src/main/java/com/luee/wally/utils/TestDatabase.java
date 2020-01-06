@@ -72,7 +72,7 @@ public enum TestDatabase {
 		   entity.setProperty("date", Date.from(yesterday.toInstant()));
 		   entity.setProperty("user_guid",redeeminRequest.getProperty("user_guid"));
 		   entity.setProperty("paid_currency","USD");
-		   entity.setProperty("amount", "13.2");
+		   entity.setProperty("amount", String.valueOf(eurCurrency));
 		   entity.setProperty("type", redeeminRequest.getProperty("type"));
 		   entity.setProperty("eur_currency",eurCurrency);
 		   entity.setProperty("email_address","mikelo@yahoo.com");
