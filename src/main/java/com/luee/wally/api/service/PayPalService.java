@@ -7,10 +7,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import com.google.appengine.api.datastore.Entity;
+import com.luee.wally.admin.repository.ApplicationSettingsRepository;
+import com.luee.wally.admin.repository.GiftCardRepository;
 import com.luee.wally.command.invoice.Money;
 import com.luee.wally.command.invoice.PayoutResult;
 import com.luee.wally.constants.Constants;
 import com.luee.wally.entity.RedeemingRequests;
+import com.luee.wally.exception.RestResponseException;
 import com.paypal.api.payments.Currency;
 import com.paypal.api.payments.ErrorDetails;
 import com.paypal.api.payments.Payout;
@@ -29,6 +33,19 @@ public class PayPalService {
 
 	public PayoutResult payout(RedeemingRequests payPalUser,String currencyCode) throws PayPalRESTException {
 		PayoutResult payoutResult=new PayoutResult();
+		ApplicationSettingsService applicationSettingsService=new ApplicationSettingsService();
+		
+		//read package name title
+		GiftCardRepository giftCardRepository=new GiftCardRepository();
+		Entity entity=giftCardRepository.getPackageNameTitleMapping(payPalUser.getPackageName());
+		if(entity==null){
+			throw new PayPalRESTException("No title in package to title mapping table.");			
+		}
+		
+		String title=(String)entity.getProperty("title");
+		
+	    String message=(String.format(applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.TANGO_CARD_EMAIL_TEMPLATE_MESSAGE),title));
+	    String subject=(String.format(applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.TANGO_CARD_EMAIL_TEMPLATE_SUBJECT),title));
 		
 		// ###Payout
 		// A resource representing a payout
@@ -45,7 +62,7 @@ public class PayPalService {
 		// the item will not be processed.
 		// #### Batch Header Instance
 		String senderBatchId = System.currentTimeMillis() + "";
-		senderBatchHeader.setSenderBatchId(senderBatchId + "001").setEmailSubject("You have a Payout!");
+		senderBatchHeader.setSenderBatchId(senderBatchId + "001").setEmailSubject(subject);
 
 		// ### Currency
 		Currency amount = new Currency();
@@ -55,7 +72,7 @@ public class PayPalService {
 		// Please note that if you are using single payout with sync mode, you
 		// can only pass one Item in the request
 		PayoutItem senderItem = new PayoutItem();
-		senderItem.setRecipientType("Email").setNote("Thanks for your service")
+		senderItem.setRecipientType("Email").setNote(message)
 				.setReceiver(payPalUser.getPaypalAccount()).setSenderItemId("201404324234").setAmount(amount);
 
 		List<PayoutItem> items = new ArrayList<PayoutItem>();
