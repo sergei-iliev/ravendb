@@ -43,9 +43,8 @@ public class PayPalService {
 		}
 		
 		String title=(String)entity.getProperty("title");
-		
-	    String message=(String.format(applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.TANGO_CARD_EMAIL_TEMPLATE_MESSAGE),title));
 	    String subject=(String.format(applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.TANGO_CARD_EMAIL_TEMPLATE_SUBJECT),title));
+	    String message=(String.format(applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.TANGO_CARD_EMAIL_TEMPLATE_MESSAGE),title));
 		
 		// ###Payout
 		// A resource representing a payout

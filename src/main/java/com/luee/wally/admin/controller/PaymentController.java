@@ -16,6 +16,9 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.http.HttpStatus;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.EntityNotFoundException;
 import com.luee.wally.admin.repository.ApplicationSettingsRepository;
@@ -30,6 +33,7 @@ import com.luee.wally.api.service.PayPalService;
 import com.luee.wally.api.service.PaymentService;
 import com.luee.wally.command.Email;
 import com.luee.wally.command.PaidUserForm;
+import com.luee.wally.command.PayExternalForm;
 import com.luee.wally.command.PaymentEligibleUserForm;
 import com.luee.wally.command.PdfAttachment;
 import com.luee.wally.command.invoice.PayoutResult;
@@ -52,7 +56,22 @@ public class PaymentController implements Controller {
 
 		resp.getWriter().write(json);
 	}
-
+	/*
+	 * REST complient API mode
+	 */
+	public void payExternal(HttpServletRequest req, HttpServletResponse resp) throws Exception {
+		PayExternalForm form = PayExternalForm.parse(req);
+		//validate  
+		if(Objects.isNull(form.getRedeemingRequestId())||form.getRedeemingRequestId().isEmpty()||
+		   Objects.isNull(form.getType())||form.getType().isEmpty()){
+			logger.log(Level.SEVERE,"Invalid form data");
+			resp.sendError(HttpServletResponse.SC_BAD_REQUEST,"Invalid Form Data");			
+			return;
+		}
+        PaymentService paymentService=new PaymentService();                
+        paymentService.payExternal(resp, form);        
+	}
+	
 	public void sendPayPal(HttpServletRequest req, HttpServletResponse resp) throws Exception {
 		String key = (String) req.getParameter("key");
 
@@ -104,7 +123,12 @@ public class PaymentController implements Controller {
 			paymentRepository.savePayPalPayment(redeemingRequests, currencyCode, eurAmount,invoiceNumber, payoutResult.getPayoutBatchId());
             //create invoice
 			PdfAttachment attachment = new PdfAttachment();
-			attachment.readFromStream(invoiceService.createInvoice(payoutResult, user, invoiceNumber));
+			attachment.readFromStream(invoiceService.createInvoice(payoutResult, 
+													(String) user.getProperty("full_name"),
+													(String) user.getProperty("full_address"),
+													(String) user.getProperty("country_code"),
+													(String) user.getProperty("paypal_account"),
+													invoiceNumber));
 			//send invoice
 			mailService.sendGridInvoice(toInvoiceMail,fromMail, attachment);
 			resp.getWriter().write("OK");

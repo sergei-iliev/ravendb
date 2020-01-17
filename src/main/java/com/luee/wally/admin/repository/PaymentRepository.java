@@ -33,6 +33,7 @@ import com.google.appengine.api.memcache.MemcacheServiceFactory;
 import com.luee.wally.api.service.impex.ImportService;
 import com.luee.wally.command.PaidUserForm;
 import com.luee.wally.constants.Constants;
+import com.luee.wally.entity.PaidUserExternal;
 import com.luee.wally.entity.RedeemingRequests;
 import com.luee.wally.json.ExchangeRateVO;
 import com.luee.wally.utils.Utilities;
@@ -111,7 +112,31 @@ public class PaymentRepository extends AbstractRepository{
 			 PreparedQuery pq = ds.prepare(query);
 			 return pq.asSingleEntity();
 	  }
-	  
+	  public Entity getExternalPaidUserByRedeemingRequestId(String redeemingRequestId){
+		     DatastoreService ds = createDatastoreService(Consistency.STRONG);			 
+		     Query query = new Query("paid_users_external");
+		     query.setFilter(new FilterPredicate("redeeming_request_id", FilterOperator.EQUAL, redeemingRequestId));
+			 PreparedQuery pq = ds.prepare(query);
+			 return pq.asSingleEntity();
+	  }
+	  public void saveExternalPaidUser(PaidUserExternal paidUserExternal,BigDecimal eurAmount,String invoiceNumber,String payoutBatchId){	
+		   DatastoreService ds = createDatastoreService(Consistency.STRONG);
+		   Entity entity=new Entity("paid_users_external");	
+		   entity.setProperty("date", new Date());
+		   entity.setProperty("country_code",paidUserExternal.getCountryCode());
+		   entity.setProperty("paid_currency",paidUserExternal.getPaidCurrency());
+		   entity.setProperty("amount", paidUserExternal.getAmount());
+		   entity.setProperty("type", paidUserExternal.getType());
+		   entity.setProperty("eur_currency", eurAmount.doubleValue());
+		   entity.setProperty("email_address",paidUserExternal.getEmail());
+		   entity.setProperty("paypal_account",paidUserExternal.getPaypalAccount());
+		   entity.setProperty("redeeming_request_id",paidUserExternal.getRedeemingRequestId());
+		   entity.setProperty("package_name",paidUserExternal.getPackageName());
+		   entity.setProperty("address",paidUserExternal.getAddress());
+		   entity.setProperty("payment_reference_id",payoutBatchId);
+		   entity.setProperty("invoice_number",invoiceNumber);
+		   ds.put(entity);	
+	  }
 	  public void savePayPalPayment(RedeemingRequests redeemingRequests,String currencyCode,BigDecimal eurAmount,String invoiceNumber,String payoutBatchId){	
 	        
 		   DatastoreService ds = createDatastoreService(Consistency.STRONG);

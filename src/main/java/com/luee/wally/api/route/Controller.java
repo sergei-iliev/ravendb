@@ -8,6 +8,8 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Locale;
 
+import javax.servlet.http.HttpServletResponse;
+
 public interface Controller {
 
 	public default Collection<String> getCountries(){
@@ -27,4 +29,11 @@ public interface Controller {
 	    ZonedDateTime sd = date.toInstant().atZone(ZoneId.systemDefault());	    
 	    return formatter.format(sd);		
 	}
+	
+//	public default void setResponse(HttpServletResponse resp,int code,String message){
+//		resp.setContentType("application/json");
+//		//HttpServletResponse.
+//		resp.setStatus(code);
+//		resp.sen
+//	}
 }

@@ -267,7 +267,7 @@ public enum TestDatabase {
 		
 		entity = new Entity("application_settings");	
 		entity.setIndexedProperty("name","TO_INVOICE_MAIL");
-		entity.setIndexedProperty("value","laterz.app@gmail.com");
+		entity.setIndexedProperty("value","sergei.iliev@gmail.com");
 		ds.put(entity);
 		
 		entity = new Entity("application_settings");	
@@ -333,4 +333,6 @@ public enum TestDatabase {
 		ds.put(entity);	
 		
 	}
+	
+	
 }

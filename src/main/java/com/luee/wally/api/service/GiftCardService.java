@@ -65,6 +65,7 @@ public class GiftCardService {
 			OrderModel orderModel= raasClient.getOrders().createOrder(createOrderRequestModel);
 			return orderModel;
 		} catch (Throwable e) {
+			logger.log(Level.SEVERE,"IOException",e);
 			if(e instanceof RaasGenericException){
 			  String msg=null;
 			  try{

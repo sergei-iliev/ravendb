@@ -167,7 +167,10 @@ public class InvoiceService {
 //		
 //		return result;
 //	}
-	public InputStream createInvoice(PayoutResult payoutResult,Entity user,String invoiceNumber) throws Exception{
+	public InputStream createInvoice(PayoutResult payoutResult,
+			/*Entity user,*/
+			String fullName,String fullAddress,String countryCode,String payPalAccount,
+			String invoiceNumber) throws Exception{
 	    ByteArrayOutputStream output=new ByteArrayOutputStream();
 		Document document = new Document();
 		PdfWriter.getInstance(document,output);
@@ -194,21 +197,21 @@ public class InvoiceService {
 		addressTable.addCell(getCell("",12, PdfPCell.ALIGN_LEFT, Font.BOLD));
 		addressTable.addCell(getCell("From",12, PdfPCell.ALIGN_LEFT, Font.BOLD));	
 		
-		addressTable.addCell(getCell((String) user.getProperty("full_name"),10, PdfPCell.ALIGN_LEFT));
+		addressTable.addCell(getCell(fullName /*(String) user.getProperty("full_name")*/,10, PdfPCell.ALIGN_LEFT));
 		addressTable.addCell(getCell("",12, PdfPCell.ALIGN_LEFT, Font.BOLD));
 		addressTable.addCell(getCell("Soft Baked Apps GmbH (haftungsbeschränkt)",10, PdfPCell.ALIGN_LEFT));
 		
-		addressTable.addCell(getCell(Objects.toString((String) user.getProperty("full_address"), ""),10, PdfPCell.ALIGN_LEFT));
+		addressTable.addCell(getCell(Objects.toString( fullAddress /*(String) user.getProperty("full_address")*/, ""),10, PdfPCell.ALIGN_LEFT));
 		addressTable.addCell(getCell("",12, PdfPCell.ALIGN_LEFT, Font.BOLD));
 		addressTable.addCell(getCell("Schinkestrasse 14",10, PdfPCell.ALIGN_LEFT));
 		
 		
-		addressTable.addCell(getCell("Country: "+Objects.toString((String) user.getProperty("country_code"), ""),10, PdfPCell.ALIGN_LEFT));
+		addressTable.addCell(getCell("Country: "+Objects.toString(countryCode/*(String) user.getProperty("country_code")*/, ""),10, PdfPCell.ALIGN_LEFT));
 		addressTable.addCell(getCell("",12, PdfPCell.ALIGN_LEFT, Font.BOLD));
 		addressTable.addCell(getCell("12047, Berlin, Germany",10, PdfPCell.ALIGN_LEFT));
 		
 		
-		addressTable.addCell(getCell(Objects.toString((String) user.getProperty("paypal_account"), "") ,10, PdfPCell.ALIGN_LEFT));
+		addressTable.addCell(getCell(Objects.toString(payPalAccount/*(String) user.getProperty("paypal_account")*/, "") ,10, PdfPCell.ALIGN_LEFT));
 		addressTable.addCell(getCell("",12, PdfPCell.ALIGN_LEFT, Font.BOLD));
 		addressTable.addCell(getCell("VAT ID: DE300857037",10, PdfPCell.ALIGN_LEFT));
 		

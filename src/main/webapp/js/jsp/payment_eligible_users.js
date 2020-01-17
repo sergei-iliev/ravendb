@@ -94,7 +94,7 @@ payment.PaymentEligibleUsersView = Backbone.View.extend({
 		
 		  var amount = Number($(this).data('amount'));
 		  if(amount>50){
-			  var result = confirm("Are you sure you want to send the user a gift card of 50");
+			  var result = confirm("Are you sure you want to send the user a gift card of "+amount);
 		      if(!result){
 		    	  return;
 		      }

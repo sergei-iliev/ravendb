@@ -1,5 +1,8 @@
 package com.luee.wally.api.service;
 
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -13,15 +16,25 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.http.HttpStatus;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.EntityNotFoundException;
+import com.luee.wally.admin.repository.ApplicationSettingsRepository;
 import com.luee.wally.admin.repository.GiftCardRepository;
+import com.luee.wally.admin.repository.InvoiceRepository;
 import com.luee.wally.admin.repository.PaymentRepository;
 import com.luee.wally.api.service.impex.ImportService;
+import com.luee.wally.command.Email;
 import com.luee.wally.command.PaidUserForm;
+import com.luee.wally.command.PayExternalForm;
 import com.luee.wally.command.PaymentEligibleUserForm;
+import com.luee.wally.command.PdfAttachment;
+import com.luee.wally.command.invoice.PayoutResult;
 import com.luee.wally.constants.Constants;
 import com.luee.wally.entity.GiftCardCountryCode;
 import com.luee.wally.entity.RedeemingRequests;
@@ -29,6 +42,8 @@ import com.luee.wally.exception.RestResponseException;
 import com.luee.wally.json.ExchangeRateVO;
 import com.luee.wally.json.JSONUtils;
 import com.luee.wally.utils.Utilities;
+import com.paypal.api.payments.ErrorDetails;
+import com.paypal.base.rest.PayPalRESTException;
 import com.tangocard.raas.exceptions.RaasGenericException;
 import com.tangocard.raas.models.CreateOrderRequestModel;
 import com.tangocard.raas.models.NameEmailModel;
@@ -45,6 +60,135 @@ public class PaymentService {
 		return Arrays.asList("USD","EUR","CAD","AUD","GBP");
 	}
 
+	public void payExternal(HttpServletResponse resp,PayExternalForm form)throws IOException{
+		//convert currency to EUR		
+		PaymentRepository paymentRepository = new PaymentRepository();
+		String currencyCode=form.getCurrency();
+		
+		BigDecimal eurAmount;
+		try{
+			eurAmount = paymentRepository.convert(Double.parseDouble(form.getAmount()), currencyCode);
+		}catch(Exception e){
+			logger.log(Level.SEVERE,"Currency converter for : "+currencyCode+" and amount: "+form.getAmount(),e);
+			resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,"Unable to convert currency to EUR");
+			return;
+		}
+		
+		//check if already paid
+		Entity paidUserExt = paymentRepository.getExternalPaidUserByRedeemingRequestId(form.getRedeemingRequestId());
+		if(paidUserExt!=null){
+			logger.log(Level.WARNING,"User already paid.");
+			resp.sendError(HttpServletResponse.SC_CONFLICT,"User already paid");			
+			return;
+		}
+		if(form.getType().equalsIgnoreCase("PayPal")){
+			sendPayPal(resp,form, eurAmount);			
+		}else if(form.getType().equalsIgnoreCase("Amazon")){
+			sendGiftCard(resp,form, eurAmount);
+		}else{
+			logger.log(Level.WARNING,"Unknown type: "+form.getType());
+		}
+		
+	}
+	/*
+	 * external user payment
+	 */
+	private void sendPayPal(HttpServletResponse resp,PayExternalForm form,BigDecimal eurAmount)throws IOException{
+		PayPalService payPalService = new PayPalService();
+		InvoiceService invoiceService = new InvoiceService();
+		MailService mailService = new MailService();
+		PaymentRepository paymentRepository = new PaymentRepository();
+
+		
+		ApplicationSettingsService applicationSettingsService=new ApplicationSettingsService();
+		String toInvoiceMail=applicationSettingsService.getApplicationSetting(ApplicationSettingsRepository.TO_INVOICE_MAIL);
+		String fromMail=applicationSettingsService.getApplicationSetting(ApplicationSettingsRepository.FROM_MAIL);
+		
+		InvoiceRepository invoiceRepository = new InvoiceRepository();
+		RedeemingRequests redeemingRequests=form.toRedeemingRequests();
+		try {
+			//payout
+			PayoutResult payoutResult = payPalService.payout(redeemingRequests,form.getCurrency());
+			//create invoice number
+			String invoiceNumber = Long.toString(invoiceRepository.createInvoiceNumber());			
+			
+			//save save paid user external
+			paymentRepository.saveExternalPaidUser(form.toPaidUserExternal(), eurAmount,invoiceNumber, payoutResult.getPayoutBatchId());
+            //create invoice
+			PdfAttachment attachment = new PdfAttachment();
+			attachment.readFromStream(invoiceService.createInvoice(payoutResult, 
+																	form.getFullName(),form.getAddress(),form.getCountryCode(),form.getPaypalAccount(),
+																	invoiceNumber));
+			//send invoice
+			mailService.sendGridInvoice(toInvoiceMail,fromMail, attachment);
+			resp.setStatus(HttpStatus.SC_OK);
+		}catch(PayPalRESTException ppe){
+			logger.log(Level.SEVERE, "PayPal rest payment: "+ppe.getMessage(), ppe);
+			StringBuffer sb=new StringBuffer();
+			sb.append("PayPal exception, check logs for details\r\n");
+			if(ppe.getDetails()!=null){
+			  for(ErrorDetails errorDetails:ppe.getDetails().getDetails()){
+			   sb.append(errorDetails.getField()+"\r\n");
+			   sb.append(errorDetails.getIssue()+"\r\n");
+			 }
+			}
+			resp.sendError(HttpStatus.SC_INTERNAL_SERVER_ERROR,sb.toString());
+		} catch (Exception ex) {
+			logger.log(Level.SEVERE, "payment", ex);
+			StringWriter sw = new StringWriter();
+			PrintWriter pw = new PrintWriter(sw);
+			ex.printStackTrace(pw);
+			String sStackTrace = sw.toString();
+			//send mail
+			Email email = new Email();
+			email.setSubject("Error alert!");
+			email.setContent((Objects.toString(ex.getMessage(), "")) + "/n/n" + sStackTrace);
+			email.setFrom(fromMail);
+			email.setTo(toInvoiceMail);
+			mailService.sendMail(email);
+			//send resp
+			resp.sendError(HttpStatus.SC_INTERNAL_SERVER_ERROR,"Server error, check logs/email for details.");
+		}		
+		
+	}
+	/*
+	 * external user payment
+	 */
+	public void sendGiftCard(HttpServletResponse resp,PayExternalForm form,BigDecimal eurAmount)throws IOException{
+		PaymentRepository paymentRepository=new PaymentRepository();
+		GiftCardRepository giftCardRepository=new GiftCardRepository();
+		
+		
+		RedeemingRequests redeemingRequests=form.toRedeemingRequests();
+		
+		
+		Entity entity=giftCardRepository.getGiftCardCountryCodeMapping(redeemingRequests.getCountryCode());
+		GiftCardCountryCode giftCardCountryCode=GiftCardCountryCode.valueOf(entity);
+		
+		entity=giftCardRepository.getPackageNameTitleMapping(redeemingRequests.getPackageName());
+		if(entity==null){
+			logger.log(Level.WARNING,"No title in package to title mapping table.");
+			resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,"No title in package to title mapping table.");
+			return;		
+		}
+		
+		
+		GiftCardService giftCardService=new GiftCardService();	
+		
+		OrderModel order;
+		try {
+			order = giftCardService.sendGiftCard(redeemingRequests, giftCardCountryCode.getUnitid(),(String)entity.getProperty("title"));
+			//save paid user external
+			paymentRepository.saveExternalPaidUser(form.toPaidUserExternal(), eurAmount,null, order.getReferenceOrderID());
+			resp.setStatus(HttpStatus.SC_OK);
+		} catch (RestResponseException e) {
+			logger.log(Level.SEVERE, "Send Tango Card error ", e);
+			resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,"Send Tango Card error.");
+		}
+
+
+		
+	}
 	public void sendGiftCard(String key) throws JsonProcessingException,RestResponseException{
 		PaymentRepository paymentRepository=new PaymentRepository();
 		GiftCardRepository giftCardRepository=new GiftCardRepository();
