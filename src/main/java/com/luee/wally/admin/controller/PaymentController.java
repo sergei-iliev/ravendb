@@ -40,6 +40,7 @@ import com.luee.wally.command.invoice.PayoutResult;
 import com.luee.wally.constants.Constants;
 import com.luee.wally.entity.RedeemingRequests;
 import com.luee.wally.entity.SearchFilterTemplate;
+import com.luee.wally.exception.AESSecurityException;
 import com.luee.wally.exception.RestResponseException;
 import com.luee.wally.json.JSONUtils;
 import com.paypal.api.payments.ErrorDetails;
@@ -60,11 +61,19 @@ public class PaymentController implements Controller {
 	 * REST complient API mode
 	 */
 	public void payExternal(HttpServletRequest req, HttpServletResponse resp) throws Exception {
-		PayExternalForm form = PayExternalForm.parse(req);
+		//AES encoded POST values
+		PayExternalForm form; 
+		try{
+		  form = PayExternalForm.parseEncoded(req);
+		}catch(AESSecurityException e){
+			logger.log(Level.SEVERE,"AES sequrity exception",e);
+			resp.sendError(HttpServletResponse.SC_BAD_REQUEST,"AES sequrity exception");						
+			return;
+		}
 		//validate  
 		if(Objects.isNull(form.getRedeemingRequestId())||form.getRedeemingRequestId().isEmpty()||
 		   Objects.isNull(form.getType())||form.getType().isEmpty()){
-			logger.log(Level.SEVERE,"Invalid form data");
+			logger.log(Level.SEVERE,"Invalid form data",req.getParameterMap());
 			resp.sendError(HttpServletResponse.SC_BAD_REQUEST,"Invalid Form Data");			
 			return;
 		}

@@ -60,4 +60,7 @@ public interface Constants {
 	
 	//public static final String PAYMENT_REPORT_EMAIL_1="gil@softbakedapps.com";
 	//public static final String PAYMENT_REPORT_EMAIL_2="laterz.app@softbakedapps.com";
+	
+	/******************AES Sequrity***************************/
+	public static final String SECRET_AES_KEY = "!SoftBacked!";
 }

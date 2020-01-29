@@ -5,7 +5,6 @@ import java.io.FileWriter;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.io.Writer;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
@@ -16,6 +15,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -27,13 +27,14 @@ import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
 import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
-import com.luee.wally.DB;
 import com.luee.wally.admin.controller.ImportController;
-import com.luee.wally.api.ConnectionMgr;
 import com.luee.wally.api.service.InvoiceService;
 import com.luee.wally.api.service.impex.ImportService;
 import com.luee.wally.csv.PaidUsers2018;
 import com.luee.wally.json.ExchangeRateVO;
+import com.luee.wally.utils.AESUtils;
+
+
 
 public class UserRevenueTest {
 
@@ -250,4 +251,13 @@ public class UserRevenueTest {
 	
 	}
 	
+	@Test
+	public void encryptStringTest() throws Exception {
+		String param="my first test";
+		String encoded=AESUtils.encrypt(param);
+		
+		String decoded=AESUtils.decrypt(encoded);
+		Assert.assertEquals(decoded,param);
+		
+	}
 }

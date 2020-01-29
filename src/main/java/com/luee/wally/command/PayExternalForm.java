@@ -5,6 +5,8 @@ import javax.servlet.ServletRequest;
 
 import com.luee.wally.entity.PaidUserExternal;
 import com.luee.wally.entity.RedeemingRequests;
+import com.luee.wally.exception.AESSecurityException;
+import com.luee.wally.utils.AESUtils;
 
 public class PayExternalForm implements WebForm {
 	private String type; 
@@ -18,6 +20,21 @@ public class PayExternalForm implements WebForm {
 	private String address;
 	private String redeemingRequestId; 
 
+	public static PayExternalForm parseEncoded(ServletRequest req) throws ServletException,AESSecurityException{
+		PayExternalForm form=new PayExternalForm();
+		form.type=AESUtils.encrypt(req.getParameter("type"));
+		form.packageName=AESUtils.decrypt(req.getParameter("package_name"));
+		form.countryCode=AESUtils.decrypt(req.getParameter("country_code"));
+		form.amount=AESUtils.decrypt(req.getParameter("amount"));
+		form.currency=AESUtils.decrypt(req.getParameter("currency"));
+		form.paypalAccount=AESUtils.decrypt(req.getParameter("paypal_account"));
+		form.emailAddress=AESUtils.decrypt(req.getParameter("email_address"));
+		form.fullName=AESUtils.decrypt(req.getParameter("full_name"));
+		form.address=AESUtils.decrypt(req.getParameter("address"));
+		form.redeemingRequestId=AESUtils.decrypt(req.getParameter("redeeming_request_id"));
+		return form;
+	}
+	
 	public static PayExternalForm parse(ServletRequest req) throws ServletException{
 		PayExternalForm form=new PayExternalForm();
 		form.type=req.getParameter("type");
@@ -128,6 +145,7 @@ public class PayExternalForm implements WebForm {
 	
 	public PaidUserExternal toPaidUserExternal(){
 		PaidUserExternal paidUserExternal=new PaidUserExternal();
+		paidUserExternal.setType(type);
 		paidUserExternal.setAddress(address);
 		paidUserExternal.setAmount(amount);
 		paidUserExternal.setCountryCode(countryCode);
