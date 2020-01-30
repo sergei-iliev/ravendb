@@ -15,7 +15,7 @@ public class PaidUser {
 	private String email;
 	private Date date;
 	private String paypalAccount;
-	private String redeemingRequesKey, redeemingRequestId;
+	private String redeemingRequestKey, redeemingRequestId;
     private String paymentReferenceId;
 	private String paidCurrency;
 	private BigDecimal eurCurrency;
@@ -32,7 +32,7 @@ public class PaidUser {
 		paidUser.setType((String) entity.getProperty("type"));
 		paidUser.setDate((Date) entity.getProperty("date"));
 		paidUser.setPaypalAccount((String) entity.getProperty("paypal_account"));
-		paidUser.redeemingRequesKey=((String) entity.getProperty("redeeming_request_key"));
+		paidUser.redeemingRequestKey=((String) entity.getProperty("redeeming_request_key"));
 		paidUser.paidCurrency=((String) entity.getProperty("paid_currency"));
 		paidUser.email=((String) entity.getProperty("email_address"));
 		paidUser.eurCurrency=BigDecimal.valueOf((double)entity.getProperty("eur_currency"));
@@ -114,12 +114,12 @@ public class PaidUser {
 
 
 
-	public String getRedeemingRequesKey() {
-		return redeemingRequesKey;
+	public String getRedeemingRequestKey() {
+		return redeemingRequestKey;
 	}
 
-	public void setRedeemingRequesKey(String redeemingRequesKey) {
-		this.redeemingRequesKey = redeemingRequesKey;
+	public void setRedeemingRequestKey(String redeemingRequesKey) {
+		this.redeemingRequestKey = redeemingRequesKey;
 	}
 
 	public String getPaymentReferenceId() {

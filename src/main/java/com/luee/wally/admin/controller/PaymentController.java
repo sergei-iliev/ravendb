@@ -61,8 +61,15 @@ public class PaymentController implements Controller {
 	 * REST complient API mode
 	 */
 	public void payExternal(HttpServletRequest req, HttpServletResponse resp) throws Exception {
+        PaymentService paymentService=new PaymentService(); 
+		MailService mailService = new MailService();
 		//AES encoded POST values
-		PayExternalForm form; 
+
+		//No sequrity - tests only
+		//PayExternalForm form=PayExternalForm.parse(req);
+		
+		//AES sequrity - production only
+		PayExternalForm form;
 		try{
 		  form = PayExternalForm.parseEncoded(req);
 		}catch(AESSecurityException e){
@@ -70,14 +77,29 @@ public class PaymentController implements Controller {
 			resp.sendError(HttpServletResponse.SC_BAD_REQUEST,"AES sequrity exception");						
 			return;
 		}
-		//validate  
-		if(Objects.isNull(form.getRedeemingRequestId())||form.getRedeemingRequestId().isEmpty()||
-		   Objects.isNull(form.getType())||form.getType().isEmpty()){
-			logger.log(Level.SEVERE,"Invalid form data",req.getParameterMap());
-			resp.sendError(HttpServletResponse.SC_BAD_REQUEST,"Invalid Form Data");			
+		
+		//validate  form
+		ApplicationSettingsService applicationSettingsService=new ApplicationSettingsService();
+		String toInvoiceMail=applicationSettingsService.getApplicationSetting(ApplicationSettingsRepository.TO_INVOICE_MAIL);
+		String fromMail=applicationSettingsService.getApplicationSetting(ApplicationSettingsRepository.FROM_MAIL);
+		try{
+			paymentService.validateExternalForm(form);
+		}catch(Exception e){
+			logger.log(Level.SEVERE,"External form validation error: ",e);            
+			
+			//send mail
+			String stackTrace=paymentService.convert(e);
+			Email email = new Email();
+			email.setSubject("External payment error alert!");
+			email.setContent((Objects.toString(e.getMessage(), "")) + "/n/n" + stackTrace);
+			email.setFrom(fromMail);
+			email.setTo(toInvoiceMail);
+			mailService.sendMail(email);
+			
+			//respond error code
+			resp.sendError(HttpServletResponse.SC_BAD_REQUEST,e.getMessage());
 			return;
-		}
-        PaymentService paymentService=new PaymentService();                
+		}   
         paymentService.payExternal(resp, form);        
 	}
 	

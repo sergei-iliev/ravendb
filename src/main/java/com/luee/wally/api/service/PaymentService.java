@@ -8,15 +8,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.Objects;
-import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.http.HttpStatus;
@@ -28,28 +24,22 @@ import com.luee.wally.admin.repository.ApplicationSettingsRepository;
 import com.luee.wally.admin.repository.GiftCardRepository;
 import com.luee.wally.admin.repository.InvoiceRepository;
 import com.luee.wally.admin.repository.PaymentRepository;
-import com.luee.wally.api.service.impex.ImportService;
 import com.luee.wally.command.Email;
 import com.luee.wally.command.PaidUserForm;
 import com.luee.wally.command.PayExternalForm;
 import com.luee.wally.command.PaymentEligibleUserForm;
 import com.luee.wally.command.PdfAttachment;
 import com.luee.wally.command.invoice.PayoutResult;
-import com.luee.wally.constants.Constants;
 import com.luee.wally.entity.GiftCardCountryCode;
 import com.luee.wally.entity.RedeemingRequests;
 import com.luee.wally.exception.RestResponseException;
-import com.luee.wally.json.ExchangeRateVO;
 import com.luee.wally.json.JSONUtils;
-import com.luee.wally.utils.Utilities;
 import com.paypal.api.payments.ErrorDetails;
 import com.paypal.base.rest.PayPalRESTException;
-import com.tangocard.raas.exceptions.RaasGenericException;
-import com.tangocard.raas.models.CreateOrderRequestModel;
-import com.tangocard.raas.models.NameEmailModel;
 import com.tangocard.raas.models.OrderModel;
 
-public class PaymentService {
+public class PaymentService extends AbstractService{
+	
 	private final Logger logger = Logger.getLogger(PaymentService.class.getName());
 
 	
@@ -59,7 +49,39 @@ public class PaymentService {
 	public Collection<String> getDefaultCurrencyCodes(){
 		return Arrays.asList("USD","EUR","CAD","AUD","GBP");
 	}
-
+	/*Don’t allow any attempt to pay:
+       1. More than 30 EUR (or an equivalent amount in a different currency) within the same transaction.
+       2. More than 100 EUR (or an equivalent amount in a different currency) to the same paypal account / email address (based on the paid_users_external table).
+	 */
+    public void validateExternalForm(PayExternalForm form)throws Exception{
+		
+    	if(Objects.isNull(form.getRedeemingRequestId())||form.getRedeemingRequestId().isEmpty()||
+				   Objects.isNull(form.getType())||form.getType().isEmpty()){
+					throw new Exception("Invalid form data");													
+		}
+    	PaymentRepository paymentRepository=new PaymentRepository();
+		//convert currency to EUR
+		BigDecimal eurAmount;
+		try{
+			eurAmount = paymentRepository.convert(Double.parseDouble(form.getAmount()), form.getCurrency());
+		}catch(Exception e){
+			logger.log(Level.SEVERE,"Currency converter for : "+form.getCurrency(),e);
+			throw e;			
+		}
+		//1. more then 30?
+		BigDecimal maxAmount=BigDecimal.valueOf(30.0);
+		if(eurAmount.compareTo(maxAmount)==1){
+		   throw new Exception("Amount in EUR {"+eurAmount+"} is more then 30");	
+		}
+		//2.all payments less then 100  
+    	Collection<Entity> entities=paymentRepository.getExternalPaidUserByEmail(form.getPaypalAccount()==null?form.getEmailAddress():form.getPaypalAccount());
+    	double sum=entities.stream().mapToDouble(e->(double)e.getProperty("eur_currency")).sum();
+    	BigDecimal total=eurAmount.add(BigDecimal.valueOf(sum));
+    	BigDecimal hundred=BigDecimal.valueOf(100.0); 
+    	if(total.compareTo(hundred)==1){
+    		 throw new Exception("Total Amount {"+sum+"}, and requested {"+eurAmount+"} is more then 100");	
+    	}
+    }
 	public void payExternal(HttpServletResponse resp,PayExternalForm form)throws IOException{
 		//convert currency to EUR		
 		PaymentRepository paymentRepository = new PaymentRepository();

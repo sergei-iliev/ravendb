@@ -29,11 +29,4 @@ public interface Controller {
 	    ZonedDateTime sd = date.toInstant().atZone(ZoneId.systemDefault());	    
 	    return formatter.format(sd);		
 	}
-	
-//	public default void setResponse(HttpServletResponse resp,int code,String message){
-//		resp.setContentType("application/json");
-//		//HttpServletResponse.
-//		resp.setStatus(code);
-//		resp.sen
-//	}
 }

@@ -3,6 +3,9 @@ package com.luee.wally.entity;
 import java.math.BigDecimal;
 import java.util.Date;
 
+import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.KeyFactory;
+
 public class PaidUserExternal {
 		private String key;				
 		private String amount;
@@ -19,6 +22,25 @@ public class PaidUserExternal {
 		private String countryCode;		
 		private String fullName;
 		private String address;
+		
+		public static PaidUserExternal valueOf(Entity entity) {
+			PaidUserExternal paidUser = new PaidUserExternal();
+			paidUser.key = KeyFactory.keyToString(entity.getKey());
+			paidUser.setAmount((String) entity.getProperty("amount"));
+			paidUser.setDate((Date) entity.getProperty("date"));
+			paidUser.setCountryCode((String) entity.getProperty("country_code"));
+			paidUser.paidCurrency=((String) entity.getProperty("paid_currency"));
+			paidUser.setType((String) entity.getProperty("type"));
+			paidUser.eurCurrency=BigDecimal.valueOf((double)entity.getProperty("eur_currency"));			
+			paidUser.email=((String) entity.getProperty("email_address"));
+			paidUser.setPaypalAccount((String) entity.getProperty("paypal_account"));			
+			paidUser.setRedeemingRequestId((String) entity.getProperty("redeeming_request_id"));
+			paidUser.packageName=(String) entity.getProperty("package_name");
+			paidUser.address=(String) entity.getProperty("address");
+			paidUser.paymentReferenceId=((String) entity.getProperty("payment_reference_id"));
+			paidUser.invoiceNumber=((String) entity.getProperty("invoice_number"));			              		
+			return paidUser;
+		}
 		
 		public String getKey() {
 			return key;

@@ -5,6 +5,7 @@ import static org.mockito.Mockito.when;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -21,6 +22,8 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import com.google.appengine.api.datastore.DatastoreService;
+import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
@@ -118,17 +121,50 @@ public class PayPalTest {
 
 	@Test
 	public void paidUserExternalPaymentTest() throws Throwable {
+		//create entities
+		DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
+		Entity entity = new Entity("paid_users_external"); 		
+		   entity.setProperty("date", new Date());
+		   entity.setProperty("country_code","US");
+		   entity.setProperty("paid_currency","USD");
+		   entity.setProperty("amount","22");
+		   entity.setProperty("type", "PayPal");
+		   entity.setProperty("eur_currency",21d);
+		   entity.setProperty("email_address","mm@gmail.com");
+		   entity.setProperty("paypal_account","ss@gmail.com");
+		   entity.setProperty("redeeming_request_id","346461");
+		   entity.setProperty("package_name","mlsafkj.dsfsd.com");
+		   entity.setProperty("address","where are you from");
+		   entity.setProperty("payment_reference_id","3456");		   	
+		   ds.put(entity);
+		
+		   entity = new Entity("paid_users_external"); 	
+		   entity.setProperty("date", new Date());
+		   entity.setProperty("country_code","US");
+		   entity.setProperty("paid_currency","USD");
+		   entity.setProperty("amount","82");
+		   entity.setProperty("type", "PayPal");
+		   entity.setProperty("eur_currency",78.8d);
+		   entity.setProperty("email_address","ss@gmail.com");
+		   entity.setProperty("paypal_account","mm@gmail.com");
+		   entity.setProperty("redeeming_request_id","34646");
+		   entity.setProperty("package_name","mlsafkj.dsfsd.com");
+		   entity.setProperty("address","where are you from");
+		   entity.setProperty("payment_reference_id","3456");		   	
+		   ds.put(entity);
+		   
         PaymentController paymentController=new PaymentController(); 
         
         when(request.getParameter("type")).thenReturn("Amazon");
         when(request.getParameter("redeeming_request_id")).thenReturn("34646");
         when(request.getParameter("country_code")).thenReturn("US");
         when(request.getParameter("currency")).thenReturn("USD");
-        when(request.getParameter("amount")).thenReturn("2.6"); 
-        when(request.getParameter("paypal_account")).thenReturn("sergei.iliev-facilitator@gmail.com"); 
+        when(request.getParameter("amount")).thenReturn("20.6"); 
+        //when(request.getParameter("paypal_account")).thenReturn("mm@gmail.com"); 
+        when(request.getParameter("email_address")).thenReturn("ss@gmail.com");         
         when(request.getParameter("package_name")).thenReturn("com.gametrix.app"); 
         when(request.getParameter("full_name")).thenReturn("Berlioz");
-        when(request.getParameter("email_address")).thenReturn("sergei.iliev@gmail.com");
+
         
         paymentController.payExternal(request,response);	
 	}

@@ -21,6 +21,7 @@ import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
+import com.google.appengine.api.datastore.Query.CompositeFilterOperator;
 import com.google.appengine.api.datastore.Query.Filter;
 import com.google.appengine.api.datastore.Query.FilterOperator;
 import com.google.appengine.api.datastore.Query.FilterPredicate;
@@ -119,6 +120,20 @@ public class PaymentRepository extends AbstractRepository{
 			 PreparedQuery pq = ds.prepare(query);
 			 return pq.asSingleEntity();
 	  }
+	  /*
+	   * many payments on same email{paypal_account or email}
+	   */
+	  public Collection<Entity> getExternalPaidUserByEmail(String email){
+		     DatastoreService ds = createDatastoreService(Consistency.EVENTUAL);			 
+		     Query query = new Query("paid_users_external");
+		     
+		     Filter filter=CompositeFilterOperator.or(new FilterPredicate("paypal_account", FilterOperator.EQUAL, email),new FilterPredicate("email_address", FilterOperator.EQUAL, email));
+		     query.setFilter(filter);
+		     
+			 PreparedQuery pq = ds.prepare(query);
+			 return pq.asList(FetchOptions.Builder.withDefaults());
+	  }
+	  
 	  public void saveExternalPaidUser(PaidUserExternal paidUserExternal,BigDecimal eurAmount,String invoiceNumber,String payoutBatchId){	
 		   DatastoreService ds = createDatastoreService(Consistency.STRONG);
 		   Entity entity=new Entity("paid_users_external");	
