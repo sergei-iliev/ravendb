@@ -138,7 +138,7 @@ public class CampaignSearchService {
 	    	  * calculate affs data by id
 	    	  */
 	    	 if(affsIds.size()>0){
-	    		 AffsSearchResult affsSearchResult= affsSearchService.processAffsSearch(affsIds,startDate,endDate);	 								
+	    		    AffsSearchResult affsSearchResult= affsSearchService.processAffsSearch(affsIds,startDate,endDate);	 								
 					totalAdRev = totalAdRev.add(affsSearchResult.getTotalAdRev());					
 					offerwallRev = offerwallRev.add(affsSearchResult.getOfferwallRev());
 					affsCount+=affsSearchResult.getCount();

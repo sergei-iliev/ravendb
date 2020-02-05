@@ -23,7 +23,10 @@ import com.google.appengine.api.ThreadManager;
 import com.luee.wally.api.route.Controller;
 import com.luee.wally.command.AffsSearchForm;
 import com.luee.wally.command.AffsSearchResult;
+import com.luee.wally.json.ExchangeRateVO;
+import com.luee.wally.utils.Utilities;
 import com.luee.wally.api.service.impex.GenerateCSV;
+import com.luee.wally.api.service.impex.ImportService;
 import com.luee.wally.admin.repository.CloudStorageRepository;
 import com.luee.wally.api.service.AffsSearchService;
 
@@ -50,7 +53,16 @@ public class AffsSearchController implements Controller{
 					    	  logger.log(Level.WARNING, "*************************Task in the background started ********************");
 					  		  AffsSearchService affsSearchService=new AffsSearchService();
 					  		  Collection<AffsSearchResult> affsSearchResults=affsSearchService.processAffsSearch(form);
-							  
+						      
+					  		  //read USD rate
+					  		  ImportService importService=new ImportService();					  		  
+					  		  String formatedDate=Utilities.formatedDate(new Date(),"yyyy-MM-dd");
+						      ExchangeRateVO rate=importService.getExchangeRates(formatedDate,"EUR","USD");
+						      BigDecimal rateValue = BigDecimal.valueOf(rate.getRates().get("USD"));
+						      for(AffsSearchResult affsSearchResult:affsSearchResults){
+						    	  affsSearchResult.setRateValue(rateValue); 
+						      }
+						      
 					  		  try(Writer writer=new StringWriter()){
 					  		    affsSearchService.createFile(writer,form, affsSearchResults);
 					  		  

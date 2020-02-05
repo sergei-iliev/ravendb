@@ -5,6 +5,7 @@ import java.io.FileWriter;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
@@ -33,6 +34,7 @@ import com.luee.wally.api.service.impex.ImportService;
 import com.luee.wally.csv.PaidUsers2018;
 import com.luee.wally.json.ExchangeRateVO;
 import com.luee.wally.utils.AESUtils;
+import com.luee.wally.utils.Utilities;
 
 
 
@@ -61,7 +63,8 @@ public class UserRevenueTest {
 		user.setDate("8/13/2019");
 		
 		ExchangeRateVO exchangeRateVO= importService.getExchangeRates(user.getFormatedDate("YYYY-MM-dd"), "EUR");
-		System.out.println(exchangeRateVO.getRates().get(user.getCurrencyCode()));
+		System.out.println(exchangeRateVO.getRates());
+		
 	}
 
 

@@ -13,6 +13,7 @@ public enum TestDatabase {
 	INSTANCE;
 	
 	public  void generateDB(){
+		createAffs();
 		createRedeemingRequests();
 		createAmazonGiftCardMap();
 		createPackageNameTitleMapping();
@@ -102,7 +103,28 @@ public enum TestDatabase {
 //		   entity.setProperty("invoice_number","111");		
 //		   ds.put(entity);
 	}
-	
+	private  void createAffs(){
+		DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
+		   Entity entity = new Entity("affs");	
+		   entity.setProperty("date", new Date());
+		   entity.setProperty("experiment","surprise_update|dismiss_notif|gradual_game_release|game_coins_formula|balance_formula|threshold_20");
+		   entity.setProperty("country_code","US");
+		   entity.setProperty("package_name","com.moregames.makemoney");
+		   entity.setProperty("gaid","c292bc0e-7eaf-4452-896f-46ffba6b229e");
+		   entity.setProperty("user_guid","cccc1675-a072-4b6b-ab66-cb599a29147d");
+		   ds.put(entity);
+		   
+		   
+		   entity = new Entity("affs");	
+		   entity.setProperty("date", new Date());
+		   entity.setProperty("experiment","surprise_update|dismiss_notif|gradual_game_release|game_coins_formula|balance_formula|threshold_20");
+		   entity.setProperty("country_code","US");
+		   entity.setProperty("package_name","com.moregames.makemoney");
+		   entity.setProperty("gaid","c292bc0e-7eaf-4452-896f-46ffba6b229e");
+		   entity.setProperty("user_guid","bbbb2675-a072-4b6b-ab66-cb599a29147d");
+		   ds.put(entity);
+		   
+	}
 	
 	private  void createPayPalCurrencyMap(){
 		DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
