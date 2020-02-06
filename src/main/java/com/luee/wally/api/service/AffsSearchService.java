@@ -36,7 +36,7 @@ public class AffsSearchService {
 	private static final int CURSOR_SIZE = 1000;
 
 	private Collection<String> header = Arrays.asList("experiment", "count", "sum_total_ad_rev", "avr_total_ad_rev",
-			"sum_offerwall_rev", "avr_offerwall_rev","avr_paid_users","paid_users_total");
+			"sum_offerwall_rev", "avr_offerwall_rev","paid_users_total","avr_paid_users");
 
 	public void createFile(Writer writer, AffsSearchForm form, Collection<AffsSearchResult> content)
 			throws IOException {
@@ -66,7 +66,7 @@ public class AffsSearchService {
 
 			line.add(item.getOfferwallRev().setScale(4, BigDecimal.ROUND_HALF_EVEN).toString());
 			line.add(item.getAvrOfferwallRev().setScale(4, BigDecimal.ROUND_HALF_EVEN).toString());
-
+			
 			line.add(item.getTotalPaidUsersUSD().setScale(4, BigDecimal.ROUND_HALF_EVEN).toString());
 			line.add(item.getAvrTotalPaidUsersUSD().setScale(4, BigDecimal.ROUND_HALF_EVEN).toString());
 			
@@ -146,7 +146,7 @@ public class AffsSearchService {
 			for(String userGuid:userGuids){
 				Collection<PaidUser> paidUsers=paidUsersRepository.findPaidUsersByGuid(userGuid);
 				BigDecimal sum=paidUsers.stream().map(u->u.getEurCurrency()).reduce(BigDecimal.ZERO, BigDecimal::add);
-				totalPaidUsers = offerwallRev.add(sum);
+				totalPaidUsers = totalPaidUsers.add(sum);
 			}
 			
 			count += results.size();
