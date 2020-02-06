@@ -20,12 +20,12 @@ import com.luee.wally.exception.AESSecurityException;
 
 public class AESUtils {
 	
-	public static String encrypt(String toEncrypt) throws AESSecurityException {
+	public static String encrypt(String toEncrypt,String aesKey) throws AESSecurityException {
 		try {
 			byte[] iv = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 			IvParameterSpec ivspec = new IvParameterSpec(iv);
 
-			SecretKeySpec secretKey = getKey();
+			SecretKeySpec secretKey = getKey(aesKey);
 			Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
 			cipher.init(Cipher.ENCRYPT_MODE, secretKey, ivspec);
 
@@ -38,12 +38,12 @@ public class AESUtils {
 		}
 	}
 
-	public static String decrypt(String toDecrypt) throws AESSecurityException {
+	public static String decrypt(String toDecrypt,String aesKey) throws AESSecurityException {
 		try {
 			byte[] iv = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 			IvParameterSpec ivspec = new IvParameterSpec(iv);
 
-			SecretKeySpec secretKey = getKey();
+			SecretKeySpec secretKey = getKey(aesKey);
 
 			Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5PADDING");
 			cipher.init(Cipher.DECRYPT_MODE, secretKey, ivspec);
@@ -56,9 +56,9 @@ public class AESUtils {
 		}
 	}
 
-	private static SecretKeySpec getKey() throws UnsupportedEncodingException, NoSuchAlgorithmException {
+	private static SecretKeySpec getKey(String aesKey) throws UnsupportedEncodingException, NoSuchAlgorithmException {
 
-		byte[] pass = Constants.SECRET_AES_KEY.getBytes("UTF-8");
+		byte[] pass = aesKey.getBytes("UTF-8");
 		MessageDigest sha = MessageDigest.getInstance("SHA-256");
 		byte[] key = sha.digest(pass);
 		key = Arrays.copyOf(key, 16);

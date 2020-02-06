@@ -46,6 +46,12 @@ public class ApplicationSettingsRepository extends AbstractRepository {
 
 	public static final String NO_REPLY_EMAIL="NO_REPLY_EMAIL";
 	
+	public static final String PAYPAL_CLIENT_ID="PAYPAL_CLIENT_ID";
+	public static final String PAYPAL_CLIENT_SECRET="PAYPAL_CLIENT_SECRET";
+	public static final String PAYPAL_MODE="PAYPAL_MODE";
+	
+	public static final String SECRET_AES_KEY ="SECRET_AES_KEY";
+	
 	public Map<String, String> getApplicationSettings() {
 		Map<String, String> map = new HashMap<>();
 

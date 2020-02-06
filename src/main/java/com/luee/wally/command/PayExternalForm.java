@@ -20,18 +20,18 @@ public class PayExternalForm implements WebForm {
 	private String address;
 	private String redeemingRequestId; 
 
-	public static PayExternalForm parseEncoded(ServletRequest req) throws ServletException,AESSecurityException{
+	public static PayExternalForm parseEncoded(ServletRequest req,String aesKey) throws ServletException,AESSecurityException{
 		PayExternalForm form=new PayExternalForm();
-		form.type=AESUtils.encrypt(req.getParameter("type"));
-		form.packageName=AESUtils.decrypt(req.getParameter("package_name"));
-		form.countryCode=AESUtils.decrypt(req.getParameter("country_code"));
-		form.amount=AESUtils.decrypt(req.getParameter("amount"));
-		form.currency=AESUtils.decrypt(req.getParameter("currency"));
-		form.paypalAccount=AESUtils.decrypt(req.getParameter("paypal_account"));
-		form.emailAddress=AESUtils.decrypt(req.getParameter("email_address"));
-		form.fullName=AESUtils.decrypt(req.getParameter("full_name"));
-		form.address=AESUtils.decrypt(req.getParameter("address"));
-		form.redeemingRequestId=AESUtils.decrypt(req.getParameter("redeeming_request_id"));
+		form.type=AESUtils.encrypt(req.getParameter("type"),aesKey);
+		form.packageName=AESUtils.decrypt(req.getParameter("package_name"),aesKey);
+		form.countryCode=AESUtils.decrypt(req.getParameter("country_code"),aesKey);
+		form.amount=AESUtils.decrypt(req.getParameter("amount"),aesKey );
+		form.currency=AESUtils.decrypt(req.getParameter("currency"),aesKey);
+		form.paypalAccount=AESUtils.decrypt(req.getParameter("paypal_account"),aesKey);
+		form.emailAddress=AESUtils.decrypt(req.getParameter("email_address"),aesKey);
+		form.fullName=AESUtils.decrypt(req.getParameter("full_name"),aesKey);
+		form.address=AESUtils.decrypt(req.getParameter("address"),aesKey);
+		form.redeemingRequestId=AESUtils.decrypt(req.getParameter("redeeming_request_id"),aesKey);
 		return form;
 	}
 	

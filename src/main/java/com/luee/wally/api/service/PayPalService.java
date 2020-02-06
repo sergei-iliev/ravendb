@@ -46,6 +46,12 @@ public class PayPalService {
 	    String subject=(String.format(applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.TANGO_CARD_EMAIL_TEMPLATE_SUBJECT),title));
 	    String message=(String.format(applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.TANGO_CARD_EMAIL_TEMPLATE_MESSAGE),title));
 		
+	    String paypalClientId=applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.PAYPAL_CLIENT_ID);
+	    String paypalClientSecret=applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.PAYPAL_CLIENT_SECRET);
+	    String paypalMode=applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.PAYPAL_MODE);
+
+	    
+	    		
 		// ###Payout
 		// A resource representing a payout
 		Payout payout = new Payout();
@@ -85,7 +91,7 @@ public class PayPalService {
 			// the call and to send a unique request id
 			// (that ensures idempotency). The SDK generates
 			// a request id if you do not pass one explicitly.
-			APIContext apiContext = new APIContext(Constants.clientId, Constants.clientSecret, Constants.mode);
+			APIContext apiContext = new APIContext(paypalClientId, paypalClientSecret, paypalMode);
 
 			// ###Create Payout Asynchronous
 			Map<String, String> parameters = new HashMap<>();

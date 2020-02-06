@@ -257,9 +257,9 @@ public class UserRevenueTest {
 	@Test
 	public void encryptStringTest() throws Exception {
 		String param="my first test";
-		String encoded=AESUtils.encrypt(param);
+		String encoded=AESUtils.encrypt(param,"setting.value");
 		
-		String decoded=AESUtils.decrypt(encoded);
+		String decoded=AESUtils.decrypt(encoded,"setting.value");
 		Assert.assertEquals(decoded,param);
 		
 	}

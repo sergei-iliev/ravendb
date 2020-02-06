@@ -63,6 +63,10 @@ public class PaymentController implements Controller {
 	public void payExternal(HttpServletRequest req, HttpServletResponse resp) throws Exception {
         PaymentService paymentService=new PaymentService(); 
 		MailService mailService = new MailService();
+		ApplicationSettingsService applicationSettingsService=new ApplicationSettingsService();
+		
+	    String aesKey=applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.SECRET_AES_KEY);
+
 		//AES encoded POST values
 
 		//No sequrity - tests only
@@ -71,7 +75,7 @@ public class PaymentController implements Controller {
 		//AES sequrity - production only
 		PayExternalForm form;
 		try{
-		  form = PayExternalForm.parseEncoded(req);
+		  form = PayExternalForm.parseEncoded(req,aesKey);
 		}catch(AESSecurityException e){
 			logger.log(Level.SEVERE,"AES sequrity exception",e);
 			resp.sendError(HttpServletResponse.SC_BAD_REQUEST,"AES sequrity exception");						
@@ -79,7 +83,6 @@ public class PaymentController implements Controller {
 		}
 		
 		//validate  form
-		ApplicationSettingsService applicationSettingsService=new ApplicationSettingsService();
 		String toInvoiceMail=applicationSettingsService.getApplicationSetting(ApplicationSettingsRepository.TO_INVOICE_MAIL);
 		String fromMail=applicationSettingsService.getApplicationSetting(ApplicationSettingsRepository.FROM_MAIL);
 		try{

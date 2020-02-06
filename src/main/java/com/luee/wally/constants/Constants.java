@@ -2,9 +2,9 @@ package com.luee.wally.constants;
 
 public interface Constants {
 
-	public static final String clientId = "AafeAthS3PRG_dkpJPVTkCgVc-O9pQ6o2PldSIOceWsn7nIm0H404DHDFg4svXJa63Pe8OtM55ySzppG";
-	public static final String clientSecret = "EC1ludnxStRx1M1VP9DDfz2xdTxMA8xcthmP_hRaQgWS09thWY2ihInfz5AA03DMxLjYZnR6sRQn-0XV";
-	public static final String mode = "sandbox";
+	//public static final String clientId = "AafeAthS3PRG_dkpJPVTkCgVc-O9pQ6o2PldSIOceWsn7nIm0H404DHDFg4svXJa63Pe8OtM55ySzppG";
+	//public static final String clientSecret = "EC1ludnxStRx1M1VP9DDfz2xdTxMA8xcthmP_hRaQgWS09thWY2ihInfz5AA03DMxLjYZnR6sRQn-0XV";
+	//public static final String mode = "sandbox";
 
 //	public static final String clientId = "ASkntpAvmDBMqRQagYpFF-Jlxevrk2lw_drkR2V2NnAIcgGxd8s-upcl2V_yZL1bGFk5vv0bJgT3cNz2";
 //	public static final String clientSecret = "EBilMxHlyy8L2k8pICZ2axsFEvzdx5CPewei0TAIg7NYEeBrJXg6EptSxgJX02hhtsmtuOUe6OFkVHA9";
@@ -62,5 +62,5 @@ public interface Constants {
 	//public static final String PAYMENT_REPORT_EMAIL_2="laterz.app@softbakedapps.com";
 	
 	/******************AES Sequrity***************************/
-	public static final String SECRET_AES_KEY = "!SoftBacked!";
+	//public static final String SECRET_AES_KEY = "!SoftBacked!";
 }
