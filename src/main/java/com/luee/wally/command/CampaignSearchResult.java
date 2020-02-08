@@ -9,13 +9,18 @@ public class CampaignSearchResult {
 	
 	private final BigDecimal offerwallRev;
 	
+	private BigDecimal totalPaidUsers;
+	
 	private String groupName,groupValue;
 	
-	public CampaignSearchResult(BigDecimal totalAdRev,BigDecimal offerwallRev,int affsCount,int campaignCount) {
+	private  BigDecimal rateValue;//EUR to USD rate
+	
+	public CampaignSearchResult(BigDecimal totalAdRev,BigDecimal offerwallRev,BigDecimal totalPaidUsers,int affsCount,int campaignCount) {
 	   this.totalAdRev=totalAdRev;
 	   this.affsCount=affsCount;
 	   this.campaignCount=campaignCount;
 	   this.offerwallRev=offerwallRev;
+	   this.totalPaidUsers=totalPaidUsers; 
 	}
 	public BigDecimal getAvrTotalAdRev(){
 		if(affsCount!=0){
@@ -32,8 +37,17 @@ public class CampaignSearchResult {
 		}
 		
 	}
-	
-
+	public BigDecimal getAvrTotalPaidUsers(){
+		if(affsCount!=0){
+		  return totalPaidUsers.divide(new BigDecimal(getAffsCount()),4, BigDecimal.ROUND_HALF_EVEN);
+		}else{
+		  return BigDecimal.ZERO;	
+		}
+		
+	}
+	public BigDecimal getTotalPaidUsers() {
+		return totalPaidUsers;
+	}
 	public int getCampaignCount() {
 		return campaignCount;
 	}
@@ -64,6 +78,14 @@ public class CampaignSearchResult {
 	public void setGroupValue(String groupValue) {
 		this.groupValue = groupValue;
 	}
+	public BigDecimal getTotalPaidUsersUSD() {
+		return getTotalPaidUsers().multiply(rateValue);		
+	}
 	
-	
+	public BigDecimal getAvrTotalPaidUsersUSD(){
+		return getAvrTotalPaidUsers().multiply(rateValue);	
+	}
+	public void setRateValue(BigDecimal rateValue) {
+		this.rateValue = rateValue;
+	}
 }

@@ -19,9 +19,12 @@ import com.luee.wally.command.AffsSearchForm;
 import com.luee.wally.command.AffsSearchResult;
 import com.luee.wally.command.CampaignSearchForm;
 import com.luee.wally.command.CampaignSearchResult;
+import com.luee.wally.json.ExchangeRateVO;
+import com.luee.wally.utils.Utilities;
 import com.luee.wally.admin.repository.CloudStorageRepository;
 import com.luee.wally.api.service.AffsSearchService;
 import com.luee.wally.api.service.CampaignSearchService;
+import com.luee.wally.api.service.impex.ImportService;
 
 public class CampaignSearchController implements Controller {
 	private final Logger logger = Logger.getLogger(CampaignSearchController.class.getName());
@@ -42,6 +45,15 @@ public class CampaignSearchController implements Controller {
 					    	  CampaignSearchService affsSearchService=new CampaignSearchService();
 					  		  Collection<CampaignSearchResult> campaignSearchResults=affsSearchService.processCampaignSearch(form);
 							  
+					  		  //read USD rate
+					  		  ImportService importService=new ImportService();					  		  
+					  		  String formatedDate=Utilities.formatedDate(new Date(),"yyyy-MM-dd");
+						      ExchangeRateVO rate=importService.getExchangeRates(formatedDate,"EUR","USD");
+						      BigDecimal rateValue = BigDecimal.valueOf(rate.getRates().get("USD"));
+						      for(CampaignSearchResult affsSearchResult:campaignSearchResults){
+						    	  affsSearchResult.setRateValue(rateValue); 
+						      }
+						      
 					  		  try(Writer writer=new StringWriter()){
 					  		    affsSearchService.createFile(writer,form, campaignSearchResults);
 					  		  

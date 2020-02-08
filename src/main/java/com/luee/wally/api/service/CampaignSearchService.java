@@ -35,7 +35,7 @@ public class CampaignSearchService {
 	
 	
 	private Collection<String> header = Arrays.asList("*","campaign_count", "affs_count", "sum_total_ad_rev", "avr_total_ad_rev",
-			"sum_offerwall_rev", "avr_offerwall_rev");
+			"sum_offerwall_rev", "avr_offerwall_rev","paid_users_total","avr_paid_users");
 
 	public void createFile(Writer writer, CampaignSearchForm form, Collection<CampaignSearchResult> content)
 			throws IOException {
@@ -62,6 +62,9 @@ public class CampaignSearchService {
 			line.add(item.getOfferwallRev().setScale(4, BigDecimal.ROUND_HALF_EVEN).toString());
 			line.add(item.getAvrOfferwallRev().setScale(4, BigDecimal.ROUND_HALF_EVEN).toString());
 
+			line.add(item.getTotalPaidUsersUSD().setScale(4, BigDecimal.ROUND_HALF_EVEN).toString());
+			line.add(item.getAvrTotalPaidUsersUSD().setScale(4, BigDecimal.ROUND_HALF_EVEN).toString());
+			
 			GenerateCSV.INSTANCE.writeLine(writer, line);
 			line.clear();
 		}
@@ -119,6 +122,7 @@ public class CampaignSearchService {
 	     
 		 BigDecimal totalAdRev = BigDecimal.ZERO;
 		 BigDecimal offerwallRev = BigDecimal.ZERO;
+		 BigDecimal totalPaidUsers = BigDecimal.ZERO;
  		 int affsCount=0,campaignCount  = 0;
 			
 		 do{
@@ -141,6 +145,7 @@ public class CampaignSearchService {
 	    		    AffsSearchResult affsSearchResult= affsSearchService.processAffsSearch(affsIds,startDate,endDate);	 								
 					totalAdRev = totalAdRev.add(affsSearchResult.getTotalAdRev());					
 					offerwallRev = offerwallRev.add(affsSearchResult.getOfferwallRev());
+					totalPaidUsers =totalPaidUsers.add(affsSearchResult.getTotalPaidUsers()); 
 					affsCount+=affsSearchResult.getCount();
 	    	 }
 	    	 campaignCount+=results.size();
@@ -148,7 +153,7 @@ public class CampaignSearchService {
 		     cursor=results.getCursor();		    		    	
 	     }while(results.size()>0);
 		 
-		 return new CampaignSearchResult(totalAdRev, offerwallRev,affsCount,campaignCount);
+		 return new CampaignSearchResult(totalAdRev, offerwallRev,totalPaidUsers,affsCount,campaignCount);
 	}
 	
 	private DatastoreService createDatastoreService(){
