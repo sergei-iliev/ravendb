@@ -16,12 +16,18 @@ public class AffsSearchResult {
 	
 	private String experiment;
 	
+	private int minRevCount;
+	
 	public AffsSearchResult(String experiment,BigDecimal totalAdRev,BigDecimal offerwallRev,BigDecimal totalPaidUsers,int count) {
+	    this(experiment,totalAdRev,offerwallRev, totalPaidUsers, count,0);
+	}
+	public AffsSearchResult(String experiment,BigDecimal totalAdRev,BigDecimal offerwallRev,BigDecimal totalPaidUsers,int count,int minRevCount) {
 	   this.experiment=experiment;
 	   this.totalAdRev=totalAdRev;
 	   this.count=count;
 	   this.offerwallRev=offerwallRev;
-	   this.totalPaidUsers=totalPaidUsers;	   
+	   this.totalPaidUsers=totalPaidUsers;	
+	   this.minRevCount=minRevCount;
 	}
 	
 	public BigDecimal getAvrTotalAdRev(){
@@ -86,5 +92,13 @@ public class AffsSearchResult {
 	
 	public void setRateValue(BigDecimal rateValue) {
 		this.rateValue = rateValue;
+	}
+	
+	public int getMinRevCount() {
+		return minRevCount;
+	}
+	
+	public void setMinRevCount(int minRevCount) {
+		this.minRevCount = minRevCount;
 	}
 }

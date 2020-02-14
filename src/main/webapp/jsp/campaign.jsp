@@ -148,7 +148,7 @@
                         <div class="form-label-group mt-3">
                         <div class="col-md-3">
                            	<label for="minRevThresholdId">Min Revenue Threshhold</label>                                
-                            <input name="minRevThreshold" type="number" class="form-control" id="minRevThresholdId" value="${webform.minRevThreshold}" >      						      					    	
+                            <input name="minRevThreshold" class="form-control" id="minRevThresholdId" value="${webform.minRevThreshold}" >      						      					    	
                         </div>
                         </div>  
                         <div class="form-group">

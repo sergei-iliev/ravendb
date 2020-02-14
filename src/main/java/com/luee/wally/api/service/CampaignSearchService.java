@@ -103,7 +103,7 @@ public class CampaignSearchService {
 		 
 	 	 return campaignSearchResults;
 	}
-	private CampaignSearchResult  processCampaignSearch(double minRevThreshold, Date startDate,Date endDate,String country,String packageName,String addNetwork,String campaignId,String sourceId){
+	private CampaignSearchResult  processCampaignSearch(Double minRevThreshold, Date startDate,Date endDate,String country,String packageName,String addNetwork,String campaignId,String sourceId){
 		
 		DatastoreService ds=createDatastoreService();
 	 	 
@@ -120,11 +120,10 @@ public class CampaignSearchService {
 	     
 		 BigDecimal totalAdRev = BigDecimal.ZERO;
 		 BigDecimal offerwallRev = BigDecimal.ZERO;
-		 BigDecimal totalPaidUsers = BigDecimal.ZERO;
-		 BigDecimal minRevThres=BigDecimal.valueOf(minRevThreshold);
+		 BigDecimal totalPaidUsers = BigDecimal.ZERO;		 
 		 
-		 
- 		 int affsCount=0,campaignCount  = 0,minRevCount=0;
+ 		 int affsCount=0,campaignCount  = 0;
+		 int minRevCount=0;
 			
 		 do{
 	    	 FetchOptions fetchOptions;	 
@@ -143,17 +142,12 @@ public class CampaignSearchService {
 	    	  * calculate affs data by id
 	    	  */
 	    	 if(affsIds.size()>0){
-	    		    AffsSearchResult affsSearchResult= affsSearchService.processAffsSearch(affsIds,startDate,endDate);	 								
+	    		    AffsSearchResult affsSearchResult= affsSearchService.processAffsSearch(minRevThreshold, affsIds,startDate,endDate);	 								
 					totalAdRev = totalAdRev.add(affsSearchResult.getTotalAdRev());					
 					offerwallRev = offerwallRev.add(affsSearchResult.getOfferwallRev());
 					totalPaidUsers =totalPaidUsers.add(affsSearchResult.getTotalPaidUsers()); 
-					affsCount+=affsSearchResult.getCount();
-					
-					BigDecimal sum=totalAdRev.add(offerwallRev);
-					if(sum.compareTo(minRevThres)>-1){
-					   	minRevCount++;
-					}
-					
+					affsCount+=affsSearchResult.getCount();		
+					minRevCount+=affsSearchResult.getMinRevCount();
 	    	 }
 	    	 campaignCount+=results.size();
 	    	 

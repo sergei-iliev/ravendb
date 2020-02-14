@@ -162,7 +162,7 @@ public class AffsSearchService {
 	 * Eventual consistency
 	 */
 
-		public AffsSearchResult processAffsSearch(Collection<String> gaids,Date startDate,Date endDate) {
+		public AffsSearchResult processAffsSearch(Double minRevThreshold,Collection<String> gaids,Date startDate,Date endDate) {
 			PaidUsersRepository paidUsersRepository=new PaidUsersRepository();
 			DatastoreService ds = createDatastoreService();
 	
@@ -170,7 +170,9 @@ public class AffsSearchService {
 			BigDecimal totalAdRev = BigDecimal.ZERO;
 			BigDecimal offerwallRev = BigDecimal.ZERO;
 			BigDecimal totalPaidUsers = BigDecimal.ZERO;
+			BigDecimal minRevThres=BigDecimal.valueOf(minRevThreshold==null?0.0:minRevThreshold);
 			int count = 0;
+			int minRevCount=0;
 			// loop for each guid
 			for (String gaid : gaids) {			
 				Query query=createQuery(startDate, endDate, gaid);
@@ -188,6 +190,13 @@ public class AffsSearchService {
 					offerwallRev = offerwallRev.add(_offerwallRev);	
 					
 					userGuids.add((String)e.getProperty("user_guid"));
+					
+					if(minRevThreshold!=null&&(minRevThreshold!=0)){
+						  BigDecimal sum=_totalAdRev.add(_offerwallRev);
+						  if(sum.compareTo(minRevThres)==0||sum.compareTo(minRevThres)==1){
+						   	minRevCount++;
+						  }
+					}					
 				}
 				
 				//read paid_users record by record
@@ -199,7 +208,7 @@ public class AffsSearchService {
 				
 				count+=results.size();
 			}
-		return new AffsSearchResult(null, totalAdRev, offerwallRev,totalPaidUsers,count);
+		return new AffsSearchResult(null, totalAdRev, offerwallRev,totalPaidUsers,count,minRevCount);
 	}
 	private DatastoreService createDatastoreService() {
 		double deadline = 15.0; // seconds

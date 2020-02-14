@@ -15,7 +15,7 @@ public class CampaignSearchForm implements WebForm{
 	private Collection<String> adNetworks=new HashSet<>();
 	private Collection<String> campaigns=new HashSet<>();
 	private String packageName;
-	private double minRevThreshold; 
+	private Double minRevThreshold; 
 	
 	public  static CampaignSearchForm parse(ServletRequest req) throws ServletException{
 		CampaignSearchForm form=new CampaignSearchForm();
@@ -24,7 +24,7 @@ public class CampaignSearchForm implements WebForm{
 		form.setCountryCode((req.getParameter("country").length() == 0 ? null : req.getParameter("country")));
 		form.setPackageName((req.getParameter("packageName").length() == 0 ? null : req.getParameter("packageName")));
 		
-		form.minRevThreshold=Double.parseDouble(((req.getParameter("minRevThreshold").length() == 0 ? "0" : req.getParameter("minRevThreshold"))));
+		form.minRevThreshold=(((req.getParameter("minRevThreshold").length() == 0 ? null : Double.parseDouble(req.getParameter("minRevThreshold")))));
 		
 		if(req.getParameterValues("adnetworks")!=null){
 			form.setAdNetworks(req.getParameterValues("adnetworks"));
@@ -143,10 +143,10 @@ public class CampaignSearchForm implements WebForm{
 		this.packageName = packageName;
 	}
 	
-	public void setMinRevThreshold(double minRevThreshold) {
+	public void setMinRevThreshold(Double minRevThreshold) {
 		this.minRevThreshold = minRevThreshold;
 	}
-	public double getMinRevThreshold() {
+	public Double getMinRevThreshold() {
 		return minRevThreshold;
 	}
 	
