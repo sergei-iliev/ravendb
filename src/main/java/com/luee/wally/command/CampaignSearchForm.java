@@ -15,7 +15,7 @@ public class CampaignSearchForm implements WebForm{
 	private Collection<String> adNetworks=new HashSet<>();
 	private Collection<String> campaigns=new HashSet<>();
 	private String packageName;
-	
+	private double minRevThreshold; 
 	
 	public  static CampaignSearchForm parse(ServletRequest req) throws ServletException{
 		CampaignSearchForm form=new CampaignSearchForm();
@@ -23,6 +23,8 @@ public class CampaignSearchForm implements WebForm{
 		form.setEndDate(form.parseDate(req.getParameter("endDate")));
 		form.setCountryCode((req.getParameter("country").length() == 0 ? null : req.getParameter("country")));
 		form.setPackageName((req.getParameter("packageName").length() == 0 ? null : req.getParameter("packageName")));
+		
+		form.minRevThreshold=Double.parseDouble(((req.getParameter("minRevThreshold").length() == 0 ? "0" : req.getParameter("minRevThreshold"))));
 		
 		if(req.getParameterValues("adnetworks")!=null){
 			form.setAdNetworks(req.getParameterValues("adnetworks"));
@@ -141,6 +143,12 @@ public class CampaignSearchForm implements WebForm{
 		this.packageName = packageName;
 	}
 	
+	public void setMinRevThreshold(double minRevThreshold) {
+		this.minRevThreshold = minRevThreshold;
+	}
+	public double getMinRevThreshold() {
+		return minRevThreshold;
+	}
 	
 	@Override
 	public String toString() {
@@ -149,7 +157,7 @@ public class CampaignSearchForm implements WebForm{
 		sb.append("endDate:"+(endDate==null?"":endDate)+"\r\n");
 		sb.append("country:"+(countryCode==null?"":countryCode)+"\r\n");
 		sb.append("packageName:"+(packageName==null?"":packageName)+"\r\n");
-		
+		sb.append("minRevThreshold:"+minRevThreshold+"\r\n");
 		sb.append("Ad Network:"+adNetworks+"\r\n");
 		sb.append("Source:"+sources+"\r\n");
 		sb.append("Campaign:"+campaigns +"\r\n");

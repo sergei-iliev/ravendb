@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.google.appengine.api.datastore.Cursor;
@@ -18,24 +17,23 @@ import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.FetchOptions;
 import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
-import com.google.appengine.api.datastore.QueryResultList;
-import com.google.appengine.api.datastore.ReadPolicy;
 import com.google.appengine.api.datastore.Query.Filter;
 import com.google.appengine.api.datastore.Query.FilterOperator;
 import com.google.appengine.api.datastore.Query.FilterPredicate;
-import com.luee.wally.command.AffsSearchForm;
+import com.google.appengine.api.datastore.QueryResultList;
+import com.google.appengine.api.datastore.ReadPolicy;
+import com.luee.wally.api.service.impex.GenerateCSV;
 import com.luee.wally.command.AffsSearchResult;
 import com.luee.wally.command.CampaignSearchForm;
 import com.luee.wally.command.CampaignSearchResult;
 import com.luee.wally.constants.Constants;
-import com.luee.wally.api.service.impex.GenerateCSV;
 
 public class CampaignSearchService {
 	private final Logger logger = Logger.getLogger(CampaignSearchService.class.getName());
 	
 	
 	private Collection<String> header = Arrays.asList("*","campaign_count", "affs_count", "sum_total_ad_rev", "avr_total_ad_rev",
-			"sum_offerwall_rev", "avr_offerwall_rev","paid_users_total","avr_paid_users");
+			"sum_offerwall_rev", "avr_offerwall_rev","paid_users_total","avr_paid_users","min_rev_count");
 
 	public void createFile(Writer writer, CampaignSearchForm form, Collection<CampaignSearchResult> content)
 			throws IOException {
@@ -65,6 +63,8 @@ public class CampaignSearchService {
 			line.add(item.getTotalPaidUsersUSD().setScale(4, BigDecimal.ROUND_HALF_EVEN).toString());
 			line.add(item.getAvrTotalPaidUsersUSD().setScale(4, BigDecimal.ROUND_HALF_EVEN).toString());
 			
+			line.add(String.valueOf(item.getMinRevCount()));
+			
 			GenerateCSV.INSTANCE.writeLine(writer, line);
 			line.clear();
 		}
@@ -73,39 +73,37 @@ public class CampaignSearchService {
 		GenerateCSV.INSTANCE.writeLine(writer, header);
 	}
 	
-	public Collection<CampaignSearchResult> processCampaignSearch(CampaignSearchForm campaignSearchForm){
-		logger.log(Level.WARNING,campaignSearchForm.toString());
-		
+	public Collection<CampaignSearchResult> processCampaignSearch(CampaignSearchForm campaignSearchForm){		
 		 Collection<CampaignSearchResult> campaignSearchResults=new ArrayList<>();
 		 if(campaignSearchForm.getAdNetworks().size()>1){  //multi search
 			 for(String adNetwork:campaignSearchForm.getAdNetworks()){
-				 CampaignSearchResult affsSearchResult= this.processCampaignSearch(campaignSearchForm.getStartDate(), campaignSearchForm.getEndDate(),campaignSearchForm.getCountryCode(), campaignSearchForm.getPackageName(),adNetwork,campaignSearchForm.getCampaignsFirst(),campaignSearchForm.getSourcesFirst());  
+				 CampaignSearchResult affsSearchResult= this.processCampaignSearch(campaignSearchForm.getMinRevThreshold(),campaignSearchForm.getStartDate(), campaignSearchForm.getEndDate(),campaignSearchForm.getCountryCode(), campaignSearchForm.getPackageName(),adNetwork,campaignSearchForm.getCampaignsFirst(),campaignSearchForm.getSourcesFirst());  
 				 affsSearchResult.setGroupName("adNetwork");
 				 affsSearchResult.setGroupValue(adNetwork);
 				 campaignSearchResults.add(affsSearchResult);				 
 			 }			 
 		 }else if(campaignSearchForm.getSources().size()>1){
 			 for(String source:campaignSearchForm.getSources()){
-				 CampaignSearchResult affsSearchResult= this.processCampaignSearch(campaignSearchForm.getStartDate(), campaignSearchForm.getEndDate(),campaignSearchForm.getCountryCode(), campaignSearchForm.getPackageName(),campaignSearchForm.getAdNetworksFirst(),campaignSearchForm.getCampaignsFirst(),source); 
+				 CampaignSearchResult affsSearchResult= this.processCampaignSearch(campaignSearchForm.getMinRevThreshold(),campaignSearchForm.getStartDate(), campaignSearchForm.getEndDate(),campaignSearchForm.getCountryCode(), campaignSearchForm.getPackageName(),campaignSearchForm.getAdNetworksFirst(),campaignSearchForm.getCampaignsFirst(),source); 
 				 affsSearchResult.setGroupName("Sources");
 				 affsSearchResult.setGroupValue(source);
 				 campaignSearchResults.add(affsSearchResult);				 
 			 }			 
 		 }else if(campaignSearchForm.getCampaigns().size()>1){
 			 for(String campaign:campaignSearchForm.getCampaigns()){
-				 CampaignSearchResult affsSearchResult= this.processCampaignSearch(campaignSearchForm.getStartDate(), campaignSearchForm.getEndDate(),campaignSearchForm.getCountryCode(), campaignSearchForm.getPackageName(),campaignSearchForm.getAdNetworksFirst(),campaign,campaignSearchForm.getSourcesFirst()); 
+				 CampaignSearchResult affsSearchResult= this.processCampaignSearch(campaignSearchForm.getMinRevThreshold(),campaignSearchForm.getStartDate(), campaignSearchForm.getEndDate(),campaignSearchForm.getCountryCode(), campaignSearchForm.getPackageName(),campaignSearchForm.getAdNetworksFirst(),campaign,campaignSearchForm.getSourcesFirst()); 
 				 affsSearchResult.setGroupName("Campaign");
 				 affsSearchResult.setGroupValue(campaign);
 				 campaignSearchResults.add(affsSearchResult);				 
 			 }
 		 }else{   //single pass
-			 CampaignSearchResult affsSearchResult= this.processCampaignSearch(campaignSearchForm.getStartDate(), campaignSearchForm.getEndDate(),campaignSearchForm.getCountryCode(), campaignSearchForm.getPackageName(),campaignSearchForm.getAdNetworksFirst(),campaignSearchForm.getCampaignsFirst(),campaignSearchForm.getSourcesFirst()); 
+			 CampaignSearchResult affsSearchResult= this.processCampaignSearch(campaignSearchForm.getMinRevThreshold(), campaignSearchForm.getStartDate(), campaignSearchForm.getEndDate(),campaignSearchForm.getCountryCode(), campaignSearchForm.getPackageName(),campaignSearchForm.getAdNetworksFirst(),campaignSearchForm.getCampaignsFirst(),campaignSearchForm.getSourcesFirst()); 
 			 campaignSearchResults.add(affsSearchResult);
 		 }
 		 
 	 	 return campaignSearchResults;
 	}
-	private CampaignSearchResult  processCampaignSearch(Date startDate,Date endDate,String country,String packageName,String addNetwork,String campaignId,String sourceId){
+	private CampaignSearchResult  processCampaignSearch(double minRevThreshold, Date startDate,Date endDate,String country,String packageName,String addNetwork,String campaignId,String sourceId){
 		
 		DatastoreService ds=createDatastoreService();
 	 	 
@@ -123,7 +121,10 @@ public class CampaignSearchService {
 		 BigDecimal totalAdRev = BigDecimal.ZERO;
 		 BigDecimal offerwallRev = BigDecimal.ZERO;
 		 BigDecimal totalPaidUsers = BigDecimal.ZERO;
- 		 int affsCount=0,campaignCount  = 0;
+		 BigDecimal minRevThres=BigDecimal.valueOf(minRevThreshold);
+		 
+		 
+ 		 int affsCount=0,campaignCount  = 0,minRevCount=0;
 			
 		 do{
 	    	 FetchOptions fetchOptions;	 
@@ -147,13 +148,19 @@ public class CampaignSearchService {
 					offerwallRev = offerwallRev.add(affsSearchResult.getOfferwallRev());
 					totalPaidUsers =totalPaidUsers.add(affsSearchResult.getTotalPaidUsers()); 
 					affsCount+=affsSearchResult.getCount();
+					
+					BigDecimal sum=totalAdRev.add(offerwallRev);
+					if(sum.compareTo(minRevThres)>-1){
+					   	minRevCount++;
+					}
+					
 	    	 }
 	    	 campaignCount+=results.size();
 	    	 
 		     cursor=results.getCursor();		    		    	
 	     }while(results.size()>0);
 		 
-		 return new CampaignSearchResult(totalAdRev, offerwallRev,totalPaidUsers,affsCount,campaignCount);
+		 return new CampaignSearchResult(totalAdRev, offerwallRev,totalPaidUsers,affsCount,campaignCount,minRevCount);
 	}
 	
 	private DatastoreService createDatastoreService(){

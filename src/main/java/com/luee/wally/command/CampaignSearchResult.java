@@ -14,13 +14,15 @@ public class CampaignSearchResult {
 	private String groupName,groupValue;
 	
 	private  BigDecimal rateValue;//EUR to USD rate
+	private int minRevCount;
 	
-	public CampaignSearchResult(BigDecimal totalAdRev,BigDecimal offerwallRev,BigDecimal totalPaidUsers,int affsCount,int campaignCount) {
+	public CampaignSearchResult(BigDecimal totalAdRev,BigDecimal offerwallRev,BigDecimal totalPaidUsers,int affsCount,int campaignCount,int minRevCount) {
 	   this.totalAdRev=totalAdRev;
 	   this.affsCount=affsCount;
 	   this.campaignCount=campaignCount;
 	   this.offerwallRev=offerwallRev;
 	   this.totalPaidUsers=totalPaidUsers; 
+	   this.minRevCount=minRevCount;
 	}
 	public BigDecimal getAvrTotalAdRev(){
 		if(affsCount!=0){
@@ -87,5 +89,13 @@ public class CampaignSearchResult {
 	}
 	public void setRateValue(BigDecimal rateValue) {
 		this.rateValue = rateValue;
+	}
+	
+	public int getMinRevCount() {
+		return minRevCount;
+	}
+	
+	public void setMinRevCount(int minRevCount) {
+		this.minRevCount = minRevCount;
 	}
 }
