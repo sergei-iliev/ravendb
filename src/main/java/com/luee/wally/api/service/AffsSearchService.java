@@ -179,7 +179,8 @@ public class AffsSearchService {
 	
 				PreparedQuery preparedQuery = ds.prepare(query);
 				QueryResultList<Entity> results = preparedQuery.asQueryResultList(FetchOptions.Builder.withDefaults());
-	
+				
+				userGuids.clear();
 				for (Entity e : results) {
 					BigDecimal _totalAdRev = BigDecimal
 							.valueOf(e.getProperty("total_ad_rev") == null ? 0 : (double) e.getProperty("total_ad_rev"));
