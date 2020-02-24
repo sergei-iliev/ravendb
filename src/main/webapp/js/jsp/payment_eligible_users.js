@@ -297,7 +297,82 @@ payment.PaymentEligibleUsersView = Backbone.View.extend({
 			  $('#removalReasonDialog').modal('hide');
 			});		  
 		  
-	  } );	  
+	  } );	
+
+	  //*********edit email field
+	  $(".edit_email").click(function(e) {
+		  e.preventDefault();
+		  let index = $(this).data('index');
+		  let key = $(this).data('entitykey');
+		  
+		  $('#editEmailDialog').modal('show');	
+		  $('#emailFieldId').val($('#email_field_'+index).text());
+		  //disconnect event handler and enable it		  
+		  $('#saveEmailFieldBtn').off();
+		  $('#saveEmailFieldBtn').on( "click", function(ee) {	
+			  if($("#emailFieldId").val().trim().length==0){
+				  return;
+			  }
+			  var formData={
+					  email:$("#emailFieldId").val(),
+					  key:key
+			  }; 
+			  $.ajax({
+				    url: '/administration/payment/eligibleusers/edit/email',
+				    type: 'post',
+				    data:formData,	    
+				    success: function(data, textStatus, jQxhr ){
+				        $('#email_field_'+index).text($("#emailFieldId").val());
+				    },
+				    error: function( jqXhr, textStatus, errorThrown ){
+				        console.log( errorThrown );
+				        alert(errorThrown);
+				    }
+				  
+				});
+				  
+				  $('#editEmailDialog').modal('hide');			
+			  
+		  });
+	  });
+	  //*********edit email field
+	  $(".edit_paypal_acount").click(function(e) {
+		  e.preventDefault();
+		  let index = $(this).data('index');
+		  let key = $(this).data('entitykey');
+		  
+		  $('#editPayPalAccountDialog').modal('show');	
+		  $('#payPalAccountFieldId').val($('#paypal_account_field_'+index).text());
+		  //disconnect event handler and enable it		  
+		  $('#savePayPalAccountFieldBtn').off();
+		  $('#savePayPalAccountFieldBtn').on( "click", function(ee) {	
+			  if($("#payPalAccountFieldId").val().trim().length==0){
+				  return;
+			  }
+			  var formData={
+					  paypal:$("#payPalAccountFieldId").val(),
+					  key:key
+			  }; 
+			  $.ajax({
+				    url: '/administration/payment/eligibleusers/edit/paypal',
+				    type: 'post',
+				    data:formData,	    
+				    success: function(data, textStatus, jQxhr ){
+				        $('#paypal_account_field_'+index).text($("#payPalAccountFieldId").val());
+				    },
+				    error: function( jqXhr, textStatus, errorThrown ){
+				        console.log( errorThrown );
+				        alert(errorThrown);
+				    }
+				  
+				});
+				  
+				  $('#editPayPalAccountDialog').modal('hide');			
+			  
+		  });
+	  });
+	  
+	  
   },
   events: {
 	  "submit #search-form":"onSubmit",

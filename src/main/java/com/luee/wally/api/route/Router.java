@@ -64,6 +64,9 @@ INSTANCE;
     	 httpPostRouteList.put("/administration/login", new Route(new LoginController(),"login"));
     	 httpPostRouteList.put("/administration/import/user/revenue/2019/background", new Route(new ImportController(),"importUserRevenue2019InBackground"));
     	 httpPostRouteList.put("/administration/payment/eligibleusers/search", new Route(new PaymentController(),"search"));
+    	 httpPostRouteList.put("/administration/payment/eligibleusers/edit/email", new Route(new PaymentController(),"editEmail"));
+    	 httpPostRouteList.put("/administration/payment/eligibleusers/edit/paypal", new Route(new PaymentController(),"editPayPalAccount"));
+    	 
     	 httpPostRouteList.put("/administration/search/template", new Route(new SearchFilterTemplateController(),"saveSearchFilterTemplate"));
     	 httpPostRouteList.put("/administration/payment/removal/reason", new Route(new PaymentController(),"saveUserPaymentRemovalReason"));
     	 httpPostRouteList.put("/administration/payment/user/pay", new Route(new PaymentController(),"pay"));

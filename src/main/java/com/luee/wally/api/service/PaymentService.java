@@ -49,6 +49,19 @@ public class PaymentService extends AbstractService{
 	public Collection<String> getDefaultCurrencyCodes(){
 		return Arrays.asList("USD","EUR","CAD","AUD","GBP");
 	}
+	
+	public void editEmail(String email,String key){
+	   PaymentRepository paymentRepository=new PaymentRepository();
+	   Entity entity=paymentRepository.getRedeemingRequestsByKey(key);
+	   entity.setProperty("email", email);	   
+	   paymentRepository.save(entity);
+	}
+	public void editPayPalAccount(String paypal,String key){
+		   PaymentRepository paymentRepository=new PaymentRepository();
+		   Entity entity=paymentRepository.getRedeemingRequestsByKey(key);
+		   entity.setProperty("paypal_account", paypal);	   
+		   paymentRepository.save(entity);
+	}
 	/*Don’t allow any attempt to pay:
        1. More than 30 EUR (or an equivalent amount in a different currency) within the same transaction.
        2. More than 100 EUR (or an equivalent amount in a different currency) to the same paypal account / email address (based on the paid_users_external table).

@@ -195,7 +195,7 @@
 						</tr>
 					</thead>
 					<tbody>
-						<c:forEach var="entity" items="${entities}">
+						<c:forEach var="entity" items="${entities}" varStatus="loop">
 							<tr>
 								<td><a href="${entity.link1}"
 									class="btn btn-primary btn-sm active" role="button"
@@ -225,9 +225,18 @@
 							    </c:if>
 							    								
 								</td>
-								<td>${entity.email}</td>
+								<td>
+								 	<div id='email_field_${loop.index}'>${entity.email}</div>
+								    <br>
+								    <a href="#" class="edit_email" data-index="${loop.index}" data-entitykey="${entity.key}"><i class="fa fa-pencil-square-o"></i></a>
+								     
+								</td>
 								<td>${entity.countryCode}</td>
-								<td>${entity.paypalAccount}</td>
+								<td>
+									<div id='paypal_account_field_${loop.index}'>${entity.paypalAccount}</div>
+									<br>
+								    <a href="#"  class="edit_paypal_acount" data-index="${loop.index}" data-entitykey="${entity.key}"><i class="fa fa-pencil-square-o"></i></a> 							
+								</td>
 								<td>
 								<button type="button" class="btn btn-primary btn-sm" data-href="${entity.link2}" value="Paid"
 									 paid-button="true" data-paymentType="${entity.type}" data-entitykey="${entity.key}">Paid</button>
@@ -376,6 +385,64 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-primary" id="saveRemovalReasonBtn">Save</button> 
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>    
+      </div>
+    </div>
+  </div>
+</div>	
+<!-- Edit Email -->
+<div class="modal fade" id="editEmailDialog" tabindex="-1" role="dialog" aria-labelledby="editEmailDialogLabel" aria-hidden="true">
+  	<div class="modal-dialog"  role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editEmailDialogLabel">Edit Email</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+      <div class="container">
+		<div class="row mt-3">
+				<div class="col-md-4">
+					<label for="emailFieldId">Email</label> 
+				</div>
+				<div class="col-md-8">
+					<input name="types" class="form-control" id="emailFieldId" value="">
+				</div>
+		</div>
+      </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" id="saveEmailFieldBtn">Save</button> 
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>    
+      </div>
+    </div>
+  </div>
+</div>	
+<!-- Edit PayPal Account -->
+<div class="modal fade" id="editPayPalAccountDialog" tabindex="-1" role="dialog" aria-labelledby="editPayPalAccountDialogLabel" aria-hidden="true">
+  	<div class="modal-dialog"  role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editPayPalAccountDialogLabel">Edit PayPal Account</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+      <div class="container">
+		<div class="row mt-3">
+				<div class="col-md-4">
+					<label for="payPalAccountFieldId">PayPal Account</label> 
+				</div>
+				<div class="col-md-8">
+					<input name="types" class="form-control" id="payPalAccountFieldId" value="">
+				</div>
+		</div>
+      </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" id="savePayPalAccountFieldBtn">Save</button> 
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>    
       </div>
     </div>

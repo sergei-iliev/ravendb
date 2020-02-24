@@ -218,6 +218,11 @@ public class PaymentRepository extends AbstractRepository{
 	     entity.setProperty("removal_reason", reason);
 	     ds.put(entity);	     
 	   }
+	   
+	   public void save(Entity entity){		   
+		   DatastoreService ds = createDatastoreService(Consistency.STRONG);
+		   ds.put(entity);
+	   }
 	  
 	   public Collection<String> getUserPaymentsRemovalReasons(){
 			Collection<String> list = new ArrayList<>();
