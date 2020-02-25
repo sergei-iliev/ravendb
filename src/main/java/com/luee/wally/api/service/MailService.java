@@ -232,7 +232,7 @@ public class MailService {
 	    request.setBody(mail.build());
 	    
 	    Response response = sg.api(request);		    
-	    logger.log(Level.INFO, response.getBody());
+	    //logger.log(Level.INFO, response.getHeaders().toString());
 }
 	
 	public void sendMail(Email email) {

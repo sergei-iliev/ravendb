@@ -62,6 +62,54 @@ public class PaymentService extends AbstractService{
 		   entity.setProperty("paypal_account", paypal);	   
 		   paymentRepository.save(entity);
 	}
+	public void validatePayPalAccount(String key)throws IOException{
+		   PaymentRepository paymentRepository=new PaymentRepository();
+		   Entity entity=paymentRepository.getRedeemingRequestsByKey(key);
+		   			
+		   RedeemingRequests redeemingRequests= RedeemingRequests.valueOf(entity);
+		   String payPalAccount=redeemingRequests.getPaypalAccount();
+		   String email=redeemingRequests.getEmail();
+		   
+		   GiftCardRepository giftCardRepository=new GiftCardRepository();
+		   Entity packageTitle=giftCardRepository.getPackageNameTitleMapping(redeemingRequests.getPackageName());
+		   if(entity==null){
+				throw new IOException("No title in package to title mapping table.");			
+		   }			
+		   String appName=(String)packageTitle.getProperty("title");
+
+		   ApplicationSettingsService applicationSettingsService=new ApplicationSettingsService();
+	       String supportEmail=applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.SUPPORT_EMAIL);
+
+		   
+		   Email mail=new Email();
+		   mail.setFrom(supportEmail);
+		   mail.setFromName(appName+" Support");
+		   mail.setTo(email);
+		   mail.setToName(redeemingRequests.getFullName());
+		   
+		   if(!email.equalsIgnoreCase(payPalAccount)){
+			   mail.setCC(payPalAccount);
+			   mail.setCCName(redeemingRequests.getFullName());
+		   }
+		   
+		   mail.setSubject("Your "+appName+" cash out request!");
+		   StringBuilder content=new StringBuilder();
+		   content.append("Dear ");
+		   content.append(redeemingRequests.getFullName());
+		   content.append(", <br>");
+		   content.append("You submitted a request to cash out a reward from "+appName+" through PayPal.<br>");
+		   content.append("Unfortunately, your PayPal account '"+redeemingRequests.getPaypalAccount()+"' could not be found.<br>");
+		   content.append("Please submit a new cash out request with a valid PayPal account. <br>");
+		   content.append("<br>");
+		   content.append("Yours,<br>");
+		   content.append(appName+" Support");
+
+		   mail.setContent(content.toString());
+	  		   
+		   MailService mailService = new MailService();
+		   mailService.sendMailGrid(mail);	    
+		   
+	}
 	/*Don’t allow any attempt to pay:
        1. More than 30 EUR (or an equivalent amount in a different currency) within the same transaction.
        2. More than 100 EUR (or an equivalent amount in a different currency) to the same paypal account / email address (based on the paid_users_external table).

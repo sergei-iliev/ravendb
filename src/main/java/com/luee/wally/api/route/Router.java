@@ -72,6 +72,7 @@ INSTANCE;
     	 httpPostRouteList.put("/administration/payment/user/pay", new Route(new PaymentController(),"pay"));
     	 httpPostRouteList.put("/administration/payment/user/giftcard", new Route(new PaymentController(),"sendGiftCard"));
     	 httpPostRouteList.put("/administration/payment/user/paypal", new Route(new PaymentController(),"sendPayPal"));
+    	 httpPostRouteList.put("/administration/payment/user/paypal/validate", new Route(new PaymentController(),"validatePayPalAccount"));
     	 
     	 httpPostRouteList.put("/administration/job/payment/user/external", new Route(new PaymentController(),"payExternal")); 
     	 

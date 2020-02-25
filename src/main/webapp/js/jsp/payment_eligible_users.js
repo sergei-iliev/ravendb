@@ -371,7 +371,36 @@ payment.PaymentEligibleUsersView = Backbone.View.extend({
 			  
 		  });
 	  });
-	  
+	  //*********send PayPal validation email
+	  $(".send_paypal_validation_email").click(function(e) {
+		  e.preventDefault();
+		  
+		  let key = $(this).data('entitykey');
+		  
+		  $('#sendPayPalValidationEmailDialog').modal('show');	
+		  //disconnect event handler and enable it		  
+		  $('#sendPayPalValidationEmailBtn').off();
+		  $('#sendPayPalValidationEmailBtn').on( "click", function(ee) {	
+			  var formData={
+					  key:key
+			  }; 
+			  $.ajax({
+				    url: '/administration/payment/user/paypal/validate',
+				    type: 'post',
+				    data:formData,	    
+				    success: function(data, textStatus, jQxhr ){
+				    },
+				    error: function( jqXhr, textStatus, errorThrown ){
+				        console.log( errorThrown );
+				        alert(errorThrown);
+				    }
+				  
+				});
+				  
+				  $('#sendPayPalValidationEmailDialog').modal('hide');			
+			  
+		  });
+	  });	  
 	  
   },
   events: {

@@ -20,10 +20,10 @@ public class GiftCardRepository extends AbstractRepository {
 			 return pq.asSingleEntity();			 
 	  }
 	  
-	  public Entity getPackageNameTitleMapping(String packagName){		     
+	  public Entity getPackageNameTitleMapping(String packageName){		     
 		     DatastoreService ds = createDatastoreService(Consistency.STRONG);
 		     Query query = new Query("package_name_title_mapping");
-		     query.setFilter(new FilterPredicate("package_name", FilterOperator.EQUAL, packagName));
+		     query.setFilter(new FilterPredicate("package_name", FilterOperator.EQUAL, packageName));
 			 PreparedQuery pq = ds.prepare(query);
 			 return pq.asSingleEntity();			 
 	  }

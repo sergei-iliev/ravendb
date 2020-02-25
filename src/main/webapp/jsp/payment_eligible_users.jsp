@@ -235,7 +235,8 @@
 								<td>
 									<div id='paypal_account_field_${loop.index}'>${entity.paypalAccount}</div>
 									<br>
-								    <a href="#"  class="edit_paypal_acount" data-index="${loop.index}" data-entitykey="${entity.key}"><i class="fa fa-pencil-square-o"></i></a> 							
+								    <a href="#"  class="edit_paypal_acount" data-index="${loop.index}" data-entitykey="${entity.key}"><i class="fa fa-pencil-square-o"></i></a>
+								    <a href="#"  class="send_paypal_validation_email" data-entitykey="${entity.key}"><i class="fa fa-paper-plane"></i></a> 							
 								</td>
 								<td>
 								<button type="button" class="btn btn-primary btn-sm" data-href="${entity.link2}" value="Paid"
@@ -448,7 +449,32 @@
     </div>
   </div>
 </div>	
-
+<!-- Send PayPal Validation email -->
+<div class="modal fade" id="sendPayPalValidationEmailDialog" tabindex="-1" role="dialog" aria-labelledby="sendPayPalValidationEmailDialogLabel" aria-hidden="true">
+  	<div class="modal-dialog"  role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="sendPayPalValidationEmailDialogLabel">Send PayPal Validation email</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+      <div class="container">
+		<div class="row mt-3">
+				<div class="col-md-12">
+					<span>Send user an email to report issue with PayPal account?</span> 
+				</div>			
+		</div>
+      </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" id="sendPayPalValidationEmailBtn">Send</button> 
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>    
+      </div>
+    </div>
+  </div>
+</div>
 		<script type="text/javascript">
 			'use strict';
 

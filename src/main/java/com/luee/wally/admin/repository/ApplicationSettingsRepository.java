@@ -52,6 +52,9 @@ public class ApplicationSettingsRepository extends AbstractRepository {
 	
 	public static final String SECRET_AES_KEY ="SECRET_AES_KEY";
 	
+	public static final String SUPPORT_EMAIL ="SUPPORT_EMAIL";
+	
+	
 	public Map<String, String> getApplicationSettings() {
 		Map<String, String> map = new HashMap<>();
 

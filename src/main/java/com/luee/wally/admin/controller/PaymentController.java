@@ -57,6 +57,7 @@ public class PaymentController implements Controller {
 
 		resp.getWriter().write(json);
 	}
+	
 	public void editEmail(HttpServletRequest req, HttpServletResponse resp) throws Exception {
 		String email=req.getParameter("email");
 		String key=req.getParameter("key");
@@ -69,6 +70,12 @@ public class PaymentController implements Controller {
 		String key=req.getParameter("key");
 		PaymentService paymentService = new PaymentService();
 		paymentService.editPayPalAccount(paypal, key);
+		resp.getWriter().write("OK");
+	}
+	public void validatePayPalAccount(HttpServletRequest req, HttpServletResponse resp) throws Exception {		
+		String key=req.getParameter("key");		
+		PaymentService paymentService = new PaymentService();
+		paymentService.validatePayPalAccount(key);
 		resp.getWriter().write("OK");
 	}
 	

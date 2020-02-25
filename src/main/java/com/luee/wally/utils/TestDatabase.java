@@ -354,6 +354,10 @@ public enum TestDatabase {
 		entity.setIndexedProperty("value","no-reply@softbakedapps.com");
 		ds.put(entity);	
 		
+		entity = new Entity("application_settings");	
+		entity.setIndexedProperty("name","SUPPORT_EMAIL");
+		entity.setIndexedProperty("value","sergei.iliev@gmail.com");
+		ds.put(entity);	
 	}
 	
 	
