@@ -376,6 +376,8 @@ payment.PaymentEligibleUsersView = Backbone.View.extend({
 		  e.preventDefault();
 		  
 		  let key = $(this).data('entitykey');
+		  let index = $(this).data('index');
+		  
 		  
 		  $('#sendPayPalValidationEmailDialog').modal('show');	
 		  //disconnect event handler and enable it		  
@@ -389,6 +391,7 @@ payment.PaymentEligibleUsersView = Backbone.View.extend({
 				    type: 'post',
 				    data:formData,	    
 				    success: function(data, textStatus, jQxhr ){
+				       $('#row_'+index).css("background-color","#ff9933");
 				    },
 				    error: function( jqXhr, textStatus, errorThrown ){
 				        console.log( errorThrown );
