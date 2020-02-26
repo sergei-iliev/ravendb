@@ -236,7 +236,9 @@
 									<div id='paypal_account_field_${loop.index}'>${entity.paypalAccount}</div>
 									<br>
 								    <a href="#"  class="edit_paypal_acount" data-index="${loop.index}" data-entitykey="${entity.key}"><i class="fa fa-pencil-square-o"></i></a>
-								    <a href="#"  class="send_paypal_validation_email" data-entitykey="${entity.key}"><i class="fa fa-paper-plane"></i></a> 							
+								    <c:if test="${entity.payPalType eq true}">								     
+								    	<a href="#"  class="send_paypal_validation_email" data-entitykey="${entity.key}"><i class="fa fa-paper-plane"></i></a> 							
+								    </c:if>
 								</td>
 								<td>
 								<button type="button" class="btn btn-primary btn-sm" data-href="${entity.link2}" value="Paid"

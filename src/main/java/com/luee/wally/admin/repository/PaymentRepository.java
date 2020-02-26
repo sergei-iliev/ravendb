@@ -98,6 +98,11 @@ public class PaymentRepository extends AbstractRepository{
 		    	 return null;
 		     }
 	  }
+	  public void deleteRedeemingRequestsByKey(String _key){
+		     Key key=KeyFactory.stringToKey(_key);
+		     DatastoreService ds = createDatastoreService(Consistency.STRONG);		     		     
+		     ds.delete(key);			  		     
+	  }
 	  
 	  public Entity getPaidUserByGuid(String userGuid){
 		     DatastoreService ds = createDatastoreService(Consistency.STRONG);		     

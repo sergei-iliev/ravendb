@@ -74,9 +74,18 @@ public class PaymentController implements Controller {
 	}
 	public void validatePayPalAccount(HttpServletRequest req, HttpServletResponse resp) throws Exception {		
 		String key=req.getParameter("key");		
-		PaymentService paymentService = new PaymentService();
-		paymentService.validatePayPalAccount(key);
-		resp.getWriter().write("OK");
+		try{
+		 PaymentService paymentService = new PaymentService();
+		 paymentService.validatePayPalAccount(key);
+		 //delete record
+		 PaymentRepository paymentRepository=new PaymentRepository();
+		 paymentRepository.deleteRedeemingRequestsByKey(key);
+		 resp.getWriter().write("OK");
+		}catch(Exception e){
+		 logger.log(Level.SEVERE,"Validate exception",e);
+		 resp.sendError(HttpServletResponse.SC_CONFLICT,"Email validation error:"+e.getMessage());	
+		}
+		
 	}
 	
 	/*

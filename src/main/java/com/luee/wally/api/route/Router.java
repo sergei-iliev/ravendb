@@ -1,5 +1,6 @@
 package com.luee.wally.api.route;
 
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -117,8 +118,9 @@ INSTANCE;
             argument[0] =  request;
             argument[1] =  response;
             method.invoke(route.getController(), argument);
+            return;
         } catch (IllegalAccessException ex) {
-            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, null, ex);            
         } catch (IllegalArgumentException ex) {
             Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, null, ex);
         } catch (InvocationTargetException ex) {
@@ -128,6 +130,11 @@ INSTANCE;
         } catch (SecurityException ex) {
         	Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, null, ex);
         }
+    	try{
+    		response.sendError(HttpServletResponse.SC_CONFLICT);
+    	}catch(IOException e){
+    		//swallow
+    	}
     }    	
     
 }
