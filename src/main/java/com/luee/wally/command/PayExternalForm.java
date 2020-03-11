@@ -22,7 +22,7 @@ public class PayExternalForm implements WebForm {
 
 	public static PayExternalForm parseEncoded(ServletRequest req,String aesKey) throws ServletException,AESSecurityException{
 		PayExternalForm form=new PayExternalForm();
-		form.type=AESUtils.encrypt(req.getParameter("type"),aesKey);
+		form.type=AESUtils.decrypt(req.getParameter("type"),aesKey);
 		form.packageName=AESUtils.decrypt(req.getParameter("package_name"),aesKey);
 		form.countryCode=AESUtils.decrypt(req.getParameter("country_code"),aesKey);
 		form.amount=AESUtils.decrypt(req.getParameter("amount"),aesKey );
