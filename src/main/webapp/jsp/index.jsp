@@ -89,11 +89,18 @@
                             <input name="packageName" class="form-control" id="packageNameId" value="${webform.packageName}">      						      					    	
                         </div>
                         </div>
+                        <div class="row justify-content-center">
                         <div class="form-group">
                             <div class="col-md-12 text-center">
-                                <button type="submit" class="btn btn-primary btn-lg mt-5">Search</button>
+                                <button type="submit" class="btn btn-primary btn-lg mt-5" name="submit" value="search">Search</button>
                             </div>
-                        </div>
+                        </div>                     
+                        <div class="form-group">
+                            <div class="col-md-12 text-center">
+                                <button  type="submit" class="btn btn-primary btn-lg mt-5" name="submit" value="export">Export</button>
+                            </div>
+                        </div>         
+                        </div>               
                     </fieldset>
                 </form>
             </div>

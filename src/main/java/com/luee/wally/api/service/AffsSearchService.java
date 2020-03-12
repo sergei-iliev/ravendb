@@ -28,32 +28,61 @@ import com.luee.wally.admin.repository.PaidUsersRepository;
 import com.luee.wally.api.service.impex.GenerateCSV;
 import com.luee.wally.command.AffsSearchForm;
 import com.luee.wally.command.AffsSearchResult;
+import com.luee.wally.entity.Affs;
 import com.luee.wally.entity.PaidUser;
 
-public class AffsSearchService {
+public class AffsSearchService extends AbstractService{
 	private final Logger logger = Logger.getLogger(AffsSearchService.class.getName());
 
 	private static final int CURSOR_SIZE = 1000;
 
-	private Collection<String> header = Arrays.asList("experiment", "count", "sum_total_ad_rev", "avr_total_ad_rev",
+	private Collection<String> searchHeader = Arrays.asList("experiment", "count", "sum_total_ad_rev", "avr_total_ad_rev",
 			"sum_offerwall_rev", "avr_offerwall_rev","paid_users_total","avr_paid_users");
 
+	private Collection<String> exportHeader = Arrays.asList("user_guid","date","experiment","offerwall_rev","total_ad_rev");
+	
+	public void createExportFile(Writer writer, AffsSearchForm form, Collection<Affs> content)
+			throws IOException {
+
+		// set header
+		writer.append(form.toString() + "\n");
+		// field names
+		convertHeaderToCSV(writer, exportHeader);
+		// set content
+		convertContentExportToCSV(writer, content);
+
+	}
+	
+
+	private void convertHeaderToCSV(Writer writer, Collection<String> header) throws IOException {
+		GenerateCSV.INSTANCE.writeLine(writer, header);
+	}
+
+	private void convertContentExportToCSV(Writer writer, Collection<Affs> list) throws IOException {
+		Collection<String> line = new ArrayList<String>();
+
+		for (Affs item : list) {
+			// item
+			line.add(item.getUserGuid());
+			line.add(item.getDate().toString());
+			line.add(item.getExperiment());
+			line.add(String.valueOf(item.getOfferwallRev()));
+			line.add(String.valueOf(item.getTotalAdRev()));
+			GenerateCSV.INSTANCE.writeLine(writer, line);
+			line.clear();
+		}
+	}
 	public void createFile(Writer writer, AffsSearchForm form, Collection<AffsSearchResult> content)
 			throws IOException {
 
 		// set header
 		writer.append(form.toString() + "\n");
 		// field names
-		convertHeaderToCSV(writer, header);
+		convertHeaderToCSV(writer, searchHeader);
 		// set content
 		convertContentToCSV(writer, content);
 
 	}
-
-	private void convertHeaderToCSV(Writer writer, Collection<String> header) throws IOException {
-		GenerateCSV.INSTANCE.writeLine(writer, header);
-	}
-
 	private void convertContentToCSV(Writer writer, Collection<AffsSearchResult> list) throws IOException {
 		Collection<String> line = new ArrayList<String>();
 
@@ -74,10 +103,76 @@ public class AffsSearchService {
 			line.clear();
 		}
 	}
+    /*
+     * Filter out Affs export
+     */
+	public Collection<Affs> processAffsExport(AffsSearchForm affsSearchForm) {
+		Collection<Affs> affsExportResults = new ArrayList<>();
 
+		if (affsSearchForm.getExperiments().size() > 0) {
+
+			for (String experiment : affsSearchForm.getExperiments()) {
+				Collection<Affs> result = processAffsExport(affsSearchForm.getStartDate(), affsSearchForm.getEndDate(),
+						affsSearchForm.getCountryCode(), experiment, affsSearchForm.getPackageName());
+				affsExportResults.addAll(result);
+			}
+
+		} else {
+			String experiment = affsSearchForm.getExperiments().isEmpty() ? null
+					: affsSearchForm.getExperiments().iterator().next();
+
+			Collection<Affs> result = processAffsExport(affsSearchForm.getStartDate(), affsSearchForm.getEndDate(),
+					affsSearchForm.getCountryCode(), experiment, affsSearchForm.getPackageName());
+			affsExportResults.addAll(result);
+
+		}
+		return affsExportResults;
+	}
+	/*
+	 * Affs export
+	 */
+	private Collection<Affs> processAffsExport(Date startDate, Date endDate, String country, String experiment,
+			String packageName) {
+		Collection<Affs> result = new ArrayList<>();
+		
+		DatastoreService ds = createDatastoreService();
+
+		Query query = createQuery(startDate, endDate, country, experiment, packageName);
+
+		PreparedQuery preparedQuery = ds.prepare(query);
+
+		QueryResultList<Entity> results;
+
+		Cursor cursor = null;
+
+		do {
+			FetchOptions fetchOptions;
+			if (cursor != null) {
+				fetchOptions = FetchOptions.Builder.withLimit(CURSOR_SIZE).startCursor(cursor);
+			} else {
+				fetchOptions = FetchOptions.Builder.withLimit(CURSOR_SIZE);
+			}
+
+			results = preparedQuery.asQueryResultList(fetchOptions);
+
+			for (Entity e : results) {
+				Affs affs=new Affs();
+				affs.setDate((Date) e.getProperty("date"));
+				affs.setTotalAdRev(e.getProperty("total_ad_rev") == null ? 0 : (double) e.getProperty("total_ad_rev"));
+				affs.setExperiment((String) e.getProperty("experiment"));
+				affs.setOfferwallRev(e.getProperty("offerwall_rev") == null ? 0 : (double) e.getProperty("offerwall_rev"));
+				affs.setUserGuid((String)e.getProperty("user_guid"));
+			    result.add(affs);				
+			}			
+			
+			cursor = results.getCursor();
+		} while (results.size() > 0);
+
+		return result;
+
+	}	
+	
 	public Collection<AffsSearchResult> processAffsSearch(AffsSearchForm affsSearchForm) {
-
-		logger.log(Level.WARNING, affsSearchForm.toString());
 
 		Collection<AffsSearchResult> affsSearchResults = new ArrayList<>();
 
@@ -210,18 +305,6 @@ public class AffsSearchService {
 				count+=results.size();
 			}
 		return new AffsSearchResult(null, totalAdRev, offerwallRev,totalPaidUsers,count,minRevCount);
-	}
-	private DatastoreService createDatastoreService() {
-		double deadline = 15.0; // seconds
-		// Construct a read policy for eventual consistency
-		ReadPolicy policy = new ReadPolicy(ReadPolicy.Consistency.EVENTUAL);
-
-		// Set both the read policy and the call deadline
-		DatastoreServiceConfig datastoreConfig = DatastoreServiceConfig.Builder.withReadPolicy(policy)
-				.deadline(deadline);
-
-		// Get Datastore service with the given configuration
-		return DatastoreServiceFactory.getDatastoreService(datastoreConfig);
 	}
 	
 	private Query createQuery(Date startDate, Date endDate, String gaid) {

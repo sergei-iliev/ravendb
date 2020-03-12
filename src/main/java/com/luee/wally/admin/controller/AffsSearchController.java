@@ -23,6 +23,7 @@ import com.google.appengine.api.ThreadManager;
 import com.luee.wally.api.route.Controller;
 import com.luee.wally.command.AffsSearchForm;
 import com.luee.wally.command.AffsSearchResult;
+import com.luee.wally.entity.Affs;
 import com.luee.wally.json.ExchangeRateVO;
 import com.luee.wally.utils.Utilities;
 import com.luee.wally.api.service.impex.GenerateCSV;
@@ -39,12 +40,32 @@ public class AffsSearchController implements Controller{
 		req.getRequestDispatcher("/jsp/index.jsp").forward(req, resp);
 	}
 	
-	public void search(HttpServletRequest req, HttpServletResponse resp)throws ServletException, IOException{
-
-		
-
+	public void search(HttpServletRequest req, HttpServletResponse resp)throws ServletException, IOException{		
         final AffsSearchForm form=AffsSearchForm.parse(req);
+      
+        if(form.getSubmitType().equals("export")){
+    		ThreadManager.createBackgroundThread(new Runnable() {
+				@Override
+				public void run() {
 
+				        try  {	        	 
+				        	logger.log(Level.WARNING, "*************************Export Task in the background started ********************");
+				        	AffsSearchService affsSearchService=new AffsSearchService();
+				        	Collection<Affs> affsExportResults=affsSearchService.processAffsExport(form);
+        	 
+				        	try(Writer writer=new StringWriter()){
+				        		affsSearchService.createExportFile(writer,form, affsExportResults);
+		  		  
+				        		CloudStorageRepository cloudStorageRepository=new CloudStorageRepository();
+				        		cloudStorageRepository.save(writer,"affs_ad_rev_export/export"+formatDate(new Date()));
+				        	}
+				        	logger.log(Level.WARNING ,"*************************Background export task finished*****************");
+				   		}catch(Exception e){
+								logger.log(Level.SEVERE, "affs export service:", e);							  
+					    }				        				        
+				}
+			}).start();					        	
+        }else{
 		ThreadManager.createBackgroundThread(new Runnable() {
 				@Override
 				public void run() {
@@ -94,7 +115,7 @@ public class AffsSearchController implements Controller{
 				        
 				}
 			}).start();		
-			
+        }	
 		req.setAttribute("webform", form);
 		req.setAttribute("countries", this.getCountries());
 		req.setAttribute("success", "Job successfully posted.");

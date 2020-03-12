@@ -17,9 +17,11 @@ public class AffsSearchForm implements WebForm{
 	private String countryCode;
 	private Collection<String> experiments=new HashSet<>();
 	private String packageName;
+    private String submitType="search";
     
 	public static AffsSearchForm parse(ServletRequest req) throws ServletException{
 		AffsSearchForm form = new AffsSearchForm();
+		form.submitType=(String)req.getParameter("submit");
 		form.setStartDate(form.parseDate(req.getParameter("startDate")));
 		form.setEndDate(form.parseDate(req.getParameter("endDate")));
         
@@ -92,7 +94,9 @@ public class AffsSearchForm implements WebForm{
 		return experiments.isEmpty()&&packageName==null&&countryCode.length()==1&&startDate==null&&endDate==null;
 	}
 	
-
+	public String getSubmitType() {
+		return submitType;
+	}
 	 
 	@Override
 	public String toString() {
