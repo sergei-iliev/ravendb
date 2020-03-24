@@ -1,5 +1,6 @@
 package com.luee.wally.api.service;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.Writer;
 import java.math.BigDecimal;
@@ -24,10 +25,12 @@ import com.google.appengine.api.datastore.Query.FilterOperator;
 import com.google.appengine.api.datastore.Query.FilterPredicate;
 import com.google.appengine.api.datastore.QueryResultList;
 import com.google.appengine.api.datastore.ReadPolicy;
+import com.luee.wally.admin.repository.CloudStorageRepository;
 import com.luee.wally.admin.repository.PaidUsersRepository;
 import com.luee.wally.api.service.impex.GenerateCSV;
 import com.luee.wally.command.AffsSearchForm;
 import com.luee.wally.command.AffsSearchResult;
+import com.luee.wally.command.Attachment;
 import com.luee.wally.entity.Affs;
 import com.luee.wally.entity.PaidUser;
 
@@ -103,6 +106,68 @@ public class AffsSearchService extends AbstractService{
 			line.clear();
 		}
 	}
+    /*
+     * Process and export gaid search in background
+     */
+	public void exportGaid(AffsSearchForm affsSearchForm)throws IOException{
+		byte[] end="\r\n".getBytes();
+
+		CloudStorageRepository cloudStorageRepository=new CloudStorageRepository();
+		
+		DatastoreService ds = createDatastoreService();
+		Query query = createQuery(affsSearchForm.getStartDate(), affsSearchForm.getEndDate(),affsSearchForm.getCountryCode(),null, affsSearchForm.getPackageName());
+		PreparedQuery preparedQuery = ds.prepare(query);
+
+		QueryResultList<Entity> results;
+		
+		ByteArrayOutputStream os=new ByteArrayOutputStream();
+		Cursor cursor = null;
+		int counter=0;
+		int suffix=0;
+		do {
+			FetchOptions fetchOptions;
+			if (cursor != null) {
+				fetchOptions = FetchOptions.Builder.withLimit(CURSOR_SIZE).startCursor(cursor);
+			} else {
+				fetchOptions = FetchOptions.Builder.withLimit(CURSOR_SIZE);
+			}
+
+			results = preparedQuery.asQueryResultList(fetchOptions);
+
+			for (Entity e : results) {				
+		    	 if(e.getProperty("gaid")!=null) {
+			    	   os.write(((String)e.getProperty("gaid")).getBytes());	 
+			           os.write(end);
+			           
+			           counter++;
+		    	 }
+		    	 
+			}			
+			
+		    if(counter%100000==0){	
+			    	//save in  				
+					Attachment attachment=new Attachment();
+					attachment.setContentType("text/plain");
+					attachment.setFileName("ExportGaidList_"+(++suffix)+".txt");
+					attachment.setBuffer(os.toByteArray());
+					cloudStorageRepository.saveFile(attachment);
+					os.reset();
+			}
+		     
+			cursor = results.getCursor();
+		} while (results.size() > 0);
+
+		//remaining list		 
+		 Attachment attachment=new Attachment();
+		 attachment.setContentType("text/plain");
+		 attachment.setFileName("ExportGaidList_"+(++suffix)+".txt");
+		 attachment.setBuffer(os.toByteArray());
+		 
+
+		 cloudStorageRepository.saveFile(attachment);
+		
+	}
+	
     /*
      * Filter out Affs export
      */

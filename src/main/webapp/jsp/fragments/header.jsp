@@ -10,6 +10,9 @@
           <li class="nav-item ${param.activeMenuItem eq 'index' ? 'active' : ''}">        
             <a class="nav-link" href="/administration">Affs Revenue<span class="sr-only">(current)</span></a>
           </li>
+          <li class="nav-item ${param.activeMenuItem eq 'exportgaid' ? 'active' : ''}">   
+            <a class="nav-link" href="/administration/exportgaid">Export Gaid</a>
+          </li>          
           <li class="nav-item ${param.activeMenuItem eq 'campaign' ? 'active' : ''}">   
             <a class="nav-link" href="/administration/campaign">Campaign Revenue</a>
           </li>

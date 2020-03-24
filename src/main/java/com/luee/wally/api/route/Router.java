@@ -45,6 +45,8 @@ INSTANCE;
         //get
     	 httpGetRouteList.put("/administration/login", new Route(new LoginController(),"index"));
     	 httpGetRouteList.put("/administration", new Route(new AffsSearchController(),"index"));
+    	 httpGetRouteList.put("/administration/exportgaid", new Route(new AffsSearchController(),"exportGaid"));
+    	 
     	 httpGetRouteList.put("/administration/logout", new Route(new LoginController(),"logout"));
     	 httpGetRouteList.put("/administration/campaign", new Route(new CampaignSearchController(),"index"));
     	 httpGetRouteList.put("/administration/import/user/revenue/2019", new Route(new ImportController(),"importUserRevenue2019"));
@@ -61,6 +63,9 @@ INSTANCE;
     	 httpGetRouteList.put("/administration/settings/cache/clear", new Route(new ApplicationSettingsController(),"clearCache"));
     	 //post
     	 httpPostRouteList.put("/administration/search", new Route(new AffsSearchController(),"search"));
+    	 httpPostRouteList.put("/administration/exportgaid/run", new Route(new AffsSearchController(),"runExportGaid"));
+    	 
+    	 
     	 httpPostRouteList.put("/administration/campaign/search", new Route(new CampaignSearchController(),"search"));
     	 httpPostRouteList.put("/administration/login", new Route(new LoginController(),"login"));
     	 httpPostRouteList.put("/administration/import/user/revenue/2019/background", new Route(new ImportController(),"importUserRevenue2019InBackground"));
@@ -82,7 +87,6 @@ INSTANCE;
     	 httpPostRouteList.put("/administration/payment/paidusers/search/byemail", new Route(new PaidUsersController(),"searchByEmail"));    	 
     	 httpPostRouteList.put("/administration/payment/paidusers/search/byguid", new Route(new PaidUsersController(),"searchByGuid"));    	 
    	 
-
     
     }
     
