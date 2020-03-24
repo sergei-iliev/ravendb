@@ -109,10 +109,32 @@ public class AffsSearchService extends AbstractService{
     /*
      * Process and export gaid search in background
      */
-	public void exportGaid(AffsSearchForm affsSearchForm)throws IOException{
+	public void exportGaid(AffsSearchForm affsSearchForm,String subfolder)throws IOException{
+		Cursor cursor = null;
+		int counter=0;
+		int suffix=0;
+		CloudStorageRepository cloudStorageRepository=new CloudStorageRepository();
 		byte[] end="\r\n".getBytes();
 
-		CloudStorageRepository cloudStorageRepository=new CloudStorageRepository();
+		//create header to each file
+		StringBuilder header=new StringBuilder();		
+		header.append("startDate:"+(affsSearchForm.getStartDate()==null?"":affsSearchForm.getStartDate())+"\r\n");
+		header.append("endDate:"+(affsSearchForm.getEndDate()==null?"":affsSearchForm.getEndDate())+"\r\n");
+		header.append("country:"+(affsSearchForm.getCountryCode()==null?"":affsSearchForm.getCountryCode())+"\r\n");
+		header.append("packageName:"+(affsSearchForm.getPackageName()==null?"":affsSearchForm.getPackageName())+"\r\n");
+		
+		ByteArrayOutputStream os=new ByteArrayOutputStream();
+		os.write(header.toString().getBytes());	//first file has the filter
+		
+		Attachment attachment=new Attachment();
+		attachment.setContentType("text/plain");
+		attachment.setFileName("ExportGAID/"+subfolder+"/ExportGaidList_"+(++suffix)+".txt");
+		attachment.setBuffer(os.toByteArray());
+		
+		cloudStorageRepository.saveFile(attachment);
+		os.reset();
+		
+
 		
 		DatastoreService ds = createDatastoreService();
 		Query query = createQuery(affsSearchForm.getStartDate(), affsSearchForm.getEndDate(),affsSearchForm.getCountryCode(),null, affsSearchForm.getPackageName());
@@ -120,10 +142,10 @@ public class AffsSearchService extends AbstractService{
 
 		QueryResultList<Entity> results;
 		
-		ByteArrayOutputStream os=new ByteArrayOutputStream();
-		Cursor cursor = null;
-		int counter=0;
-		int suffix=0;
+
+		
+		
+
 		do {
 			FetchOptions fetchOptions;
 			if (cursor != null) {
@@ -144,23 +166,25 @@ public class AffsSearchService extends AbstractService{
 		    	 
 			}			
 			
-		    if(counter%100000==0){	
+		    if(counter>100000){	
 			    	//save in  				
-					Attachment attachment=new Attachment();
+					attachment=new Attachment();
 					attachment.setContentType("text/plain");
-					attachment.setFileName("ExportGaidList_"+(++suffix)+".txt");
+					attachment.setFileName("ExportGAID/"+subfolder+"/ExportGaidList_"+(++suffix)+".txt");
 					attachment.setBuffer(os.toByteArray());
 					cloudStorageRepository.saveFile(attachment);
+					
 					os.reset();
+					counter=0;
 			}
 		     
 			cursor = results.getCursor();
 		} while (results.size() > 0);
 
 		//remaining list		 
-		 Attachment attachment=new Attachment();
+		 attachment=new Attachment();
 		 attachment.setContentType("text/plain");
-		 attachment.setFileName("ExportGaidList_"+(++suffix)+".txt");
+		 attachment.setFileName("ExportGAID/"+subfolder+"/ExportGaidList_"+(++suffix)+".txt");
 		 attachment.setBuffer(os.toByteArray());
 		 
 

@@ -52,7 +52,7 @@ public class AffsSearchController implements Controller {
 					logger.log(Level.WARNING,
 							"*************************Export Gaid Task in the background started ********************");
 					AffsSearchService affsSearchService = new AffsSearchService();
-					affsSearchService.exportGaid(form);
+					affsSearchService.exportGaid(form,formatDate(new Date()));
 					logger.log(Level.WARNING,
 							"*************************Background export Gaid task finished*****************");
 				} catch (Exception e) {
