@@ -18,6 +18,7 @@ import com.luee.wally.admin.controller.ImportController;
 import com.luee.wally.admin.controller.LoginController;
 import com.luee.wally.admin.controller.PaidUsersController;
 import com.luee.wally.admin.controller.PaymentController;
+import com.luee.wally.admin.controller.PaymentLoginController;
 import com.luee.wally.admin.controller.PaymentReportsController;
 import com.luee.wally.admin.controller.SearchFilterTemplateController;
 
@@ -61,6 +62,11 @@ INSTANCE;
     	 
     	 httpGetRouteList.put("/administration/settings", new Route(new ApplicationSettingsController(),"index"));
     	 httpGetRouteList.put("/administration/settings/cache/clear", new Route(new ApplicationSettingsController(),"clearCache"));
+    	 
+    	 httpGetRouteList.put("/administration/api/login/request", new Route(new PaymentLoginController(),"loginRequest"));
+    	 httpGetRouteList.put("/administration/api/login/paypal/token", new Route(new PaymentLoginController(),"payPalLoginToken"));
+    	 httpGetRouteList.put("/administration/api/login/amazon/token", new Route(new PaymentLoginController(),"amazonLoginToken"));
+    	 
     	 //post
     	 httpPostRouteList.put("/administration/search", new Route(new AffsSearchController(),"search"));
     	 httpPostRouteList.put("/administration/exportgaid/run", new Route(new AffsSearchController(),"runExportGaid"));

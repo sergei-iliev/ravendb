@@ -14,6 +14,9 @@ public final class Utilities {
 	   return (domain.contains("luee-wally-dev"));	
 	}
 	
+	public static boolean isTestEnv(){
+		return true;
+	}
 	public static String getBucketName(){
 		if(isDevEnv()){
 			return Constants.BUCKET_NAME_DEV;

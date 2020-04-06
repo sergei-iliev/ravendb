@@ -8,6 +8,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -18,8 +19,11 @@ import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.FetchOptions;
+import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
+import com.google.appengine.api.datastore.Query.Filter;
 import com.google.appengine.api.datastore.Query.FilterOperator;
 import com.google.appengine.api.datastore.Query.FilterPredicate;
 import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
@@ -208,22 +212,27 @@ public class DBTestCase {
 		CampaignSearchService service=new CampaignSearchService();
 		service.processCampaignSearch(form);
 		
-//		Query q = new Query("user_campaign_data");
-//
+		Query q = new Query("user_campaign_data");
+
 //		PreparedQuery pq = ds.prepare(q);
 //		List<Entity> list = pq.asList(FetchOptions.Builder.withLimit(5));
 //
 //		for (Entity ee : list) {
-//			System.out.println(ee.getKey().getParent().getName());
+//			System.out.println(ee.getKey().getName());
 //
 //			Query qq = new Query("affs");
-//			qq.setFilter(new FilterPredicate("gaid", FilterOperator.EQUAL,ee.getKey().getParent().getName()));
+//			qq.setFilter(new FilterPredicate("gaid", FilterOperator.EQUAL,ee.getKey().getName()));
 //			PreparedQuery pqq = ds.prepare(q);
 //			List<Entity> listq = pq.asList(FetchOptions.Builder.withLimit(5));
 //            
 //		    System.out.println(listq.size());
 //		}
-		// }
+		
+		//search by custom key
+		Key key=KeyFactory.createKey("user_campaign_data", "caad1520-1a0f-4285-be0c-b74f1a18fe68");
+		Entity e=ds.get(key);
+		System.out.println(e);
+		
 	}
 	private void createRedeemingRequestEntity(String userGuid,String amount,Date date,String packageName,String type,String paypalAccount,String countryCode){
 		DatastoreService ds = DatastoreServiceFactory.getDatastoreService();

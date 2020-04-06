@@ -38,11 +38,11 @@ public class AdminFilter implements Filter {
         HttpServletResponse response = (HttpServletResponse) resp;
 
         
-        if(request.isSecure()){
-        	resp.getWriter().print("HTTPS required!");
-        	resp.flushBuffer();
-        	return;
-        }
+//        if(!request.isSecure()){
+//        	resp.getWriter().print("HTTPS required!");
+//        	resp.flushBuffer();
+//        	return;
+//        }
         
         Utilities.domain= request.getServerName();
         String loginedUser = (String) request.getSession().getAttribute("login");
@@ -52,6 +52,11 @@ public class AdminFilter implements Filter {
             chain.doFilter(request, response);
             return;
         }
+        //skip security for api calls
+        if (request.getRequestURI().startsWith("/administration/api")) {        	
+        	Router.INSTANCE.execute(request.getRequestURI(), request, response);
+        	return;
+        }        
         //skip security for jobs
         if (request.getRequestURI().startsWith("/administration/job")) {        	
         	Router.INSTANCE.execute(request.getRequestURI(), request, response);
