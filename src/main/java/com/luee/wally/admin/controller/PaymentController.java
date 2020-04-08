@@ -30,6 +30,7 @@ import com.luee.wally.api.service.ApplicationSettingsService;
 import com.luee.wally.api.service.InvoiceService;
 import com.luee.wally.api.service.MailService;
 import com.luee.wally.api.service.PayPalService;
+import com.luee.wally.api.service.PaymentRuleService;
 import com.luee.wally.api.service.PaymentService;
 import com.luee.wally.command.Email;
 import com.luee.wally.command.PaidUserForm;
@@ -37,6 +38,7 @@ import com.luee.wally.command.PayExternalForm;
 import com.luee.wally.command.PaymentEligibleUserForm;
 import com.luee.wally.command.PdfAttachment;
 import com.luee.wally.command.invoice.PayoutResult;
+import com.luee.wally.command.payment.RedeemingRequestRuleValue;
 import com.luee.wally.constants.Constants;
 import com.luee.wally.entity.RedeemingRequests;
 import com.luee.wally.entity.SearchFilterTemplate;
@@ -286,6 +288,10 @@ public class PaymentController implements Controller {
 		PaymentService paymentService = new PaymentService();
 		Collection<RedeemingRequests> entities = paymentService.searchEligibleUsers(form);
 
+		//run rules
+		PaymentRuleService paymentRuleService=new PaymentRuleService();
+		Collection<RedeemingRequestRuleValue> result=paymentRuleService.executeRedeemingRequestRules(entities);
+		
 		PaymentRepository paymentRepository = new PaymentRepository();
 		Collection<String> reasons = paymentRepository.getUserPaymentsRemovalReasons();
 
@@ -297,7 +303,7 @@ public class PaymentController implements Controller {
 		req.setAttribute("isPayPalVisible",
 				Boolean.valueOf(map.get(ApplicationSettingsRepository.SHOW_PAYPAL_PAY)));		
 		req.setAttribute("webform", form);
-		req.setAttribute("entities", entities);
+		req.setAttribute("entities", result);
 		req.setAttribute("reasons", reasons);
 		req.setAttribute("paymentTypes", paymentService.getDefaultPaymentTypes());
 		req.setAttribute("defaultCurrencyCodes", paymentService.getDefaultCurrencyCodes());
@@ -305,7 +311,19 @@ public class PaymentController implements Controller {
 		req.getRequestDispatcher("/jsp/payment_eligible_users.jsp").forward(req, resp);
 
 	}
-
+	public void getRedeemingRequestRuleResult(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		String key=req.getParameter("key");
+		PaymentRepository paymentRepository=new PaymentRepository();
+		Entity entity=paymentRepository.getRedeemingRequestsByKey(key);
+		RedeemingRequests redeemingRequest=RedeemingRequests.valueOf(entity);
+		
+		PaymentRuleService paymentRuleService=new PaymentRuleService();
+		Map<String,Object> result=paymentRuleService.getRedeemingRequestRuleResult(redeemingRequest);
+		
+		
+		resp.getWriter().write(JSONUtils.writeObject(result));
+		
+	}
 	public void search(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
 		PaymentService paymentService = new PaymentService();
@@ -313,7 +331,11 @@ public class PaymentController implements Controller {
 		PaymentEligibleUserForm form = PaymentEligibleUserForm.parse(req);
 
 		Collection<RedeemingRequests> entities = paymentService.searchEligibleUsers(form);
-
+		
+		//run rules
+		PaymentRuleService paymentRuleService=new PaymentRuleService();
+		Collection<RedeemingRequestRuleValue> result=paymentRuleService.executeRedeemingRequestRules(entities);
+		
 		PaymentRepository paymentRepository = new PaymentRepository();
 		Collection<String> reasons = paymentRepository.getUserPaymentsRemovalReasons();
 
@@ -329,7 +351,7 @@ public class PaymentController implements Controller {
 		req.setAttribute("isPayPalVisible",
 				Boolean.valueOf(map.get(ApplicationSettingsRepository.SHOW_PAYPAL_PAY)));
 		req.setAttribute("webform", form);
-		req.setAttribute("entities", entities);
+		req.setAttribute("entities", result);
 		req.setAttribute("reasons", removalReasons);
 		req.setAttribute("paymentTypes", paymentService.getDefaultPaymentTypes());
 		req.setAttribute("defaultCurrencyCodes", paymentService.getDefaultCurrencyCodes());

@@ -183,6 +183,7 @@
 				<table class="table" id="searchResultTable">
 					<thead>
 						<tr>
+							<th scope="col">V</th>
 							<th scope="col">Find</th>
 							<th scope="col">user_guid</th>
 							<th scope="col">date</th>
@@ -197,52 +198,67 @@
 					<tbody>
 						<c:forEach var="entity" items="${entities}" varStatus="loop">
 							<tr id='row_${loop.index}'>
-								<td><a href="${entity.link1}"
+								<td>
+								<c:if test="${entity.ruleStatus eq 'red'}">
+					            	<a href="#" rule-status="true" data-entitykey="${entity.redeemingRequest.key}"> 
+								    	<svg width="24px" height="24px" viewBox="0 0 24 24" fit="" preserveAspectRatio="xMidYMid meet" focusable="false"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" fill="#D50000"></path></svg>
+									</a>    
+								</c:if>
+								<c:if test="${entity.ruleStatus eq 'yellow'}">
+									<a href="#" rule-status="true" data-entitykey="${entity.redeemingRequest.key}">
+								    	<svg fill="#FF9E00" width="24px" height="24px" viewBox="0 0 24 24" fit="" preserveAspectRatio="xMidYMid meet" focusable="false"><path d="M9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1zm3-19C8.13 2 5 5.13 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.87-3.13-7-7-7z" fill-rule="evenodd"></path></svg>
+								    </a>	
+							    </c:if>
+							    <c:if test="${entity.ruleStatus eq 'green'}">	    
+									<svg width="24" height="24" viewBox="0 0 24 24" fit="" preserveAspectRatio="xMidYMid meet" focusable="false"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" fill="#0F9D58"></path></svg>
+								</c:if>									    
+								</td>
+								<td><a href="${entity.redeemingRequest.link1}"
 									class="btn btn-primary btn-sm active" role="button"
 									aria-pressed="true" target="_blank">Find</a>
 									
-									<button type="button" class="btn btn-primary btn-sm" data-entitykey="${entity.key}" remove-reason-button="true">Remove</button>									 																									
+									<button type="button" class="btn btn-primary btn-sm" data-entitykey="${entity.redeemingRequest.key}" remove-reason-button="true">Remove</button>									 																									
 									
 									</td>
-								<td>${entity.userGuid}</td>
-								<td>${entity.date}</td>
-								<td>${entity.amount}</td>
+								<td>${entity.redeemingRequest.userGuid}</td>
+								<td>${entity.redeemingRequest.date}</td>
+								<td>${entity.redeemingRequest.amount}</td>
 								<td>
-								${entity.type} 								
-								<c:if test="${entity.amazonType eq true}">
+								${entity.redeemingRequest.type} 								
+								<c:if test="${entity.redeemingRequest.amazonType eq true}">
 								  <c:if test="${isSendGCVisible eq true}">
 								    <br>
-								    <button type="button" class="btn btn-primary btn-sm" data-href="${entity.link2}" 
-									  pay-gc-button="true" data-entitykey="${entity.key}" data-amount="${entity.amount}">Send GC</button>
+								    <button type="button" class="btn btn-primary btn-sm" data-href="${entity.redeemingRequest.link2}" 
+									  pay-gc-button="true" data-entitykey="${entity.redeemingRequest.key}" data-amount="${entity.redeemingRequest.amount}">Send GC</button>
 								  </c:if>	   
 							    </c:if>
-								<c:if test="${entity.payPalType eq true}">
+								<c:if test="${entity.redeemingRequest.payPalType eq true}">
 								  <c:if test="${isPayPalVisible eq true}">
 								    <br>
-								    <button type="button" class="btn btn-primary btn-sm" data-href="${entity.link2}"
-									  pay-paypal-button="true" data-entitykey="${entity.key}" data-amount="${entity.amount}">PayPal</button>
+								    <button type="button" class="btn btn-primary btn-sm" data-href="${entity.redeemingRequest.link2}"
+									  pay-paypal-button="true" data-entitykey="${entity.redeemingRequest.key}" data-amount="${entity.redeemingRequest.amount}">PayPal</button>
 								   </c:if>	   
 							    </c:if>
 							    								
 								</td>
 								<td>
-								 	<div id='email_field_${loop.index}'>${entity.email}</div>
+								 	<div id='email_field_${loop.index}'>${entity.redeemingRequest.email}</div>
 								    <br>
-								    <a href="#" class="edit_email" data-index="${loop.index}" data-entitykey="${entity.key}"><i class="fa fa-pencil-square-o"></i></a>
+								    <a href="#" class="edit_email" data-index="${loop.index}" data-entitykey="${entity.redeemingRequest.key}"><i class="fa fa-pencil-square-o"></i></a>
 								     
 								</td>
-								<td>${entity.countryCode}</td>
+								<td>${entity.redeemingRequest.countryCode}</td>
 								<td>
-									<div id='paypal_account_field_${loop.index}'>${entity.paypalAccount}</div>
+									<div id='paypal_account_field_${loop.index}'>${entity.redeemingRequest.paypalAccount}</div>
 									<br>
-								    <a href="#"  class="edit_paypal_acount" data-index="${loop.index}" data-entitykey="${entity.key}"><i class="fa fa-pencil-square-o"></i></a>
-								    <c:if test="${entity.payPalType eq true}">								     
-								    	<a href="#"  class="send_paypal_validation_email" data-index="${loop.index}" data-entitykey="${entity.key}"><i class="fa fa-paper-plane"></i></a> 							
+								    <a href="#"  class="edit_paypal_acount" data-index="${loop.index}" data-entitykey="${entity.redeemingRequest.key}"><i class="fa fa-pencil-square-o"></i></a>
+								    <c:if test="${entity.redeemingRequest.payPalType eq true}">								     
+								    	<a href="#"  class="send_paypal_validation_email" data-index="${loop.index}" data-entitykey="${entity.redeemingRequest.key}"><i class="fa fa-paper-plane"></i></a> 							
 								    </c:if>
 								</td>
 								<td>
-								<button type="button" class="btn btn-primary btn-sm" data-href="${entity.link2}" value="Paid"
-									 paid-button="true" data-paymentType="${entity.type}" data-entitykey="${entity.key}">Paid</button>
+								<button type="button" class="btn btn-primary btn-sm" data-href="${entity.redeemingRequest.link2}" value="Paid"
+									 paid-button="true" data-paymentType="${entity.redeemingRequest.type}" data-entitykey="${entity.redeemingRequest.key}">Paid</button>
 								</td>
 							</tr>
 						</c:forEach>
@@ -472,6 +488,31 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-primary" id="sendPayPalValidationEmailBtn">Send</button> 
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>    
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Rules -->
+<div class="modal fade" id="ruleStatusDialog" tabindex="-1" role="dialog" aria-labelledby="ruleStatusDialogLabel" aria-hidden="true">
+  	<div class="modal-dialog"  role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="ruleStatusDialogLabel">Redeeming Request Rule Status</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+      <div class="container">
+		<div class="row mt-3">
+				<div class="col-md-12" id="ruleStatusResultId">
+					 
+				</div>			
+		</div>
+      </div>
+      </div>
+      <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>    
       </div>
     </div>

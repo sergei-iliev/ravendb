@@ -11,13 +11,16 @@ public class RedeemingRequests {
 	private String userGuid;
 	private String amount;
 	private String type;
-	private String email, fullName;
+	private String email, fullName, fullAddress;
 	private String countryCode;
-	private Date date;
+	private Date date, creationDate;
 	private String paypalAccount;
 	private String link1, link2;
 	private String key, redeemingRequestId, packageName;
-
+	private String uaChannel;
+	private String ipAddress;
+    private boolean paid;
+    
 	public static RedeemingRequests valueOf(Entity entity) {
 		RedeemingRequests redeemingRequests = new RedeemingRequests();
 		redeemingRequests.key = KeyFactory.keyToString(entity.getKey());
@@ -27,10 +30,15 @@ public class RedeemingRequests {
 		redeemingRequests.setRedeemingRequestId((String) entity.getProperty("redeeming_request_id"));
 		redeemingRequests.setType((String) entity.getProperty("type"));
 		redeemingRequests.setDate((Date) entity.getProperty("date"));
+		redeemingRequests.setCreationDate((Date) entity.getProperty("creation_date"));
 		redeemingRequests.setPaypalAccount((String) entity.getProperty("paypal_account"));
 		redeemingRequests.setCountryCode((String) entity.getProperty("country_code"));
 		redeemingRequests.setEmail((String) entity.getProperty("email"));
 		redeemingRequests.setPackageName((String) entity.getProperty("package_name"));
+		redeemingRequests.setUaChannel((String) entity.getProperty("ua_channel"));
+		redeemingRequests.setIpAddress((String) entity.getProperty("ip_address"));		
+		redeemingRequests.setFullAddress((String) entity.getProperty("full_address"));
+		redeemingRequests.setPaid((Boolean) entity.getProperty("is_paid"));
 
 		// redeemingRequests.setLink1("/administration/payment/test?amount="+redeemingRequests.amount+"&user_guid="+redeemingRequests.userGuid);
 		// redeemingRequests.setLink2("/administration/payment/test?amount="+redeemingRequests.amount+"&user_guid="+redeemingRequests.userGuid);
@@ -47,6 +55,38 @@ public class RedeemingRequests {
 		}
 
 		return redeemingRequests;
+	}
+
+	public boolean isPaid() {
+		return paid;
+	}
+
+	public void setPaid(boolean paid) {
+		this.paid = paid;
+	}
+
+	public String getFullAddress() {
+		return fullAddress;
+	}
+
+	public void setFullAddress(String fullAddress) {
+		this.fullAddress = fullAddress;
+	}
+
+	public String getIpAddress() {
+		return ipAddress;
+	}
+
+	public void setIpAddress(String ipAddress) {
+		this.ipAddress = ipAddress;
+	}
+
+	public String getUaChannel() {
+		return uaChannel;
+	}
+
+	public void setUaChannel(String uaChannel) {
+		this.uaChannel = uaChannel;
 	}
 
 	public String getKey() {
@@ -97,6 +137,14 @@ public class RedeemingRequests {
 
 	public void setDate(Date date) {
 		this.date = date;
+	}
+
+	public Date getCreationDate() {
+		return creationDate;
+	}
+
+	public void setCreationDate(Date creationDate) {
+		this.creationDate = creationDate;
 	}
 
 	public String getAmount() {
@@ -164,11 +212,40 @@ public class RedeemingRequests {
 	}
 
 	@JsonIgnore
+	public String fullNameLink(){
+		if (Utilities.isDevEnv()) {
+			return "https://console.cloud.google.com/datastore/entities;kind=redeeming_requests_new;ns=__$DEFAULT$__/query/kind;filter=%5B%229%2Ffull_name%7CSTR%7CEQ%7C7%2F"+this.fullName+"%22%5D?project=luee-wally-dev";
+		} else {
+			return "https://console.cloud.google.com/datastore/entities;kind=redeeming_requests_new;ns=__$DEFAULT$__/query/kind;filter=%5B%229%2Ffull_name%7CSTR%7CEQ%7C7%2F"+this.fullName+"%22%5D?project=luee-wally-v2-cpc";
+		}		
+	}
+	
+	@JsonIgnore
+	public String fullAddressLink(){
+		if (Utilities.isDevEnv()) {
+			return "https://console.cloud.google.com/datastore/entities;kind=redeeming_requests_new;ns=__$DEFAULT$__/query/kind;filter=%5B%229%2Ffull_name%7CSTR%7CEQ%7C7%2F"+this.fullAddress+"%22%5D?project=luee-wally-dev";
+		} else {
+			return "https://console.cloud.google.com/datastore/entities;kind=redeeming_requests_new;ns=__$DEFAULT$__/query/kind;filter=%5B%229%2Ffull_name%7CSTR%7CEQ%7C7%2F"+this.fullAddress+"%22%5D?project=luee-wally-v2-cpc";
+		}			
+	}
+
+	@JsonIgnore
+	public String ipAddressLink(){
+		if (Utilities.isDevEnv()) {
+			return "https://console.cloud.google.com/datastore/entities;kind=redeeming_requests_new;ns=__$DEFAULT$__/query/kind;filter=%5B%229%2Ffull_name%7CSTR%7CEQ%7C7%2F"+this.ipAddress+"%22%5D?project=luee-wally-dev";
+		} else {
+			return "https://console.cloud.google.com/datastore/entities;kind=redeeming_requests_new;ns=__$DEFAULT$__/query/kind;filter=%5B%229%2Ffull_name%7CSTR%7CEQ%7C7%2F"+this.ipAddress+"%22%5D?project=luee-wally-v2-cpc";
+		}			
+	}
+
+	
+	@JsonIgnore
 	public boolean isAmazonType() {
 		return type.equalsIgnoreCase("amazon");
 	}
+
 	@JsonIgnore
 	public boolean isPayPalType() {
 		return type.equalsIgnoreCase("paypal");
-	}	
+	}
 }

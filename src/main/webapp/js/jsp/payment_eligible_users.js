@@ -6,7 +6,40 @@ payment.PaymentEligibleUsersView = Backbone.View.extend({
   // It's the first function called when this view it's instantiated.
   initialize: function(){
 	  $('[data-toggle="tooltip"]').tooltip();	
-
+	  
+	  //********Rule status
+	  $('[rule-status="true"]').click(function(e) {
+		  e.preventDefault();
+		  var key = $(this).data('entitykey');
+		  $('#ruleStatusDialog').modal('show');
+		  		  
+			var formData={
+					   key:key					
+				  };
+			//1.register record in paid_user table
+			$.ajax({
+				url:'/administration/payment/eligibleusers/rules/status',
+				type:'post',
+				data:formData,
+				success: function(data, textStatus, jQxhr ){			          
+ 					let map=JSON.parse(data);
+ 					console.log(map);
+ 					let rule_status_result="<div>Time to cash out : <strong>"+map.cashout+"</strong></div>";
+ 					if(map.uachannel!=null){
+ 						rule_status_result+="<div>UA Channel : <strong>"+map.uachannel+"</strong></div>";
+ 					}
+ 					map.differentuserlist.forEach((item)=>{ 						
+ 						rule_status_result+="<div>"+item.text+"<br><a href='"+item.url+"'>"+item.name+"</a></div>";
+ 					});
+ 					$('#ruleStatusResultId').html(rule_status_result);
+ 					 					
+				},
+				error: function( jqXhr, textStatus, errorThrown ){
+					alert( errorThrown );
+				}
+	  
+			});		  
+	  });
 	  //********PayPal
 	  $('[pay-paypal-button="true"]').click(function(e) {
 		  e.preventDefault();

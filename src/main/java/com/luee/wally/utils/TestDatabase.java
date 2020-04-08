@@ -21,21 +21,48 @@ public enum TestDatabase {
 		createPayPalCurrencyMap();				
 	}
 	private  void createRedeemingRequests(){
+		DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
 		Entity entity=createRedeemingRequestEntity("Sergey Iliev","15b5-4e3a-b398-8792a9a9f530","48bb2675-a072-4b6b-ab66-cb599a29147d", "2.1", new Date(), "com.moregames.makemoney1", "PayPal", "sergei.iliev-facilitator@gmail.com", "DE");		
+		entity.setProperty("ua_channel", "organic");
+		entity.setProperty("ip_address", "123.0.0.23");		
+		entity.setProperty("full_address", "baba tonka 6 for accson");
+		
+		ds.put(entity);		
 		crearePaiedUsersEntity(entity,1.8);
 		
 		entity=createRedeemingRequestEntity("Minko","696f-4258-baef-55b6aa6550b1","ffff2675-a072-4b6b-ab66-cb599a29147d", "1",new Date(), "com.moregames.makemoney", "PayPal", "sergei.iliev-facilitator@gmail.com", "US");
+		entity.setProperty("ua_channel", "supersonic");
+		entity.setProperty("ip_address", "123.0.0.23");
+		entity.setProperty("full_address", "baba tonka 6 for accson");
+		ds.put(entity);
 		crearePaiedUsersEntity(entity,0.8);
 		
 		entity=createRedeemingRequestEntity("Minko1","696f-4258-baef-55b6aa6550b11","ffff2675-a072-4b6b-ab66-cb599a29147d1", "1", new Date(), "com.moregames.makemoney2", "PayPal", "sergei.iliev-facilitator@gmail.com", "US");
+		entity.setProperty("ua_channel", "vungle");
+		entity.setProperty("ip_address", "123.0.0.23");
+		ds.put(entity);
 		crearePaiedUsersEntity(entity,0.9);
 		
-		entity=createRedeemingRequestEntity("Minko2","696f-4258-baef-55b6aa6550b12","ffff2675-a072-4b6b-ab66-cb599a29147d2", "1", new Date(), "com.moregames.makemoney", "PayPal", "sergei.iliev-facilitator@gmail.com", "US");
-		crearePaiedUsersEntity(entity,0.9);
+		entity=createRedeemingRequestEntity("Minko1","696f-4258-baef-55b6aa6550b12","ffff2675-a072-4b6b-ab66-cb599a29147d2", "1", new Date(), "com.moregames.makemoney", "PayPal", "sergei.iliev-facilitator@gmail.com", "US");		
+		ds.put(entity);		
+		crearePaiedUsersEntity(entity,0.9);	
+
+		entity=createRedeemingRequestEntity("Minko1","696f-4258-baef-55b6aa6550b13","ffff2675-a072-4b6b-ab66-cb599a29147d3", "1", new Date(), "com.moregames.makemoney", "PayPal", "sergei.iliev-facilitator@gmail.com", "US");		
+		entity.setProperty("is_paid", true);
+		ds.put(entity);		
+		crearePaiedUsersEntity(entity,0.9);	
+
 		
 		createRedeemingRequestEntity("Viola","e701-4678-8d39-0c2485204f3b","aaaa2675-a072-4b6b-ab66-cb599a29147d", "0.1", new Date(), "com.moregames.makemoney", "Amazon", "sergei_iliev@yahoo.com", "GB");		
 		
 		entity=createRedeemingRequestEntity("Spas","90dd-47a1-9b47-a8892a20c7e9","bbbb2675-a072-4b6b-ab66-cb599a29147d", "3.1", new Date(), "com.moregames.makemoney", "Amazon", "sergei.iliev@gmail.com", "US");
+		entity.setProperty("ua_channel", "organic");
+		//put create in the past
+		ZonedDateTime now=ZonedDateTime.now();
+		ZonedDateTime yesterday=now.minusHours(22);		
+		entity.setProperty("creation_date",Date.from(yesterday.toInstant()));
+		entity.setProperty("ip_address", "77.98.102.111");
+		ds.put(entity);
 		crearePaiedUsersEntity(entity,2.9);
 		
 		createRedeemingRequestEntity("Gurmen","8957-48bb-a08c-de0adca6a91e","cccc1675-a072-4b6b-ab66-cb599a29147d", "1.1", new Date(), "com.moregames.makemoney", "Amazon", "sergei.iliev@gmail.com", "DE");		
@@ -48,12 +75,13 @@ public enum TestDatabase {
 		redeeming.setIndexedProperty("full_name", fullName);
 		redeeming.setIndexedProperty("user_guid",userGuid);
 		redeeming.setIndexedProperty("package_name", packageName);
-		redeeming.setIndexedProperty("date",date);		
+		redeeming.setIndexedProperty("date",date);
+		redeeming.setIndexedProperty("creation_date",date);
 		redeeming.setIndexedProperty("type", type);
 		redeeming.setIndexedProperty("redeeming_request_id", redeemingRequestId);
 		redeeming.setIndexedProperty("paypal_account", paypalAccount);
 		redeeming.setIndexedProperty("country_code", countryCode);
-		redeeming.setIndexedProperty("is_paid", false);
+		redeeming.setIndexedProperty("is_paid", false);		
 		redeeming.setIndexedProperty("email", paypalAccount);
 		ds.put(redeeming);
        
