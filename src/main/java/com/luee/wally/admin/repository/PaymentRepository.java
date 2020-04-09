@@ -261,17 +261,12 @@ public class PaymentRepository extends AbstractRepository {
 		DatastoreService ds = createDatastoreService(Consistency.EVENTUAL);
 
 		Query query = new Query("redeeming_requests_new");
-		CompositeFilter filter = CompositeFilterOperator.and(new FilterPredicate("is_paid", FilterOperator.EQUAL, true),
+		CompositeFilter filter = CompositeFilterOperator.and(
 				new FilterPredicate("ip_address", FilterOperator.EQUAL, ipAddress),
 				new FilterPredicate("user_guid", FilterOperator.NOT_EQUAL, userGuid));
 		query.setFilter(filter);
 		PreparedQuery pq = ds.prepare(query);
 		int count = pq.countEntities(FetchOptions.Builder.withDefaults());
-
-		// QueryResultList<Entity> entities =
-		// pq.asQueryResultList(FetchOptions.Builder.withDefaults());
-		// for(Entity entity:entities)
-		// System.out.println(count);
 
 		return count;
 
@@ -281,19 +276,13 @@ public class PaymentRepository extends AbstractRepository {
 		DatastoreService ds = createDatastoreService(Consistency.EVENTUAL);
 
 		Query query = new Query("redeeming_requests_new");
-		CompositeFilter filter = CompositeFilterOperator.and(
-				new FilterPredicate("is_paid", FilterOperator.EQUAL, true),
+		CompositeFilter filter = CompositeFilterOperator.and(				
 				new FilterPredicate("full_name", FilterOperator.EQUAL, fullName),
 				new FilterPredicate("user_guid", FilterOperator.NOT_EQUAL, userGuid)
 				);
 		query.setFilter(filter);
 		PreparedQuery pq = ds.prepare(query);
 		int count = pq.countEntities(FetchOptions.Builder.withDefaults());
-
-		// QueryResultList<Entity> entities =
-		// pq.asQueryResultList(FetchOptions.Builder.withDefaults());
-		// for(Entity entity:entities)
-	    //System.out.println(count);
 
 		return count;
 
@@ -303,17 +292,13 @@ public class PaymentRepository extends AbstractRepository {
 		DatastoreService ds = createDatastoreService(Consistency.EVENTUAL);
 
 		Query query = new Query("redeeming_requests_new");
-		CompositeFilter filter = CompositeFilterOperator.and(new FilterPredicate("is_paid", FilterOperator.EQUAL, true),
+		CompositeFilter filter = CompositeFilterOperator.and(
 				new FilterPredicate("full_address", FilterOperator.EQUAL, fullAddress),
 				new FilterPredicate("user_guid", FilterOperator.NOT_EQUAL, userGuid));
 		query.setFilter(filter);
 		PreparedQuery pq = ds.prepare(query);
 		int count = pq.countEntities(FetchOptions.Builder.withDefaults());
 
-		// QueryResultList<Entity> entities =
-		// pq.asQueryResultList(FetchOptions.Builder.withDefaults());
-		// for(Entity entity:entities)
-		// System.out.println(count);
 
 		return count;
 

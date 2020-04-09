@@ -29,7 +29,7 @@ payment.PaymentEligibleUsersView = Backbone.View.extend({
  						rule_status_result+="<div>UA Channel : <strong>"+map.uachannel+"</strong></div>";
  					}
  					map.differentuserlist.forEach((item)=>{ 						
- 						rule_status_result+="<div>"+item.text+"<br><a href='"+item.url+"'>"+item.name+"</a></div>";
+ 						rule_status_result+="<div>"+item.text+"<br><a href='"+item.url+"' target='_blank'>"+item.name+"</a></div>";
  					});
  					$('#ruleStatusResultId').html(rule_status_result);
  					 					

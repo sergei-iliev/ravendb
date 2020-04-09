@@ -1,14 +1,11 @@
 package com.luee.wally.api.rule.redeemingrequest;
 
-import java.util.Collection;
-
-import com.google.appengine.api.datastore.Entity;
 import com.luee.wally.admin.repository.PaymentRepository;
 import com.luee.wally.entity.RedeemingRequests;
 
 /**
  * 
- *“redeeming_requests_new” table has entities with the same value of “full_address” with value “is_paid” = true and a different user_guid.
+ *“redeeming_requests_new” table has entities with the same value of “full_address” and a different user_guid.
  */
 public class FullAddressDifferentUserRule extends RedeemingRequestRule {
     private PaymentRepository paymentRepository=new PaymentRepository();

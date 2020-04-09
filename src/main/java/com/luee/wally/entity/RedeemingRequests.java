@@ -223,18 +223,26 @@ public class RedeemingRequests {
 	@JsonIgnore
 	public String fullAddressLink(){
 		if (Utilities.isDevEnv()) {
-			return "https://console.cloud.google.com/datastore/entities;kind=redeeming_requests_new;ns=__$DEFAULT$__/query/kind;filter=%5B%229%2Ffull_name%7CSTR%7CEQ%7C7%2F"+this.fullAddress+"%22%5D?project=luee-wally-dev";
+			//return "https://console.cloud.google.com/datastore/entities;kind=redeeming_requests_new;ns=__$DEFAULT$__/query/kind;filter=%5B%229%2Ffull_address%7CSTR%7CEQ%7C7%2F"+this.fullAddress+"%22%5D?project=luee-wally-dev";
+			return "https://console.cloud.google.com/datastore/entities;kind=redeeming_requests_new;ns=__$DEFAULT$__/query/kind;filter=%5B%2212%2Ffull_address%7CSTR%7CEQ%7C5%2F"+this.fullAddress+"%22%5D?project=luee-wally-dev";
+
 		} else {
-			return "https://console.cloud.google.com/datastore/entities;kind=redeeming_requests_new;ns=__$DEFAULT$__/query/kind;filter=%5B%229%2Ffull_name%7CSTR%7CEQ%7C7%2F"+this.fullAddress+"%22%5D?project=luee-wally-v2-cpc";
-		}			
+			//return "https://console.cloud.google.com/datastore/entities;kind=redeeming_requests_new;ns=__$DEFAULT$__/query/kind;filter=%5B%229%2Ffull_address%7CSTR%7CEQ%7C7%2F"+this.fullAddress+"%22%5D?project=luee-wally-v2-cpc";
+			return "https://console.cloud.google.com/datastore/entities;kind=redeeming_requests_new;ns=__$DEFAULT$__/query/kind;filter=%5B%2212%2Ffull_address%7CSTR%7CEQ%7C5%2F"+this.fullAddress+"%22%5D?project=luee-wally-v2-cpc";
+		}	
+		
+
 	}
 
 	@JsonIgnore
 	public String ipAddressLink(){
 		if (Utilities.isDevEnv()) {
-			return "https://console.cloud.google.com/datastore/entities;kind=redeeming_requests_new;ns=__$DEFAULT$__/query/kind;filter=%5B%229%2Ffull_name%7CSTR%7CEQ%7C7%2F"+this.ipAddress+"%22%5D?project=luee-wally-dev";
+			//return "https://console.cloud.google.com/datastore/entities;kind=redeeming_requests_new;ns=__$DEFAULT$__/query/kind;filter=%5B%229%2Fip_address%7CSTR%7CEQ%7C7%2F"+this.ipAddress+"%22%5D?project=luee-wally-dev";
+			return "https://console.cloud.google.com/datastore/entities;kind=redeeming_requests_new;ns=__$DEFAULT$__/query/kind;filter=%5B%2210%2Fip_address%7CSTR%7CEQ%7C5%2F"+this.ipAddress+"%22%5D?project=luee-wally-dev";
+	
 		} else {
-			return "https://console.cloud.google.com/datastore/entities;kind=redeeming_requests_new;ns=__$DEFAULT$__/query/kind;filter=%5B%229%2Ffull_name%7CSTR%7CEQ%7C7%2F"+this.ipAddress+"%22%5D?project=luee-wally-v2-cpc";
+			//return "https://console.cloud.google.com/datastore/entities;kind=redeeming_requests_new;ns=__$DEFAULT$__/query/kind;filter=%5B%229%2Fip_address%7CSTR%7CEQ%7C7%2F"+this.ipAddress+"%22%5D?project=luee-wally-v2-cpc";
+			return "https://console.cloud.google.com/datastore/entities;kind=redeeming_requests_new;ns=__$DEFAULT$__/query/kind;filter=%5B%2210%2Fip_address%7CSTR%7CEQ%7C5%2F"+this.ipAddress+"%22%5D?project=luee-wally-v2-cpc";
 		}			
 	}
 
