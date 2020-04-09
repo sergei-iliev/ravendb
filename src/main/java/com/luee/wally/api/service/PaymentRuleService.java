@@ -69,7 +69,7 @@ public class PaymentRuleService extends AbstractService {
 				
 				object.put("name", redeemingRequest.getFullName());
 				object.put("text",
-						"There are "+count+" paid redeeming requests with the same Full Name: '"+redeemingRequest.getFullName()+"', and a different user_guid."						
+						"There are "+count+" redeeming requests with the same Full Name: '"+redeemingRequest.getFullName()+"', and a different user_guid."						
 						);
 				object.put("url", redeemingRequest.fullNameLink());
 				objects.add(object);
@@ -80,7 +80,7 @@ public class PaymentRuleService extends AbstractService {
 
 				object.put("name", redeemingRequest.getFullAddress());
 				object.put("text",
-						"There are "+count+" paid redeeming requests with the same Full Address: '"+redeemingRequest.getFullAddress()+"', and a different user_guid."
+						"There are "+count+" redeeming requests with the same Full Address: '"+redeemingRequest.getFullAddress()+"', and a different user_guid."
 						);
 				object.put("url", redeemingRequest.fullAddressLink());
 				objects.add(object);
@@ -91,7 +91,7 @@ public class PaymentRuleService extends AbstractService {
 				
 				object.put("name", redeemingRequest.getIpAddress());
 				object.put("text",
-						"There are "+count+" paid redeeming requests with the same IP Address: '"+redeemingRequest.getIpAddress()+"', and a different user_guid."						
+						"There are "+count+" redeeming requests with the same IP Address: '"+redeemingRequest.getIpAddress()+"', and a different user_guid."						
 						);
 				object.put("url", redeemingRequest.ipAddressLink());
 				objects.add(object);
