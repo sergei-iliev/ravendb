@@ -12,7 +12,6 @@ public class FullNameDifferentUserRule extends RedeemingRequestRule {
     
 	@Override
 	public void execute(RedeemingRequestRuleContext context,RedeemingRequests redeemingRequests) {
-	   	System.out.println(redeemingRequests.getFullName()+">>"+redeemingRequests.getUserGuid());
 		int count=paymentRepository.countEligibleUsersByName(redeemingRequests.getFullName(),redeemingRequests.getUserGuid()); 
 		if(count>0){
 			   context.getResult().add(RuleResultType.FULL_NAME_DIFFERENT_USER);

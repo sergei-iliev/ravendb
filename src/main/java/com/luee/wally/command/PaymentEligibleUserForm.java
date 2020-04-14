@@ -12,17 +12,21 @@ import javax.servlet.ServletRequest;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.luee.wally.command.payment.RuleStatusType;
 
 public class PaymentEligibleUserForm implements WebForm{
 
+	
 	private Date startDate, endDate;
 	private Collection<String> countryCodes=new HashSet<>();
 	private Collection<String> types=new HashSet<>();
 	private Collection<String> packageNames=new HashSet<>();
 	private Boolean  confirmedEmail;
 	private BigDecimal amountFrom,amountTo; 
+	private RuleStatusType colorFlag;
 	
 	public PaymentEligibleUserForm() {
+		this.colorFlag=RuleStatusType.None;
 	    types.add("PayPal");
 	    types.add("Amazon");
 	    countryCodes.add("US");
@@ -50,6 +54,8 @@ public class PaymentEligibleUserForm implements WebForm{
 		form.setStartDate(form.parseDate(req.getParameter("startDate")));
 		form.setEndDate(form.parseDate(req.getParameter("endDate")));
 
+		form.setColorFlag(req.getParameter("colorFlag")==null||req.getParameter("colorFlag").equals("")?RuleStatusType.None:RuleStatusType.valueOf(req.getParameter("colorFlag")));
+		
 		if(req.getParameterValues("countries")!=null){
 			form.setCountryCodes(req.getParameterValues("countries"));
 		}else if(req.getParameterValues("countries[]")!=null){
@@ -64,6 +70,12 @@ public class PaymentEligibleUserForm implements WebForm{
 		return form;
 	}
 	
+	public RuleStatusType getColorFlag() {
+		return colorFlag;
+	}
+	public void setColorFlag(RuleStatusType colorFlag) {
+		this.colorFlag = colorFlag;
+	}
 	public void setCountryCodes(Collection<String> countryCodes) {
 		this.countryCodes = countryCodes;
 	}

@@ -36,7 +36,6 @@ public class CampaignSearchController implements Controller {
 	
 	public void search(HttpServletRequest req, HttpServletResponse resp)throws ServletException, IOException{
 		 final CampaignSearchForm form=CampaignSearchForm.parse(req);
-		 System.out.println(form);
 			ThreadManager.createBackgroundThread(new Runnable() {
 				@Override
 				public void run() {

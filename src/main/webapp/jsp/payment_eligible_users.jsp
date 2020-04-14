@@ -164,7 +164,17 @@
 							</div>
 							</div>
 							</div>
-
+							
+							<div class="form-label-group mt-3">
+							<div class="col-md-3">
+								<label for="colorFlagId">Color Flag</label>
+								<select name="colorFlag" class="form-control" id="colorFlagId">
+									<c:forEach var="item" items="${colorFlags}">
+										<option value='${item}'  ${item == webform.colorFlag? 'selected' : ''}>${item}</option>
+									</c:forEach>
+								</select>								
+  							</div>
+							</div>
 							<div class="form-group">
 								<div class="col-md-12 text-center">
 									<button type="submit" class="btn btn-primary btn-lg mt-5" >Search</button>
@@ -199,17 +209,17 @@
 						<c:forEach var="entity" items="${entities}" varStatus="loop">
 							<tr id='row_${loop.index}'>
 								<td>
-								<c:if test="${entity.ruleStatus eq 'red'}">
+								<c:if test="${entity.ruleStatus eq 'Red'}">
 					            	<a href="#" rule-status="true" data-entitykey="${entity.redeemingRequest.key}"> 
 								    	<svg width="24px" height="24px" viewBox="0 0 24 24" fit="" preserveAspectRatio="xMidYMid meet" focusable="false"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" fill="#D50000"></path></svg>
 									</a>    
 								</c:if>
-								<c:if test="${entity.ruleStatus eq 'yellow'}">
+								<c:if test="${entity.ruleStatus eq 'Yellow'}">
 									<a href="#" rule-status="true" data-entitykey="${entity.redeemingRequest.key}">
 								    	<svg fill="#FF9E00" width="24px" height="24px" viewBox="0 0 24 24" fit="" preserveAspectRatio="xMidYMid meet" focusable="false"><path d="M9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1zm3-19C8.13 2 5 5.13 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.87-3.13-7-7-7z" fill-rule="evenodd"></path></svg>
 								    </a>	
 							    </c:if>
-							    <c:if test="${entity.ruleStatus eq 'green'}">	    
+							    <c:if test="${entity.ruleStatus eq 'Green'}">	    
 									<svg width="24" height="24" viewBox="0 0 24 24" fit="" preserveAspectRatio="xMidYMid meet" focusable="false"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" fill="#0F9D58"></path></svg>
 								</c:if>									    
 								</td>

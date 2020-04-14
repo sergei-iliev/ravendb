@@ -20,21 +20,21 @@ public class RedeemingRequestRuleValue {
 		return ruleResultType;
 	}
 
-	public String getRuleStatus() {
+	public RuleStatusType getRuleStatus() {
 		if (ruleResultType != null) {
 			switch (ruleResultType) {
 			case TIME_TO_CACH_LESS_24_ORGANIC:
-				return "red";
+				return RuleStatusType.Red;
 			case TIME_TO_CACH_LESS_24_NON_ORGANIC:
 			case TIME_TO_CACH_LESS_48_ORGANIC:
 			case FULL_NAME_DIFFERENT_USER:
 			case FULL_ADDRESS_DIFFERENT_USER:
 			case IP_ADDRESS_DIFFERENT_USER:
-				return "yellow";
+				return RuleStatusType.Yellow;
 			default:
-				return "green";
+				return RuleStatusType.Green;
 			}
 		}
-		return "green";
+		return RuleStatusType.Green;
 	}
 }

@@ -11,14 +11,12 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.http.HttpStatus;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.EntityNotFoundException;
 import com.luee.wally.admin.repository.ApplicationSettingsRepository;
@@ -39,14 +37,13 @@ import com.luee.wally.command.PaymentEligibleUserForm;
 import com.luee.wally.command.PdfAttachment;
 import com.luee.wally.command.invoice.PayoutResult;
 import com.luee.wally.command.payment.RedeemingRequestRuleValue;
-import com.luee.wally.constants.Constants;
+import com.luee.wally.command.payment.RuleStatusType;
 import com.luee.wally.entity.RedeemingRequests;
 import com.luee.wally.entity.SearchFilterTemplate;
 import com.luee.wally.exception.AESSecurityException;
 import com.luee.wally.exception.RestResponseException;
 import com.luee.wally.json.JSONUtils;
 import com.paypal.api.payments.ErrorDetails;
-import com.paypal.base.exception.PayPalException;
 import com.paypal.base.rest.PayPalRESTException;
 
 public class PaymentController implements Controller {
@@ -268,6 +265,7 @@ public class PaymentController implements Controller {
 
 		req.setAttribute("webform", form);
 		req.setAttribute("countries", this.getCountries());
+		req.setAttribute("colorFlags", RuleStatusType.values());
 		req.getRequestDispatcher("/jsp/payment_eligible_users.jsp").forward(req, resp);
 	}
 
@@ -291,6 +289,10 @@ public class PaymentController implements Controller {
 		//run rules
 		PaymentRuleService paymentRuleService=new PaymentRuleService();
 		Collection<RedeemingRequestRuleValue> result=paymentRuleService.executeRedeemingRequestRules(entities);
+		//filter out result based on color flag
+		if(form.getColorFlag()!=RuleStatusType.None){			
+			result=result.stream().filter(r->r.getRuleStatus()==form.getColorFlag()).collect(Collectors.toList());
+		}
 		
 		PaymentRepository paymentRepository = new PaymentRepository();
 		Collection<String> reasons = paymentRepository.getUserPaymentsRemovalReasons();
@@ -303,6 +305,7 @@ public class PaymentController implements Controller {
 		req.setAttribute("isPayPalVisible",
 				Boolean.valueOf(map.get(ApplicationSettingsRepository.SHOW_PAYPAL_PAY)));		
 		req.setAttribute("webform", form);
+		req.setAttribute("colorFlags", RuleStatusType.values());
 		req.setAttribute("entities", result);
 		req.setAttribute("reasons", reasons);
 		req.setAttribute("paymentTypes", paymentService.getDefaultPaymentTypes());
@@ -335,6 +338,10 @@ public class PaymentController implements Controller {
 		//run rules
 		PaymentRuleService paymentRuleService=new PaymentRuleService();
 		Collection<RedeemingRequestRuleValue> result=paymentRuleService.executeRedeemingRequestRules(entities);
+		//filter out result based on color flag
+		if(form.getColorFlag()!=RuleStatusType.None){			
+			result=result.stream().filter(r->r.getRuleStatus()==form.getColorFlag()).collect(Collectors.toList());
+		}
 		
 		PaymentRepository paymentRepository = new PaymentRepository();
 		Collection<String> reasons = paymentRepository.getUserPaymentsRemovalReasons();
@@ -351,6 +358,7 @@ public class PaymentController implements Controller {
 		req.setAttribute("isPayPalVisible",
 				Boolean.valueOf(map.get(ApplicationSettingsRepository.SHOW_PAYPAL_PAY)));
 		req.setAttribute("webform", form);
+		req.setAttribute("colorFlags", RuleStatusType.values());
 		req.setAttribute("entities", result);
 		req.setAttribute("reasons", removalReasons);
 		req.setAttribute("paymentTypes", paymentService.getDefaultPaymentTypes());
