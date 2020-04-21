@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.luee.wally.admin.controller.AffsSearchController;
 import com.luee.wally.admin.controller.ApplicationSettingsController;
 import com.luee.wally.admin.controller.CampaignSearchController;
+import com.luee.wally.admin.controller.EmailTemplateController;
 import com.luee.wally.admin.controller.ImportController;
 import com.luee.wally.admin.controller.LoginController;
 import com.luee.wally.admin.controller.PaidUsersController;
@@ -67,6 +68,9 @@ INSTANCE;
     	 httpGetRouteList.put("/administration/api/login/paypal/token", new Route(new PaymentLoginController(),"payPalLoginToken"));
     	 httpGetRouteList.put("/administration/api/login/amazon/token", new Route(new PaymentLoginController(),"amazonLoginToken"));
     	 
+    	 httpGetRouteList.put("/administration/email/template/content", new Route(new EmailTemplateController(),"getEmailTemplateContent"));
+    	 httpGetRouteList.put("/administration/email/template/list", new Route(new EmailTemplateController(),"getEmailTemplates"));
+    	 
     	 //post
     	 httpPostRouteList.put("/administration/search", new Route(new AffsSearchController(),"search"));
     	 httpPostRouteList.put("/administration/exportgaid/run", new Route(new AffsSearchController(),"runExportGaid"));
@@ -94,7 +98,8 @@ INSTANCE;
     	 httpPostRouteList.put("/administration/payment/paidusers/search/byemail", new Route(new PaidUsersController(),"searchByEmail"));
     	 httpPostRouteList.put("/administration/payment/paidusers/search/byemail", new Route(new PaidUsersController(),"searchByEmail"));    	 
     	 httpPostRouteList.put("/administration/payment/paidusers/search/byguid", new Route(new PaidUsersController(),"searchByGuid"));    	 
-   	 
+   	     //email template
+    	 httpPostRouteList.put("/administration/email/template/send", new Route(new EmailTemplateController(),"sendEmailTemplate"));
     
     }
     

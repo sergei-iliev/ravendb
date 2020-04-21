@@ -1,6 +1,7 @@
 package com.luee.wally.admin.repository;
 
 import java.math.BigDecimal;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -142,7 +143,19 @@ public class PaymentRepository extends AbstractRepository {
 		PreparedQuery pq = ds.prepare(query);
 		return pq.asList(FetchOptions.Builder.withDefaults());
 	}
+	public Collection<Entity> getExternalPaidUserInLastDay() {
+		DatastoreService ds = createDatastoreService(Consistency.EVENTUAL);
+		
+		ZonedDateTime now=ZonedDateTime.now();
+		ZonedDateTime yesterday=now.minusHours(24);
+		Date from=(Date.from(yesterday.toInstant()));
+		
+		Query query = new Query("paid_users_external");				
+		query.setFilter(new FilterPredicate("date", FilterOperator.GREATER_THAN_OR_EQUAL,from));
 
+		PreparedQuery pq = ds.prepare(query);
+		return pq.asList(FetchOptions.Builder.withDefaults());
+	}
 	public void saveExternalPaidUser(PaidUserExternal paidUserExternal, BigDecimal eurAmount, String invoiceNumber,
 			String payoutBatchId) {
 		DatastoreService ds = createDatastoreService(Consistency.STRONG);

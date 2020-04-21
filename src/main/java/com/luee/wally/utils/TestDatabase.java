@@ -18,7 +18,8 @@ public enum TestDatabase {
 		createAmazonGiftCardMap();
 		createPackageNameTitleMapping();
 		createApplicationSettings();
-		createPayPalCurrencyMap();				
+		createPayPalCurrencyMap();	
+		createEmailTemplates();
 	}
 	private  void createRedeemingRequests(){
 		DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
@@ -388,5 +389,14 @@ public enum TestDatabase {
 		ds.put(entity);	
 	}
 	
-	
+	private void createEmailTemplates(){
+		DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
+		Entity entity = new Entity("email_templates");	
+		entity.setIndexedProperty("name","first template");
+		entity.setProperty("date",new Date());
+		entity.setProperty("subject","Your subject");
+		entity.setIndexedProperty("type","SEND_ELIGIBLE_USER_EMAIL_TEMPLATE");		
+		entity.setProperty("content","<p><b>Hello from me!</b></p><p><font color=\"#00ff00\"><b>What is up with you?</b></font></p><p><b><font color=\"#ff00ff\">Thank you!</font></b></p><p><br></p>");
+		ds.put(entity);		
+	}
 }

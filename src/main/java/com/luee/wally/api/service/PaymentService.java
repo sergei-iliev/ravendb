@@ -135,21 +135,61 @@ public class PaymentService extends AbstractService {
 			logger.log(Level.SEVERE, "Currency converter for : " + form.getCurrency(), e);
 			throw e;
 		}
-		// 1. more then 30?
-		BigDecimal maxAmount = BigDecimal.valueOf(30.0);
+		// 1. more then 5?
+		BigDecimal maxAmount = BigDecimal.valueOf(5.0);
 		if (eurAmount.compareTo(maxAmount) == 1) {
-			throw new Exception("Amount in EUR {" + eurAmount + "} is more then 30");
+			throw new Exception("Amount in EUR {" + eurAmount + "} is more then 5");
 		}
-		// 2.all payments less then 100
+		// 2.all payments less then 30
 		Collection<Entity> entities = paymentRepository.getExternalPaidUserByEmail(
 				form.getPaypalAccount() == null ? form.getEmailAddress() : form.getPaypalAccount());
 		double sum = entities.stream().mapToDouble(e -> (double) e.getProperty("eur_currency")).sum();
 		BigDecimal total = eurAmount.add(BigDecimal.valueOf(sum));
-		BigDecimal hundred = BigDecimal.valueOf(100.0);
-		if (total.compareTo(hundred) == 1) {
-			throw new Exception("Total Amount {" + sum + "}, and requested {" + eurAmount + "} is more then 100");
+		BigDecimal limit = BigDecimal.valueOf(30.0);
+		if (total.compareTo(limit) == 1) {
+			throw new Exception("Total Amount {" + sum + "}, and requested {" + eurAmount + "} is more then 30");
 		}
-	}
+	
+		// 3. all external payments from today don't exceed X eur.
+		
+		Collection<Entity> entitiesDaily = paymentRepository.getExternalPaidUserInLastDay();
+		double sumDay = entitiesDaily.stream().mapToDouble(e -> (double) e.getProperty("eur_currency")).sum();
+		BigDecimal totalDay = eurAmount.add(BigDecimal.valueOf(sumDay));
+		limit = BigDecimal.valueOf(500.0);
+		if (totalDay.compareTo(limit) == 1) {
+			throw new Exception("Total Amount for past 24 hours {" + sumDay + "}, and requested {" + eurAmount + "} is more than the daily limit of:"+limit);
+		}
+	}	
+//	public void validateExternalForm(PayExternalForm form) throws Exception {
+//
+//		if (Objects.isNull(form.getRedeemingRequestId()) || form.getRedeemingRequestId().isEmpty()
+//				|| Objects.isNull(form.getType()) || form.getType().isEmpty()) {
+//			throw new Exception("Invalid form data");
+//		}
+//		PaymentRepository paymentRepository = new PaymentRepository();
+//		// convert currency to EUR
+//		BigDecimal eurAmount;
+//		try {
+//			eurAmount = paymentRepository.convert(Double.parseDouble(form.getAmount()), form.getCurrency());
+//		} catch (Exception e) {
+//			logger.log(Level.SEVERE, "Currency converter for : " + form.getCurrency(), e);
+//			throw e;
+//		}
+//		// 1. more then 30?
+//		BigDecimal maxAmount = BigDecimal.valueOf(30.0);
+//		if (eurAmount.compareTo(maxAmount) == 1) {
+//			throw new Exception("Amount in EUR {" + eurAmount + "} is more then 30");
+//		}
+//		// 2.all payments less then 100
+//		Collection<Entity> entities = paymentRepository.getExternalPaidUserByEmail(
+//				form.getPaypalAccount() == null ? form.getEmailAddress() : form.getPaypalAccount());
+//		double sum = entities.stream().mapToDouble(e -> (double) e.getProperty("eur_currency")).sum();
+//		BigDecimal total = eurAmount.add(BigDecimal.valueOf(sum));
+//		BigDecimal hundred = BigDecimal.valueOf(100.0);
+//		if (total.compareTo(hundred) == 1) {
+//			throw new Exception("Total Amount {" + sum + "}, and requested {" + eurAmount + "} is more then 100");
+//		}
+//	}
 
 	public void payExternal(HttpServletResponse resp, PayExternalForm form) throws IOException {
 		// convert currency to EUR

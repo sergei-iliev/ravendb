@@ -5,8 +5,91 @@ payment.PaymentEligibleUsersView = Backbone.View.extend({
   el: '#contentid',
   // It's the first function called when this view it's instantiated.
   initialize: function(){
-	  $('[data-toggle="tooltip"]').tooltip();	
+	  $('[data-toggle="tooltip"]').tooltip();
 	  
+	  
+	  
+	  //*********send email template**************************
+	  $('#summernoteid').summernote({
+		  height: 250        		  
+      });
+	 
+//	  $('#sendUserEmailDialog').on('hidden.bs.modal', function (e) {
+//		  window.alert('hidden event fired!');
+//	  });
+
+	  var getFormData=function(){
+		  return {};
+	  };
+	  $('#sendUserEmailBtn').on( "click", function(e) {
+		  if($('#emailTemplateSubjectId').val()===''||$('#summernoteid').summernote('code')===''){
+			  alert('Empty form fields not allowed');
+			  return;
+		  }	
+		  var formData=getFormData();
+			//send email template
+			$.ajax({
+				url:'/administration/email/template/send',
+				type:'post',
+				data:formData,
+				success: function(data, textStatus, jQxhr ){			          
+					$('#sendUserEmailDialog').modal('hide');					 					
+				},
+				error: function( jqXhr, textStatus, errorThrown ){
+					alert( errorThrown );
+				}
+	  
+			});			  
+		  	
+	  });
+
+	  $(".send_user_email").click(function(e) {
+		  e.preventDefault();		  
+		  let key = $(this).data('entitykey');
+		  let templateKey=null;
+		  getFormData=function(){
+			 return {
+				 key:key,
+				 subject:$('#emailTemplateSubjectId').val(),
+				 content:$('#summernoteid').summernote('code')	
+			 };   
+		  }
+		  
+		  $('#summernoteid').summernote('code','');	  
+		  $('#sendUserEmailDialog').modal('show');	
+		  
+		  $("#emailTemplatesTableBodyId").empty();
+		  $.ajax({
+			    url: '/administration/email/template/list',
+			    type: 'get',		    	   
+			    success: function(data, textStatus, jQxhr ){
+			    	var map=JSON.parse(data);
+			        var html='';
+			        
+				        $.each(map.result, function(i, item) {
+			               html += "<tr data-entitykey='"+item.key+"'><td>" + item.name + "</td><td>" + item.dateAsText + "</td></tr>";
+			            });		       
+			        $('#emailTemplatesTableBodyId').append(html);
+			        //bind event handlers
+			        $('#emailTemplatesTableBodyId tr').on('click', function (e) {
+			        	templateKey=$(this).data('entitykey')
+			        	//on click load template			        	
+			        	$.get("/administration/email/template/content?key="+templateKey, function( data ) {
+			        		console.log(data);
+					    	var map=JSON.parse(data);
+			        		$('#summernoteid').summernote('code',map.result.content);	
+			        		$('#emailTemplateSubjectId').val(map.result.subject);	 
+			        	});
+			        });
+
+			    },
+			    error: function( jqXhr, textStatus, errorThrown ){
+			        console.log( errorThrown );
+			    }
+			  
+			});			  
+		
+	  });	  
 	  //********Rule status
 	  $('[rule-status="true"]').click(function(e) {
 		  e.preventDefault();
@@ -499,7 +582,6 @@ payment.PaymentEligibleUsersView = Backbone.View.extend({
 		    type: 'get',		    	   
 		    success: function(data, textStatus, jQxhr ){
 		    	var map=JSON.parse(data);
-		        console.log(map.result);
 		        var html='';
 		        
 			        $.each(map.result, function(i, item) {

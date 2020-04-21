@@ -1,7 +1,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <title>Administration</title>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -14,7 +14,7 @@
 	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 		
 <link rel="stylesheet" href="/css/bootstrap/bootstrap.min.css">
-
+<link rel="stylesheet" href="/css/app.css">
 <script src="/js/bootstrap/popper.min.js"></script>
 <script src="/js/bootstrap/bootstrap.min.js"></script>
 
@@ -22,6 +22,10 @@
 <script src="/js/backbone/underscore.min.js"></script>
 <script src="/js/backbone/backbone.min.js"></script>
 <script src="/js/jsp/payment_eligible_users.js"></script>
+
+<!-- include https://summernote.org -->
+<link href="/js/summernote/summernote-bs4.min.css" rel="stylesheet">
+<script src="/js/summernote/summernote-bs4.min.js"></script>
 
 <body>
 	<jsp:include page="/jsp/fragments/header.jsp">
@@ -255,7 +259,7 @@
 								 	<div id='email_field_${loop.index}'>${entity.redeemingRequest.email}</div>
 								    <br>
 								    <a href="#" class="edit_email" data-index="${loop.index}" data-entitykey="${entity.redeemingRequest.key}"><i class="fa fa-pencil-square-o"></i></a>
-								     
+								    <a href="#" class="send_user_email" data-index="${loop.index}" data-entitykey="${entity.redeemingRequest.key}"><i class="fa fa-at"></i></a> 
 								</td>
 								<td>${entity.redeemingRequest.countryCode}</td>
 								<td>
@@ -357,7 +361,7 @@
     </div>
   </div>
 </div>	
-	<!-- Save Search Template -->
+	<!-- Load Search Template -->
 <div class="modal fade" id="loadSearchTemplateDialog" tabindex="-1" role="dialog" aria-labelledby="loadSearchTemplateLabel" aria-hidden="true">
   	<div class="modal-dialog modal-lg"  role="document">
     <div class="modal-content">
@@ -523,6 +527,54 @@
       </div>
       </div>
       <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>    
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Send Email Template -->
+<div class="modal fade" id="sendUserEmailDialog" tabindex="-1" role="dialog" aria-labelledby="sendUserEmailDialogLabel" aria-hidden="true">
+  	<div class="modal-dialog modal-dialog-centered"  role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="sendUserEmailDialogLabel">Send Email</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+      <div class="container">
+        
+        <table id="emailTemplatesTableId" 
+        class='table table-bordered table-condensed table-striped table-hover' data-height="200" width="100%">
+        	<thead id='emailTemplatesTableHeaderId'>
+            	<tr>
+                	<th data-field="id">Email Template Name</th>
+                	<th data-field="name">Date</th>              
+            	</tr>
+        	</thead>
+        	<tbody id="emailTemplatesTableBodyId">
+        	  
+        	</tbody>
+        </table>
+        <div class="row mt-3">
+		   <div class="col-md-12">
+				<label for="emailTemplateSubjectId">Subject</label> <input
+										name="emailTemplateSubject" class="form-control" id="emailTemplateSubjectId"
+										value="">											 
+		   </div>			
+		</div>
+		<div class="row mt-3">
+				<div class="col-md-12">
+			        <div id="summernoteid"></div>		 
+				</div>			
+		</div>
+      </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" id="sendUserEmailBtn">Send</button>       
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>    
       </div>
     </div>
