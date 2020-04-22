@@ -31,6 +31,9 @@ public class PayPalService {
 	private static final String PAYOUT_STATUS_PROCESSING = "PROCESSING";
 	private static final String PAYOUT_STATUS_SUCCESS = "SUCCESS";
 
+	private static final String RECEIVER_UNREGISTERED="RECEIVER_UNREGISTERED";
+	private static final String PENDING_RECIPIENT_NON_HOLDING_CURRENCY_PAYMENT_PREFERENCE="PENDING_RECIPIENT_NON_HOLDING_CURRENCY_PAYMENT_PREFERENCE";	
+	
 	public PayoutResult payout(RedeemingRequests payPalUser,String currencyCode) throws PayPalRESTException {
 		PayoutResult payoutResult=new PayoutResult();
 		ApplicationSettingsService applicationSettingsService=new ApplicationSettingsService();
@@ -106,7 +109,17 @@ public class PayPalService {
 				if(pay.getBatchHeader().getBatchStatus().equals(PAYOUT_STATUS_SUCCESS)){
 				    //could be error success
 					if((!pay.getItems().isEmpty())&&pay.getItems().get(0).getError()!=null){
-					   throw createPayoutException(pay.getItems().get(0).getError(),payPalUser.getPaypalAccount());	
+
+						if(!pay.getItems().get(0).getError().getName().isEmpty()){
+							if(pay.getItems().get(0).getError().getName().equals(RECEIVER_UNREGISTERED)||
+							   pay.getItems().get(0).getError().getName().equals(PENDING_RECIPIENT_NON_HOLDING_CURRENCY_PAYMENT_PREFERENCE)){
+								payoutResult.setPayoutError(pay.getItems().get(0).getError().getName());								
+							}else{
+								throw createPayoutException(pay.getItems().get(0).getError(),payPalUser.getPaypalAccount());	
+							}
+						}else{						
+					       throw createPayoutException(pay.getItems().get(0).getError(),payPalUser.getPaypalAccount());
+						}
 					}
 					//success completed
 					payoutResult.setAmount(new Money( pay.getBatchHeader().getAmount().getValue(),pay.getBatchHeader().getAmount().getCurrency()));
@@ -129,7 +142,7 @@ public class PayPalService {
 	}
 
 	private PayPalRESTException createTimeoutException(String paypalAccount) {
-		PayPalRESTException ex = new PayPalRESTException("PayPal payout processing timeout for user"+paypalAccount);
+		PayPalRESTException ex = new PayPalRESTException("PayPal payout processing timeout for user "+paypalAccount);
 		com.paypal.api.payments.Error error = new com.paypal.api.payments.Error();
 
 		ErrorDetails errorDetails = new ErrorDetails("PayPal payout timeout", paypalAccount);

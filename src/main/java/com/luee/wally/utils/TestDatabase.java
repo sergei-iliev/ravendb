@@ -8,6 +8,7 @@ import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.KeyFactory;
+import com.google.appengine.api.datastore.Text;
 
 public enum TestDatabase {
 	INSTANCE;
@@ -396,7 +397,7 @@ public enum TestDatabase {
 		entity.setProperty("date",new Date());
 		entity.setProperty("subject","Your subject");
 		entity.setIndexedProperty("type","SEND_ELIGIBLE_USER_EMAIL_TEMPLATE");		
-		entity.setProperty("content","<p><b>Hello from me!</b></p><p><font color=\"#00ff00\"><b>What is up with you?</b></font></p><p><b><font color=\"#ff00ff\">Thank you!</font></b></p><p><br></p>");
+		entity.setProperty("content",new Text("<p><b>Hello from me!</b></p><p><font color=\"#00ff00\"><b>What is up with you?</b></font></p><p><b><font color=\"#ff00ff\">Thank you!</font></b></p><p><br></p>"));
 		ds.put(entity);		
 	}
 }

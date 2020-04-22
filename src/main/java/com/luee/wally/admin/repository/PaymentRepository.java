@@ -157,7 +157,7 @@ public class PaymentRepository extends AbstractRepository {
 		return pq.asList(FetchOptions.Builder.withDefaults());
 	}
 	public void saveExternalPaidUser(PaidUserExternal paidUserExternal, BigDecimal eurAmount, String invoiceNumber,
-			String payoutBatchId) {
+			String payoutBatchId,String payoutError) {
 		DatastoreService ds = createDatastoreService(Consistency.STRONG);
 		Entity entity = new Entity("paid_users_external");
 		entity.setProperty("date", new Date());
@@ -173,11 +173,12 @@ public class PaymentRepository extends AbstractRepository {
 		entity.setProperty("address", paidUserExternal.getAddress());
 		entity.setProperty("payment_reference_id", payoutBatchId);
 		entity.setProperty("invoice_number", invoiceNumber);
+		entity.setProperty("paypal_error_reponse",payoutError);
 		ds.put(entity);
 	}
 
 	public void savePayPalPayment(RedeemingRequests redeemingRequests, String currencyCode, BigDecimal eurAmount,
-			String invoiceNumber, String payoutBatchId) {
+			String invoiceNumber, String payoutBatchId,String payoutError) {
 
 		DatastoreService ds = createDatastoreService(Consistency.STRONG);
 		Entity entity = new Entity("paid_users");
@@ -195,6 +196,7 @@ public class PaymentRepository extends AbstractRepository {
 		entity.setProperty("redeeming_request_id", redeemingRequests.getRedeemingRequestId());
 		entity.setProperty("payment_reference_id", payoutBatchId);
 		entity.setProperty("invoice_number", invoiceNumber);
+		entity.setProperty("paypal_error_reponse",payoutError);
 		ds.put(entity);
 	}
 

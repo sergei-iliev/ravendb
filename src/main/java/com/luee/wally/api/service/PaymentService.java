@@ -247,7 +247,7 @@ public class PaymentService extends AbstractService {
 
 			// save save paid user external
 			paymentRepository.saveExternalPaidUser(form.toPaidUserExternal(), eurAmount, invoiceNumber,
-					payoutResult.getPayoutBatchId());
+					payoutResult.getPayoutBatchId(),payoutResult.getPayoutError());
 			// create invoice
 			PdfAttachment attachment = new PdfAttachment();
 			attachment.readFromStream(invoiceService.createInvoice(payoutResult, form.getFullName(), form.getAddress(),
@@ -312,7 +312,7 @@ public class PaymentService extends AbstractService {
 					(String) entity.getProperty("title"));
 			// save paid user external
 			paymentRepository.saveExternalPaidUser(form.toPaidUserExternal(), eurAmount, null,
-					order.getReferenceOrderID());
+					order.getReferenceOrderID(),null);
 			resp.setStatus(HttpStatus.SC_OK);
 		} catch (RestResponseException e) {
 			logger.log(Level.SEVERE, "Send Tango Card error ", e);

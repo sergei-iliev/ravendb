@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.Text;
 import com.luee.wally.admin.repository.ApplicationSettingsRepository;
 import com.luee.wally.admin.repository.EmailTemplateRepository;
 import com.luee.wally.admin.repository.GiftCardRepository;
@@ -42,8 +43,8 @@ public class EmailTemplateController implements Controller{
 		Entity entity=emailTemplateRepository.findEntityByKey(key);
 		EmailTemplate emailTemplate=EmailTemplate.valueOf(entity);
 		
-		//set content
-		emailTemplate.setContent((String)entity.getProperty("content"));
+		//set content		
+		emailTemplate.setContent(((Text)entity.getProperty("content")).getValue());
 		Map<String,Object> value=new HashMap<String, Object>();
 		value.put("result",emailTemplate);
 		

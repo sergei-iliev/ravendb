@@ -184,7 +184,7 @@ public class PaymentController implements Controller {
 			String invoiceNumber = Long.toString(invoiceRepository.createInvoiceNumber());			
 			
 			//save payment
-			paymentRepository.savePayPalPayment(redeemingRequests, currencyCode, eurAmount,invoiceNumber, payoutResult.getPayoutBatchId());
+			paymentRepository.savePayPalPayment(redeemingRequests, currencyCode, eurAmount,invoiceNumber, payoutResult.getPayoutBatchId(),payoutResult.getPayoutError());
             //create invoice
 			PdfAttachment attachment = new PdfAttachment();
 			attachment.readFromStream(invoiceService.createInvoice(payoutResult, 
@@ -197,7 +197,7 @@ public class PaymentController implements Controller {
 			mailService.sendGridInvoice(toInvoiceMail,fromMail, attachment);
 			resp.getWriter().write("OK");
 		}catch(PayPalRESTException ppe){
-			logger.log(Level.SEVERE, "PayPal rest payment", ppe);
+			logger.log(Level.SEVERE,ppe.getMessage(), ppe);
 			resp.getWriter().write("PayPal exception, check logs for details\r\n");
 			for(ErrorDetails errorDetails:ppe.getDetails().getDetails()){
 			  resp.getWriter().write(errorDetails.getField()+"\r\n");

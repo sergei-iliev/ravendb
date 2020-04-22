@@ -10,6 +10,8 @@ public class PayoutResult {
 	
 	private Money fee;
 
+	private String payoutError;
+	
 	public String getPayoutBatchId() {
 		return payoutBatchId;
 	}
@@ -35,7 +37,13 @@ public class PayoutResult {
 	public void setFee(Money fee) {
 		this.fee = fee;
 	}
+	public String getPayoutError() {
+		return payoutError;
+	}
 	
+	public void setPayoutError(String payoutError) {
+		this.payoutError = payoutError;
+	}
 	public String getTotal(){
 		BigDecimal a=new BigDecimal(amount.getValue());
 		BigDecimal f=new BigDecimal(fee.getValue());
