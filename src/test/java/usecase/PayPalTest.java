@@ -91,7 +91,7 @@ public class PayPalTest {
 
 			String invoiceNumber = Long.toString(invoiceRepository.createInvoiceNumber());
 			paymentRepository.savePayPalPayment(redeemingRequests, "USD", BigDecimal.ZERO, invoiceNumber,
-					payoutResult.getPayoutBatchId());
+					payoutResult.getPayoutBatchId(),null);
 
 			PdfAttachment attachment = new PdfAttachment();
 			attachment.readFromStream(invoiceService.createInvoice(payoutResult, 

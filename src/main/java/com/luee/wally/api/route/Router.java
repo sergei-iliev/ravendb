@@ -58,16 +58,18 @@ INSTANCE;
     	 httpGetRouteList.put("/administration/search/template/filter", new Route(new PaymentController(),"searchByFilterTemplate"));
     	 httpGetRouteList.put("/administration/payment/test", new Route(new PaymentController(),"test"));
     	 httpGetRouteList.put("/administration/job/reports/payment/yesterday", new Route(new PaymentReportsController(),"getPaymentReportForYesterday"));
+    	 httpGetRouteList.put("/administration/job/redeemingrequest/email/reminder", new Route(new EmailTemplateController(),"redeemingRequestEmailJob"));
+
     	 httpGetRouteList.put("/administration/payment/paidusers", new Route(new PaidUsersController(),"index"));
 
     	 
     	 httpGetRouteList.put("/administration/settings", new Route(new ApplicationSettingsController(),"index"));
     	 httpGetRouteList.put("/administration/settings/cache/clear", new Route(new ApplicationSettingsController(),"clearCache"));
-    	 
+    	 /*
     	 httpGetRouteList.put("/administration/api/login/request", new Route(new PaymentLoginController(),"loginRequest"));
     	 httpGetRouteList.put("/administration/api/login/paypal/token", new Route(new PaymentLoginController(),"payPalLoginToken"));
     	 httpGetRouteList.put("/administration/api/login/amazon/token", new Route(new PaymentLoginController(),"amazonLoginToken"));
-    	 
+    	 */
     	 httpGetRouteList.put("/administration/email/template/content", new Route(new EmailTemplateController(),"getEmailTemplateContent"));
     	 httpGetRouteList.put("/administration/email/template/list", new Route(new EmailTemplateController(),"getEmailTemplates"));
     	 

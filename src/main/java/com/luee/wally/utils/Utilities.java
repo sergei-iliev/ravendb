@@ -8,7 +8,7 @@ import com.luee.wally.constants.Constants;
 
 public final class Utilities {
     
-	public static String domain=null;
+	public static String domain="";
 	
 	public static boolean isDevEnv(){		
 	   return (domain.contains("luee-wally-dev"));	

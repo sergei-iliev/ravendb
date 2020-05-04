@@ -7,6 +7,7 @@ import java.util.Date;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.datastore.Text;
 
@@ -53,7 +54,7 @@ public enum TestDatabase {
 		entity.setProperty("is_paid", true);
 		ds.put(entity);		
 		crearePaiedUsersEntity(entity,0.9);	
-
+		createRedeemingRequestsEmailJob(entity.getKey());
 		
 		createRedeemingRequestEntity("Viola","e701-4678-8d39-0c2485204f3b","aaaa2675-a072-4b6b-ab66-cb599a29147d", "0.1", new Date(), "com.moregames.makemoney", "Amazon", "sergei_iliev@yahoo.com", "GB");		
 		
@@ -66,8 +67,10 @@ public enum TestDatabase {
 		entity.setProperty("ip_address", "77.98.102.111");
 		ds.put(entity);
 		crearePaiedUsersEntity(entity,2.9);
+		createRedeemingRequestsEmailJob(entity.getKey());
 		
 		createRedeemingRequestEntity("Gurmen","8957-48bb-a08c-de0adca6a91e","cccc1675-a072-4b6b-ab66-cb599a29147d", "1.1", new Date(), "com.moregames.makemoney", "Amazon", "sergei.iliev@gmail.com", "DE");		
+		createRedeemingRequestsEmailJob(entity.getKey());
 	}
 	private  Entity createRedeemingRequestEntity(String fullName,String redeemingRequestId,String userGuid,String amount, Date date,String packageName,String type,String paypalAccount,String countryCode){
 		DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
@@ -84,7 +87,7 @@ public enum TestDatabase {
 		redeeming.setIndexedProperty("paypal_account", paypalAccount);
 		redeeming.setIndexedProperty("country_code", countryCode);
 		redeeming.setIndexedProperty("is_paid", false);		
-		redeeming.setIndexedProperty("email", paypalAccount);
+		redeeming.setIndexedProperty("email", "sergei_iliev@yahoo.com");
 		ds.put(redeeming);
        
 		return redeeming;
@@ -398,6 +401,41 @@ public enum TestDatabase {
 		entity.setProperty("subject","Your subject");
 		entity.setIndexedProperty("type","SEND_ELIGIBLE_USER_EMAIL_TEMPLATE");		
 		entity.setProperty("content",new Text("<p><b>Hello from me!</b></p><p><font color=\"#00ff00\"><b>What is up with you?</b></font></p><p><b><font color=\"#ff00ff\">Thank you!</font></b></p><p><br></p>"));
+		ds.put(entity);	
+		
+		 
+		entity = new Entity("email_templates");	
+		entity.setIndexedProperty("name","confirm_email_reminder_paypal");
+		entity.setProperty("date",new Date());
+		entity.setProperty("subject","Your subject");
+		entity.setIndexedProperty("type","CONFIRM_EMAIL_REMINDER");		
+		entity.setProperty("content",new Text("<p><b>Hello ${full_name}!</b></p><p><font color=\"#00ff00\"><b>What is up with you? ${email}</b></font></p><p><b><font color=\"#ff00ff\">Thank you!</font></b></p><p><br></p>"));
+		ds.put(entity);	
+		
+		entity = new Entity("email_templates");	
+		entity.setIndexedProperty("name","confirm_email_alert_paypal");
+		entity.setProperty("date",new Date());
+		entity.setProperty("subject","Your subject reminder");
+		entity.setIndexedProperty("type","CONFIRM_EMAIL_REMINDER");		
+		entity.setProperty("content",new Text("<p><b>Alert ${full_name}!</b></p><p><font color=\"#00ff00\"><b>What is up with you? ${email}</b></font></p><p><b><font color=\"#ff00ff\">Thank you!</font></b></p><p><br></p>"));
+		ds.put(entity);	
+		
+		entity = new Entity("email_templates");	
+		entity.setIndexedProperty("name","confirm_email_reminder_amazon");
+		entity.setProperty("date",new Date());
+		entity.setProperty("subject","Your subject reminder");
+		entity.setIndexedProperty("type","CONFIRM_EMAIL_REMINDER");		
+		entity.setProperty("content",new Text("<p><b>AMAZON ${full_name}!</b></p><p><font color=\"#00ff00\"><b>What is up with you? ${email}</b></font></p><p><b><font color=\"#ff00ff\">Thank you!</font></b></p><p><br></p>"));
+		ds.put(entity);	
+		
+	}
+	
+	private void createRedeemingRequestsEmailJob(Key key){
+		DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
+		Entity entity = new Entity("redeeming_requests_email_job");	
+		entity.setIndexedProperty("redeeming_request_key",KeyFactory.keyToString(key));
+		entity.setProperty("created_date",new Date());				
 		ds.put(entity);		
 	}
+	
 }

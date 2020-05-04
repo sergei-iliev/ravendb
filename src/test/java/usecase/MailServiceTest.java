@@ -3,12 +3,22 @@ package usecase;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.HashMap;
+import java.util.Map;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
+import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
+import com.luee.wally.api.EmailTemplateMgr;
+import com.luee.wally.api.service.EmailTemplateService;
 import com.luee.wally.api.service.MailService;
 import com.luee.wally.command.PdfAttachment;
 import com.luee.wally.constants.Constants;
+import com.luee.wally.utils.TestDatabase;
 import com.sendgrid.Content;
 import com.sendgrid.Email;
 import com.sendgrid.Mail;
@@ -19,6 +29,21 @@ import com.sendgrid.SendGrid;
 
 public class MailServiceTest {
 
+	private final LocalServiceTestHelper helper = new LocalServiceTestHelper(new LocalDatastoreServiceTestConfig());
+
+	
+	@Before
+	public void initialize() {
+		helper.setUp();
+
+	}
+
+	@After
+	public void release() throws Exception {
+
+		helper.tearDown();
+	}
+	
 	private PdfAttachment createAttachment()throws Exception{
 		File file=new File("d:\\S1.pdf");
 		PdfAttachment attachment=new PdfAttachment();
@@ -65,6 +90,23 @@ public class MailServiceTest {
 	      System.out.println(response.getBody());
 	      System.out.println(response.getHeaders());
 
+	}
+	
+	@Test
+	public void createFreemarkerTemplateTest() throws Exception{
+		Map<String,String> tmp = new HashMap<>();
+	    tmp.put("user","邢天宇");
+	    tmp.put("mister","Leonov");
+        String result=EmailTemplateMgr.INSTANCE.processTemplate("I am very well ${user}, how are you ${mister}", tmp);
+        System.out.println(result);
+	}
+	@Test
+	public void testProcessRedeemingRequestsEmailJob()throws Exception{
+	   //prepare entity	
+	   TestDatabase.INSTANCE.generateDB();
+	   	
+	   EmailTemplateService emailTemplateService=new EmailTemplateService();
+	   emailTemplateService.processRedeemingRequestsEmailJob();
 	}
 	
 }

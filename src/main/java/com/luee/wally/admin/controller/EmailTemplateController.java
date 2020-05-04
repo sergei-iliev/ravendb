@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletRequest;
@@ -93,4 +94,14 @@ public class EmailTemplateController implements Controller{
 		MailService mailService = new MailService();
 		mailService.sendMailGrid(mail);
 	}	
+	/*
+	 * Job task
+	 */
+	public void redeemingRequestEmailJob(HttpServletRequest req, HttpServletResponse resp) throws Exception {
+  	    logger.log(Level.WARNING, "***********************Start email reminder Job ********************");
+		EmailTemplateService emailTemplateService=new EmailTemplateService();
+		emailTemplateService.processRedeemingRequestsEmailJob();
+  	    logger.log(Level.WARNING, "***********************End email reminder Job ********************");
+		
+	}
 }

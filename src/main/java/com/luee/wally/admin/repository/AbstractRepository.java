@@ -3,7 +3,6 @@ package com.luee.wally.admin.repository;
 import java.util.Collection;
 import java.util.Map;
 
-import com.google.appengine.api.datastore.AdminDatastoreService.KeyBuilder;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceConfig;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
@@ -27,6 +26,15 @@ public class AbstractRepository {
 		  }catch(EntityNotFoundException e){
 			 return null; 
 		  }
+	}
+	public void deleteEntity(Key key){
+		DatastoreService ds = createDatastoreService(Consistency.STRONG);
+		ds.delete(key);
+	}
+	
+	public void deleteEntity(String key){
+		DatastoreService ds = createDatastoreService(Consistency.STRONG);
+		ds.delete(KeyFactory.stringToKey(key));
 	}
 	
 	protected DatastoreService createDatastoreService(ReadPolicy.Consistency consistency) {
