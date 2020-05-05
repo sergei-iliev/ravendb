@@ -11,9 +11,6 @@ import java.util.function.Function;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-import org.junit.runner.FilterFactory.FilterNotCreatedException;
-
-import com.google.appengine.api.datastore.AdminDatastoreService.KeyBuilder;
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
@@ -71,7 +68,7 @@ public class EmailTemplateService extends AbstractService{
 
 		//redeeming requests
 		Map<Key,Entity> map=emailTemplateRepository.findEntitiesByKey(jobMap.keySet());
-		System.out.println(map);
+
 		for(Entity entity:map.values()){
 			RedeemingRequests redeemingRequests= RedeemingRequests.valueOf(entity);
 			Entity packageTitle = giftCardRepository.getPackageNameTitleMapping(redeemingRequests.getPackageName());			
@@ -81,7 +78,8 @@ public class EmailTemplateService extends AbstractService{
 			variables.put("full_name", redeemingRequests.getFullName());
 			variables.put("paypal_account", redeemingRequests.getPaypalAccount());
 			variables.put("email", redeemingRequests.getEmail());
-				
+			variables.put("redeeming_request_id",redeemingRequests.getRedeemingRequestId());
+			
 			if(redeemingRequests.getType().equalsIgnoreCase("PayPal")){				
 				if(redeemingRequests.getPaypalAccount().equalsIgnoreCase(redeemingRequests.getEmail())){				               
  					String body=EmailTemplateMgr.INSTANCE.processTemplate(confirmEmailReminderPayPalContent, variables);
