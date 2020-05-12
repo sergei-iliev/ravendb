@@ -174,6 +174,7 @@ public class PaymentRepository extends AbstractRepository {
 		entity.setProperty("payment_reference_id", payoutBatchId);
 		entity.setProperty("invoice_number", invoiceNumber);
 		entity.setProperty("paypal_error_reponse",payoutError);
+		entity.setProperty("full_name",paidUserExternal.getFullName());
 		ds.put(entity);
 	}
 
@@ -197,6 +198,7 @@ public class PaymentRepository extends AbstractRepository {
 		entity.setProperty("payment_reference_id", payoutBatchId);
 		entity.setProperty("invoice_number", invoiceNumber);
 		entity.setProperty("paypal_error_reponse",payoutError);
+		
 		ds.put(entity);
 	}
 

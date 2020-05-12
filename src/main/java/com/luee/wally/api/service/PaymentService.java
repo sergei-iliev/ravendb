@@ -136,18 +136,18 @@ public class PaymentService extends AbstractService {
 			throw e;
 		}
 		// 1. more then 5?
-		BigDecimal maxAmount = BigDecimal.valueOf(5.0);
+		BigDecimal maxAmount = BigDecimal.valueOf(15.0);
 		if (eurAmount.compareTo(maxAmount) == 1) {
-			throw new Exception("Amount in EUR {" + eurAmount + "} is more then 5");
+			throw new Exception("Amount in EUR {" + eurAmount + "} is more then 15. email:"+form.getEmailAddress()+" paypal account:"+form.getPaypalAccount());
 		}
 		// 2.all payments less then 30
 		Collection<Entity> entities = paymentRepository.getExternalPaidUserByEmail(
-				form.getPaypalAccount() == null ? form.getEmailAddress() : form.getPaypalAccount());
+				(form.getPaypalAccount() == null || "".equals(form.getPaypalAccount())) ? form.getEmailAddress() : form.getPaypalAccount());
 		double sum = entities.stream().mapToDouble(e -> (double) e.getProperty("eur_currency")).sum();
 		BigDecimal total = eurAmount.add(BigDecimal.valueOf(sum));
 		BigDecimal limit = BigDecimal.valueOf(30.0);
 		if (total.compareTo(limit) == 1) {
-			throw new Exception("Total Amount {" + sum + "}, and requested {" + eurAmount + "} is more then 30");
+			throw new Exception("Total Amount {" + sum + "}, and requested {" + eurAmount + "} is more then 30. email:"+form.getEmailAddress()+" paypal account:"+form.getPaypalAccount());
 		}
 	
 		// 3. all external payments from today don't exceed X eur.
@@ -157,7 +157,7 @@ public class PaymentService extends AbstractService {
 		BigDecimal totalDay = eurAmount.add(BigDecimal.valueOf(sumDay));
 		limit = BigDecimal.valueOf(500.0);
 		if (totalDay.compareTo(limit) == 1) {
-			throw new Exception("Total Amount for past 24 hours {" + sumDay + "}, and requested {" + eurAmount + "} is more than the daily limit of:"+limit);
+			throw new Exception("Total Amount for past 24 hours {" + sumDay + "}, and requested {" + eurAmount + "} is more than the daily limit of:"+limit+".email:"+form.getEmailAddress()+" paypal account:"+form.getPaypalAccount());
 		}
 	}	
 //	public void validateExternalForm(PayExternalForm form) throws Exception {

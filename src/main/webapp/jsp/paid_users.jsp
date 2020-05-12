@@ -7,37 +7,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<style>
-.list-group-item {
-  user-select: none;
-}
-
-.list-group input[type="checkbox"] {
-  display: none;
-}
-
-.list-group input[type="checkbox"] + .list-group-item {
-  cursor: pointer;
-}
-
-.list-group input[type="checkbox"] + .list-group-item:before {
-  content: "\2713";
-  color: transparent;
-  font-weight: bold;
-  margin-right: 1em;
-}
-
-.list-group input[type="checkbox"]:checked + .list-group-item {
-  background-color: #0275D8;
-  color: #FFF;
-}
-
-.list-group input[type="checkbox"]:checked + .list-group-item:before {
-  color: inherit;
-}
-
-</style>
-
+<link rel="stylesheet" href="/css/main.css">
 <script src="/js/jquery/jquery.min.js"></script>
 <link rel="stylesheet"
 	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">

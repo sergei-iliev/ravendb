@@ -14,7 +14,14 @@ import javax.servlet.ServletRequest;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class PaidUserSearchForm implements WebForm {
+public class PaidUserGroupByForm implements WebForm{
+	public enum GroupByType{
+		NONE,
+		TIME,
+		LOCALE,
+		ALL
+	}
+	
 	private Date startDate, endDate;
 	private String email;
 	private String paypalAccount;
@@ -25,8 +32,13 @@ public class PaidUserSearchForm implements WebForm {
 	private Collection<String> packageNames = new HashSet<>();
 	private BigDecimal amountFrom, amountTo;
 
+	private String groupByTime; // day;month;year
+	private String groupByLocale; // country,currency
 
-	public PaidUserSearchForm() {
+	private GroupByType groupByType=GroupByType.NONE;
+	
+	
+	public PaidUserGroupByForm() {
 		types.add("PayPal");
 		types.add("Amazon");
 		activeTab = 1;
@@ -35,14 +47,17 @@ public class PaidUserSearchForm implements WebForm {
 		startDate = Date.from(yesterday.toInstant());
 	}
 
-	public static PaidUserSearchForm parse(ServletRequest req) throws ServletException {
-		PaidUserSearchForm form = new PaidUserSearchForm();
+	public static PaidUserGroupByForm parse(ServletRequest req) throws ServletException {
+		PaidUserGroupByForm form = new PaidUserGroupByForm();
 		form.types.clear();
 		form.packageNames.clear();
 		form.countryCodes.clear();
 
 		form.setAmountFrom(req.getParameter("amountFrom"));
 		form.setAmountTo(req.getParameter("amountTo"));
+
+		form.setGroupByLocale(req.getParameter("groupByLocale"));
+		form.setGroupByTime(req.getParameter("groupByTime"));
 
 		form.setStartDate(form.parseDate(req.getParameter("startDate")));
 		form.setEndDate(form.parseDate(req.getParameter("endDate")));
@@ -67,9 +82,27 @@ public class PaidUserSearchForm implements WebForm {
 			form.paypalAccount = ((req.getParameter("paypalAccount").length() == 0 ? null
 					: req.getParameter("paypalAccount")));
 		}
+		
+		form.resolveGroupByType();
 		return form;
 	}
-
+	private void resolveGroupByType(){
+		if(this.groupByLocale==null&&groupByTime==null){
+			this.groupByType=GroupByType.NONE;
+		}else if(this.groupByLocale!=null&&this.groupByTime!=null){
+			this.groupByType=GroupByType.ALL;
+		}else if(this.groupByLocale!=null){
+			this.groupByType=GroupByType.LOCALE; 
+		}else{
+			this.groupByType=GroupByType.TIME;
+		}
+	}
+	public GroupByType getGroupByType() {
+		return groupByType;
+	}
+	public void setGroupByType(GroupByType groupByType) {
+		this.groupByType = groupByType;
+	}
 	public String getEndDateAsText() {
 		if (endDate != null) {
 			return formatedDate(endDate, "yyyy-MM-dd");
@@ -213,12 +246,19 @@ public class PaidUserSearchForm implements WebForm {
 		this.activeTab = activeTab;
 	}
 
-	@Override
-	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		sb.append("startDate:" + (startDate == null ? "" : startDate) + "\r\n");
-		sb.append("endDate:" + (endDate == null ? "" : endDate) + "\r\n");
-		return sb.toString();
+	public String getGroupByTime() {
+		return groupByTime;
 	}
 
+	public void setGroupByTime(String groupByTime) {
+		this.groupByTime = groupByTime;
+	}
+
+	public String getGroupByLocale() {
+		return groupByLocale;
+	}
+
+	public void setGroupByLocale(String groupByLocale) {
+		this.groupByLocale = groupByLocale;
+	}
 }

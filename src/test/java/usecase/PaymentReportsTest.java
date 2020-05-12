@@ -16,7 +16,7 @@ import com.luee.wally.api.service.PaymentReportsService;
 import com.luee.wally.command.PaidUserSearchForm;
 import com.luee.wally.utils.TestDatabase;
 
-public class PaymentReports {
+public class PaymentReportsTest {
 
 	private final LocalServiceTestHelper helper = new LocalServiceTestHelper(new LocalDatastoreServiceTestConfig());
 

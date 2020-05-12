@@ -4,6 +4,8 @@ import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 
+import org.joda.time.LocalDate;
+
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
@@ -31,29 +33,29 @@ public enum TestDatabase {
 		entity.setProperty("full_address", "baba tonka 6 for accson");
 		
 		ds.put(entity);		
-		crearePaiedUsersEntity(entity,1.8);
+		crearePaiedUsersEntity(entity,1.8,"EUR",createDate(12, 1, 2020));
 		
 		entity=createRedeemingRequestEntity("Minko","696f-4258-baef-55b6aa6550b1","ffff2675-a072-4b6b-ab66-cb599a29147d", "1",new Date(), "com.moregames.makemoney", "PayPal", "sergei.iliev-facilitator@gmail.com", "US");
 		entity.setProperty("ua_channel", "supersonic");
 		entity.setProperty("ip_address", "123.0.0.23");
 		entity.setProperty("full_address", "baba tonka 6 for accson");
 		ds.put(entity);
-		crearePaiedUsersEntity(entity,0.8);
+		crearePaiedUsersEntity(entity,0.8,"USD",createDate(14, 1, 2020));
 		
 		entity=createRedeemingRequestEntity("Minko1 and Macarena","696f-4258-baef-55b6aa6550b11","ffff2675-a072-4b6b-ab66-cb599a29147d1", "1", new Date(), "com.moregames.makemoney2", "PayPal", "sergei.iliev-facilitator@gmail.com", "US");
 		entity.setProperty("ua_channel", "vungle");
 		entity.setProperty("ip_address", "123.0.0.23");
 		ds.put(entity);
-		crearePaiedUsersEntity(entity,0.9);
+		crearePaiedUsersEntity(entity,0.9,"USD",createDate(14, 1, 2020));
 		
 		entity=createRedeemingRequestEntity("Minko1 and Macarena","696f-4258-baef-55b6aa6550b12","ffff2675-a072-4b6b-ab66-cb599a29147d2", "1", new Date(), "com.moregames.makemoney", "PayPal", "sergei.iliev-facilitator@gmail.com", "US");		
 		ds.put(entity);		
-		crearePaiedUsersEntity(entity,0.9);	
+		crearePaiedUsersEntity(entity,0.9,"USD",createDate(12, 1, 2020));	
 
 		entity=createRedeemingRequestEntity("Minko1 and Macarena","696f-4258-baef-55b6aa6550b13","ffff2675-a072-4b6b-ab66-cb599a29147d3", "1", new Date(), "com.moregames.makemoney", "PayPal", "sergei.iliev-facilitator@gmail.com", "US");		
 		entity.setProperty("is_paid", true);
 		ds.put(entity);		
-		crearePaiedUsersEntity(entity,0.9);	
+		crearePaiedUsersEntity(entity,0.9,"USD",createDate(12, 1, 2020));	
 		createRedeemingRequestsEmailJob(entity.getKey());
 		
 		createRedeemingRequestEntity("Viola","e701-4678-8d39-0c2485204f3b","aaaa2675-a072-4b6b-ab66-cb599a29147d", "0.1", new Date(), "com.moregames.makemoney", "Amazon", "sergei_iliev@yahoo.com", "GB");		
@@ -66,11 +68,14 @@ public enum TestDatabase {
 		entity.setProperty("creation_date",Date.from(yesterday.toInstant()));
 		entity.setProperty("ip_address", "77.98.102.111");
 		ds.put(entity);
-		crearePaiedUsersEntity(entity,2.9);
+		crearePaiedUsersEntity(entity,2.9,"USD",createDate(12, 1, 2020));
 		createRedeemingRequestsEmailJob(entity.getKey());
 		
-		createRedeemingRequestEntity("Gurmen","8957-48bb-a08c-de0adca6a91e","cccc1675-a072-4b6b-ab66-cb599a29147d", "1.1", new Date(), "com.moregames.makemoney", "Amazon", "sergei.iliev@gmail.com", "DE");		
+		entity=createRedeemingRequestEntity("Gurmen","8957-48bb-a089-de0adca6a91e","cccc1675-a072-4b6b-ab66-cb599a291BAA", "1.1", new Date(), "com.moregames.makemoney", "Amazon", "sergei.iliev@gmail.com", "DE");		
+		crearePaiedUsersEntity(entity,15,"EUR",createDate(12, 1, 2020));
 		createRedeemingRequestsEmailJob(entity.getKey());
+		
+		
 	}
 	private  Entity createRedeemingRequestEntity(String fullName,String redeemingRequestId,String userGuid,String amount, Date date,String packageName,String type,String paypalAccount,String countryCode){
 		DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
@@ -93,7 +98,7 @@ public enum TestDatabase {
 		return redeeming;
 		
 	}
-	private void crearePaiedUsersEntity(Entity redeeminRequest,double eurCurrency){
+	private void crearePaiedUsersEntity(Entity redeeminRequest,double eurCurrency,String currencyCode,Date date){
 		   DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
 		   
 		   ZonedDateTime now=ZonedDateTime.now();
@@ -103,9 +108,10 @@ public enum TestDatabase {
 		   ZonedDateTime yesterdayEnd=yesterdayStart.plusHours(24);
 		   
 		   Entity entity=new Entity("paid_users");	
-		   entity.setProperty("date", Date.from(yesterday.toInstant()));
+		   //entity.setProperty("date", Date.from(yesterday.toInstant()));
+		   entity.setProperty("date", date);
 		   entity.setProperty("user_guid",redeeminRequest.getProperty("user_guid"));
-		   entity.setProperty("paid_currency","USD");
+		   entity.setProperty("paid_currency",currencyCode);
 		   entity.setProperty("amount", String.valueOf(eurCurrency));
 		   entity.setProperty("type", redeeminRequest.getProperty("type"));
 		   entity.setProperty("eur_currency",eurCurrency);
@@ -119,22 +125,6 @@ public enum TestDatabase {
 		   entity.setProperty("invoice_number","1111");		
 		   ds.put(entity);
 		   
-//		   entity=new Entity("paid_users");	
-//		   entity.setProperty("date", Date.from(yesterday.toInstant()));
-//		   entity.setProperty("user_guid","ffff2675-a072-4b6b-ab66-cb599a29147d");
-//		   entity.setProperty("paid_currency","USD");
-//		   entity.setProperty("amount", "3.2");
-//		   entity.setProperty("type", "PayPal");
-//		   entity.setProperty("eur_currency",2.0);
-//		   entity.setProperty("email_address","sergio@yahoo.com");
-//		   entity.setProperty("paypal_account","mikelo@yahoo.com");
-//		   entity.setProperty("paid_user_success", true);
-//		   entity.setProperty("email_sent_success",true);
-//		   entity.setProperty("redeeming_request_key","");
-//		   entity.setProperty("redeeming_request_id","15b5-4e3a-b398-8792a9a9f530");
-//		   entity.setProperty("payment_reference_id","ref-number");
-//		   entity.setProperty("invoice_number","111");		
-//		   ds.put(entity);
 	}
 	private  void createAffs(){
 		DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
@@ -436,6 +426,11 @@ public enum TestDatabase {
 		entity.setIndexedProperty("redeeming_request_key",KeyFactory.keyToString(key));
 		entity.setProperty("created_date",new Date());				
 		ds.put(entity);		
+	}
+	
+	private Date createDate(int day,int month,int year){
+		LocalDate localDate = new LocalDate(year, month, day);
+		return localDate.toDate();
 	}
 	
 }

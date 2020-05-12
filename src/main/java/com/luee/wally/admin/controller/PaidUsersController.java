@@ -10,19 +10,27 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.luee.wally.api.route.Controller;
 import com.luee.wally.api.service.PaidUsersService;
+import com.luee.wally.command.PaidUserGroupByForm;
+import com.luee.wally.command.PaidUserGroupByResult;
 import com.luee.wally.command.PaidUserSearchForm;
-import com.luee.wally.entity.PaidUser;
+import com.luee.wally.command.viewobject.PaidUserGroupByVO;
 
 public class PaidUsersController implements Controller {
 	private final Logger logger = Logger.getLogger(PaidUsersController.class.getName());
 
 
 	public void index(HttpServletRequest req, HttpServletResponse resp)throws ServletException, IOException{
-		PaidUserSearchForm form = new PaidUserSearchForm();
 
-		req.setAttribute("webform", form);
-		req.setAttribute("countries", this.getCountries());
-		req.getRequestDispatcher("/jsp/paid_users.jsp").forward(req, resp);
+		if(req.getParameter("groupby")==null){
+		  req.setAttribute("webform", new PaidUserSearchForm());
+		  req.setAttribute("countries", this.getCountries());
+		  req.getRequestDispatcher("/jsp/paid_users.jsp").forward(req, resp);
+		}else{
+			
+			req.setAttribute("webform", new PaidUserGroupByForm());
+			req.setAttribute("countries", this.getCountries());	
+		  req.getRequestDispatcher("/jsp/paid_users_groupby.jsp").forward(req, resp);	
+		}
 	}
 
 	public void search(HttpServletRequest req, HttpServletResponse resp)throws ServletException, IOException{
@@ -74,4 +82,16 @@ public class PaidUsersController implements Controller {
 		req.getRequestDispatcher("/jsp/paid_users.jsp").forward(req, resp);
 	}
 	
+	public void searchGroupBy(HttpServletRequest req, HttpServletResponse resp)throws ServletException, IOException{
+		PaidUserGroupByForm form=PaidUserGroupByForm.parse(req);
+		PaidUsersService paidUsersService=new PaidUsersService();
+		Collection<PaidUserGroupByVO> list=paidUsersService.searchGroupBy(form);
+		
+		Collection<PaidUserGroupByResult> groupBy=paidUsersService.groupBy(list,form.getGroupByType(),form.getGroupByTime(),form.getGroupByLocale());
+		req.setAttribute("entities", groupBy);
+		
+		req.setAttribute("webform", form);
+		req.setAttribute("countries", this.getCountries());
+		req.getRequestDispatcher("/jsp/paid_users_groupby.jsp").forward(req, resp);
+	}
 }

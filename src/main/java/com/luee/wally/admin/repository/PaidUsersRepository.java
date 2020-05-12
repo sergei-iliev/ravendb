@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -45,7 +46,17 @@ public class PaidUsersRepository extends AbstractRepository{
 		  }
 		  return stream.map(e->e.getKey()).collect(Collectors.toSet());
 	  }
-	  
+	  public  Map<Key,Entity> findRedeemingRequestEntities(Collection<Key> keys,Collection<String> countryCodes,Collection<String> packageNames) {		  
+          Map<Key,Entity> map=this.findEntitiesByKey(keys);
+		  Stream<Entity> stream= map.values().stream();
+		  if(countryCodes.size()>0){
+			  stream=stream.filter(e->countryCodes.contains((String)e.getProperty("country_code")));
+		  }
+		  if(packageNames.size()>0){
+			  stream=stream.filter(e->packageNames.contains((String)e.getProperty("package_name")));		                       
+		  }
+		  return stream.collect(Collectors.toMap(e->e.getKey(),Function.identity()));
+	  }	  
 	  public String findPaidUsers(String start,Collection<Entity> result,String type,Date startDate,Date endDate){
 			     DatastoreService  ds= createDatastoreService(Consistency.EVENTUAL);
 			
@@ -114,6 +125,8 @@ public class PaidUsersRepository extends AbstractRepository{
 			}
 			return query;
 		}
+		
+		
 		private Query createPaidUsersQuery(String type,Date startDate,Date endDate){
 			Query query = new Query("paid_users");
 			Collection<Filter> predicates=new ArrayList<>();
