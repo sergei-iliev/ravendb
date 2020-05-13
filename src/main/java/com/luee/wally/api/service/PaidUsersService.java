@@ -46,10 +46,26 @@ public class PaidUsersService {
 	       if(cursor==null){
 	         break;
 	       }
-	       Collection<Key> keys=output.stream().map(e->KeyFactory.stringToKey((String)e.getProperty("redeeming_request_key"))).collect(Collectors.toSet());
+	       /* FIX this !!!!!!!!!!!!!!!!!
+	        * BAAAAAAAAAAAAAAADDDDDDDDDDDDDDDDDD
+	        * BAD
+	        */
+	       Collection<Key> keys=output.stream().map(e->{
+	    	   if(e.getProperty("redeeming_request_key") instanceof Key){
+	    		 return  (Key)e.getProperty("redeeming_request_key"); 
+	    	   }else{
+	    	     return KeyFactory.stringToKey((String)e.getProperty("redeeming_request_key"));
+	    	   }	    	   
+	       }).collect(Collectors.toSet());
 	       Map<Key,Entity> redeemingRequestsMap= paidUsersRepository.findRedeemingRequestEntities(keys, form.getCountryCodes(), form.getPackageNames());
 	       output.removeIf(e->{
-	    	   Key k=KeyFactory.stringToKey((String)e.getProperty("redeeming_request_key"));
+	    	   Key k;
+	    	   if(e.getProperty("redeeming_request_key") instanceof Key){
+	    		   k=(Key)e.getProperty("redeeming_request_key"); 
+	    	   }else{
+	    	       k=KeyFactory.stringToKey((String)e.getProperty("redeeming_request_key"));
+	    	   }	    	   
+	    	   
 	    	   if(redeemingRequestsMap.keySet().contains(k)){
 	    		   e.setProperty("country_code", redeemingRequestsMap.get(k).getProperty("country_code"));
 	    		   return false; 
