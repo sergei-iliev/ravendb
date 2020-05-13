@@ -26,8 +26,7 @@ public class PaidUserGroupByForm implements WebForm{
 	private String email;
 	private String paypalAccount;
 	private String userGuid;
-	private Collection<String> types = new HashSet<>();
-	private int activeTab;
+	private String type;
 	private Collection<String> countryCodes = new HashSet<>();
 	private Collection<String> packageNames = new HashSet<>();
 	private BigDecimal amountFrom, amountTo;
@@ -39,9 +38,7 @@ public class PaidUserGroupByForm implements WebForm{
 	
 	
 	public PaidUserGroupByForm() {
-		types.add("PayPal");
-		types.add("Amazon");
-		activeTab = 1;
+		type="PayPal";
 		ZonedDateTime now = ZonedDateTime.now();
 		ZonedDateTime yesterday = now.minusDays(7);
 		startDate = Date.from(yesterday.toInstant());
@@ -49,7 +46,7 @@ public class PaidUserGroupByForm implements WebForm{
 
 	public static PaidUserGroupByForm parse(ServletRequest req) throws ServletException {
 		PaidUserGroupByForm form = new PaidUserGroupByForm();
-		form.types.clear();
+		
 		form.packageNames.clear();
 		form.countryCodes.clear();
 
@@ -70,7 +67,7 @@ public class PaidUserGroupByForm implements WebForm{
 		}
 
 		form.setPackageNames(req.getParameter("packageNames"));
-		form.setTypes(req.getParameter("types"));
+		form.setType(req.getParameter("types"));
 
 		if (req.getParameter("userGuid") != null) {
 			form.userGuid = ((req.getParameter("userGuid").length() == 0 ? null : req.getParameter("userGuid")));
@@ -144,26 +141,15 @@ public class PaidUserGroupByForm implements WebForm{
 		this.countryCodes.addAll(Arrays.asList(countryCodes));
 	}
 
-	public void setTypes(Collection<String> types) {
-		this.types = types;
-	}
 
-	@JsonProperty
-	public Collection<String> getTypes() {
-		return types;
+	@JsonIgnore
+	public String getType() {
+		return type;
 	}
 
 	@JsonIgnore
-	public String getTypesAsText() {
-		return types.stream().collect(Collectors.joining(","));
-	}
-
-	@JsonIgnore
-	public void setTypes(String types) {
-		if (types != null && types.length() > 0) {
-			String[] items = types.split(",");
-			this.types.addAll(Arrays.asList(items));
-		}
+	public void setType(String type) {
+		this.type=type;
 	}
 
 	public void setPackageNames(Collection<String> packageNames) {
@@ -236,14 +222,6 @@ public class PaidUserGroupByForm implements WebForm{
 
 	public void setPaypalAccount(String paypalAccount) {
 		this.paypalAccount = paypalAccount;
-	}
-
-	public int getActiveTab() {
-		return activeTab;
-	}
-
-	public void setActiveTab(int activeTab) {
-		this.activeTab = activeTab;
 	}
 
 	public String getGroupByTime() {

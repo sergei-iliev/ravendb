@@ -42,7 +42,7 @@ public class PaidUsersService {
 	    do{
 	       output.clear();	
 	       //read batch from paid users
-	       cursor= paidUsersRepository.findPaidUsers(cursor,output,form.getTypes().isEmpty()?null:form.getTypes().iterator().next(), form.getStartDate(), form.getEndDate());
+	       cursor= paidUsersRepository.findPaidUsers(cursor,output,form.getType(), form.getStartDate(), form.getEndDate());
 	       if(cursor==null){
 	         break;
 	       }

@@ -43,7 +43,7 @@
 								<div class="col-md-3">
 									<label for="typesId">Payment type</label> <input name="types"
 										class="form-control" id="typesId"
-										placeholder="${webform.typesAsText}">
+										value="${webform.type}">
 								</div>
 							</div>
 							<div class="form-label-group">
