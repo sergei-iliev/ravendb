@@ -9,12 +9,11 @@ import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.Key;
 
 public class PaidUserGroupByVO implements ViewObject {
-	private Key key;
 	private String amount;
 	// private BigDecimal amountBG;
 	private Date date;
 
-	private String redeemingRequestKey;
+	//private String redeemingRequestKey;
 	private String currencyCode, countryCode;
 	private double eurCurrency;
 	private BigDecimal eurCurrencyBigDecimal;
@@ -26,8 +25,8 @@ public class PaidUserGroupByVO implements ViewObject {
 		PaidUserGroupByVO paidUser = new PaidUserGroupByVO();
 		paidUser.date = ((Date) entity.getProperty("date"));
 		paidUser.countryCode = (String) entity.getProperty("country_code");
-		paidUser.key = entity.getKey();
-		paidUser.redeemingRequestKey = ((String) entity.getProperty("redeeming_request_key"));
+
+		//paidUser.redeemingRequestKey = ((String) entity.getProperty("redeeming_request_key"));
 		paidUser.currencyCode = ((String) entity.getProperty("paid_currency"));
 		// paidUser.amount=(String) entity.getProperty("amount");
 		// paidUser.amountBG=new BigDecimal(paidUser.amount);
@@ -49,13 +48,7 @@ public class PaidUserGroupByVO implements ViewObject {
 
 	}
 
-	public Key getKey() {
-		return key;
-	}
 
-	public void setKey(Key key) {
-		this.key = key;
-	}
 
 	public double getEurCurrency() {
 		return eurCurrency;
@@ -79,13 +72,13 @@ public class PaidUserGroupByVO implements ViewObject {
 		this.date = date;
 	}
 
-	public String getRedeemingRequestKey() {
-		return redeemingRequestKey;
-	}
-
-	public void setRedeemingRequestKey(String redeemingRequestKey) {
-		this.redeemingRequestKey = redeemingRequestKey;
-	}
+//	public String getRedeemingRequestKey() {
+//		return redeemingRequestKey;
+//	}
+//
+//	public void setRedeemingRequestKey(String redeemingRequestKey) {
+//		this.redeemingRequestKey = redeemingRequestKey;
+//	}
 
 	public String getCurrencyCode() {
 		return currencyCode;

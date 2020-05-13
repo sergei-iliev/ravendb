@@ -40,7 +40,7 @@ public class PayedUserTest {
 		ZonedDateTime yesterday=now.minusDays(10);
 		   
 		PaidUserGroupByForm form=new PaidUserGroupByForm();
-		form.getTypes().clear();
+
 		form.getCountryCodes().clear();
 		form.getPackageNames().clear();
 		form.setGroupByType(GroupByType.LOCALE);
@@ -74,7 +74,7 @@ public class PayedUserTest {
 		ZonedDateTime yesterday=now.minusDays(10);
 		   
 		PaidUserGroupByForm form=new PaidUserGroupByForm();
-		form.getTypes().clear();
+
 		form.getCountryCodes().clear();
 		form.getPackageNames().clear();
 		form.setGroupByType(GroupByType.TIME);
@@ -107,7 +107,7 @@ public class PayedUserTest {
 		ZonedDateTime yesterday=now.minusDays(10);
 		   
 		PaidUserGroupByForm form=new PaidUserGroupByForm();
-		form.getTypes().clear();
+
 		form.getCountryCodes().clear();
 		form.getPackageNames().clear();
 		form.setGroupByType(GroupByType.TIME);
@@ -140,7 +140,7 @@ public class PayedUserTest {
 		ZonedDateTime yesterday=now.minusDays(10);
 		   
 		PaidUserGroupByForm form=new PaidUserGroupByForm();
-		form.getTypes().clear();
+
 		form.getCountryCodes().clear();
 		form.getPackageNames().clear();
 		form.setGroupByType(GroupByType.TIME);
@@ -164,7 +164,7 @@ public class PayedUserTest {
 		ZonedDateTime yesterday=now.minusDays(10);
 		   
 		PaidUserGroupByForm form=new PaidUserGroupByForm();
-		form.getTypes().clear();
+	
 		form.getCountryCodes().clear();
 		form.getPackageNames().clear();
 		form.setGroupByType(GroupByType.ALL);
@@ -188,7 +188,6 @@ public class PayedUserTest {
 		ZonedDateTime yesterday=now.minusDays(10);
 		   
 		PaidUserGroupByForm form=new PaidUserGroupByForm();
-		form.getTypes().clear();
 		form.getCountryCodes().clear();
 		form.getPackageNames().clear();
 		form.setGroupByType(GroupByType.ALL);
@@ -212,7 +211,7 @@ public class PayedUserTest {
 		ZonedDateTime yesterday=now.minusDays(10);
 		   
 		PaidUserGroupByForm form=new PaidUserGroupByForm();
-		form.getTypes().clear();
+	
 		form.getCountryCodes().clear();
 		form.getPackageNames().clear();
 		form.setGroupByType(GroupByType.ALL);
