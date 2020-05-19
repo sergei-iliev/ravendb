@@ -90,8 +90,8 @@ public class PaidUsersService {
     /*
      * In memory  grouping
      */
-	public Collection<PaidUserGroupByResult> groupBy(Collection<PaidUserGroupByVO> list,GroupByType groupByType,String groupByTime,String groupByLocale){
-		Collection<PaidUserGroupByResult> output=new ArrayList<>();
+	public List<PaidUserGroupByResult> groupBy(Collection<PaidUserGroupByVO> list,GroupByType groupByType,String groupByTime,String groupByLocale){
+		List<PaidUserGroupByResult> output=new ArrayList<>();
 		switch(groupByType){
 		case TIME:
 		  if(groupByTime.equals("day")){
@@ -99,14 +99,14 @@ public class PaidUsersService {
 			  Map<Integer,List<PaidUserGroupByVO>> result=list.stream().collect(Collectors.groupingBy(PaidUserGroupByVO::getDayTime));
 			  for(List<PaidUserGroupByVO> groups:result.values()){
 				  double sum=groups.stream().mapToDouble(PaidUserGroupByVO::getEurCurrency).sum();
-			      output.add(new PaidUserGroupByResult(groups.get(0).getDayTimeStr(), null,BigDecimal.valueOf(sum)));
+			      output.add(new PaidUserGroupByResult(groups.get(0).getDayTimeStr(), null,BigDecimal.valueOf(sum),groups.get(0).getDayTime()));
 			  }			  
 			  return output;
 		  }else if(groupByTime.equals("month")){
 			  Map<Integer,List<PaidUserGroupByVO>> result=list.stream().collect(Collectors.groupingBy(PaidUserGroupByVO::getMonthTime));
 			  for(List<PaidUserGroupByVO> groups:result.values()){
 				  double sum=groups.stream().mapToDouble(PaidUserGroupByVO::getEurCurrency).sum();
-			      output.add(new PaidUserGroupByResult(groups.get(0).getMonthTimeStr(), null,BigDecimal.valueOf(sum)));
+			      output.add(new PaidUserGroupByResult(groups.get(0).getMonthTimeStr(), null,BigDecimal.valueOf(sum),groups.get(0).getDayTime()));
 			  }			  
 			  return output;
 			  
@@ -114,17 +114,17 @@ public class PaidUsersService {
 			  Map<Integer,List<PaidUserGroupByVO>> result=list.stream().collect(Collectors.groupingBy(PaidUserGroupByVO::getYearTime));
 			  for(List<PaidUserGroupByVO> groups:result.values()){				  
 				  double sum=groups.stream().mapToDouble(PaidUserGroupByVO::getEurCurrency).sum();
-			      output.add(new PaidUserGroupByResult(groups.get(0).getYearTimeStr(), null,BigDecimal.valueOf(sum)));
+			      output.add(new PaidUserGroupByResult(groups.get(0).getYearTimeStr(), null,BigDecimal.valueOf(sum),groups.get(0).getDayTime()));
 			  }			  
 			  return output;			  
 		  }
 		case LOCALE:
 		  if(groupByLocale.equals("country")){ 
 				Map<String,Double> result=list.stream().collect(Collectors.groupingBy(PaidUserGroupByVO::getCountryCode,Collectors.summingDouble(PaidUserGroupByVO::getEurCurrency)));
-				return result.entrySet().stream().map(e->new PaidUserGroupByResult(null,e.getKey(),BigDecimal.valueOf(e.getValue()))).collect(Collectors.toList());				  
+				return result.entrySet().stream().map(e->new PaidUserGroupByResult(null,e.getKey(),BigDecimal.valueOf(e.getValue()),null)).collect(Collectors.toList());				  
 		  }else{  //currency
 				Map<String,Double> result=list.stream().collect(Collectors.groupingBy(PaidUserGroupByVO::getCurrencyCode,Collectors.summingDouble(PaidUserGroupByVO::getEurCurrency)));
-				return result.entrySet().stream().map(e->new PaidUserGroupByResult(null,e.getKey(),BigDecimal.valueOf(e.getValue()))).collect(Collectors.toList());
+				return result.entrySet().stream().map(e->new PaidUserGroupByResult(null,e.getKey(),BigDecimal.valueOf(e.getValue()),null)).collect(Collectors.toList());
 		  }
 		  
 		case ALL:
@@ -138,7 +138,7 @@ public class PaidUsersService {
 				  }else{  ////day:currency
 					 subgroups=groups.stream().collect(Collectors.groupingBy(PaidUserGroupByVO::getCurrencyCode,Collectors.summingDouble(PaidUserGroupByVO::getEurCurrency)));
 				  }
-			      output.addAll(subgroups.entrySet().stream().map(e->new PaidUserGroupByResult(groups.get(0).getDayTimeStr(),e.getKey(),BigDecimal.valueOf(e.getValue()))).collect(Collectors.toList()));
+			      output.addAll(subgroups.entrySet().stream().map(e->new PaidUserGroupByResult(groups.get(0).getDayTimeStr(),e.getKey(),BigDecimal.valueOf(e.getValue()),groups.get(0).getDayTime())).collect(Collectors.toList()));
 			    }
 			    return output;
 			}else if(groupByTime.equals("month")){
@@ -150,7 +150,7 @@ public class PaidUsersService {
 					  }else{  //month:currency
 						 subgroups=groups.stream().collect(Collectors.groupingBy(PaidUserGroupByVO::getCurrencyCode,Collectors.summingDouble(PaidUserGroupByVO::getEurCurrency)));
 					  }
-				      output.addAll(subgroups.entrySet().stream().map(e->new PaidUserGroupByResult(groups.get(0).getMonthTimeStr(),e.getKey(),BigDecimal.valueOf(e.getValue()))).collect(Collectors.toList()));
+				      output.addAll(subgroups.entrySet().stream().map(e->new PaidUserGroupByResult(groups.get(0).getMonthTimeStr(),e.getKey(),BigDecimal.valueOf(e.getValue()),groups.get(0).getDayTime())).collect(Collectors.toList()));
 				  }			  
 				  return output;				
 			}else{  //year
@@ -162,7 +162,7 @@ public class PaidUsersService {
 					  }else{  //month:currency
 						 subgroups=groups.stream().collect(Collectors.groupingBy(PaidUserGroupByVO::getCurrencyCode,Collectors.summingDouble(PaidUserGroupByVO::getEurCurrency)));
 					  }
-				      output.addAll(subgroups.entrySet().stream().map(e->new PaidUserGroupByResult(groups.get(0).getYearTimeStr(),e.getKey(),BigDecimal.valueOf(e.getValue()))).collect(Collectors.toList()));
+				      output.addAll(subgroups.entrySet().stream().map(e->new PaidUserGroupByResult(groups.get(0).getYearTimeStr(),e.getKey(),BigDecimal.valueOf(e.getValue()),groups.get(0).getDayTime())).collect(Collectors.toList()));
 				  }			  
 				  return output;					
 			}
@@ -173,6 +173,9 @@ public class PaidUsersService {
 		return null;
 	}
 	
+	public void sortBy(List<PaidUserGroupByResult> records){
+	   records.sort(Comparator.comparing(o -> o.getDayTime()));	   
+	}	
     /*
      * In memory filter
      */

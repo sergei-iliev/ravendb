@@ -2,6 +2,7 @@ package com.luee.wally.admin.controller;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.List;
 import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
@@ -11,6 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.luee.wally.api.route.Controller;
 import com.luee.wally.api.service.PaidUsersService;
 import com.luee.wally.command.PaidUserGroupByForm;
+import com.luee.wally.command.PaidUserGroupByForm.GroupByType;
 import com.luee.wally.command.PaidUserGroupByResult;
 import com.luee.wally.command.PaidUserSearchForm;
 import com.luee.wally.command.viewobject.PaidUserGroupByVO;
@@ -87,7 +89,13 @@ public class PaidUsersController implements Controller {
 		PaidUsersService paidUsersService=new PaidUsersService();
 		Collection<PaidUserGroupByVO> list=paidUsersService.searchGroupBy(form);
 		
-		Collection<PaidUserGroupByResult> groupBy=paidUsersService.groupBy(list,form.getGroupByType(),form.getGroupByTime(),form.getGroupByLocale());
+		List<PaidUserGroupByResult> groupBy=paidUsersService.groupBy(list,form.getGroupByType(),form.getGroupByTime(),form.getGroupByLocale());
+		
+		if(form.getGroupByType()==GroupByType.ALL||form.getGroupByType()==GroupByType.TIME){
+			paidUsersService.sortBy(groupBy);
+		}
+		
+		
 		req.setAttribute("entities", groupBy);
 		
 		req.setAttribute("webform", form);

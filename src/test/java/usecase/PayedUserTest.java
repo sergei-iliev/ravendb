@@ -3,6 +3,7 @@ package usecase;
 import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 
 import org.junit.After;
 import org.junit.Before;
@@ -77,28 +78,20 @@ public class PayedUserTest {
 
 		form.getCountryCodes().clear();
 		form.getPackageNames().clear();
+		form.setType(null);
 		form.setGroupByType(GroupByType.TIME);
 		form.setGroupByTime("day");
 		
 		form.setStartDate(null);
-		form.setEndDate(Date.from(yesterday.toInstant()));
-		
-		//form.setAmountFrom("0.9");
-		//form.setAmountTo("1");
-		//form.getTypes().add("PayPal");
-		
-		//form.getPackageNames().add("com.moregames.makemoney1");
-		//form.getPackageNames().add("com.moregames.makemoney2");
-		
-		//form.getCountryCodes().add("DE");
-		//form.getCountryCodes().add("US");
+		form.setEndDate(TestDatabase.createDate(1,1, 2070));
 		
         PaidUsersService paidUsersService=new PaidUsersService();
         
         Collection<PaidUserGroupByVO> l=paidUsersService.searchGroupBy(form);
-        Collection<PaidUserGroupByResult> r=paidUsersService.groupBy(l, form.getGroupByType(),form.getGroupByTime(), form.getGroupByLocale());
+        List<PaidUserGroupByResult> r=paidUsersService.groupBy(l, form.getGroupByType(),form.getGroupByTime(), form.getGroupByLocale());
+        paidUsersService.sortBy(r);
         
-        r.forEach(e->System.out.println(e.getGroupByTimeValue()+"::"+e.getAmount()));
+        r.forEach(e->System.out.println(e.getGroupByTimeValue()+"::"+e.getAmount()+"::"+e.getDayTime()));
 	}
 	@Test
 	public void searchPayedUserGroupByMonthTest(){				
@@ -112,26 +105,20 @@ public class PayedUserTest {
 		form.getPackageNames().clear();
 		form.setGroupByType(GroupByType.TIME);
 		form.setGroupByTime("month");
+		form.setType(null);
 		
 		form.setStartDate(null);
-		form.setEndDate(Date.from(yesterday.toInstant()));
+		form.setEndDate(TestDatabase.createDate(1,1, 2070));
 		
-		//form.setAmountFrom("0.9");
-		//form.setAmountTo("1");
-		//form.getTypes().add("PayPal");
-		
-		//form.getPackageNames().add("com.moregames.makemoney1");
-		//form.getPackageNames().add("com.moregames.makemoney2");
-		
-		//form.getCountryCodes().add("DE");
-		//form.getCountryCodes().add("US");
+
 		
         PaidUsersService paidUsersService=new PaidUsersService();
         
         Collection<PaidUserGroupByVO> l=paidUsersService.searchGroupBy(form);
-        Collection<PaidUserGroupByResult> r=paidUsersService.groupBy(l, form.getGroupByType(),form.getGroupByTime(), form.getGroupByLocale());
+        List<PaidUserGroupByResult> r=paidUsersService.groupBy(l, form.getGroupByType(),form.getGroupByTime(), form.getGroupByLocale());
+        paidUsersService.sortBy(r);
         
-        r.forEach(e->System.out.println(e.getGroupByTimeValue()+"::"+e.getAmount()));
+        r.forEach(e->System.out.println(e.getGroupByTimeValue()+"::"+e.getAmount()+"::"+e.getDayTime()));
 	}	
 	@Test
 	public void searchPayedUserGroupByYearTest(){				
@@ -145,17 +132,19 @@ public class PayedUserTest {
 		form.getPackageNames().clear();
 		form.setGroupByType(GroupByType.TIME);
 		form.setGroupByTime("year");
-		
+		form.setType(null);
 		form.setStartDate(null);
-		form.setEndDate(Date.from(yesterday.toInstant()));
+		form.setEndDate(TestDatabase.createDate(1,1, 2070));
 		
 		
         PaidUsersService paidUsersService=new PaidUsersService();
         
         Collection<PaidUserGroupByVO> l=paidUsersService.searchGroupBy(form);
-        Collection<PaidUserGroupByResult> r=paidUsersService.groupBy(l, form.getGroupByType(),form.getGroupByTime(), form.getGroupByLocale());
+        List<PaidUserGroupByResult> r=paidUsersService.groupBy(l, form.getGroupByType(),form.getGroupByTime(), form.getGroupByLocale());
         
-        r.forEach(e->System.out.println(e.getGroupByTimeValue()+"::"+e.getAmount()));
+        paidUsersService.sortBy(r);
+        
+        r.forEach(e->System.out.println(e.getGroupByTimeValue()+"::"+e.getAmount()+"::"+e.getDayTime()));
 	}	
 	@Test
 	public void searchPayedUserGroupByDayCountryTest(){				
@@ -177,9 +166,11 @@ public class PayedUserTest {
         PaidUsersService paidUsersService=new PaidUsersService();
         
         Collection<PaidUserGroupByVO> l=paidUsersService.searchGroupBy(form);
-        Collection<PaidUserGroupByResult> r=paidUsersService.groupBy(l, form.getGroupByType(),form.getGroupByTime(), form.getGroupByLocale());
+        List<PaidUserGroupByResult> r=paidUsersService.groupBy(l, form.getGroupByType(),form.getGroupByTime(), form.getGroupByLocale());
         
-        r.forEach(e->System.out.println(e.getGroupByTimeValue()+"::"+e.getGroupByLocaleValue()+"::"+e.getAmount()));
+        paidUsersService.sortBy(r);
+        
+        r.forEach(e->System.out.println(e.getGroupByTimeValue()+"::"+e.getAmount()+"::"+e.getDayTime()));
 	}
 	@Test
 	public void searchPayedUserGroupByMonthCountryTest(){				
@@ -190,8 +181,8 @@ public class PayedUserTest {
 		PaidUserGroupByForm form=new PaidUserGroupByForm();
 		form.getCountryCodes().clear();
 		form.getPackageNames().clear();
-		form.setGroupByType(GroupByType.ALL);
-		form.setGroupByTime("month");
+		form.setGroupByType(GroupByType.LOCALE);
+		//form.setGroupByTime("month");
 		form.setGroupByLocale("currency");
 		form.setStartDate(null);
 		form.setEndDate(Date.from(yesterday.toInstant()));
@@ -214,8 +205,9 @@ public class PayedUserTest {
 	
 		form.getCountryCodes().clear();
 		form.getPackageNames().clear();
+		form.setType(null);
 		form.setGroupByType(GroupByType.ALL);
-		form.setGroupByTime("year");
+		form.setGroupByTime("day");
 		form.setGroupByLocale("country");
 		form.setStartDate(null);
 		form.setEndDate(Date.from(yesterday.toInstant()));
@@ -224,7 +216,8 @@ public class PayedUserTest {
         PaidUsersService paidUsersService=new PaidUsersService();
         
         Collection<PaidUserGroupByVO> l=paidUsersService.searchGroupBy(form);
-        Collection<PaidUserGroupByResult> r=paidUsersService.groupBy(l, form.getGroupByType(),form.getGroupByTime(), form.getGroupByLocale());
+        List<PaidUserGroupByResult> r=paidUsersService.groupBy(l, form.getGroupByType(),form.getGroupByTime(), form.getGroupByLocale());
+        paidUsersService.sortBy(r);
         
         r.forEach(e->System.out.println(e.getGroupByTimeValue()+"::"+e.getGroupByLocaleValue()+"::"+e.getAmount()));
 	}		

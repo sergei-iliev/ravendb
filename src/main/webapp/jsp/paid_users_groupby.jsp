@@ -204,7 +204,7 @@
 							<tr>							 			
 								<td>${entity.groupByTimeValue}</td>																			
 								<td>${entity.groupByLocaleValue}</td>
-								<td>${entity.amount}</td>								
+								<td><fmt:formatNumber value="${entity.amount}" type="currency" currencySymbol=""/></td>								
 							</tr>
 						</c:forEach>
 					</tbody>
@@ -222,7 +222,7 @@
 						<c:forEach var="entity" items="${entities}">
 							<tr>							 															
 								<td>${webform.groupByType eq 'TIME' ? entity.groupByTimeValue :entity.groupByLocaleValue}</td>
-								<td>${entity.amount}</td>								
+								<td><fmt:formatNumber value="${entity.amount}" type="currency" currencySymbol=""/></td>									
 							</tr>
 						</c:forEach>
 					</tbody>

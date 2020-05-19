@@ -10,10 +10,9 @@ import com.google.appengine.api.datastore.Key;
 
 public class PaidUserGroupByVO implements ViewObject {
 	private String amount;
-	// private BigDecimal amountBG;
 	private Date date;
 
-	//private String redeemingRequestKey;
+
 	private String currencyCode, countryCode;
 	private double eurCurrency;
 	private BigDecimal eurCurrencyBigDecimal;
@@ -26,10 +25,7 @@ public class PaidUserGroupByVO implements ViewObject {
 		paidUser.date = ((Date) entity.getProperty("date"));
 		paidUser.countryCode = (String) entity.getProperty("country_code");
 
-		//paidUser.redeemingRequestKey = ((String) entity.getProperty("redeeming_request_key"));
 		paidUser.currencyCode = ((String) entity.getProperty("paid_currency"));
-		// paidUser.amount=(String) entity.getProperty("amount");
-		// paidUser.amountBG=new BigDecimal(paidUser.amount);
 		paidUser.eurCurrency = ((double) entity.getProperty("eur_currency"));
 		paidUser.eurCurrencyBigDecimal = BigDecimal.valueOf(((double) entity.getProperty("eur_currency")));
 		paidUser.resolveDate();
@@ -42,8 +38,8 @@ public class PaidUserGroupByVO implements ViewObject {
 		month = localDate.getMonthValue();
 		day = localDate.getDayOfMonth();
 
-		this.dayTime = 1000 * day + month * 100 + year;
-		this.monthTime = month * 100 + year;
+		this.dayTime = day + month * 100 + year*10000;
+		this.monthTime = month * 100 + year*10000;
 		this.yearTime = year;
 
 	}
@@ -71,14 +67,6 @@ public class PaidUserGroupByVO implements ViewObject {
 	public void setDate(Date date) {
 		this.date = date;
 	}
-
-//	public String getRedeemingRequestKey() {
-//		return redeemingRequestKey;
-//	}
-//
-//	public void setRedeemingRequestKey(String redeemingRequestKey) {
-//		this.redeemingRequestKey = redeemingRequestKey;
-//	}
 
 	public String getCurrencyCode() {
 		return currencyCode;
