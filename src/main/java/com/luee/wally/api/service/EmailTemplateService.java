@@ -113,12 +113,12 @@ public class EmailTemplateService extends AbstractService{
 	
 	public void processExternalPaymentSentEmailJob(String key)throws Exception{
 		EmailTemplateRepository emailTemplateRepository=new EmailTemplateRepository();
-		Entity entity=emailTemplateRepository.findEntityByKey(key);
-		if(entity==null){
+		Entity sentEmailEntity=emailTemplateRepository.findEntityByKey(key);
+		if(sentEmailEntity==null){
 			logger.severe("Unable to find record in 'external_payments_sent_email' with key="+key);
 		    return;
 		}
-		String email=(String)entity.getProperty("email_address");
+		String email=(String)sentEmailEntity.getProperty("email_address");
 		
 		Collection<Entity> entities=emailTemplateRepository.getEmailTemplates("external_payment_cashout_notification", null);
 		String content=((Text)entities.iterator().next().getProperty("content")).getValue();
@@ -134,13 +134,14 @@ public class EmailTemplateService extends AbstractService{
 		variables.put("paypal_account",paidUserExternal.getPaypalAccount()); 
 		variables.put("email",paidUserExternal.getEmail());
 		
-		String body=EmailTemplateMgr.INSTANCE.processTemplate(content, variables);
+		String body=EmailTemplateMgr.INSTANCE.processTemplate(content, variables);		
 		
 		sendEmailReminder(subject,body,email,paidUserExternal.getFullName(),"pl.time.app@gmail.com","PlayTime Support");				
         
 		//update
-		paidUserExternalEntity.setProperty("status", (int)Constants.SENT);
-		emailTemplateRepository.createOrUpdateEntity(paidUserExternalEntity);		
+		sentEmailEntity.setProperty("status",Constants.SENT);
+		
+		emailTemplateRepository.createOrUpdateEntity(sentEmailEntity);		
 	}
 	
 	private void sendEmailReminder(String subject,String body,String toEmail,String toName,String fromEmail,String fromName) throws IOException{
