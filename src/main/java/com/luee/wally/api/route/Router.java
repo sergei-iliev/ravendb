@@ -73,7 +73,6 @@ INSTANCE;
     	 httpGetRouteList.put("/administration/email/template/content", new Route(new EmailTemplateController(),"getEmailTemplateContent"));
     	 httpGetRouteList.put("/administration/email/template/list", new Route(new EmailTemplateController(),"getEmailTemplates"));
     	 
-    	 httpGetRouteList.put("/administration/job/payment/user/external/email", new Route(new EmailTemplateController(),"externalPaymentSentEmail")); 
     	 
     	 //*********post*******
     	 httpPostRouteList.put("/administration/search", new Route(new AffsSearchController(),"search"));
@@ -97,6 +96,8 @@ INSTANCE;
     	 httpPostRouteList.put("/administration/payment/user/paypal/validate", new Route(new PaymentController(),"validatePayPalAccount"));
     	 
     	 httpPostRouteList.put("/administration/job/payment/user/external", new Route(new PaymentController(),"payExternal")); 
+    	 httpPostRouteList.put("/administration/job/payment/user/external/email", new Route(new EmailTemplateController(),"externalPaymentSentEmail")); 
+
     	 
     	 httpPostRouteList.put("/administration/payment/paidusers/search/general", new Route(new PaidUsersController(),"search")); 
     	 httpPostRouteList.put("/administration/payment/paidusers/search/byemail", new Route(new PaidUsersController(),"searchByEmail"));
