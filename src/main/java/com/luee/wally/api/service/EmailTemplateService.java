@@ -18,9 +18,12 @@ import com.google.appengine.api.datastore.Text;
 import com.luee.wally.admin.repository.ApplicationSettingsRepository;
 import com.luee.wally.admin.repository.EmailTemplateRepository;
 import com.luee.wally.admin.repository.GiftCardRepository;
+import com.luee.wally.admin.repository.PaymentRepository;
 import com.luee.wally.api.EmailTemplateMgr;
 import com.luee.wally.command.Email;
+import com.luee.wally.constants.Constants;
 import com.luee.wally.entity.EmailTemplate;
+import com.luee.wally.entity.PaidUserExternal;
 import com.luee.wally.entity.RedeemingRequests;
 
 public class EmailTemplateService extends AbstractService{
@@ -108,6 +111,38 @@ public class EmailTemplateService extends AbstractService{
 		}
 	}
 	
+	public void processExternalPaymentSentEmailJob(String key)throws Exception{
+		EmailTemplateRepository emailTemplateRepository=new EmailTemplateRepository();
+		Entity entity=emailTemplateRepository.findEntityByKey(key);
+		if(entity==null){
+			logger.severe("Unable to find record in 'external_payments_sent_email' with key="+key);
+		    return;
+		}
+		String email=(String)entity.getProperty("email_address");
+		
+		Collection<Entity> entities=emailTemplateRepository.getEmailTemplates("external_payment_cashout_notification", null);
+		String content=((Text)entities.iterator().next().getProperty("content")).getValue();
+		String subject=(String)entities.iterator().next().getProperty("subject");
+		
+		PaymentRepository paymentRepository = new PaymentRepository();
+		entities = paymentRepository.getExternalPaidUserByEmail(email);
+		Entity paidUserExternalEntity=entities.iterator().next();
+		PaidUserExternal paidUserExternal =PaidUserExternal.valueOf(paidUserExternalEntity);
+		
+		Map<String,String> variables=new HashMap<String, String>();
+		variables.put("full_name", paidUserExternal.getFullName());
+		variables.put("paypal_account",paidUserExternal.getPaypalAccount()); 
+		variables.put("email",paidUserExternal.getEmail());
+		
+		String body=EmailTemplateMgr.INSTANCE.processTemplate(content, variables);
+		
+		sendEmailReminder(subject,body,email,paidUserExternal.getFullName(),"pl.time.app@gmail.com","PlayTime Support");				
+        
+		//update
+		paidUserExternalEntity.setProperty("status", (int)Constants.SENT);
+		emailTemplateRepository.createOrUpdateEntity(paidUserExternalEntity);		
+	}
+	
 	private void sendEmailReminder(String subject,String body,String toEmail,String toName,String fromEmail,String fromName) throws IOException{
 		Email mail = new Email();
 		mail.setFrom(fromEmail);
@@ -122,4 +157,6 @@ public class EmailTemplateService extends AbstractService{
 		mailService.sendMailGrid(mail);
 		
 	}
+	
+	
 }

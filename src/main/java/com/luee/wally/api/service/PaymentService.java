@@ -20,7 +20,13 @@ import org.apache.http.HttpStatus;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.EntityNotFoundException;
+import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.KeyFactory;
+import com.google.appengine.api.taskqueue.Queue;
+import com.google.appengine.api.taskqueue.QueueFactory;
+import com.google.appengine.api.taskqueue.TaskOptions;
 import com.luee.wally.admin.repository.ApplicationSettingsRepository;
+import com.luee.wally.admin.repository.EmailTemplateRepository;
 import com.luee.wally.admin.repository.GiftCardRepository;
 import com.luee.wally.admin.repository.InvoiceRepository;
 import com.luee.wally.admin.repository.PaymentRepository;
@@ -160,38 +166,42 @@ public class PaymentService extends AbstractService {
 			throw new Exception("Total Amount for past 24 hours {" + sumDay + "}, and requested {" + eurAmount + "} is more than the daily limit of:"+limit+".email:"+form.getEmailAddress()+" paypal account:"+form.getPaypalAccount());
 		}
 	}	
-//	public void validateExternalForm(PayExternalForm form) throws Exception {
-//
-//		if (Objects.isNull(form.getRedeemingRequestId()) || form.getRedeemingRequestId().isEmpty()
-//				|| Objects.isNull(form.getType()) || form.getType().isEmpty()) {
-//			throw new Exception("Invalid form data");
-//		}
-//		PaymentRepository paymentRepository = new PaymentRepository();
-//		// convert currency to EUR
-//		BigDecimal eurAmount;
-//		try {
-//			eurAmount = paymentRepository.convert(Double.parseDouble(form.getAmount()), form.getCurrency());
-//		} catch (Exception e) {
-//			logger.log(Level.SEVERE, "Currency converter for : " + form.getCurrency(), e);
-//			throw e;
-//		}
-//		// 1. more then 30?
-//		BigDecimal maxAmount = BigDecimal.valueOf(30.0);
-//		if (eurAmount.compareTo(maxAmount) == 1) {
-//			throw new Exception("Amount in EUR {" + eurAmount + "} is more then 30");
-//		}
-//		// 2.all payments less then 100
-//		Collection<Entity> entities = paymentRepository.getExternalPaidUserByEmail(
-//				form.getPaypalAccount() == null ? form.getEmailAddress() : form.getPaypalAccount());
-//		double sum = entities.stream().mapToDouble(e -> (double) e.getProperty("eur_currency")).sum();
-//		BigDecimal total = eurAmount.add(BigDecimal.valueOf(sum));
-//		BigDecimal hundred = BigDecimal.valueOf(100.0);
-//		if (total.compareTo(hundred) == 1) {
-//			throw new Exception("Total Amount {" + sum + "}, and requested {" + eurAmount + "} is more then 100");
-//		}
-//	}
-
-	public void payExternal(HttpServletResponse resp, PayExternalForm form) throws IOException {
+	/*
+	 * Send external user an email if following conditions occure
+	 * 1.If the total amount of payments until now is above 0.45 eur (for both paypal and amazon: sum up the same email).
+	   2.If we didn’t send an email of this template to the user yet.
+	 */
+	public void sendExternalUserEmail(String payPalAccount,String email){
+		PaymentRepository paymentRepository = new PaymentRepository();
+	  //1.
+		Collection<Entity> entities = paymentRepository.getExternalPaidUserByEmail(
+				(payPalAccount == null || "".equals(payPalAccount)) ? email :payPalAccount);
+		
+		double sum = entities.stream().mapToDouble(e -> (double) e.getProperty("eur_currency")).sum();
+		BigDecimal total = BigDecimal.valueOf(sum);
+		BigDecimal limit = BigDecimal.valueOf(0.45);
+		if (total.compareTo(limit) != 1) {  //not yet over the limit
+			return;
+		}
+		
+	 //2.
+		EmailTemplateRepository emailTemplateRepository=new EmailTemplateRepository();
+		Collection<Entity> list=emailTemplateRepository.getExternalPaymentSentEmails(email);
+		if(list.size()>0){   //email is already sent
+			return;
+		}
+		//create email
+		Key sentEmailKey=emailTemplateRepository.createExternalPaymentSentEmail(email);
+		
+		long DELAY_MS =20*60*1000;  //20 minutes
+		
+		Queue queue = QueueFactory.getDefaultQueue();
+		queue.add(TaskOptions.Builder.withUrl("/administration/job/payment/user/external/email")
+				.param("external_payment_sent_key", KeyFactory.keyToString(sentEmailKey))				
+				.countdownMillis(DELAY_MS));
+		
+	}
+	public int payExternal(PayExternalForm form) throws IOException {
 		// convert currency to EUR
 		PaymentRepository paymentRepository = new PaymentRepository();
 		String currencyCode = form.getCurrency();
@@ -202,23 +212,24 @@ public class PaymentService extends AbstractService {
 		} catch (Exception e) {
 			logger.log(Level.SEVERE, "Currency converter for : " + currencyCode + " and amount: " + form.getAmount(),
 					e);
-			resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Unable to convert currency to EUR");
-			return;
+			//resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Unable to convert currency to EUR");
+			return HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 		}
 
 		// check if already paid
 		Entity paidUserExt = paymentRepository.getExternalPaidUserByRedeemingRequestId(form.getRedeemingRequestId());
 		if (paidUserExt != null) {
 			logger.log(Level.WARNING, "User already paid.");
-			resp.sendError(HttpServletResponse.SC_CONFLICT, "User already paid");
-			return;
+			//resp.sendError(HttpServletResponse.SC_CONFLICT, "User already paid");
+			return HttpServletResponse.SC_CONFLICT;
 		}
 		if (form.getType().equalsIgnoreCase("PayPal")) {
-			sendPayPal(resp, form, eurAmount);
+			return sendPayPal(form, eurAmount);
 		} else if (form.getType().equalsIgnoreCase("Amazon")) {
-			sendGiftCard(resp, form, eurAmount);
+			return sendGiftCard(form, eurAmount);
 		} else {
 			logger.log(Level.WARNING, "Unknown type: " + form.getType());
+			return HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 		}
 
 	}
@@ -226,7 +237,7 @@ public class PaymentService extends AbstractService {
 	/*
 	 * external user payment
 	 */
-	private void sendPayPal(HttpServletResponse resp, PayExternalForm form, BigDecimal eurAmount) throws IOException {
+	private int sendPayPal(PayExternalForm form, BigDecimal eurAmount) throws IOException {
 		PayPalService payPalService = new PayPalService();
 		InvoiceService invoiceService = new InvoiceService();
 		MailService mailService = new MailService();
@@ -254,7 +265,8 @@ public class PaymentService extends AbstractService {
 					form.getCountryCode(), form.getPaypalAccount(), invoiceNumber));
 			// send invoice
 			mailService.sendGridInvoice(toInvoiceMail, fromMail, attachment);
-			resp.setStatus(HttpStatus.SC_OK);
+			//resp.setStatus(HttpStatus.SC_OK);
+			return HttpStatus.SC_OK;
 		} catch (PayPalRESTException ppe) {
 			logger.log(Level.SEVERE, "PayPal rest payment: " + ppe.getMessage(), ppe);
 			StringBuffer sb = new StringBuffer();
@@ -265,7 +277,8 @@ public class PaymentService extends AbstractService {
 					sb.append(errorDetails.getIssue() + "\r\n");
 				}
 			}
-			resp.sendError(HttpStatus.SC_INTERNAL_SERVER_ERROR, sb.toString());
+			//resp.sendError(HttpStatus.SC_INTERNAL_SERVER_ERROR, sb.toString());
+			return HttpStatus.SC_INTERNAL_SERVER_ERROR;
 		} catch (Exception ex) {
 			logger.log(Level.SEVERE, "payment", ex);
 			StringWriter sw = new StringWriter();
@@ -280,7 +293,8 @@ public class PaymentService extends AbstractService {
 			email.setTo(toInvoiceMail);
 			mailService.sendMail(email);
 			// send resp
-			resp.sendError(HttpStatus.SC_INTERNAL_SERVER_ERROR, "Server error, check logs/email for details.");
+			//resp.sendError(HttpStatus.SC_INTERNAL_SERVER_ERROR, "Server error, check logs/email for details.");
+			return HttpStatus.SC_INTERNAL_SERVER_ERROR;
 		}
 
 	}
@@ -288,7 +302,7 @@ public class PaymentService extends AbstractService {
 	/*
 	 * external user payment
 	 */
-	public void sendGiftCard(HttpServletResponse resp, PayExternalForm form, BigDecimal eurAmount) throws IOException {
+	public int sendGiftCard(PayExternalForm form, BigDecimal eurAmount) throws IOException {
 		PaymentRepository paymentRepository = new PaymentRepository();
 		GiftCardRepository giftCardRepository = new GiftCardRepository();
 
@@ -300,8 +314,8 @@ public class PaymentService extends AbstractService {
 		entity = giftCardRepository.getPackageNameTitleMapping(redeemingRequests.getPackageName());
 		if (entity == null) {
 			logger.log(Level.WARNING, "No title in package to title mapping table.");
-			resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "No title in package to title mapping table.");
-			return;
+			//resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "No title in package to title mapping table.");
+			return HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 		}
 
 		GiftCardService giftCardService = new GiftCardService();
@@ -313,10 +327,12 @@ public class PaymentService extends AbstractService {
 			// save paid user external
 			paymentRepository.saveExternalPaidUser(form.toPaidUserExternal(), eurAmount, null,
 					order.getReferenceOrderID(),null);
-			resp.setStatus(HttpStatus.SC_OK);
+			//resp.setStatus(HttpStatus.SC_OK);
+			return HttpStatus.SC_OK;
 		} catch (RestResponseException e) {
 			logger.log(Level.SEVERE, "Send Tango Card error ", e);
-			resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Send Tango Card error.");
+			//resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Send Tango Card error.");
+		    return HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 		}
 
 	}

@@ -17,6 +17,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.http.HttpStatus;
+
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.EntityNotFoundException;
 import com.luee.wally.admin.repository.ApplicationSettingsRepository;
@@ -133,7 +135,17 @@ public class PaymentController implements Controller {
 			resp.sendError(HttpServletResponse.SC_BAD_REQUEST,e.getMessage());
 			return;
 		}   
-        paymentService.payExternal(resp, form);        
+        int status=paymentService.payExternal(form);
+        
+        //short circuit on error
+        if(status!=HttpStatus.SC_OK){
+        	resp.sendError(status);	
+        }	
+        //send email delayed on conditions
+        paymentService.sendExternalUserEmail(form.getPaypalAccount(),form.getEmailAddress());
+        
+        resp.setStatus(HttpStatus.SC_OK);
+        
 	}
 	
 	public void sendPayPal(HttpServletRequest req, HttpServletResponse resp) throws Exception {

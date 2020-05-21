@@ -31,7 +31,10 @@ public class AbstractRepository {
 		DatastoreService ds = createDatastoreService(Consistency.STRONG);
 		ds.delete(key);
 	}
-	
+	public void createOrUpdateEntity(Entity entity){
+		DatastoreService ds = createDatastoreService(Consistency.STRONG);
+		ds.put(entity);
+	}
 	public void deleteEntity(String key){
 		DatastoreService ds = createDatastoreService(Consistency.STRONG);
 		ds.delete(KeyFactory.stringToKey(key));

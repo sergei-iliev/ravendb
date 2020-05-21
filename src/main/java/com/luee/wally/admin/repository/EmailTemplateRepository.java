@@ -15,12 +15,14 @@ import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.Query.FilterOperator;
 import com.google.appengine.api.datastore.Query.FilterPredicate;
 import com.google.appengine.api.datastore.ReadPolicy.Consistency;
+import com.luee.wally.constants.Constants;
 
 public class EmailTemplateRepository extends AbstractRepository {
 	private final Logger logger = Logger.getLogger(EmailTemplateRepository.class.getName());
 
 	public static final String SEND_ELIGIBLE_USER_EMAIL_TEMPLATE="SEND_ELIGIBLE_USER_EMAIL_TEMPLATE";
 	public static final String CONFIRM_EMAIL_REMINDER_PAYPAL="CONFIRM_EMAIL_REMINDER_PAYPAL";
+	public static final String EXTERNAL_PAYMENTS_SENT_EMAILS="EXTERNAL_PAYMENTS_SENT_EMAILS";
 	
 	public Collection<Entity> getEmailTemplates(String name,String type){
 		DatastoreService ds = createDatastoreService(Consistency.EVENTUAL);
@@ -55,5 +57,29 @@ public class EmailTemplateRepository extends AbstractRepository {
 		PreparedQuery pq = ds.prepare(query);
 		return pq.asList(FetchOptions.Builder.withDefaults());
 	}
+	
+	public Key createExternalPaymentSentEmail(String email){
+		DatastoreService ds = createDatastoreService(Consistency.STRONG);
+		
+		Entity entity = new Entity("external_payments_sent_emails");	
+		entity.setIndexedProperty("status",(Integer)Constants.PENDING);
+		entity.setIndexedProperty("created_date",new Date());	
+		entity.setIndexedProperty("email_address", email);
+		
+		entity.setProperty("email_template",EXTERNAL_PAYMENTS_SENT_EMAILS);
+		ds.put(entity);
+		return entity.getKey();
+	}
+	
+	public Collection<Entity> getExternalPaymentSentEmails(String email){
+		DatastoreService ds = createDatastoreService(Consistency.STRONG);
+		Query query = new Query("external_payments_sent_emails");				
+		
+		query.setFilter(new FilterPredicate("email_address", FilterOperator.EQUAL,email));
+		
+		PreparedQuery pq = ds.prepare(query);
+		return pq.asList(FetchOptions.Builder.withDefaults());
+	}
+	
 	
 }

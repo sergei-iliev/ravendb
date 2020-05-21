@@ -73,7 +73,9 @@ INSTANCE;
     	 httpGetRouteList.put("/administration/email/template/content", new Route(new EmailTemplateController(),"getEmailTemplateContent"));
     	 httpGetRouteList.put("/administration/email/template/list", new Route(new EmailTemplateController(),"getEmailTemplates"));
     	 
-    	 //post
+    	 httpGetRouteList.put("/administration/job/payment/user/external/email", new Route(new EmailTemplateController(),"externalPaymentSentEmail")); 
+    	 
+    	 //*********post*******
     	 httpPostRouteList.put("/administration/search", new Route(new AffsSearchController(),"search"));
     	 httpPostRouteList.put("/administration/exportgaid/run", new Route(new AffsSearchController(),"runExportGaid"));
     	 

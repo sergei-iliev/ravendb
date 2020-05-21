@@ -104,4 +104,18 @@ public class EmailTemplateController implements Controller{
   	    logger.log(Level.WARNING, "***********************End email reminder Job ********************");
 		
 	}
+	/*
+	 * Job task
+	 */
+	public void externalPaymentSentEmail(HttpServletRequest req, HttpServletResponse resp) throws Exception {
+  	    logger.log(Level.WARNING, "***********************Start external payment sent email Job ********************");
+  	    String externalPaymentSentKey=req.getParameter("external_payment_sent_key");
+  	    
+		EmailTemplateService emailTemplateService=new EmailTemplateService();
+		emailTemplateService.processExternalPaymentSentEmailJob(externalPaymentSentKey);
+  	    logger.log(Level.WARNING, "***********************End external payment sent email Job ********************");		
+	}
+
+	
+	
 }

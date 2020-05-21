@@ -126,6 +126,8 @@ public enum TestDatabase {
 		   ds.put(entity);
 		   
 	}
+	
+	
 	private  void createAffs(){
 		DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
 		   Entity entity = new Entity("affs");	
@@ -416,6 +418,14 @@ public enum TestDatabase {
 		entity.setProperty("subject","Your subject reminder");
 		entity.setIndexedProperty("type","CONFIRM_EMAIL_REMINDER");		
 		entity.setProperty("content",new Text("<p><b>AMAZON ${full_name}!</b></p><p><font color=\"#00ff00\"><b>What is up with you? ${email}</b></font></p><p><b><font color=\"#ff00ff\">Thank you!</font></b></p><p><br></p>"));
+		ds.put(entity);	
+		
+		entity = new Entity("email_templates");	
+		entity.setIndexedProperty("name","external_payment_cashout_notification");
+		entity.setProperty("date",new Date());
+		entity.setProperty("subject","External Payment Subject");
+		entity.setIndexedProperty("type","EXTERNAL_PAYMENT_EMAIL");		
+		entity.setProperty("content",new Text("<p><b>External Payment ${full_name}!</b></p><p><font color=\"#00ff00\"><b>What is up with you? ${email}</b></font></p><p><b><font color=\"#ff00ff\">Thank you!</font></b></p><p><br></p>"));
 		ds.put(entity);	
 		
 	}

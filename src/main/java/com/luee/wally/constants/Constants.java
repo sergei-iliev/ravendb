@@ -63,4 +63,8 @@ public interface Constants {
 	
 	/******************AES Sequrity***************************/
 	//public static final String SECRET_AES_KEY = "!SoftBacked!";
+	
+	public static final int PENDING =1;
+	public static final int SENT =2;
+	
 }

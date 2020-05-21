@@ -38,7 +38,8 @@ public class PaidUserExternal {
 			paidUser.packageName=(String) entity.getProperty("package_name");
 			paidUser.address=(String) entity.getProperty("address");
 			paidUser.paymentReferenceId=((String) entity.getProperty("payment_reference_id"));
-			paidUser.invoiceNumber=((String) entity.getProperty("invoice_number"));			              		
+			paidUser.invoiceNumber=((String) entity.getProperty("invoice_number"));		
+			paidUser.fullName=((String) entity.getProperty("full_name"));
 			return paidUser;
 		}
 		
