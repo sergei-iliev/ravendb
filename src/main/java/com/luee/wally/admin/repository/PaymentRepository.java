@@ -139,7 +139,8 @@ public class PaymentRepository extends AbstractRepository {
 		Filter filter = CompositeFilterOperator.or(new FilterPredicate("paypal_account", FilterOperator.EQUAL, email),
 				new FilterPredicate("email_address", FilterOperator.EQUAL, email));
 		query.setFilter(filter);
-
+		query.addSort("date", SortDirection.DESCENDING);
+		
 		PreparedQuery pq = ds.prepare(query);
 		return pq.asList(FetchOptions.Builder.withDefaults());
 	}

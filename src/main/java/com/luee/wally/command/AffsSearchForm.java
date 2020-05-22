@@ -89,7 +89,7 @@ public class AffsSearchForm implements WebForm{
 	public void setPackageName(String packageName) {
 		this.packageName=packageName;
 	}
-
+	@JsonIgnore
 	public boolean isEmpty(){
 		return experiments.isEmpty()&&packageName==null&&countryCode.length()==1&&startDate==null&&endDate==null;
 	}
