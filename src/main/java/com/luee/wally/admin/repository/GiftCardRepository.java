@@ -1,11 +1,16 @@
 package com.luee.wally.admin.repository;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
+import com.google.appengine.api.datastore.Query.CompositeFilter;
+import com.google.appengine.api.datastore.Query.CompositeFilterOperator;
+import com.google.appengine.api.datastore.Query.Filter;
 import com.google.appengine.api.datastore.Query.FilterOperator;
 import com.google.appengine.api.datastore.Query.FilterPredicate;
 import com.google.appengine.api.datastore.ReadPolicy.Consistency;
@@ -19,15 +24,21 @@ public class GiftCardRepository extends AbstractRepository {
 			 PreparedQuery pq = ds.prepare(query);
 			 return pq.asSingleEntity();			 
 	  }
+
 	  public Entity getGiftCardCountryCodeExternalMapping(String countryCode,String currency){		     
 		     DatastoreService ds = createDatastoreService(Consistency.STRONG);
 		     Query query = new Query("tango_card_country_code_mapping_external");
-		     query.setFilter(new FilterPredicate("country_code", FilterOperator.EQUAL, countryCode));
-		     query.setFilter(new FilterPredicate("currency", FilterOperator.EQUAL, currency));
-			 PreparedQuery pq = ds.prepare(query);
+			 
+		     List<Filter> filters = new ArrayList<Query.Filter>();
+			 filters.add(new FilterPredicate("country_code", FilterOperator.EQUAL, countryCode));
+			 filters.add(new FilterPredicate("currency", FilterOperator.EQUAL, currency));
+		     
+			 CompositeFilter compFilter = new CompositeFilter(CompositeFilterOperator.AND, filters );
+		     query.setFilter(compFilter);
+			 
+		     PreparedQuery pq = ds.prepare(query);
 			 return pq.asSingleEntity();			 
 	  }
-	  
 	  public Entity getPackageNameTitleMapping(String packageName){		     
 		     DatastoreService ds = createDatastoreService(Consistency.STRONG);
 		     Query query = new Query("package_name_title_mapping");

@@ -309,6 +309,9 @@ public class PaymentService extends AbstractService {
 		RedeemingRequests redeemingRequests = form.toRedeemingRequests();
 
 		Entity entity = giftCardRepository.getGiftCardCountryCodeExternalMapping(redeemingRequests.getCountryCode(),form.getCurrency());
+		if(entity==null){
+			entity = giftCardRepository.getGiftCardCountryCodeExternalMapping("",form.getCurrency());
+		}
 		GiftCardCountryCode giftCardCountryCode = GiftCardCountryCode.valueOf(entity);
 
 		entity = giftCardRepository.getPackageNameTitleMapping(redeemingRequests.getPackageName());
