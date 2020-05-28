@@ -300,7 +300,7 @@ public class PaymentService extends AbstractService {
 	}
 
 	/*
-	 * external user payment
+	 * external/EXTERNAL user payment
 	 */
 	public int sendGiftCard(PayExternalForm form, BigDecimal eurAmount) throws IOException {
 		PaymentRepository paymentRepository = new PaymentRepository();
@@ -308,7 +308,7 @@ public class PaymentService extends AbstractService {
 
 		RedeemingRequests redeemingRequests = form.toRedeemingRequests();
 
-		Entity entity = giftCardRepository.getGiftCardCountryCodeMapping(redeemingRequests.getCountryCode());
+		Entity entity = giftCardRepository.getGiftCardCountryCodeExternalMapping(redeemingRequests.getCountryCode(),form.getCurrency());
 		GiftCardCountryCode giftCardCountryCode = GiftCardCountryCode.valueOf(entity);
 
 		entity = giftCardRepository.getPackageNameTitleMapping(redeemingRequests.getPackageName());

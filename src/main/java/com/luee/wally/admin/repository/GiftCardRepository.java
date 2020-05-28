@@ -19,6 +19,14 @@ public class GiftCardRepository extends AbstractRepository {
 			 PreparedQuery pq = ds.prepare(query);
 			 return pq.asSingleEntity();			 
 	  }
+	  public Entity getGiftCardCountryCodeExternalMapping(String countryCode,String currency){		     
+		     DatastoreService ds = createDatastoreService(Consistency.STRONG);
+		     Query query = new Query("tango_card_country_code_mapping_external");
+		     query.setFilter(new FilterPredicate("country_code", FilterOperator.EQUAL, countryCode));
+		     query.setFilter(new FilterPredicate("currency", FilterOperator.EQUAL, currency));
+			 PreparedQuery pq = ds.prepare(query);
+			 return pq.asSingleEntity();			 
+	  }
 	  
 	  public Entity getPackageNameTitleMapping(String packageName){		     
 		     DatastoreService ds = createDatastoreService(Consistency.STRONG);

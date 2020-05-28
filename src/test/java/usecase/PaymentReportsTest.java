@@ -18,6 +18,7 @@ import com.google.appengine.api.datastore.ReadPolicy.Consistency;
 import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 import com.luee.wally.admin.repository.EmailTemplateRepository;
+import com.luee.wally.admin.repository.GiftCardRepository;
 import com.luee.wally.admin.repository.PaidUsersRepository;
 import com.luee.wally.api.service.EmailTemplateService;
 import com.luee.wally.api.service.PaidUsersService;
@@ -46,8 +47,12 @@ public class PaymentReportsTest {
 	@Test
 	public void getPayedUserYesterdayReportTest(){
 		TestDatabase.INSTANCE.generateDB();
-        PaymentReportsService paymentReportsService=new PaymentReportsService();
-        System.out.println(paymentReportsService.getPaymentReportForYesterday().getTotalAmountByCountryCodeMap());
+        //PaymentReportsService paymentReportsService=new PaymentReportsService();
+        //System.out.println(paymentReportsService.getPaymentReportForYesterday().getTotalAmountByCountryCodeMap());
+		GiftCardRepository giftCardRepository=new GiftCardRepository();
+		Entity entity=giftCardRepository.getGiftCardCountryCodeExternalMapping("US","EUR");
+		System.out.println(entity);
+		
 	}
 
 	@Test

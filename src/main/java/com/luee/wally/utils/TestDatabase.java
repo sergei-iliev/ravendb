@@ -263,6 +263,21 @@ public enum TestDatabase {
 		entity.setIndexedProperty("brand","Amazon.com");
 		entity.setIndexedProperty("unitid","U666425");
 		ds.put(entity);		
+		
+		
+		entity = new Entity("tango_card_country_code_mapping_external");	
+		entity.setIndexedProperty("country_code","US");
+		entity.setIndexedProperty("currency","USD");
+		entity.setIndexedProperty("brand","Amazon.com");
+		entity.setIndexedProperty("unitid","U666425");
+		ds.put(entity);
+		
+		entity = new Entity("tango_card_country_code_mapping_external");	
+		entity.setIndexedProperty("country_code","US");
+		entity.setIndexedProperty("currency","EUR");
+		entity.setIndexedProperty("brand","Amazon.com");
+		entity.setIndexedProperty("unitid","U666425");
+		ds.put(entity);
 
 	}
 	
