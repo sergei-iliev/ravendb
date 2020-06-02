@@ -36,6 +36,7 @@ import com.luee.wally.command.PayExternalForm;
 import com.luee.wally.command.PaymentEligibleUserForm;
 import com.luee.wally.command.PdfAttachment;
 import com.luee.wally.command.invoice.PayoutResult;
+import com.luee.wally.constants.PaymentConstants;
 import com.luee.wally.entity.GiftCardCountryCode;
 import com.luee.wally.entity.RedeemingRequests;
 import com.luee.wally.exception.RestResponseException;
@@ -142,18 +143,18 @@ public class PaymentService extends AbstractService {
 			throw e;
 		}
 		// 1. more then 5?
-		BigDecimal maxAmount = BigDecimal.valueOf(15.0);
+		BigDecimal maxAmount =PaymentConstants.SINGLE_PAYMENT;
 		if (eurAmount.compareTo(maxAmount) == 1) {
-			throw new Exception("Amount in EUR {" + eurAmount + "} is more then 15. email:"+form.getEmailAddress()+" paypal account:"+form.getPaypalAccount());
+			throw new Exception("Amount in EUR {" + eurAmount + "} is more then "+maxAmount+". email:"+form.getEmailAddress()+" paypal account:"+form.getPaypalAccount());
 		}
 		// 2.all payments less then 30
 		Collection<Entity> entities = paymentRepository.getExternalPaidUserByEmail(
 				(form.getPaypalAccount() == null || "".equals(form.getPaypalAccount())) ? form.getEmailAddress() : form.getPaypalAccount());
 		double sum = entities.stream().mapToDouble(e -> (double) e.getProperty("eur_currency")).sum();
 		BigDecimal total = eurAmount.add(BigDecimal.valueOf(sum));
-		BigDecimal limit = BigDecimal.valueOf(30.0);
+		BigDecimal limit = PaymentConstants.TOTAL_PAYMENTS_PER_USER;
 		if (total.compareTo(limit) == 1) {
-			throw new Exception("Total Amount {" + sum + "}, and requested {" + eurAmount + "} is more then 30. email:"+form.getEmailAddress()+" paypal account:"+form.getPaypalAccount());
+			throw new Exception("Total Amount {" + sum + "}, and requested {" + eurAmount + "} is more then "+limit+". email:"+form.getEmailAddress()+" paypal account:"+form.getPaypalAccount());
 		}
 	
 		// 3. all external payments from today don't exceed X eur.
@@ -161,7 +162,7 @@ public class PaymentService extends AbstractService {
 		Collection<Entity> entitiesDaily = paymentRepository.getExternalPaidUserInLastDay();
 		double sumDay = entitiesDaily.stream().mapToDouble(e -> (double) e.getProperty("eur_currency")).sum();
 		BigDecimal totalDay = eurAmount.add(BigDecimal.valueOf(sumDay));
-		limit = BigDecimal.valueOf(500.0);
+		limit = PaymentConstants.TOTAL_DAILY_PAYMENT;
 		if (totalDay.compareTo(limit) == 1) {
 			throw new Exception("Total Amount for past 24 hours {" + sumDay + "}, and requested {" + eurAmount + "} is more than the daily limit of:"+limit+".email:"+form.getEmailAddress()+" paypal account:"+form.getPaypalAccount());
 		}
