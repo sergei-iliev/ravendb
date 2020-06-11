@@ -307,6 +307,22 @@ public enum TestDatabase {
 		ds.put(entity);
 		
 		entity = new Entity("application_settings");	
+		entity.setIndexedProperty("name","PAYPAL_CLIENT_ID");
+		entity.setIndexedProperty("value","AafeAthS3PRG_dkpJPVTkCgVc-O9pQ6o2PldSIOceWsn7nIm0H404DHDFg4svXJa63Pe8OtM55ySzppG");
+		ds.put(entity);
+		
+		entity = new Entity("application_settings");	
+		entity.setIndexedProperty("name","PAYPAL_CLIENT_SECRET");
+		entity.setIndexedProperty("value","EC1ludnxStRx1M1VP9DDfz2xdTxMA8xcthmP_hRaQgWS09thWY2ihInfz5AA03DMxLjYZnR6sRQn-0XV");
+		ds.put(entity);
+
+		entity = new Entity("application_settings");	
+		entity.setIndexedProperty("name","PAYPAL_MODE");
+		entity.setIndexedProperty("value","sandbox");
+		ds.put(entity);
+
+		
+		entity = new Entity("application_settings");	
 		entity.setIndexedProperty("name","SHOW_PAYPAL_PAY");
 		entity.setIndexedProperty("value","true");
 		ds.put(entity);

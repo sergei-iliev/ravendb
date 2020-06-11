@@ -133,11 +133,13 @@ public class PaymentService extends AbstractService {
 				|| Objects.isNull(form.getType()) || form.getType().isEmpty()) {
 			throw new Exception("Invalid form data");
 		}
+		
+		/*
 		Double amount=Double.parseDouble(form.getAmount());
 		if(amount.compareTo(PaymentConstants.BLOCK_PAYMENT_VALUE)==0){
 		   logger.log(Level.SEVERE, "Block payment amount : " + form.getAmount());
 		   throw new Exception("Block payment amount : " + form.getAmount()); 
-		}
+		}*/
 		
 		PaymentRepository paymentRepository = new PaymentRepository();
 		// convert currency to EUR

@@ -173,11 +173,11 @@ public class PaymentController implements Controller {
 		/*
 		 * Don't pay if already paid up
 		 */
-		if (paidUser != null) {
-			resp.getWriter().write("+");			
-			resp.getWriter().write(JSONUtils.writeObject(paidUser, Entity.class));
-			return;
-		}
+//		if (paidUser != null) {
+//			resp.getWriter().write("+");			
+//			resp.getWriter().write(JSONUtils.writeObject(paidUser, Entity.class));
+//			return;
+//		}
 		
 		PayPalService payPalService = new PayPalService();
 		InvoiceService invoiceService = new InvoiceService();

@@ -21,6 +21,7 @@ import com.paypal.api.payments.Payout;
 import com.paypal.api.payments.PayoutBatch;
 import com.paypal.api.payments.PayoutItem;
 import com.paypal.api.payments.PayoutSenderBatchHeader;
+import com.paypal.api.payments.Transactions;
 import com.paypal.base.rest.APIContext;
 import com.paypal.base.rest.PayPalRESTException;
 
@@ -30,7 +31,8 @@ public class PayPalService {
 	private static final String PAYOUT_STATUS_PENDING = "PENDING";
 	private static final String PAYOUT_STATUS_PROCESSING = "PROCESSING";
 	private static final String PAYOUT_STATUS_SUCCESS = "SUCCESS";
-
+	private static final String PAYOUT_STATUS_DENIED = "DENIED";
+	
 	private static final String RECEIVER_UNREGISTERED="RECEIVER_UNREGISTERED";
 	private static final String PENDING_RECIPIENT_NON_HOLDING_CURRENCY_PAYMENT_PREFERENCE="PENDING_RECIPIENT_NON_HOLDING_CURRENCY_PAYMENT_PREFERENCE";	
 	
@@ -105,11 +107,10 @@ public class PayPalService {
 			PayoutBatch pay;
 			for(int i=0;i<Constants.PAYPAL_LOOP_COUNT;i++){
 				pay= Payout.get(apiContext, batch.getBatchHeader().getPayoutBatchId());
-				
+
 				if(pay.getBatchHeader().getBatchStatus().equals(PAYOUT_STATUS_SUCCESS)){
 				    //could be error success
 					if((!pay.getItems().isEmpty())&&pay.getItems().get(0).getError()!=null){
-
 						if(!pay.getItems().get(0).getError().getName().isEmpty()){
 							if(pay.getItems().get(0).getError().getName().equals(RECEIVER_UNREGISTERED)||
 							   pay.getItems().get(0).getError().getName().equals(PENDING_RECIPIENT_NON_HOLDING_CURRENCY_PAYMENT_PREFERENCE)){
@@ -130,6 +131,9 @@ public class PayPalService {
 						payoutResult.setFee(new Money("0.0",currencyCode));	
 					}
 					return payoutResult;
+				}else if(pay.getBatchHeader().getBatchStatus().equals(PAYOUT_STATUS_DENIED)){					
+					 logger.severe(pay.getItems().toString());
+					 throw createPayoutException(pay.getItems().get(0).getError(),payPalUser.getPaypalAccount());
 				}
 			
 			try{
