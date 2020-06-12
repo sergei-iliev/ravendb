@@ -17,6 +17,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.http.HttpStatus;
 
 import com.google.appengine.api.datastore.Entity;
@@ -110,7 +111,7 @@ public class PaymentController implements Controller {
 		  form = PayExternalForm.parseEncoded(req,aesKey);
 		}catch(AESSecurityException e){
 			logger.log(Level.SEVERE,"AES sequrity exception",e);
-			resp.sendError(HttpServletResponse.SC_BAD_REQUEST,"AES sequrity exception");						
+			resp.sendError(HttpServletResponse.SC_BAD_REQUEST,"AES security exception");						
 			return;
 		}
 		
@@ -135,11 +136,11 @@ public class PaymentController implements Controller {
 			resp.sendError(HttpServletResponse.SC_BAD_REQUEST,e.getMessage());
 			return;
 		}   
-        int status=paymentService.payExternal(form);
+        Pair<Integer, String> status=paymentService.payExternal(form);
         
         //short circuit on error
-        if(status!=HttpStatus.SC_OK){
-        	resp.sendError(status);	
+        if(status.getKey()!=HttpStatus.SC_OK){
+        	resp.sendError(status.getKey(),status.getValue());	
         }	
         //send email delayed on conditions
         paymentService.sendExternalUserEmail(form.getPaypalAccount(),form.getEmailAddress());

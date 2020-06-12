@@ -15,6 +15,8 @@ import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.http.HttpStatus;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -210,7 +212,7 @@ public class PaymentService extends AbstractService {
 				.countdownMillis(DELAY_MS));
 		
 	}
-	public int payExternal(PayExternalForm form) throws IOException {
+	public Pair<Integer,String> payExternal(PayExternalForm form) throws IOException {
 		// convert currency to EUR
 		PaymentRepository paymentRepository = new PaymentRepository();
 		String currencyCode = form.getCurrency();
@@ -222,7 +224,7 @@ public class PaymentService extends AbstractService {
 			logger.log(Level.SEVERE, "Currency converter for : " + currencyCode + " and amount: " + form.getAmount(),
 					e);
 			//resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Unable to convert currency to EUR");
-			return HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
+			return new ImmutablePair<>(HttpServletResponse.SC_PAYMENT_REQUIRED, "Unable to convert currency to EUR");
 		}
 
 		// check if already paid
@@ -230,7 +232,7 @@ public class PaymentService extends AbstractService {
 		if (paidUserExt != null) {
 			logger.log(Level.WARNING, "User already paid.");
 			//resp.sendError(HttpServletResponse.SC_CONFLICT, "User already paid");
-			return HttpServletResponse.SC_CONFLICT;
+			return new ImmutablePair<>(HttpServletResponse.SC_CONFLICT,"User already paid");
 		}
 		if (form.getType().equalsIgnoreCase("PayPal")) {
 			return sendPayPal(form, eurAmount);
@@ -238,7 +240,7 @@ public class PaymentService extends AbstractService {
 			return sendGiftCard(form, eurAmount);
 		} else {
 			logger.log(Level.WARNING, "Unknown type: " + form.getType());
-			return HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
+			return new ImmutablePair<>(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,"Unknown type: " + form.getType());
 		}
 
 	}
@@ -246,7 +248,7 @@ public class PaymentService extends AbstractService {
 	/*
 	 * external user payment
 	 */
-	private int sendPayPal(PayExternalForm form, BigDecimal eurAmount) throws IOException {
+	private Pair<Integer,String> sendPayPal(PayExternalForm form, BigDecimal eurAmount) throws IOException {
 		PayPalService payPalService = new PayPalService();
 		InvoiceService invoiceService = new InvoiceService();
 		MailService mailService = new MailService();
@@ -274,8 +276,8 @@ public class PaymentService extends AbstractService {
 					form.getCountryCode(), form.getPaypalAccount(), invoiceNumber));
 			// send invoice
 			mailService.sendGridInvoice(toInvoiceMail, fromMail, attachment);
-			//resp.setStatus(HttpStatus.SC_OK);
-			return HttpStatus.SC_OK;
+			
+			return new ImmutablePair<>(HttpStatus.SC_OK, null);
 		} catch (PayPalRESTException ppe) {
 			logger.log(Level.SEVERE, "PayPal rest payment: " + ppe.getMessage(), ppe);
 			StringBuffer sb = new StringBuffer();
@@ -287,7 +289,7 @@ public class PaymentService extends AbstractService {
 				}
 			}
 			//resp.sendError(HttpStatus.SC_INTERNAL_SERVER_ERROR, sb.toString());
-			return HttpStatus.SC_INTERNAL_SERVER_ERROR;
+			return new ImmutablePair<>(HttpStatus.SC_BAD_REQUEST,sb.toString());
 		} catch (Exception ex) {
 			logger.log(Level.SEVERE, "payment", ex);
 			StringWriter sw = new StringWriter();
@@ -301,9 +303,8 @@ public class PaymentService extends AbstractService {
 			email.setFrom(fromMail);
 			email.setTo(toInvoiceMail);
 			mailService.sendMail(email);
-			// send resp
-			//resp.sendError(HttpStatus.SC_INTERNAL_SERVER_ERROR, "Server error, check logs/email for details.");
-			return HttpStatus.SC_INTERNAL_SERVER_ERROR;
+			// send resp			
+			return new ImmutablePair<>(HttpStatus.SC_BAD_REQUEST,sStackTrace);
 		}
 
 	}
@@ -311,7 +312,7 @@ public class PaymentService extends AbstractService {
 	/*
 	 * external/EXTERNAL user payment
 	 */
-	public int sendGiftCard(PayExternalForm form, BigDecimal eurAmount) throws IOException {
+	public Pair<Integer,String> sendGiftCard(PayExternalForm form, BigDecimal eurAmount) throws IOException {
 		PaymentRepository paymentRepository = new PaymentRepository();
 		GiftCardRepository giftCardRepository = new GiftCardRepository();
 
@@ -327,7 +328,7 @@ public class PaymentService extends AbstractService {
 		if (entity == null) {
 			logger.log(Level.WARNING, "No title in package to title mapping table.");
 			//resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "No title in package to title mapping table.");
-			return HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
+			return new ImmutablePair<>(HttpServletResponse.SC_BAD_REQUEST,"No title in package to title mapping table.");
 		}
 
 		GiftCardService giftCardService = new GiftCardService();
@@ -340,11 +341,11 @@ public class PaymentService extends AbstractService {
 			paymentRepository.saveExternalPaidUser(form.toPaidUserExternal(), eurAmount, null,
 					order.getReferenceOrderID(),null);
 			//resp.setStatus(HttpStatus.SC_OK);
-			return HttpStatus.SC_OK;
+			return new ImmutablePair<>(HttpStatus.SC_OK,null);
 		} catch (RestResponseException e) {
 			logger.log(Level.SEVERE, "Send Tango Card error ", e);
 			//resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Send Tango Card error.");
-		    return HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
+		    return new ImmutablePair<>(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,"Send Tango Card error.");
 		}
 
 	}
