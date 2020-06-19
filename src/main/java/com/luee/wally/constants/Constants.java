@@ -34,6 +34,7 @@ public interface Constants {
 	public static final int CURSOR_SIZE=3;
 	
 	public static final int PAYPAL_LOOP_COUNT=25;
+	public static final int LOCK_LOOP_COUNT=10;
 	
 	public static final String TANGO_CARD_PRODUCTION="production";
 	
@@ -67,4 +68,5 @@ public interface Constants {
 	public static final int PENDING =1;
 	public static final int SENT =2;
 	
+	public static final String ENTITY_REDEEMING_REQUEST_ID ="REDEEMING_REQUEST_ENTITY";
 }

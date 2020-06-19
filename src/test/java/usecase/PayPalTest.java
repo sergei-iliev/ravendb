@@ -5,8 +5,17 @@ import static org.mockito.Mockito.when;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -168,4 +177,49 @@ public class PayPalTest {
         
         paymentController.payExternal(request,response);	
 	}
+	
+	@Mock
+	private HttpServletRequest request1;
+	@Mock
+	private HttpServletRequest request2;
+	@Mock
+	private HttpServletRequest request3;
+	@Mock
+	private HttpServletRequest request4;
+	
+	@Test
+	public void distributeLockTest()throws Exception{
+	   List<HttpServletRequest> requests=new LinkedList<>();
+	   requests.add(request);
+	   requests.add(request1);
+	   requests.add(request2);
+	   requests.add(request3);
+	   requests.add(request4);
+	   
+	   PaymentController paymentController=new PaymentController();
+	   
+       Collection<Callable<Void>> tasks = new ArrayList<>();
+       ExecutorService executor = Executors.newFixedThreadPool(10);
+       
+       for (int i = 0; i < 5; i++) {
+           final int j=i;
+    	   Callable<Void> runnable = () -> {   
+    		   when(requests.get(j).getParameter("rid")).thenReturn("100"+j);
+        	   paymentController.payExternal(requests.get(j), response);                       	   
+               return null;
+           };
+           tasks.add(runnable);
+       }
+
+       Collection<Future<Void>> futures = executor.invokeAll(tasks);
+       for (Future<Void> future : futures) {
+           // Throws an exception if an exception was thrown by the task.
+           future.get(15, TimeUnit.SECONDS);
+       }
+
+	
+	
+	}
+	
+	
 }

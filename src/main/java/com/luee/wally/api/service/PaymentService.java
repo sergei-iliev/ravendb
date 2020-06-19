@@ -32,12 +32,14 @@ import com.luee.wally.admin.repository.EmailTemplateRepository;
 import com.luee.wally.admin.repository.GiftCardRepository;
 import com.luee.wally.admin.repository.InvoiceRepository;
 import com.luee.wally.admin.repository.PaymentRepository;
+import com.luee.wally.api.lock.MemoryCacheLock;
 import com.luee.wally.command.Email;
 import com.luee.wally.command.PaidUserForm;
 import com.luee.wally.command.PayExternalForm;
 import com.luee.wally.command.PaymentEligibleUserForm;
 import com.luee.wally.command.PdfAttachment;
 import com.luee.wally.command.invoice.PayoutResult;
+import com.luee.wally.constants.Constants;
 import com.luee.wally.constants.PaymentConstants;
 import com.luee.wally.entity.GiftCardCountryCode;
 import com.luee.wally.entity.RedeemingRequests;
@@ -234,6 +236,20 @@ public class PaymentService extends AbstractService {
 			//resp.sendError(HttpServletResponse.SC_CONFLICT, "User already paid");
 			return new ImmutablePair<>(HttpServletResponse.SC_CONFLICT,"User already paid");
 		}
+		
+		//****lock payment for concurrent requests		
+		if(!MemoryCacheLock.INSTANCE.lock(MemoryCacheLock.EXTERNAL_PAYMENT_LOCK)){					
+			return new ImmutablePair<>(HttpServletResponse.SC_CONFLICT,"Concurrent request wait timeout.");			
+		}
+		try{
+			if(!MemoryCacheLock.INSTANCE.lockPrimaryKey(Constants.ENTITY_REDEEMING_REQUEST_ID,form.getRedeemingRequestId())){
+				return new ImmutablePair<>(HttpServletResponse.SC_CONFLICT,"Redeeming request id="+form.getRedeemingRequestId()+" is being paid by another thread.");	
+			}						
+		}finally{
+			MemoryCacheLock.INSTANCE.unlock(MemoryCacheLock.EXTERNAL_PAYMENT_LOCK);	
+		}		
+				
+		
 		if (form.getType().equalsIgnoreCase("PayPal")) {
 			return sendPayPal(form, eurAmount);
 		} else if (form.getType().equalsIgnoreCase("Amazon")) {

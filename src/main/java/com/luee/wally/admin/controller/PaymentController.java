@@ -26,6 +26,7 @@ import com.luee.wally.admin.repository.ApplicationSettingsRepository;
 import com.luee.wally.admin.repository.InvoiceRepository;
 import com.luee.wally.admin.repository.PaymentRepository;
 import com.luee.wally.admin.repository.SearchFilterTemplateRepository;
+import com.luee.wally.api.lock.MemoryCacheLock;
 import com.luee.wally.api.route.Controller;
 import com.luee.wally.api.service.ApplicationSettingsService;
 import com.luee.wally.api.service.InvoiceService;
@@ -41,6 +42,7 @@ import com.luee.wally.command.PdfAttachment;
 import com.luee.wally.command.invoice.PayoutResult;
 import com.luee.wally.command.payment.RedeemingRequestRuleValue;
 import com.luee.wally.command.payment.RuleStatusType;
+import com.luee.wally.constants.Constants;
 import com.luee.wally.entity.RedeemingRequests;
 import com.luee.wally.entity.SearchFilterTemplate;
 import com.luee.wally.exception.AESSecurityException;
@@ -53,168 +55,195 @@ public class PaymentController implements Controller {
 	private final Logger logger = Logger.getLogger(PaymentController.class.getName());
 
 	public void test(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		resp.setContentType("application/json");
-		resp.setCharacterEncoding("UTF-8");
-		String json = "{" + "\"paid_successfully\": true," + "\"email_sent_successfully\": false" + "}";
+		String rid = (req.getParameter("rid"));
 
-		resp.getWriter().write(json);
+		if (!MemoryCacheLock.INSTANCE.lock(MemoryCacheLock.EXTERNAL_PAYMENT_LOCK)) {
+			resp.getWriter().write("TIMEOUT on " + rid);
+			return;
+		}
+		try {
+			if(!MemoryCacheLock.INSTANCE.lockPrimaryKey(Constants.ENTITY_REDEEMING_REQUEST_ID,rid)){
+				resp.getWriter().write("RECORD LOCKED");
+				return;
+			}
+			
+			System.out.println("*****PROCESSING long interval " + rid);
+			try {
+				Thread.currentThread().sleep(4000);
+			} catch (InterruptedException e) {
+
+			}
+		} finally {
+			//MemoryCacheLock.INSTANCE.unlockPrimaryKey(Constants.ENTITY_REDEEMING_REQUEST_ID);
+			MemoryCacheLock.INSTANCE.unlock(MemoryCacheLock.EXTERNAL_PAYMENT_LOCK);
+		}
+		resp.getWriter().write("SUCCESS on " + rid);
+		// resp.setContentType("application/json");
+		// resp.setCharacterEncoding("UTF-8");
+		// String json = "{" + "\"paid_successfully\": true," +
+		// "\"email_sent_successfully\": false" + "}";
+		//
+		// resp.getWriter().write(json);
 	}
-	
+
 	public void editEmail(HttpServletRequest req, HttpServletResponse resp) throws Exception {
-		String email=req.getParameter("email");
-		String key=req.getParameter("key");
+		String email = req.getParameter("email");
+		String key = req.getParameter("key");
 		PaymentService paymentService = new PaymentService();
 		paymentService.editEmail(email, key);
 		resp.getWriter().write("OK");
 	}
+
 	public void editPayPalAccount(HttpServletRequest req, HttpServletResponse resp) throws Exception {
-		String paypal=req.getParameter("paypal");
-		String key=req.getParameter("key");
+		String paypal = req.getParameter("paypal");
+		String key = req.getParameter("key");
 		PaymentService paymentService = new PaymentService();
 		paymentService.editPayPalAccount(paypal, key);
 		resp.getWriter().write("OK");
 	}
-	public void validatePayPalAccount(HttpServletRequest req, HttpServletResponse resp) throws Exception {		
-		String key=req.getParameter("key");		
-		try{
-		 PaymentService paymentService = new PaymentService();
-		 paymentService.validatePayPalAccount(key);
-		 //delete record
-		 PaymentRepository paymentRepository=new PaymentRepository();
-		 paymentRepository.deleteRedeemingRequestsByKey(key);
-		 resp.getWriter().write("OK");
-		}catch(Exception e){
-		 logger.log(Level.SEVERE,"Validate exception",e);
-		 resp.sendError(HttpServletResponse.SC_CONFLICT,"Email validation error:"+e.getMessage());	
+
+	public void validatePayPalAccount(HttpServletRequest req, HttpServletResponse resp) throws Exception {
+		String key = req.getParameter("key");
+		try {
+			PaymentService paymentService = new PaymentService();
+			paymentService.validatePayPalAccount(key);
+			// delete record
+			PaymentRepository paymentRepository = new PaymentRepository();
+			paymentRepository.deleteRedeemingRequestsByKey(key);
+			resp.getWriter().write("OK");
+		} catch (Exception e) {
+			logger.log(Level.SEVERE, "Validate exception", e);
+			resp.sendError(HttpServletResponse.SC_CONFLICT, "Email validation error:" + e.getMessage());
 		}
-		
+
 	}
-	
+
 	/*
 	 * REST complient API mode
 	 */
 	public void payExternal(HttpServletRequest req, HttpServletResponse resp) throws Exception {
-        PaymentService paymentService=new PaymentService(); 
+		PaymentService paymentService = new PaymentService();
 		MailService mailService = new MailService();
-		ApplicationSettingsService applicationSettingsService=new ApplicationSettingsService();
-		
-	    String aesKey=applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.SECRET_AES_KEY);
+		ApplicationSettingsService applicationSettingsService = new ApplicationSettingsService();
 
-		//AES encoded POST values
+		String aesKey = applicationSettingsService
+				.getApplicationSettingCached(ApplicationSettingsRepository.SECRET_AES_KEY);
 
-		//No sequrity - tests only
-		//PayExternalForm form=PayExternalForm.parse(req);
-		
-		//AES sequrity - production only
+		// AES encoded POST values
+
+		// No sequrity - tests only
+		// PayExternalForm form=PayExternalForm.parse(req);
+
+		// AES sequrity - production only
 		PayExternalForm form;
-		try{
-		  form = PayExternalForm.parseEncoded(req,aesKey);
-		}catch(AESSecurityException e){
-			logger.log(Level.SEVERE,"AES sequrity exception",e);
-			resp.sendError(HttpServletResponse.SC_BAD_REQUEST,"AES security exception");						
+		try {
+			form = PayExternalForm.parseEncoded(req, aesKey);
+		} catch (AESSecurityException e) {
+			logger.log(Level.SEVERE, "AES sequrity exception", e);
+			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "AES security exception");
 			return;
 		}
-		
-		//validate  form
-		String toInvoiceMail=applicationSettingsService.getApplicationSetting(ApplicationSettingsRepository.TO_INVOICE_MAIL);
-		String fromMail=applicationSettingsService.getApplicationSetting(ApplicationSettingsRepository.FROM_MAIL);
-		try{
+
+		// validate form
+		String toInvoiceMail = applicationSettingsService
+				.getApplicationSetting(ApplicationSettingsRepository.TO_INVOICE_MAIL);
+		String fromMail = applicationSettingsService.getApplicationSetting(ApplicationSettingsRepository.FROM_MAIL);
+		try {
 			paymentService.validateExternalForm(form);
-		}catch(Exception e){
-			logger.log(Level.SEVERE,"External form validation error: ",e);            
-			
-			//send mail
-			String stackTrace=paymentService.convert(e);
+		} catch (Exception e) {
+			logger.log(Level.SEVERE, "External form validation error: ", e);
+
+			// send mail
+			String stackTrace = paymentService.convert(e);
 			Email email = new Email();
 			email.setSubject("External payment error alert!");
 			email.setContent((Objects.toString(e.getMessage(), "")) + "/n/n" + stackTrace);
 			email.setFrom(fromMail);
 			email.setTo(toInvoiceMail);
 			mailService.sendMail(email);
-			
-			//respond error code
-			resp.sendError(HttpServletResponse.SC_BAD_REQUEST,e.getMessage());
+
+			// respond error code
+			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
 			return;
-		}   
-        Pair<Integer, String> status=paymentService.payExternal(form);
-        
-        //short circuit on error
-        if(status.getKey()!=HttpStatus.SC_OK){
-        	resp.sendError(status.getKey(),status.getValue());	
-        }	
-        //send email delayed on conditions
-        paymentService.sendExternalUserEmail(form.getPaypalAccount(),form.getEmailAddress());
-        
-        resp.setStatus(HttpStatus.SC_OK);
-        
+		}
+		Pair<Integer, String> status = paymentService.payExternal(form);
+
+		// short circuit on error
+		if (status.getKey() != HttpStatus.SC_OK) {
+			resp.sendError(status.getKey(), status.getValue());
+		}
+		// send email delayed on conditions
+		paymentService.sendExternalUserEmail(form.getPaypalAccount(), form.getEmailAddress());
+
+		resp.setStatus(HttpStatus.SC_OK);
+
 	}
-	
+
 	public void sendPayPal(HttpServletRequest req, HttpServletResponse resp) throws Exception {
 		String key = (String) req.getParameter("key");
 
-		
-	    //find user to paypal to
+		// find user to paypal to
 		PaymentRepository paymentRepository = new PaymentRepository();
 		Entity user = paymentRepository.getRedeemingRequestsByKey(key);
-		
-		RedeemingRequests redeemingRequests = RedeemingRequests.valueOf(user);
-		String currencyCode=paymentRepository.getPayPalCurrencyCode(redeemingRequests.getCountryCode());
 
-		//convert currency to EUR
+		RedeemingRequests redeemingRequests = RedeemingRequests.valueOf(user);
+		String currencyCode = paymentRepository.getPayPalCurrencyCode(redeemingRequests.getCountryCode());
+
+		// convert currency to EUR
 		BigDecimal eurAmount;
-		try{
+		try {
 			eurAmount = paymentRepository.convert(Double.parseDouble(redeemingRequests.getAmount()), currencyCode);
-		}catch(Exception e){
-			logger.log(Level.SEVERE,"Currency converter for : "+currencyCode,e);
+		} catch (Exception e) {
+			logger.log(Level.SEVERE, "Currency converter for : " + currencyCode, e);
 			resp.getWriter().write("Unable to convert currency to EUR");
 			return;
 		}
-		//check if already paid
+		// check if already paid
 		Entity paidUser = paymentRepository.getPaidUserByRedeemingRequestId(redeemingRequests.getRedeemingRequestId());
 		/*
 		 * Don't pay if already paid up
 		 */
-//		if (paidUser != null) {
-//			resp.getWriter().write("+");			
-//			resp.getWriter().write(JSONUtils.writeObject(paidUser, Entity.class));
-//			return;
-//		}
-		
+		// if (paidUser != null) {
+		// resp.getWriter().write("+");
+		// resp.getWriter().write(JSONUtils.writeObject(paidUser,
+		// Entity.class));
+		// return;
+		// }
+
 		PayPalService payPalService = new PayPalService();
 		InvoiceService invoiceService = new InvoiceService();
 		MailService mailService = new MailService();
 		String sStackTrace;
-		
-		ApplicationSettingsService applicationSettingsService=new ApplicationSettingsService();
-		String toInvoiceMail=applicationSettingsService.getApplicationSetting(ApplicationSettingsRepository.TO_INVOICE_MAIL);
-		String fromMail=applicationSettingsService.getApplicationSetting(ApplicationSettingsRepository.FROM_MAIL);
-		
+
+		ApplicationSettingsService applicationSettingsService = new ApplicationSettingsService();
+		String toInvoiceMail = applicationSettingsService
+				.getApplicationSetting(ApplicationSettingsRepository.TO_INVOICE_MAIL);
+		String fromMail = applicationSettingsService.getApplicationSetting(ApplicationSettingsRepository.FROM_MAIL);
+
 		InvoiceRepository invoiceRepository = new InvoiceRepository();
 		try {
-			//payout
-			PayoutResult payoutResult = payPalService.payout(redeemingRequests,currencyCode);
-			//create invoice number
-			String invoiceNumber = Long.toString(invoiceRepository.createInvoiceNumber());			
-			
-			//save payment
-			paymentRepository.savePayPalPayment(redeemingRequests, currencyCode, eurAmount,invoiceNumber, payoutResult.getPayoutBatchId(),payoutResult.getPayoutError());
-            //create invoice
+			// payout
+			PayoutResult payoutResult = payPalService.payout(redeemingRequests, currencyCode);
+			// create invoice number
+			String invoiceNumber = Long.toString(invoiceRepository.createInvoiceNumber());
+
+			// save payment
+			paymentRepository.savePayPalPayment(redeemingRequests, currencyCode, eurAmount, invoiceNumber,
+					payoutResult.getPayoutBatchId(), payoutResult.getPayoutError());
+			// create invoice
 			PdfAttachment attachment = new PdfAttachment();
-			attachment.readFromStream(invoiceService.createInvoice(payoutResult, 
-													(String) user.getProperty("full_name"),
-													(String) user.getProperty("full_address"),
-													(String) user.getProperty("country_code"),
-													(String) user.getProperty("paypal_account"),
-													invoiceNumber));
-			//send invoice
-			mailService.sendGridInvoice(toInvoiceMail,fromMail, attachment);
+			attachment.readFromStream(invoiceService.createInvoice(payoutResult, (String) user.getProperty("full_name"),
+					(String) user.getProperty("full_address"), (String) user.getProperty("country_code"),
+					(String) user.getProperty("paypal_account"), invoiceNumber));
+			// send invoice
+			mailService.sendGridInvoice(toInvoiceMail, fromMail, attachment);
 			resp.getWriter().write("OK");
-		}catch(PayPalRESTException ppe){
-			logger.log(Level.SEVERE,ppe.getMessage(), ppe);
+		} catch (PayPalRESTException ppe) {
+			logger.log(Level.SEVERE, ppe.getMessage(), ppe);
 			resp.getWriter().write("PayPal exception, check logs for details\r\n");
-			for(ErrorDetails errorDetails:ppe.getDetails().getDetails()){
-			  resp.getWriter().write(errorDetails.getField()+"\r\n");
-			  resp.getWriter().write(errorDetails.getIssue()+"\r\n");
+			for (ErrorDetails errorDetails : ppe.getDetails().getDetails()) {
+				resp.getWriter().write(errorDetails.getField() + "\r\n");
+				resp.getWriter().write(errorDetails.getIssue() + "\r\n");
 			}
 		} catch (Exception ex) {
 			logger.log(Level.SEVERE, "payment", ex);
@@ -230,7 +259,7 @@ public class PaymentController implements Controller {
 			mailService.sendMail(email);
 			resp.getWriter().write("Server error, check logs for details.");
 		}
-		    
+
 	}
 
 	public void sendGiftCard(HttpServletRequest req, HttpServletResponse resp) throws Exception {
@@ -299,14 +328,14 @@ public class PaymentController implements Controller {
 		PaymentService paymentService = new PaymentService();
 		Collection<RedeemingRequests> entities = paymentService.searchEligibleUsers(form);
 
-		//run rules
-		PaymentRuleService paymentRuleService=new PaymentRuleService();
-		Collection<RedeemingRequestRuleValue> result=paymentRuleService.executeRedeemingRequestRules(entities);
-		//filter out result based on color flag
-		if(form.getColorFlag()!=RuleStatusType.None){			
-			result=result.stream().filter(r->r.getRuleStatus()==form.getColorFlag()).collect(Collectors.toList());
+		// run rules
+		PaymentRuleService paymentRuleService = new PaymentRuleService();
+		Collection<RedeemingRequestRuleValue> result = paymentRuleService.executeRedeemingRequestRules(entities);
+		// filter out result based on color flag
+		if (form.getColorFlag() != RuleStatusType.None) {
+			result = result.stream().filter(r -> r.getRuleStatus() == form.getColorFlag()).collect(Collectors.toList());
 		}
-		
+
 		PaymentRepository paymentRepository = new PaymentRepository();
 		Collection<String> reasons = paymentRepository.getUserPaymentsRemovalReasons();
 
@@ -315,8 +344,7 @@ public class PaymentController implements Controller {
 
 		req.setAttribute("isSendGCVisible",
 				Boolean.valueOf(map.get(ApplicationSettingsRepository.SHOW_TANGO_GIFT_CARD)));
-		req.setAttribute("isPayPalVisible",
-				Boolean.valueOf(map.get(ApplicationSettingsRepository.SHOW_PAYPAL_PAY)));		
+		req.setAttribute("isPayPalVisible", Boolean.valueOf(map.get(ApplicationSettingsRepository.SHOW_PAYPAL_PAY)));
 		req.setAttribute("webform", form);
 		req.setAttribute("colorFlags", RuleStatusType.values());
 		req.setAttribute("entities", result);
@@ -327,19 +355,21 @@ public class PaymentController implements Controller {
 		req.getRequestDispatcher("/jsp/payment_eligible_users.jsp").forward(req, resp);
 
 	}
-	public void getRedeemingRequestRuleResult(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		String key=req.getParameter("key");
-		PaymentRepository paymentRepository=new PaymentRepository();
-		Entity entity=paymentRepository.getRedeemingRequestsByKey(key);
-		RedeemingRequests redeemingRequest=RedeemingRequests.valueOf(entity);
-		
-		PaymentRuleService paymentRuleService=new PaymentRuleService();
-		Map<String,Object> result=paymentRuleService.getRedeemingRequestRuleResult(redeemingRequest);
-		
-		
+
+	public void getRedeemingRequestRuleResult(HttpServletRequest req, HttpServletResponse resp)
+			throws ServletException, IOException {
+		String key = req.getParameter("key");
+		PaymentRepository paymentRepository = new PaymentRepository();
+		Entity entity = paymentRepository.getRedeemingRequestsByKey(key);
+		RedeemingRequests redeemingRequest = RedeemingRequests.valueOf(entity);
+
+		PaymentRuleService paymentRuleService = new PaymentRuleService();
+		Map<String, Object> result = paymentRuleService.getRedeemingRequestRuleResult(redeemingRequest);
+
 		resp.getWriter().write(JSONUtils.writeObject(result));
-		
+
 	}
+
 	public void search(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
 		PaymentService paymentService = new PaymentService();
@@ -347,15 +377,15 @@ public class PaymentController implements Controller {
 		PaymentEligibleUserForm form = PaymentEligibleUserForm.parse(req);
 
 		Collection<RedeemingRequests> entities = paymentService.searchEligibleUsers(form);
-		
-		//run rules
-		PaymentRuleService paymentRuleService=new PaymentRuleService();
-		Collection<RedeemingRequestRuleValue> result=paymentRuleService.executeRedeemingRequestRules(entities);
-		//filter out result based on color flag
-		if(form.getColorFlag()!=RuleStatusType.None){			
-			result=result.stream().filter(r->r.getRuleStatus()==form.getColorFlag()).collect(Collectors.toList());
+
+		// run rules
+		PaymentRuleService paymentRuleService = new PaymentRuleService();
+		Collection<RedeemingRequestRuleValue> result = paymentRuleService.executeRedeemingRequestRules(entities);
+		// filter out result based on color flag
+		if (form.getColorFlag() != RuleStatusType.None) {
+			result = result.stream().filter(r -> r.getRuleStatus() == form.getColorFlag()).collect(Collectors.toList());
 		}
-		
+
 		PaymentRepository paymentRepository = new PaymentRepository();
 		Collection<String> reasons = paymentRepository.getUserPaymentsRemovalReasons();
 
@@ -367,9 +397,8 @@ public class PaymentController implements Controller {
 
 		req.setAttribute("isSendGCVisible",
 				Boolean.valueOf(map.get(ApplicationSettingsRepository.SHOW_TANGO_GIFT_CARD)));
-		
-		req.setAttribute("isPayPalVisible",
-				Boolean.valueOf(map.get(ApplicationSettingsRepository.SHOW_PAYPAL_PAY)));
+
+		req.setAttribute("isPayPalVisible", Boolean.valueOf(map.get(ApplicationSettingsRepository.SHOW_PAYPAL_PAY)));
 		req.setAttribute("webform", form);
 		req.setAttribute("colorFlags", RuleStatusType.values());
 		req.setAttribute("entities", result);
