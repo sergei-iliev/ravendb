@@ -235,21 +235,7 @@ public class PaymentService extends AbstractService {
 			logger.log(Level.WARNING, "User already paid.");
 			//resp.sendError(HttpServletResponse.SC_CONFLICT, "User already paid");
 			return new ImmutablePair<>(HttpServletResponse.SC_CONFLICT,"User already paid");
-		}
-		
-		//****lock payment for concurrent requests		
-		if(!MemoryCacheLock.INSTANCE.lock(MemoryCacheLock.EXTERNAL_PAYMENT_LOCK)){					
-			return new ImmutablePair<>(HttpServletResponse.SC_CONFLICT,"Concurrent request wait timeout.");			
-		}
-		try{
-			if(!MemoryCacheLock.INSTANCE.lockPrimaryKey(Constants.ENTITY_REDEEMING_REQUEST_ID,form.getRedeemingRequestId())){
-				return new ImmutablePair<>(HttpServletResponse.SC_CONFLICT,"Redeeming request id="+form.getRedeemingRequestId()+" is being paid by another thread.");	
-			}						
-		}finally{
-			MemoryCacheLock.INSTANCE.unlock(MemoryCacheLock.EXTERNAL_PAYMENT_LOCK);	
-		}		
-				
-		
+		}									
 		if (form.getType().equalsIgnoreCase("PayPal")) {
 			return sendPayPal(form, eurAmount);
 		} else if (form.getType().equalsIgnoreCase("Amazon")) {

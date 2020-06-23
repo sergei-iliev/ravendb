@@ -17,11 +17,13 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.http.HttpStatus;
 
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.EntityNotFoundException;
+import com.google.appengine.api.memcache.Expiration;
 import com.luee.wally.admin.repository.ApplicationSettingsRepository;
 import com.luee.wally.admin.repository.InvoiceRepository;
 import com.luee.wally.admin.repository.PaymentRepository;
@@ -54,30 +56,31 @@ import com.paypal.base.rest.PayPalRESTException;
 public class PaymentController implements Controller {
 	private final Logger logger = Logger.getLogger(PaymentController.class.getName());
 
-	public void test(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+	public void test(HttpServletRequest req, HttpServletResponse resp) throws Exception {
 		String rid = (req.getParameter("rid"));
-
+		String KEY=String.format("%s|%s",Constants.ENTITY_REDEEMING_REQUEST_ID,rid);
+		logger.warning(KEY);
 		if (!MemoryCacheLock.INSTANCE.lock(MemoryCacheLock.EXTERNAL_PAYMENT_LOCK)) {
-			resp.getWriter().write("TIMEOUT on " + rid);
+			resp.getWriter().write("TIMEOUT on " + KEY);
 			return;
 		}
 		try {
-			if(!MemoryCacheLock.INSTANCE.lockPrimaryKey(Constants.ENTITY_REDEEMING_REQUEST_ID,rid)){
-				resp.getWriter().write("RECORD LOCKED");
+			if(!MemoryCacheLock.INSTANCE.lockPrimaryKeyTimeout(KEY,Expiration.byDeltaSeconds(30))){
+				resp.getWriter().write("RECORD LOCKED "+KEY);
 				return;
 			}
 			
-			System.out.println("*****PROCESSING long interval " + rid);
-			try {
-				Thread.currentThread().sleep(4000);
-			} catch (InterruptedException e) {
-
-			}
-		} finally {
-			//MemoryCacheLock.INSTANCE.unlockPrimaryKey(Constants.ENTITY_REDEEMING_REQUEST_ID);
+		} finally {			
 			MemoryCacheLock.INSTANCE.unlock(MemoryCacheLock.EXTERNAL_PAYMENT_LOCK);
 		}
-		resp.getWriter().write("SUCCESS on " + rid);
+		
+		try{
+			logger.warning("*****PROCESSING long interval " + KEY);
+			Thread.currentThread().sleep(8000);
+		}finally{
+			MemoryCacheLock.INSTANCE.unlockPrimaryKey(KEY);	
+		}
+		resp.getWriter().write("SUCCESS on " + KEY);
 		// resp.setContentType("application/json");
 		// resp.setCharacterEncoding("UTF-8");
 		// String json = "{" + "\"paid_successfully\": true," +
@@ -166,17 +169,38 @@ public class PaymentController implements Controller {
 			resp.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
 			return;
 		}
-		Pair<Integer, String> status = paymentService.payExternal(form);
-
-		// short circuit on error
-		if (status.getKey() != HttpStatus.SC_OK) {
-			resp.sendError(status.getKey(), status.getValue());
+		
+		String RedeemingRequestKey=String.format("%s|%s",Constants.ENTITY_REDEEMING_REQUEST_ID,form.getRedeemingRequestId());
+		
+		//****lock payment for concurrent requests		
+		if(!MemoryCacheLock.INSTANCE.lock(MemoryCacheLock.EXTERNAL_PAYMENT_LOCK)){					
+			resp.sendError(HttpServletResponse.SC_CONFLICT,"Concurrent request lock wait timeout.");
+			return;
 		}
-		// send email delayed on conditions
-		paymentService.sendExternalUserEmail(form.getPaypalAccount(), form.getEmailAddress());
+		try{
+			if(!MemoryCacheLock.INSTANCE.lockPrimaryKeyTimeout(RedeemingRequestKey,Expiration.byDeltaSeconds(30))){			
+				resp.sendError(HttpServletResponse.SC_CONFLICT,"Redeeming request id="+form.getRedeemingRequestId()+" is being paid by another thread.");
+				return;
+			}						
+		}finally{
+			MemoryCacheLock.INSTANCE.unlock(MemoryCacheLock.EXTERNAL_PAYMENT_LOCK);	
+		}
+		
+		try{
+			//****process external payment *****
+			Pair<Integer, String> status = paymentService.payExternal(form);			
+			// short circuit on error
+			if (status.getKey() != HttpStatus.SC_OK) {
+				resp.sendError(status.getKey(), status.getValue());
+			}
+			// send email delayed on conditions
+			paymentService.sendExternalUserEmail(form.getPaypalAccount(), form.getEmailAddress());
 
-		resp.setStatus(HttpStatus.SC_OK);
-
+			resp.setStatus(HttpStatus.SC_OK);			
+		}finally{
+			MemoryCacheLock.INSTANCE.unlockPrimaryKey(RedeemingRequestKey);				
+		}
+		
 	}
 
 	public void sendPayPal(HttpServletRequest req, HttpServletResponse resp) throws Exception {

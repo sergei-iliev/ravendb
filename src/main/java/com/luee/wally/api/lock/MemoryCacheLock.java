@@ -3,6 +3,7 @@ package com.luee.wally.api.lock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.google.appengine.api.memcache.Expiration;
 import com.google.appengine.api.memcache.MemcacheService;
 import com.google.appengine.api.memcache.MemcacheServiceFactory;
 import com.luee.wally.constants.Constants;
@@ -32,34 +33,41 @@ public enum MemoryCacheLock {
 		return false;		
 		
 	}
-	/*
-	 * Check if current PK is what next concurrent threads' PK request is 
-	 */
-	public boolean lockPrimaryKey(String entityTypeId,String entityPK){
-		MemcacheService memcache = MemcacheServiceFactory.getMemcacheService();
-		String value = (String) memcache.get(entityTypeId);
-		if (value == null) {	//first one
-			memcache.put(entityTypeId,entityPK); 		 
-			return true;
-		}else{
-			if(entityPK.equals(value)){  //same record is processsed
-				return false;
-			}else{
-				memcache.put(entityTypeId,entityPK);
-				return true;
-			}				
-		}
-	}
-	public void unlockPrimaryKey(String entityTypeId){
-		MemcacheService memcache = MemcacheServiceFactory.getMemcacheService();
-		memcache.put(entityTypeId,null); 
-	}
-	
-	
 	
 	public void unlock(String key){
 		MemcacheService memcache = MemcacheServiceFactory.getMemcacheService();		
 		memcache.put(key,0L);		
 	}
+	
+	/*
+	 * Check if current PK is what next concurrent threads' PK request is 
+	 */
+	public boolean lockPrimaryKey(String entityPK){
+		MemcacheService memcache = MemcacheServiceFactory.getMemcacheService();
+		Long value = (Long) memcache.get(entityPK);
+		if (value == null) {	//no current processing
+			memcache.put(entityPK,1L); 		 
+			return true;
+		}else{			
+			return false;						
+		}
+	}
+	public boolean lockPrimaryKeyTimeout(String entityPK,Expiration timeout){
+		MemcacheService memcache = MemcacheServiceFactory.getMemcacheService();
+		Long value = (Long) memcache.get(entityPK);
+		if (value == null) {	//no current processing
+			memcache.put(entityPK,1L,timeout); 		 
+			return true;
+		}else{			
+			return false;						
+		}
+	}	
+	public void unlockPrimaryKey(String entityPK){
+		MemcacheService memcache = MemcacheServiceFactory.getMemcacheService();
+		memcache.delete(entityPK); 
+	}
+	
+	
+	
 	
 }
