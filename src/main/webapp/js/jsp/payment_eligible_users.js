@@ -106,14 +106,15 @@ payment.PaymentEligibleUsersView = Backbone.View.extend({
 				data:formData,
 				success: function(data, textStatus, jQxhr ){			          
  					let map=JSON.parse(data);
- 					console.log(map);
- 					let rule_status_result="<div>Time to cash out : <strong>"+map.cashout+"</strong></div>";
+ 					
+ 					let rule_status_result="<ul><li>Time to cash out : <strong>"+map.cashout+"</strong></li>";
  					if(map.uachannel!=null){
- 						rule_status_result+="<div>UA Channel : <strong>"+map.uachannel+"</strong></div>";
+ 						rule_status_result+="<li>UA Channel : <strong>"+map.uachannel+"</strong></li>";
  					}
  					map.differentuserlist.forEach((item)=>{ 						
- 						rule_status_result+="<div>"+item.text+"<br><a href='"+item.url+"' target='_blank'>"+item.name+"</a></div>";
+ 						rule_status_result+="<li>"+item.text+"<br><a href='"+item.url+"' target='_blank'>"+item.name+"</a></li>";
  					});
+ 					rule_status_result+="</ul>";
  					$('#ruleStatusResultId').html(rule_status_result);
  					 					
 				},
