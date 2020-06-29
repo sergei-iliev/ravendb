@@ -58,6 +58,7 @@ INSTANCE;
     	 httpGetRouteList.put("/administration/search/template/filter", new Route(new PaymentController(),"searchByFilterTemplate"));
     	 httpGetRouteList.put("/administration/payment/test", new Route(new PaymentController(),"test"));
     	 httpGetRouteList.put("/administration/job/reports/payment/yesterday", new Route(new PaymentReportsController(),"getPaymentReportForYesterday"));
+    	 httpGetRouteList.put("/administration/job/reports/payment/external/yesterday", new Route(new PaymentReportsController(),"getExternalPaymentReportForYesterday"));
     	 httpGetRouteList.put("/administration/job/redeemingrequest/email/reminder", new Route(new EmailTemplateController(),"redeemingRequestEmailJob"));
 
     	 httpGetRouteList.put("/administration/payment/paidusers", new Route(new PaidUsersController(),"index"));

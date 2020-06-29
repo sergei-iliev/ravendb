@@ -58,9 +58,48 @@ public class PaymentReportsRepository extends AbstractRepository{
 			} while (results.size() > 0);
 			return paymentAmount;
 		}
-		/*
-		 * Read redeeming_requests by foraign key
-		 */
+		public PaymentAmount getExternalPaymentReports(Date startDate,Date endDate){
+			DatastoreService ds = createDatastoreService(Consistency.EVENTUAL);
+			
+			Query query = createExternalPaymentQuery(startDate, endDate);
+
+			PreparedQuery preparedQuery = ds.prepare(query);
+
+			QueryResultList<Entity> results;
+			Cursor cursor = null;
+			PaymentAmount paymentAmount=new PaymentAmount();
+			
+			do {
+				FetchOptions fetchOptions;
+				if (cursor != null) {
+					fetchOptions = FetchOptions.Builder.withLimit(Constants.CURSOR_SIZE).startCursor(cursor);
+				} else {
+					fetchOptions = FetchOptions.Builder.withLimit(Constants.CURSOR_SIZE);
+				}
+
+				results = preparedQuery.asQueryResultList(fetchOptions);
+			
+				for (Entity e : results) {
+					paymentAmount.addTotalAmountEur((double) e.getProperty("eur_currency"));
+					paymentAmount.addTotalAmountByCurrencyMap((String) e.getProperty("paid_currency"),(String) e.getProperty("amount"));
+					paymentAmount.addTotalAmountByTypeMap((String) e.getProperty("type"),(double) e.getProperty("eur_currency"));										
+				    paymentAmount.addTotalAmountByAmountMap((String) e.getProperty("amount"),(double) e.getProperty("eur_currency"));									    
+				    String countryCode=(String)e.getProperty("country_code");				    
+				    paymentAmount.addTotalAmountByCountryCodeMap(countryCode,(double) e.getProperty("eur_currency"));
+				}
+			
+				cursor = results.getCursor();
+			} while (results.size() > 0);
+			return paymentAmount;
+		}		
+		private Query createExternalPaymentQuery(Date startDate, Date endDate) {
+
+			Query query = new Query("paid_users_external");			
+			query.setFilter(Query.CompositeFilterOperator.and(new FilterPredicate("date", FilterOperator.GREATER_THAN, startDate),new FilterPredicate("date", FilterOperator.LESS_THAN, endDate)));
+			return query;
+		}
+		
+		
 		private Query createQuery(Date startDate, Date endDate) {
 
 			Query query = new Query("paid_users");			

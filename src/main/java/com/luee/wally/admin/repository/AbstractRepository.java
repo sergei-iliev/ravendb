@@ -14,7 +14,10 @@ import com.google.appengine.api.datastore.ReadPolicy;
 import com.google.appengine.api.datastore.ReadPolicy.Consistency;
 
 public class AbstractRepository {
-
+	public void save(Entity entity) {
+		DatastoreService ds = createDatastoreService(Consistency.STRONG);
+		ds.put(entity);
+	}
 	public Map<Key,Entity> findEntitiesByKey(Collection<Key> keys){
 		  DatastoreService ds = createDatastoreService(Consistency.EVENTUAL);
 		  return ds.get(keys);
