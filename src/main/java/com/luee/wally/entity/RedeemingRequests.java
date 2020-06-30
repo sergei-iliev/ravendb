@@ -1,6 +1,9 @@
 package com.luee.wally.entity;
 
 import java.util.Date;
+import java.util.List;
+
+import org.json.simple.JSONArray;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.appengine.api.datastore.Entity;
@@ -20,8 +23,10 @@ public class RedeemingRequests {
 	private String uaChannel;
 	private String ipAddress;
     private boolean paid;
+    private List<Long> coinsPerGame;
     
 	public static RedeemingRequests valueOf(Entity entity) {
+
 		RedeemingRequests redeemingRequests = new RedeemingRequests();
 		redeemingRequests.key = KeyFactory.keyToString(entity.getKey());
 		redeemingRequests.setAmount((String) entity.getProperty("amount"));
@@ -39,7 +44,7 @@ public class RedeemingRequests {
 		redeemingRequests.setIpAddress((String) entity.getProperty("ip_address"));		
 		redeemingRequests.setFullAddress((String) entity.getProperty("full_address"));
 		redeemingRequests.setPaid((Boolean) entity.getProperty("is_paid"));
-
+		redeemingRequests.setCoinsPerGame((List)entity.getProperty("coins_per_game"));
 		// redeemingRequests.setLink1("/administration/payment/test?amount="+redeemingRequests.amount+"&user_guid="+redeemingRequests.userGuid);
 		// redeemingRequests.setLink2("/administration/payment/test?amount="+redeemingRequests.amount+"&user_guid="+redeemingRequests.userGuid);
 
@@ -57,6 +62,12 @@ public class RedeemingRequests {
 		return redeemingRequests;
 	}
 
+public List<Long> getCoinsPerGame() {
+	return coinsPerGame;
+}
+public void setCoinsPerGame(List<Long> coinsPerGame) {
+	this.coinsPerGame = coinsPerGame;
+}
 	public boolean isPaid() {
 		return paid;
 	}

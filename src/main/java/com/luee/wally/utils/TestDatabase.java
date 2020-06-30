@@ -2,9 +2,12 @@ package com.luee.wally.utils;
 
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import org.joda.time.LocalDate;
+import org.json.simple.JSONArray;
 
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
@@ -79,7 +82,10 @@ public enum TestDatabase {
 	}
 	private  Entity createRedeemingRequestEntity(String fullName,String redeemingRequestId,String userGuid,String amount, Date date,String packageName,String type,String paypalAccount,String countryCode){
 		DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
-	
+	    JSONArray  coins=new JSONArray();		
+	    coins.add(new Integer(2345));
+	    coins.add(new Integer(39051));
+	    
 		Entity redeeming = new Entity("redeeming_requests_new");		
 		redeeming.setIndexedProperty("amount", amount);
 		redeeming.setIndexedProperty("full_name", fullName);
@@ -92,6 +98,7 @@ public enum TestDatabase {
 		redeeming.setIndexedProperty("paypal_account", paypalAccount);
 		redeeming.setIndexedProperty("country_code", countryCode);
 		redeeming.setIndexedProperty("is_paid", false);		
+		redeeming.setIndexedProperty("coins_per_game",coins);
 		redeeming.setIndexedProperty("email", "sergei_iliev@yahoo.com");
 		ds.put(redeeming);
        

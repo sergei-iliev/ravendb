@@ -10,6 +10,7 @@ package com.luee.wally.api.rule.redeemingrequest;
 		“redeeming_requests_new” table has entities with the same value of “full_name” with value “is_paid” = true and a different user_guid.
 		“redeeming_requests_new” table has entities with the same value of “full_address” with value “is_paid” = true and a different user_guid.
 		“redeeming_requests_new” table has entities with the same value of “ip_address” with value “is_paid” = true and a different user_guid.
+
 *
  */
 public enum RuleResultType {
@@ -18,5 +19,8 @@ public enum RuleResultType {
     TIME_TO_CACH_LESS_48_ORGANIC,
     FULL_NAME_DIFFERENT_USER,
     FULL_ADDRESS_DIFFERENT_USER,
-    IP_ADDRESS_DIFFERENT_USER;		
+    IP_ADDRESS_DIFFERENT_USER,
+    COINS_PER_GAME_EQUAL_0,
+    COINS_PER_GAME_LESS_THEN_3
+    ;		
 }

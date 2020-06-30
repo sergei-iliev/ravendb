@@ -13,6 +13,7 @@ public class RedeemingRequestEngine {
 		first.setNext(new TimeToCashLess24NonOrganicRule());
 		first.setNext(new TimeToCashLess48OrganicRule());
 		first.setNext(new FullNameDifferentUserRule());
+		first.setNext(new CoinsPerGameRule());
 		first.setNext(new FullAddressDifferentUserRule());
 		first.setNext(new IpAddressDifferentUserRule());
 	}

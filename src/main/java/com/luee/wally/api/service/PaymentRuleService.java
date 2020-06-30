@@ -59,6 +59,15 @@ public class PaymentRuleService extends AbstractService {
 		}else{
 		  result.put("uachannel","none");	
 		}
+		//coins
+		for(RuleResultType ruleResult:ruleResults){
+			if(ruleResult==RuleResultType.COINS_PER_GAME_EQUAL_0||ruleResult==RuleResultType.COINS_PER_GAME_LESS_THEN_3){
+				long count=redeemingRequest.getCoinsPerGame().stream().filter(i->i>=100).count();
+				result.put("coinspergame",count);
+				break;
+			}			
+		}
+		
 		Collection<Map<String,String>> objects=new ArrayList<>();
 		result.put("differentuserlist",objects);
 		
@@ -95,7 +104,7 @@ public class PaymentRuleService extends AbstractService {
 						);
 				object.put("url", redeemingRequest.ipAddressLink());
 				objects.add(object);
-			}			
+			}
 		}
 		
 		return result;

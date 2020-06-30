@@ -31,6 +31,10 @@ public class RedeemingRequestRuleValue {
 			case FULL_ADDRESS_DIFFERENT_USER:
 			case IP_ADDRESS_DIFFERENT_USER:
 				return RuleStatusType.Yellow;
+			case COINS_PER_GAME_EQUAL_0:
+				return RuleStatusType.Red;
+			case COINS_PER_GAME_LESS_THEN_3:
+				return RuleStatusType.Yellow;
 			default:
 				return RuleStatusType.Green;
 			}
