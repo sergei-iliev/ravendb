@@ -41,7 +41,7 @@ public class PaymentReportsService {
 		
 	}
 	
-	public void sendReportToMail(PaymentAmount paymentAmount){
+	public void sendReportToMail(PaymentAmount paymentAmount,String subject){
 		//create mail body
 		 StringBuffer sb=new StringBuffer();
 		 sb.append("1. Total amount paid in eur.\r\n");
@@ -74,7 +74,7 @@ public class PaymentReportsService {
 		 email.setTo(applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.PAYMENT_REPORT_EMAIL_1));
 		 email.setContent(sb.toString());
 		 email.setFrom(applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.NO_REPLY_EMAIL));
-		 email.setSubject("Payment Report");
+		 email.setSubject(subject);
 		 
 		 MailService mailService=new MailService();
 		 mailService.sendMail(email);	

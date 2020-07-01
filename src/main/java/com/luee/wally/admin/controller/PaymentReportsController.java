@@ -29,7 +29,7 @@ public class PaymentReportsController implements Controller{
 		PaymentReportsService paymentReportsService=new PaymentReportsService();
 		PaymentAmount paymentAmount=paymentReportsService.getPaymentReportForYesterday();		
 		
-		 paymentReportsService.sendReportToMail(paymentAmount);
+		 paymentReportsService.sendReportToMail(paymentAmount,"Payment Report");
 		 
 		 logger.log(Level.WARNING, "*************************End Payment Reports Job ********************");
 	}
@@ -42,7 +42,7 @@ public class PaymentReportsController implements Controller{
 		PaymentReportsService paymentReportsService=new PaymentReportsService();
 		PaymentAmount paymentAmount=paymentReportsService.getExternalPaymentReportForYesterday();
 		
-		paymentReportsService.sendReportToMail(paymentAmount);
+		paymentReportsService.sendReportToMail(paymentAmount,"External Payment Report");
 		 
 		 logger.log(Level.WARNING, "*************************End External Payment Reports Job ********************");
 	}
