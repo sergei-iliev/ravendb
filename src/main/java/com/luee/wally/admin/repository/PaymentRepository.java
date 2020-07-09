@@ -300,7 +300,18 @@ public class PaymentRepository extends AbstractRepository {
 		return count;
 
 	}
+	public Collection<Entity> getEligibleUsersByEmail(String email) {
+		DatastoreService ds = createDatastoreService(Consistency.EVENTUAL);
+		Query query = new Query("redeeming_requests_new");
 
+		Filter filter = CompositeFilterOperator.or(new FilterPredicate("paypal_account", FilterOperator.EQUAL, email),
+				new FilterPredicate("email", FilterOperator.EQUAL, email));
+		query.setFilter(filter);
+		query.addSort("date", SortDirection.DESCENDING);
+		
+		PreparedQuery pq = ds.prepare(query);
+		return pq.asList(FetchOptions.Builder.withDefaults());
+	}
 	public int countEligibleUsersByAddress(String fullAddress, String userGuid) {
 		DatastoreService ds = createDatastoreService(Consistency.EVENTUAL);
 

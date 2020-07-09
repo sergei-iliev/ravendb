@@ -20,6 +20,7 @@ import com.google.appengine.api.datastore.FetchOptions;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
+import com.google.appengine.api.datastore.Query.CompositeFilterOperator;
 import com.google.appengine.api.datastore.Query.Filter;
 import com.google.appengine.api.datastore.Query.FilterOperator;
 import com.google.appengine.api.datastore.Query.FilterPredicate;
@@ -104,7 +105,7 @@ public class PaidUsersRepository extends AbstractRepository{
 			Query query = new Query("paid_users");
 			query.setFilter(new FilterPredicate("user_guid", FilterOperator.EQUAL , userGuid));			
 			return query;
-		}
+		}	
 		
 		private Query createPaidUsersQuery(String email,String paypalAccount){
 			Query query = new Query("paid_users");

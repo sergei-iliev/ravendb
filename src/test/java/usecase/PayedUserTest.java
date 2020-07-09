@@ -9,8 +9,10 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
+import com.luee.wally.admin.repository.PaidUsersRepository;
 import com.luee.wally.api.service.PaidUsersService;
 import com.luee.wally.command.PaidUserGroupByForm;
 import com.luee.wally.command.PaidUserGroupByForm.GroupByType;
@@ -220,5 +222,7 @@ public class PayedUserTest {
         paidUsersService.sortBy(r);
         
         r.forEach(e->System.out.println(e.getGroupByTimeValue()+"::"+e.getGroupByLocaleValue()+"::"+e.getAmount()));
-	}		
+	}	
+	
+	
 }

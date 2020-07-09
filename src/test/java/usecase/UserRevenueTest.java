@@ -28,12 +28,18 @@ import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
 import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
+import com.luee.wally.admin.controller.ConfirmEmailController;
 import com.luee.wally.admin.controller.ImportController;
+import com.luee.wally.admin.repository.PaidUsersRepository;
+import com.luee.wally.admin.repository.PaymentRepository;
+import com.luee.wally.api.service.ConfirmEmailService;
 import com.luee.wally.api.service.InvoiceService;
 import com.luee.wally.api.service.impex.ImportService;
 import com.luee.wally.csv.PaidUsers2018;
+import com.luee.wally.entity.RedeemingRequests;
 import com.luee.wally.json.ExchangeRateVO;
 import com.luee.wally.utils.AESUtils;
+import com.luee.wally.utils.TestDatabase;
 import com.luee.wally.utils.Utilities;
 
 
@@ -256,13 +262,12 @@ public class UserRevenueTest {
 	
 	@Test
 	public void encryptStringTest() throws Exception {
-		String param="my first test";
-		String encoded=AESUtils.encrypt(param,"1234567890123456");
-		System.out.println(encoded);
-		String decoded=AESUtils.decrypt(encoded,"1234567890123456");
-		Assert.assertEquals(decoded,param);
+		TestDatabase.INSTANCE.generateDB();
+		ConfirmEmailService service=new ConfirmEmailService();
+		Collection<RedeemingRequests> entities=service.confirmEmail("sergei.iliev-facilitator@gmail2.com");
 		
-		System.out.println(decoded);
+		
+		System.out.println(entities);
 		
 	}
 }

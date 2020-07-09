@@ -24,6 +24,7 @@ public class RedeemingRequests {
 	private String ipAddress;
     private boolean paid;
     private List<Long> coinsPerGame;
+    private boolean confirmedEmail;
     
 	public static RedeemingRequests valueOf(Entity entity) {
 
@@ -45,6 +46,7 @@ public class RedeemingRequests {
 		redeemingRequests.setFullAddress((String) entity.getProperty("full_address"));
 		redeemingRequests.setPaid((Boolean) entity.getProperty("is_paid"));
 		redeemingRequests.setCoinsPerGame((List)entity.getProperty("coins_per_game"));
+		redeemingRequests.setConfirmedEmail((Boolean)entity.getProperty("confirmed_email"));
 		// redeemingRequests.setLink1("/administration/payment/test?amount="+redeemingRequests.amount+"&user_guid="+redeemingRequests.userGuid);
 		// redeemingRequests.setLink2("/administration/payment/test?amount="+redeemingRequests.amount+"&user_guid="+redeemingRequests.userGuid);
 
@@ -61,6 +63,17 @@ public class RedeemingRequests {
 
 		return redeemingRequests;
 	}
+
+	
+public boolean isConfirmedEmail() {
+		return confirmedEmail;
+	}
+
+
+	public void setConfirmedEmail(boolean confirmedEmail) {
+		this.confirmedEmail = confirmedEmail;
+	}
+
 
 public List<Long> getCoinsPerGame() {
 	return coinsPerGame;

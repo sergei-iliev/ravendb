@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.luee.wally.admin.controller.AffsSearchController;
 import com.luee.wally.admin.controller.ApplicationSettingsController;
 import com.luee.wally.admin.controller.CampaignSearchController;
+import com.luee.wally.admin.controller.ConfirmEmailController;
 import com.luee.wally.admin.controller.EmailTemplateController;
 import com.luee.wally.admin.controller.ImportController;
 import com.luee.wally.admin.controller.LoginController;
@@ -62,7 +63,7 @@ INSTANCE;
     	 httpGetRouteList.put("/administration/job/redeemingrequest/email/reminder", new Route(new EmailTemplateController(),"redeemingRequestEmailJob"));
 
     	 httpGetRouteList.put("/administration/payment/paidusers", new Route(new PaidUsersController(),"index"));
-
+    	 httpGetRouteList.put("/administration/payment/confirmemail", new Route(new ConfirmEmailController(),"index"));
     	 
     	 httpGetRouteList.put("/administration/settings", new Route(new ApplicationSettingsController(),"index"));
     	 httpGetRouteList.put("/administration/settings/cache/clear", new Route(new ApplicationSettingsController(),"clearCache"));
@@ -78,7 +79,7 @@ INSTANCE;
     	 //*********post*******
     	 httpPostRouteList.put("/administration/search", new Route(new AffsSearchController(),"search"));
     	 httpPostRouteList.put("/administration/exportgaid/run", new Route(new AffsSearchController(),"runExportGaid"));
-    	 
+    	
     	 
     	 httpPostRouteList.put("/administration/campaign/search", new Route(new CampaignSearchController(),"search"));
     	 httpPostRouteList.put("/administration/login", new Route(new LoginController(),"login"));
@@ -87,6 +88,7 @@ INSTANCE;
     	 httpPostRouteList.put("/administration/payment/eligibleusers/edit/email", new Route(new PaymentController(),"editEmail"));
     	 httpPostRouteList.put("/administration/payment/eligibleusers/edit/paypal", new Route(new PaymentController(),"editPayPalAccount"));
     	 httpPostRouteList.put("/administration/payment/eligibleusers/rules/status", new Route(new PaymentController(),"getRedeemingRequestRuleResult"));
+    	 httpPostRouteList.put("/administration/payment/confirmemail", new Route(new ConfirmEmailController(),"confirmEmail"));
 
     	 
     	 httpPostRouteList.put("/administration/search/template", new Route(new SearchFilterTemplateController(),"saveSearchFilterTemplate"));

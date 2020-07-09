@@ -30,7 +30,7 @@ public enum TestDatabase {
 	}
 	private  void createRedeemingRequests(){
 		DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
-		Entity entity=createRedeemingRequestEntity("Sergey Iliev","15b5-4e3a-b398-8792a9a9f530","48bb2675-a072-4b6b-ab66-cb599a29147d", "2.1", new Date(), "com.moregames.makemoney1", "PayPal", "sergei.iliev-facilitator@gmail.com", "DE");		
+		Entity entity=createRedeemingRequestEntity("Sergey Iliev","15b5-4e3a-b398-8792a9a9f530","48bb2675-a072-4b6b-ab66-cb599a29147d", "2.1", new Date(), "com.moregames.makemoney1", "PayPal", "sergei.iliev-facilitator@gmail1.com", "DE");		
 		entity.setProperty("ua_channel", "organic");
 		entity.setProperty("ip_address", "123.0.0.23");		
 		entity.setProperty("full_address", "baba tonka 6 for accson");
@@ -100,6 +100,7 @@ public enum TestDatabase {
 		redeeming.setIndexedProperty("is_paid", false);		
 		redeeming.setIndexedProperty("coins_per_game",coins);
 		redeeming.setIndexedProperty("email", "sergei_iliev@yahoo.com");
+		redeeming.setIndexedProperty("confirmed_email", true);
 		ds.put(redeeming);
        
 		return redeeming;
