@@ -30,7 +30,7 @@
 						<fieldset>
 							<div class="form-label-group mt-3">
 								<div class="col-md-3">
-									<label for="typesId">Confirm Email</label> <input name="email"
+									<label for="emailId">Please only enter email addresses that we received emails from</label> <input name="email"
 										class="form-control" id="emailId"
 										value="${email}">
 								</div>
@@ -50,7 +50,7 @@
       			</div>
 	</div>
 		<c:if test="${message!=null}">
-		   <div class="alert alert-primary" role="alert">${message}</div>
+		   <div class="alert alert-success" role="alert">${message}</div>
 		</c:if>
 		
 	</div>
