@@ -34,11 +34,11 @@ public class PaidUserGroupByForm implements WebForm{
 	private String groupByTime; // day;month;year
 	private String groupByLocale; // country,currency
 
-	private GroupByType groupByType=GroupByType.NONE;
+	private GroupByType groupByType=GroupByType.TIME;
 	
 	
 	public PaidUserGroupByForm() {
-		type="PayPal";
+		groupByTime="day";
 		ZonedDateTime now = ZonedDateTime.now();
 		ZonedDateTime yesterday = now.minusDays(7);
 		startDate = Date.from(yesterday.toInstant());

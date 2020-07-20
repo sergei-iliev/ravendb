@@ -49,10 +49,16 @@
       				</div>
       			</div>
 	</div>
-		<c:if test="${message!=null}">
-		   <div class="alert alert-success" role="alert">${message}</div>
-		</c:if>
-		
+	<c:if test="${message!=null}">
+		 <c:choose>
+    	  <c:when test="${message.right}">
+			<div class="alert alert-success" role="alert">${message.left}</div>
+    	</c:when>    
+    	<c:otherwise>
+			<div class="alert alert-primary" role="alert">${message.left}</div>
+    	</c:otherwise>		  
+		</c:choose> 
+	</c:if>		
 	</div>
 	
 </body>
