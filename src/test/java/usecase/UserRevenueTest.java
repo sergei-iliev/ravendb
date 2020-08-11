@@ -6,9 +6,11 @@ import java.io.InputStream;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.math.BigDecimal;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -32,6 +34,7 @@ import com.luee.wally.admin.controller.ConfirmEmailController;
 import com.luee.wally.admin.controller.ImportController;
 import com.luee.wally.admin.repository.PaidUsersRepository;
 import com.luee.wally.admin.repository.PaymentRepository;
+import com.luee.wally.admin.repository.UserRevenueRepository;
 import com.luee.wally.api.service.ConfirmEmailService;
 import com.luee.wally.api.service.InvoiceService;
 import com.luee.wally.api.service.impex.ImportService;
@@ -270,4 +273,34 @@ public class UserRevenueTest {
 		System.out.println(entities);
 		
 	}
+	
+	@Test
+	public void compareDatesTest() throws Exception {
+        UserRevenueRepository userRevenueRepository=new UserRevenueRepository();
+		List<Entity> list=new ArrayList<>();
+		Entity e=new Entity("affs");
+		ZonedDateTime now=ZonedDateTime.now();
+		ZonedDateTime yesterday=now.minusDays(10);
+		e.setProperty("date",Date.from(yesterday.toInstant()));
+		e.setProperty("id","1");
+		list.add(e);
+		
+		
+		 e=new Entity("affs");
+		e.setProperty("date",new Date());
+		e.setProperty("id","2");
+		list.add(e);
+		
+		 e=new Entity("affs");
+		now=ZonedDateTime.now();
+		yesterday=now.minusDays(30);
+		e.setProperty("date",Date.from(yesterday.toInstant()));
+		e.setProperty("id","3");
+		list.add(e);
+		
+		Comparator<Entity> comparator = userRevenueRepository.createDateComparator("date");
+		Entity ent= list.stream().max(comparator).orElse(null);
+		System.out.println(ent);
+		
+	}	
 }
