@@ -35,8 +35,10 @@ import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 import com.luee.wally.DB;
 import com.luee.wally.admin.controller.ImportController;
 import com.luee.wally.api.ConnectionMgr;
+import com.luee.wally.api.service.GiftCardService;
 import com.luee.wally.api.service.InvoiceService;
 import com.luee.wally.api.service.impex.ImportService;
+import com.luee.wally.command.Email;
 import com.luee.wally.constants.Constants;
 import com.luee.wally.csv.PaidUsers2018;
 import com.luee.wally.json.ExchangeRateVO;
@@ -94,6 +96,25 @@ public class GiftCardTest {
 
 	}
 	
+	@Test
+	public void getAcountsTest() throws Throwable {
+		   Configuration.environment=Configuration.environment.PRODUCTION;
+		   RaasClient raasClient=new  RaasClient(Constants.PROD_PLATFORM_IDENTIFIER,Constants.PROD_PLATFORM_KEY);
+		   List<AccountModel> accoutModels = raasClient.getAccounts().getAllAccounts();
+		   for(AccountModel accountModel:accoutModels){
+			   double balance=accountModel.getCurrentBalance();
+			   String accountIdentifier=accountModel.getAccountIdentifier();
+			   if(Double.compare(Constants.TANGO_CARD_ACCOUNT_BALANCE_THRESHOLD, balance)>0){
+				   //send email
+					Email email = new Email();
+					email.setSubject("Tango card account balance threshold!");
+					email.setContent("Tango Card account "+accountIdentifier+" balance is "+balance);
+
+			   }
+		   }
+
+
+	}
 	@Test
 	public void getCustomersTest() throws Throwable {
 		   Configuration.environment=Configuration.environment.PRODUCTION;

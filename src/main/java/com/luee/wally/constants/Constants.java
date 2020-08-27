@@ -52,6 +52,7 @@ public interface Constants {
 	public static final String PROD_PLATFORM_CUSTOMER ="G71971146";
 	public static final String PROD_PLATFORM_ACCOUNT ="A88393817";
 	
+	public static final double TANGO_CARD_ACCOUNT_BALANCE_THRESHOLD =8000.0;
 	
 	//public static final String EMAIL_TEMPLATE_SUBJECT ="Your reward from %s!";
 	//public static final String EMAIL_TEMPLATE_MESSAGE ="Congratulations! You just received your reward from %s.";

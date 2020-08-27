@@ -16,11 +16,11 @@ import com.luee.wally.admin.controller.ApplicationSettingsController;
 import com.luee.wally.admin.controller.CampaignSearchController;
 import com.luee.wally.admin.controller.ConfirmEmailController;
 import com.luee.wally.admin.controller.EmailTemplateController;
+import com.luee.wally.admin.controller.GiftCardController;
 import com.luee.wally.admin.controller.ImportController;
 import com.luee.wally.admin.controller.LoginController;
 import com.luee.wally.admin.controller.PaidUsersController;
 import com.luee.wally.admin.controller.PaymentController;
-import com.luee.wally.admin.controller.PaymentLoginController;
 import com.luee.wally.admin.controller.PaymentReportsController;
 import com.luee.wally.admin.controller.SearchFilterTemplateController;
 
@@ -61,7 +61,8 @@ INSTANCE;
     	 httpGetRouteList.put("/administration/job/reports/payment/yesterday", new Route(new PaymentReportsController(),"getPaymentReportForYesterday"));
     	 httpGetRouteList.put("/administration/job/reports/payment/external/yesterday", new Route(new PaymentReportsController(),"getExternalPaymentReportForYesterday"));
     	 httpGetRouteList.put("/administration/job/redeemingrequest/email/reminder", new Route(new EmailTemplateController(),"redeemingRequestEmailJob"));
-
+    	 httpGetRouteList.put("/administration/job/giftcard/account/balance", new Route(new GiftCardController(),"checkGiftCardAccountBalanceJob"));
+    	 
     	 httpGetRouteList.put("/administration/payment/paidusers", new Route(new PaidUsersController(),"index"));
     	 httpGetRouteList.put("/administration/payment/confirmemail", new Route(new ConfirmEmailController(),"index"));
     	 

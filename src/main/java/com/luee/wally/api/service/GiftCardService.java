@@ -2,12 +2,15 @@ package com.luee.wally.api.service;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.List;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.commons.io.IOUtils;
 
 import com.luee.wally.admin.repository.ApplicationSettingsRepository;
+import com.luee.wally.command.Email;
 import com.luee.wally.constants.Constants;
 import com.luee.wally.entity.RedeemingRequests;
 import com.luee.wally.exception.RestResponseException;
@@ -15,6 +18,7 @@ import com.luee.wally.json.JSONUtils;
 import com.tangocard.raas.Configuration;
 import com.tangocard.raas.RaasClient;
 import com.tangocard.raas.exceptions.RaasGenericException;
+import com.tangocard.raas.models.AccountModel;
 import com.tangocard.raas.models.CreateOrderRequestModel;
 import com.tangocard.raas.models.NameEmailModel;
 import com.tangocard.raas.models.OrderModel;
@@ -22,7 +26,51 @@ import com.tangocard.raas.models.OrderModel;
 public class GiftCardService {
 	private final static Logger logger = Logger.getLogger(GiftCardService.class.getName());
 
-	
+	public void checkGiftCardAccountBalance(){
+		ApplicationSettingsService applicationSettingsService=new ApplicationSettingsService();
+		MailService mailService=new MailService();
+		
+		String environment=applicationSettingsService.getApplicationSetting(ApplicationSettingsRepository.TANGO_CARD_ENVIRONMENT);
+		if(environment.equalsIgnoreCase(Constants.TANGO_CARD_PRODUCTION)){
+			Configuration.environment=Configuration.environment.PRODUCTION;
+		}else{
+			Configuration.environment=Configuration.environment.SANDBOX;
+		}
+		String supportEmail = applicationSettingsService
+				.getApplicationSettingCached(ApplicationSettingsRepository.SUPPORT_EMAIL);
+		String toEmail_1=applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.PAYMENT_REPORT_EMAIL_1);
+		String toEmail_2=applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.PAYMENT_REPORT_EMAIL_2);
+				
+		RaasClient raasClient=new  RaasClient(applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.TANGO_CARD_PLATFORM_IDENTIFIER),applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.TANGO_CARD_PLATFORM_KEY));
+		try {
+			   List<AccountModel> accoutModels = raasClient.getAccounts().getAllAccounts();
+			   for(AccountModel accountModel:accoutModels){
+				   double balance=accountModel.getCurrentBalance();
+				   String accountIdentifier=accountModel.getAccountIdentifier();
+				   if(Double.compare(Constants.TANGO_CARD_ACCOUNT_BALANCE_THRESHOLD, balance)>0){
+					   //send email
+						Email email = new Email();
+						email.setSubject("Tango card account balance threshold!");
+						email.setContent("Tango Card account "+accountIdentifier+" balance is "+balance);
+						email.setFrom(supportEmail);
+						email.setTo(toEmail_1);						
+						email.setCC(toEmail_2);
+						mailService.sendMailGrid(email);
+				   }
+			   }
+		} catch (Throwable e) {
+			logger.log(Level.SEVERE,"IOException",e);
+			if(e instanceof RaasGenericException){
+			  String msg=null;
+			  try{
+				msg=IOUtils.toString(((RaasGenericException)e).getHttpContext().getResponse().getRawBody(),Charset.defaultCharset());
+				logger.log(Level.SEVERE,"RaasClient",msg);
+			  }catch(IOException ioe){
+				  logger.log(Level.SEVERE,"IOException",ioe);				  
+			  }					   						  
+		    }
+		}
+	}
 	public OrderModel sendGiftCard(RedeemingRequests redeemingRequests,String unitid,String from)throws RestResponseException{
 		ApplicationSettingsService applicationSettingsService=new ApplicationSettingsService();
 		

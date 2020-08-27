@@ -231,7 +231,7 @@ public class UserRevenueService {
 		Entity entity =userRevenueRepository.getJob(jobName, date); 
 		Objects.requireNonNull(entity,"Job entity does not exists for date: "+date);
 		
-		Integer attempts=(Integer)entity.getProperty("attempts");
+		Integer attempts=((Long)entity.getProperty("attempts")).intValue();
 		int counter=0;
 		if(attempts!=null){
 			counter=attempts.intValue();
@@ -245,5 +245,5 @@ public class UserRevenueService {
 		userRevenueRepository.save(entity);
 		
 		return counter<50;
-	}
+	}	
 }
