@@ -215,14 +215,16 @@
 					<thead>
 						<tr>							
 							<th scope="col">GroupBy</th>							
-							<th scope="col">Amount</th>							
+							<th scope="col">Amount</th>
+							<th scope="col">Count</th>								
 						</tr>
 					</thead>
 					<tbody>
 						<c:forEach var="entity" items="${entities}">
 							<tr>							 															
 								<td>${webform.groupByType eq 'TIME' ? entity.groupByTimeValue :entity.groupByLocaleValue}</td>
-								<td><fmt:formatNumber value="${entity.amount}" type="currency" currencySymbol=""/></td>									
+								<td><fmt:formatNumber value="${entity.amount}" type="currency" currencySymbol=""/></td>
+								<td>${entity.count}</td>																	
 							</tr>
 						</c:forEach>
 					</tbody>
