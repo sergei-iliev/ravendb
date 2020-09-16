@@ -23,6 +23,7 @@ import com.luee.wally.admin.controller.PaidUsersController;
 import com.luee.wally.admin.controller.PaymentController;
 import com.luee.wally.admin.controller.PaymentReportsController;
 import com.luee.wally.admin.controller.SearchFilterTemplateController;
+import com.luee.wally.admin.controller.UsersController;
 
 /*
  * Based on
@@ -76,6 +77,7 @@ INSTANCE;
     	 httpGetRouteList.put("/administration/email/template/content", new Route(new EmailTemplateController(),"getEmailTemplateContent"));
     	 httpGetRouteList.put("/administration/email/template/list", new Route(new EmailTemplateController(),"getEmailTemplates"));
     	 
+    	 httpGetRouteList.put("/administration/users/data/delete", new Route(new UsersController(),"index"));
     	 
     	 //*********post*******
     	 httpPostRouteList.put("/administration/search", new Route(new AffsSearchController(),"search"));
@@ -111,6 +113,8 @@ INSTANCE;
     	 //email template
     	 httpPostRouteList.put("/administration/email/template/send", new Route(new EmailTemplateController(),"sendEmailTemplate"));
     
+    	 httpPostRouteList.put("/administration/users/data/delete", new Route(new UsersController(),"deleteUserData"));
+    	 
     }
     
     public boolean hasPath(String httpMethod,String url){

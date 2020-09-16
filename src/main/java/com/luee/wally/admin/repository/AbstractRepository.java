@@ -1,5 +1,6 @@
 package com.luee.wally.admin.repository;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Date;
@@ -10,9 +11,16 @@ import com.google.appengine.api.datastore.DatastoreServiceConfig;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.EntityNotFoundException;
+import com.google.appengine.api.datastore.FetchOptions;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
+import com.google.appengine.api.datastore.PreparedQuery;
+import com.google.appengine.api.datastore.Query;
+import com.google.appengine.api.datastore.QueryResultList;
 import com.google.appengine.api.datastore.ReadPolicy;
+import com.google.appengine.api.datastore.Query.Filter;
+import com.google.appengine.api.datastore.Query.FilterOperator;
+import com.google.appengine.api.datastore.Query.FilterPredicate;
 import com.google.appengine.api.datastore.ReadPolicy.Consistency;
 
 public class AbstractRepository {
@@ -61,8 +69,32 @@ public class AbstractRepository {
 		};
 		return comparator;
 	}
+	public Query filterByOr(String tableName,String fieldName,Collection<String> values){
+		Query query = new Query(tableName);
+		Collection<Filter> predicates=new ArrayList<>();
+		
+		values.forEach(e->{
+			predicates.add(new FilterPredicate(fieldName, FilterOperator.EQUAL, e));
+		});
+		
 
-	protected DatastoreService createDatastoreService(ReadPolicy.Consistency consistency) {
+		if(predicates.size()>1){
+			query.setFilter(Query.CompositeFilterOperator.or(predicates));			
+		}else{
+			query.setFilter(predicates.iterator().next());
+		}
+		return query;		
+	}
+	
+	public Collection<Entity> findEntities(String tableName,String fieldName, String value){
+		DatastoreService ds = createDatastoreService(Consistency.EVENTUAL);
+		Query query = new Query(tableName);
+		query.setFilter(new FilterPredicate(fieldName, FilterOperator.EQUAL, value));
+		PreparedQuery pq = ds.prepare(query);
+		return pq.asQueryResultList(FetchOptions.Builder.withDefaults());			
+	}
+	
+	public DatastoreService createDatastoreService(ReadPolicy.Consistency consistency) {
 
 		double deadline = 15.0; // seconds
 		DatastoreServiceConfig datastoreConfig;

@@ -36,6 +36,15 @@
           		<a class="dropdown-item" href="/administration/payment/confirmemail">Confirm Email</a>       	
         	</div>
       	</li>
+          <li class="nav-item dropdown ${param.activeMenuItem eq 'users' ? 'active' : ''}">
+        	<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          		Users
+        	</a>
+        	<div class="dropdown-menu" aria-labelledby="navbarDropdown">
+          		<a class="dropdown-item" href="/administration/users/data/delete">User data removal</a>
+          		       	
+        	</div>
+      	</li>      	
       	<li class="nav-item ${param.activeMenuItem eq 'settings' ? 'active' : ''}">   
             <a class="nav-link" href="/administration/settings">Application Settings</a>
         </li>
