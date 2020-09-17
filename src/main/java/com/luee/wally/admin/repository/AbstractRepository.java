@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceConfig;
@@ -22,8 +23,10 @@ import com.google.appengine.api.datastore.Query.Filter;
 import com.google.appengine.api.datastore.Query.FilterOperator;
 import com.google.appengine.api.datastore.Query.FilterPredicate;
 import com.google.appengine.api.datastore.ReadPolicy.Consistency;
+import com.luee.wally.api.service.UserService;
 
 public class AbstractRepository {
+	private final Logger logger = Logger.getLogger(AbstractRepository.class.getName());
 	public void save(Entity entity) {
 		DatastoreService ds = createDatastoreService(Consistency.STRONG);
 		ds.put(entity);
@@ -46,16 +49,19 @@ public class AbstractRepository {
 	public void deleteEntity(Key key) {
 		DatastoreService ds = createDatastoreService(Consistency.STRONG);
 		ds.delete(key);
+		logger.warning("DELETE: "+key);
 	}
 
 	public void createOrUpdateEntity(Entity entity) {
 		DatastoreService ds = createDatastoreService(Consistency.STRONG);
 		ds.put(entity);
+		logger.warning("UPDATE: "+entity.getKey());
 	}
 
 	public void deleteEntity(String key) {
 		DatastoreService ds = createDatastoreService(Consistency.STRONG);
 		ds.delete(KeyFactory.stringToKey(key));
+		logger.warning("DELETE: "+KeyFactory.stringToKey(key));
 	}
 
 	public Comparator<Entity> createDateComparator(String fieldName) {
