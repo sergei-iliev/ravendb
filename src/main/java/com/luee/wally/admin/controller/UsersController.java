@@ -33,15 +33,19 @@ public class UsersController implements Controller {
 		UserService userService = new UserService();
 		if (form.getSearchOption().equals("2")) { // email
 			try{
-				userService.deleteUserDataByEmail(form.getInput());
-				req.setAttribute("message","Email address '"+form.getInput()+"' user data was successfully deleted.");
+				int count=userService.deleteUserDataByEmail(form.getInput());
+				String str=userService.convertNumberToText(count);
+				req.setAttribute("message","Email address '"+form.getInput()+"' user data was successfully deleted."+
+				 " "+str+" user(s) affected");
 			}catch(IllegalAccessError e){
 				req.setAttribute("error",e.getMessage());
 			}
 		} else {
 			try{
-				userService.deleteUserDataByGuid(form.getInput());
-				req.setAttribute("message","User guid '"+form.getInput()+"' user data was successfully deleted.");
+				int count=userService.deleteUserDataByGuid(form.getInput());				
+				String str=userService.convertNumberToText(count);
+				req.setAttribute("message","Email address '"+form.getInput()+"' user data was successfully deleted."+
+				 " "+str+" user(s) affected.");
 			}catch(IllegalAccessError e){
 				req.setAttribute("error",e.getMessage());
 			}
@@ -50,4 +54,6 @@ public class UsersController implements Controller {
 
 		req.getRequestDispatcher("/jsp/delete_users_data.jsp").forward(req, resp);
 	}
+	
+	
 }

@@ -41,23 +41,23 @@
 							<label>Search options</label> 
 							<div class="form-check">
 								<input class="form-check-input" type="radio"
-									name="searchOption" id="searchOption1" value="1"
-									
-									<c:if test="${webform.searchOption == null||webform.searchOption eq '1'}">
-										checked
-									</c:if>
-									> <label class="form-check-label"
-									for="searchOption2"> GUID </label>
-							</div>
-							<div class="form-check">
-								<input class="form-check-input" type="radio"
 									name="searchOption" id="searchOption2" value="2"
-									<c:if test="${webform.searchOption != null&&webform.searchOption eq '2'}">
+									<c:if test="${webform.searchOption == null||webform.searchOption eq '2'}">
 										checked
 									</c:if>									
 									>
 								<label class="form-check-label" for="searchOption2">
 									Email Address </label>
+							</div>							
+							<div class="form-check">
+								<input class="form-check-input" type="radio"
+									name="searchOption" id="searchOption1" value="1"
+									
+									<c:if test="${webform.searchOption != null&&webform.searchOption eq '1'}">
+										checked
+									</c:if>
+									> <label class="form-check-label"
+									for="searchOption2"> GUID </label>
 							</div>
 							</div>
 							</div>							

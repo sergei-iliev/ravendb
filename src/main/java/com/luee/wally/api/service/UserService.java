@@ -17,7 +17,8 @@ public class UserService {
 	private UserRepository userRepository=new UserRepository();		
 	private PaidUsersRepository paidUsersRepository=new PaidUsersRepository();
 	
-	public void deleteUserDataByEmail(String email){
+	public int deleteUserDataByEmail(String email){
+	    int count=0;
 		Collection<String> emails=(this.convertToEmails(email));
 		//1. affs
 		Collection<Entity> affs = userRepository.getRecordsByEmails(emails, "affs", "email");
@@ -38,6 +39,7 @@ public class UserService {
 			e.setProperty("full_name","Removed per request from user");
 			e.setProperty("full_address","Removed per request from user");
 			e.setProperty("email","removed@removed.com");
+			e.setProperty("paypal_account","removed@removed.com");			
 			userRepository.createOrUpdateEntity(e);
 		});
 		
@@ -65,14 +67,15 @@ public class UserService {
 				paidUsersRepository.createOrUpdateEntity(pu);
 			});
 		});
-		
-		affs.forEach(e->{
-			userRepository.deleteEntity(e.getKey());
-		});
-		
+		for(Entity aff:affs){
+			userRepository.deleteEntity(aff.getKey());
+			count++;
+		}
+		return count;
 	}
 
-	public void deleteUserDataByGuid(String guid){
+	public int deleteUserDataByGuid(String guid){
+		int count=0;
 		//1. affs
 		Collection<Entity> affs = userRepository.getRecordsByEmails(Collections.singleton(guid), "affs", "user_guid");
 		
@@ -100,10 +103,12 @@ public class UserService {
 				paidUsersRepository.createOrUpdateEntity(pu);
 			});
 		});
-		
-		affs.forEach(e->{
-			userRepository.deleteEntity(e.getKey());
-		});
+
+		for(Entity aff:affs){
+			userRepository.deleteEntity(aff.getKey());
+			count++;
+		}
+		return count;
 		
 	}
 	public Collection<String> convertToEmails(String email){
@@ -114,6 +119,20 @@ public class UserService {
 		result.add(StringUtils.capitalize(lower));
 				
 		return result;
+	}
+	
+	public String convertNumberToText(int number){
+		if(number<=0){
+			return "0";
+		}else if(number==1){
+			return "One";
+		}else if(number==2){
+			return "Two";
+		}else if(number==3){
+			return "Three";
+		}else{
+			return String.valueOf(number); 
+		}		
 	}
 	
 }
