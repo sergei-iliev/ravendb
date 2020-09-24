@@ -209,7 +209,8 @@ public class PaymentController implements Controller {
 		// find user to paypal to
 		PaymentRepository paymentRepository = new PaymentRepository();
 		Entity user = paymentRepository.getRedeemingRequestsByKey(key);
-
+		logger.warning("Pay user: "+user.getProperty("email")+","+user.getProperty("paypal_account"));
+		
 		RedeemingRequests redeemingRequests = RedeemingRequests.valueOf(user);
 		String currencyCode = paymentRepository.getPayPalCurrencyCode(redeemingRequests.getCountryCode());
 
@@ -227,12 +228,11 @@ public class PaymentController implements Controller {
 		/*
 		 * Don't pay if already paid up
 		 */
-		// if (paidUser != null) {
-		// resp.getWriter().write("+");
-		// resp.getWriter().write(JSONUtils.writeObject(paidUser,
-		// Entity.class));
-		// return;
-		// }
+		 if (paidUser != null) {
+			 //resp.getWriter().write("+");
+			 resp.getWriter().write(JSONUtils.writeObject(paidUser,Entity.class));
+			 return;
+		 }
 
 		PayPalService payPalService = new PayPalService();
 		InvoiceService invoiceService = new InvoiceService();
@@ -310,7 +310,10 @@ public class PaymentController implements Controller {
 		PaymentRepository paymentRepository = new PaymentRepository();
 		// get redeeming request by key
 		Entity redeemingRequests = paymentRepository.getRedeemingRequestsByKey(form.getKey());
-		Entity paidUser = paymentRepository.getPaidUserByGuid((String) redeemingRequests.getProperty("user_guid"));
+		logger.warning("Pay user: "+redeemingRequests.getProperty("email")+","+redeemingRequests.getProperty("paypal_account"));
+		
+		Entity paidUser = paymentRepository.getPaidUserByRedeemingRequestId((String) redeemingRequests.getProperty("redeeming_request_id"));
+		
 		/*
 		 * Don't pay if already paid up
 		 */
