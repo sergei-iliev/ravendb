@@ -55,7 +55,7 @@ import com.paypal.base.rest.PayPalRESTException;
 
 public class PaymentController implements Controller {
 	private final Logger logger = Logger.getLogger(PaymentController.class.getName());
-
+/*
 	public void test(HttpServletRequest req, HttpServletResponse resp) throws Exception {
 		String rid = (req.getParameter("rid"));
 		String KEY=String.format("%s|%s",Constants.ENTITY_REDEEMING_REQUEST_ID,rid);
@@ -88,7 +88,7 @@ public class PaymentController implements Controller {
 		//
 		// resp.getWriter().write(json);
 	}
-
+*/
 	public void editEmail(HttpServletRequest req, HttpServletResponse resp) throws Exception {
 		String email = req.getParameter("email");
 		String key = req.getParameter("key");
@@ -408,6 +408,7 @@ public class PaymentController implements Controller {
 		// run rules
 		PaymentRuleService paymentRuleService = new PaymentRuleService();
 		Collection<RedeemingRequestRuleValue> result = paymentRuleService.executeRedeemingRequestRules(entities);
+	
 		// filter out result based on color flag
 		if (form.getColorFlag() != RuleStatusType.None) {
 			result = result.stream().filter(r -> r.getRuleStatus() == form.getColorFlag()).collect(Collectors.toList());

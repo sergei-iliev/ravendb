@@ -95,7 +95,9 @@ public class AbstractRepository {
 	public Collection<Entity> findEntities(String tableName,String fieldName, String value){
 		DatastoreService ds = createDatastoreService(Consistency.EVENTUAL);
 		Query query = new Query(tableName);
-		query.setFilter(new FilterPredicate(fieldName, FilterOperator.EQUAL, value));
+		if(fieldName!=null){
+			query.setFilter(new FilterPredicate(fieldName, FilterOperator.EQUAL, value));
+		}
 		PreparedQuery pq = ds.prepare(query);
 		return pq.asQueryResultList(FetchOptions.Builder.withDefaults());			
 	}

@@ -72,6 +72,12 @@ public class PaymentRuleService extends AbstractService {
 		result.put("differentuserlist",objects);
 		
 		for(RuleResultType ruleResult:ruleResults){
+			if(ruleResult==RuleResultType.SUSPICIOUS_EMAIL_DOMAIN_RED||ruleResult==RuleResultType.SUSPICIOUS_EMAIL_DOMAIN_YELLOW){
+				Map<String,String> object=new HashMap<>(3);			 					
+				object.put("name", redeemingRequest.getFullName());
+				object.put("text",String.format("Suspected email domain: {%s}/{%s}",redeemingRequest.getEmail(),redeemingRequest.getPaypalAccount())); 						
+				objects.add(object);
+			}
 			if(ruleResult==RuleResultType.FULL_NAME_DIFFERENT_USER){
 				Map<String,String> object=new HashMap<>(3);
 				int count=paymentRepository.countEligibleUsersByName(redeemingRequest.getFullName(),redeemingRequest.getUserGuid()); 		

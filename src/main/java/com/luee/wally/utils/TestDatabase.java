@@ -15,6 +15,7 @@ import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.datastore.Text;
+import com.luee.wally.command.payment.RuleStatusType;
 
 public enum TestDatabase {
 	INSTANCE;
@@ -27,6 +28,7 @@ public enum TestDatabase {
 		createApplicationSettings();
 		createPayPalCurrencyMap();	
 		createEmailTemplates();
+		createSuspiciousEmailDomainsTable();
 	}
 	private  void createRedeemingRequests(){
 		DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
@@ -56,7 +58,7 @@ public enum TestDatabase {
 		crearePaiedUsersEntity(entity,0.9,"USD",createDate(12, 1, 2020));	
 
 		entity=createRedeemingRequestEntity("Minko1 and Macarena","696f-4258-baef-55b6aa6550b13","ffff2675-a072-4b6b-ab66-cb599a29147d3", "1", new Date(), "com.moregames.makemoney", "PayPal", "sergei.iliev-facilitator@gmail.com", "US");		
-		entity.setProperty("is_paid", true);
+		entity.setProperty("is_paid", false);
 		ds.put(entity);		
 		crearePaiedUsersEntity(entity,0.9,"USD",createDate(15, 1, 2020));	
 		createRedeemingRequestsEmailJob(entity.getKey());
@@ -100,7 +102,7 @@ public enum TestDatabase {
 		redeeming.setIndexedProperty("is_paid", false);		
 		redeeming.setIndexedProperty("coins_per_game",coins);
 		redeeming.setIndexedProperty("email", "sergei_iliev@yahoo.com");
-		redeeming.setIndexedProperty("confirmed_email", true);
+		redeeming.setIndexedProperty("confirmed_email", false);
 		ds.put(redeeming);
        
 		return redeeming;
@@ -125,8 +127,8 @@ public enum TestDatabase {
 		   entity.setProperty("eur_currency",eurCurrency);
 		   entity.setProperty("email_address","mikelo@yahoo.com");
 		   entity.setProperty("paypal_account","hristo@yahoo.com");
-		   entity.setProperty("paid_user_success", true);
-		   entity.setProperty("email_sent_success",true);
+		   entity.setProperty("paid_user_success", false);
+		   entity.setProperty("email_sent_success",false);
 		   entity.setProperty("redeeming_request_key",KeyFactory.keyToString(redeeminRequest.getKey()));
 		   entity.setProperty("redeeming_request_id",redeeminRequest.getProperty("redeeming_request_id"));
 		   entity.setProperty("payment_reference_id","ref-number");
@@ -468,6 +470,14 @@ public enum TestDatabase {
 		entity.setProperty("content",new Text("<p><b>External Payment ${full_name}!</b></p><p><font color=\"#00ff00\"><b>What is up with you? ${email}</b></font></p><p><b><font color=\"#ff00ff\">Thank you!</font></b></p><p><br></p>"));
 		ds.put(entity);	
 		
+	}
+	private void createSuspiciousEmailDomainsTable(){
+		Entity entity = new Entity("suspicious_email_domains");
+		entity.setIndexedProperty("domain", "yahoo.com");
+		entity.setIndexedProperty("level",RuleStatusType.Yellow.toString().toLowerCase());
+		
+		DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
+		ds.put(entity);
 	}
 	
 	private void createRedeemingRequestsEmailJob(Key key){

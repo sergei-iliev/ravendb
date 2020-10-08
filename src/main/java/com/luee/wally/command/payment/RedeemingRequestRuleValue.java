@@ -35,6 +35,11 @@ public class RedeemingRequestRuleValue {
 				return RuleStatusType.Red;
 			case COINS_PER_GAME_LESS_THEN_3:
 				return RuleStatusType.Yellow;
+			case SUSPICIOUS_EMAIL_DOMAIN_RED:
+				return RuleStatusType.Red;
+			case SUSPICIOUS_EMAIL_DOMAIN_YELLOW:
+				return RuleStatusType.Yellow;
+				
 			default:
 				return RuleStatusType.Green;
 			}
