@@ -13,6 +13,9 @@ public class RedeemingRequestRuleContext {
 
 	private Collection<Entity> suspiciousDomains;
 	
+	public void reset(){
+		this.result.clear();
+	}
 	public boolean isExitOnResult() {
 		return exitOnResult;
 	}

@@ -11,7 +11,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import com.google.appengine.api.datastore.Entity;
 import com.luee.wally.admin.repository.PaymentRepository;
+import com.luee.wally.admin.repository.SuspiciousEmailDomainRepository;
 import com.luee.wally.api.rule.redeemingrequest.RedeemingRequestEngine;
 import com.luee.wally.api.rule.redeemingrequest.RuleResultType;
 import com.luee.wally.command.payment.RedeemingRequestRuleValue;
@@ -67,17 +69,34 @@ public class PaymentRuleService extends AbstractService {
 				break;
 			}			
 		}
+		//illegal domains
 		
-		Collection<Map<String,String>> objects=new ArrayList<>();
+		for(RuleResultType ruleResult:ruleResults){			
+			if(ruleResult==RuleResultType.SUSPICIOUS_EMAIL_DOMAIN_RED||ruleResult==RuleResultType.SUSPICIOUS_EMAIL_DOMAIN_YELLOW){		 					
+				SuspiciousEmailDomainRepository suspiciousEmailDomainRepository=new SuspiciousEmailDomainRepository();
+				Collection<Entity> entities=suspiciousEmailDomainRepository.findSuspiciousDomainByEmail(redeemingRequest.getEmail());
+				boolean suspiciousEmail=!entities.isEmpty();	
+				
+				entities=suspiciousEmailDomainRepository.findSuspiciousDomainByEmail(redeemingRequest.getPaypalAccount());
+				boolean suspiciousPayPalAccount=!entities.isEmpty();
+				
+
+				if(suspiciousEmail&&suspiciousPayPalAccount){
+				    if(redeemingRequest.getEmail().equalsIgnoreCase(redeemingRequest.getPaypalAccount())){
+				    	result.put("suspiciousdomain",String.format("{%s}",redeemingRequest.getEmail()));
+				    }else{
+				    	result.put("suspiciousdomain",String.format("{%s}/{%s}",redeemingRequest.getEmail(),redeemingRequest.getPaypalAccount()));	
+				    }
+				}else{
+					result.put("suspiciousdomain",String.format("{%s}",redeemingRequest.getEmail()!=null?redeemingRequest.getEmail():redeemingRequest.getPaypalAccount()));
+				}
+				break;
+			}			
+		}		
+		Collection<Object> objects=new ArrayList<>();
 		result.put("differentuserlist",objects);
 		
 		for(RuleResultType ruleResult:ruleResults){
-			if(ruleResult==RuleResultType.SUSPICIOUS_EMAIL_DOMAIN_RED||ruleResult==RuleResultType.SUSPICIOUS_EMAIL_DOMAIN_YELLOW){
-				Map<String,String> object=new HashMap<>(3);			 					
-				object.put("name", redeemingRequest.getFullName());
-				object.put("text",String.format("Suspected email domain: {%s}/{%s}",redeemingRequest.getEmail(),redeemingRequest.getPaypalAccount())); 						
-				objects.add(object);
-			}
 			if(ruleResult==RuleResultType.FULL_NAME_DIFFERENT_USER){
 				Map<String,String> object=new HashMap<>(3);
 				int count=paymentRepository.countEligibleUsersByName(redeemingRequest.getFullName(),redeemingRequest.getUserGuid()); 		

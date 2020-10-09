@@ -114,6 +114,9 @@ payment.PaymentEligibleUsersView = Backbone.View.extend({
  					if(map.uachannel!=null){
  						rule_status_result+="<li>UA Channel : <strong>"+map.uachannel+"</strong></li>";
  					}
+ 					if(map.suspiciousdomain!=null){
+ 						rule_status_result+="<li>Suspected email domain : <strong>"+map.suspiciousdomain+"</strong></li>";
+ 					}
  					map.differentuserlist.forEach((item)=>{ 						
  						rule_status_result+="<li>"+item.text+"<br><a href='"+item.url+"' target='_blank'>"+item.name+"</a></li>";
  					});

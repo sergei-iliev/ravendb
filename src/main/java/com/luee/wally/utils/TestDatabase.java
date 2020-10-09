@@ -472,11 +472,15 @@ public enum TestDatabase {
 		
 	}
 	private void createSuspiciousEmailDomainsTable(){
+		DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
 		Entity entity = new Entity("suspicious_email_domains");
 		entity.setIndexedProperty("domain", "yahoo.com");
-		entity.setIndexedProperty("level",RuleStatusType.Yellow.toString().toLowerCase());
+		entity.setIndexedProperty("level",RuleStatusType.Yellow.toString().toLowerCase());		
+		ds.put(entity);
 		
-		DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
+		entity = new Entity("suspicious_email_domains");
+		entity.setIndexedProperty("domain", "gmail.com");
+		entity.setIndexedProperty("level",RuleStatusType.Red.toString().toLowerCase());		
 		ds.put(entity);
 	}
 	

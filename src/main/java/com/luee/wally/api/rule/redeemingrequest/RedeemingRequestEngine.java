@@ -13,20 +13,19 @@ public class RedeemingRequestEngine {
 	private RedeemingRequestRuleContext context;
 	
 	public RedeemingRequestEngine() {
-		first=new EmailDomainUserRule();
-		first.setNext(new TimeToCashLess24OrganicRule());
+		first=(new TimeToCashLess24OrganicRule());
 		first.setNext(new TimeToCashLess24NonOrganicRule());
 		first.setNext(new TimeToCashLess48OrganicRule());
 		first.setNext(new FullNameDifferentUserRule());
 		first.setNext(new CoinsPerGameRule());
 		first.setNext(new FullAddressDifferentUserRule());
 		first.setNext(new IpAddressDifferentUserRule());
-		
+		first.setNext(new EmailDomainUserRule());
 		context = this.create();
 	}
 
 	public List<RuleResultType> execute(RedeemingRequests redeemingRequest,boolean exitOnResult) {
-		
+		context.reset();
 		context.setExitOnResult(exitOnResult);
 		first.execute(context,redeemingRequest);
 		return context.getResult();
