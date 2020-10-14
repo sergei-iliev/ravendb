@@ -5,6 +5,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -29,22 +30,21 @@ public class PaymentRuleService extends AbstractService {
 
 		RedeemingRequestEngine engine = new RedeemingRequestEngine();
 		for (RedeemingRequests redeemingRequest : redeemingRequests) {
-			List<RuleResultType> list = engine.execute(redeemingRequest, true);
-			result.add(new RedeemingRequestRuleValue(redeemingRequest, list.isEmpty() ? null : list.get(0)));
+			Collection<RuleResultType> list = engine.execute(redeemingRequest, false);
+			result.add(new RedeemingRequestRuleValue(redeemingRequest, list.isEmpty() ? null : list.iterator().next()));
 		}
 		return result;
 	}
 
-	public List<RuleResultType> executeRedeemingRequestRules(RedeemingRequests redeemingRequests) {
-		RedeemingRequestEngine engine = new RedeemingRequestEngine();
-		return engine.execute(redeemingRequests, false);
-	}
+
 	
 	public Map<String,Object> getRedeemingRequestRuleResult(RedeemingRequests redeemingRequest){
 		Map<String,Object> result=new HashMap<>();
 		PaymentRepository paymentRepository=new PaymentRepository();
 		//execute rules for a record
-		List<RuleResultType> ruleResults=this.executeRedeemingRequestRules(redeemingRequest);
+		RedeemingRequestEngine engine = new RedeemingRequestEngine();
+		Collection<RuleResultType> ruleResults= engine.execute(redeemingRequest, false);
+		
 		
 		Date date = redeemingRequest.getDate();
 		Date creationDate = redeemingRequest.getCreationDate();
@@ -83,12 +83,12 @@ public class PaymentRuleService extends AbstractService {
 
 				if(suspiciousEmail&&suspiciousPayPalAccount){
 				    if(redeemingRequest.getEmail().equalsIgnoreCase(redeemingRequest.getPaypalAccount())){
-				    	result.put("suspiciousdomain",String.format("{%s}",redeemingRequest.getEmail()));
+				    	result.put("suspiciousdomain",String.format("%s",redeemingRequest.getEmail()));
 				    }else{
-				    	result.put("suspiciousdomain",String.format("{%s}/{%s}",redeemingRequest.getEmail(),redeemingRequest.getPaypalAccount()));	
+				    	result.put("suspiciousdomain",String.format("%s/%s",redeemingRequest.getEmail(),redeemingRequest.getPaypalAccount()));	
 				    }
 				}else{
-					result.put("suspiciousdomain",String.format("{%s}",redeemingRequest.getEmail()!=null?redeemingRequest.getEmail():redeemingRequest.getPaypalAccount()));
+					result.put("suspiciousdomain",String.format("%s",redeemingRequest.getEmail()!=null?redeemingRequest.getEmail():redeemingRequest.getPaypalAccount()));
 				}
 				break;
 			}			

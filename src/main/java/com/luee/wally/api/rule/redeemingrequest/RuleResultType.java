@@ -1,4 +1,9 @@
 package com.luee.wally.api.rule.redeemingrequest;
+
+import java.util.Comparator;
+
+import com.luee.wally.command.payment.RuleStatusType;
+
 /**
  * 
  Red Flag:
@@ -13,16 +18,25 @@ package com.luee.wally.api.rule.redeemingrequest;
 
 *
  */
-public enum RuleResultType {
-    TIME_TO_CACH_LESS_24_ORGANIC,
-    TIME_TO_CACH_LESS_24_NON_ORGANIC,
-    TIME_TO_CACH_LESS_48_ORGANIC,
-    FULL_NAME_DIFFERENT_USER,
-    FULL_ADDRESS_DIFFERENT_USER,
-    IP_ADDRESS_DIFFERENT_USER,
-    COINS_PER_GAME_EQUAL_0,
-    COINS_PER_GAME_LESS_THEN_3,
-    SUSPICIOUS_EMAIL_DOMAIN_RED,
-    SUSPICIOUS_EMAIL_DOMAIN_YELLOW
-    ;		
+public enum RuleResultType{	
+    TIME_TO_CACH_LESS_24_ORGANIC(RuleStatusType.Red),
+    TIME_TO_CACH_LESS_24_NON_ORGANIC(RuleStatusType.Yellow),
+    TIME_TO_CACH_LESS_48_ORGANIC(RuleStatusType.Yellow),
+    FULL_NAME_DIFFERENT_USER(RuleStatusType.Yellow),
+    FULL_ADDRESS_DIFFERENT_USER(RuleStatusType.Yellow),
+    IP_ADDRESS_DIFFERENT_USER(RuleStatusType.Yellow),
+    COINS_PER_GAME_EQUAL_0(RuleStatusType.Red),
+    COINS_PER_GAME_LESS_THEN_3(RuleStatusType.Yellow),
+    SUSPICIOUS_EMAIL_DOMAIN_RED(RuleStatusType.Red),
+    SUSPICIOUS_EMAIL_DOMAIN_YELLOW(RuleStatusType.Yellow)
+    ;	
+	private RuleStatusType ruleStatusType; 
+	private RuleResultType(RuleStatusType ruleStatusType) {
+		this.ruleStatusType=ruleStatusType;
+	}
+	
+	public RuleStatusType getRuleStatusType() {
+		return ruleStatusType;
+	}
+	
 }

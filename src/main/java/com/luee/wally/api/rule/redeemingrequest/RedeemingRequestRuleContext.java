@@ -1,15 +1,18 @@
 package com.luee.wally.api.rule.redeemingrequest;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import com.google.appengine.api.datastore.Entity;
 
 public class RedeemingRequestRuleContext {
 
 	private boolean exitOnResult;
-	private List<RuleResultType> result=new ArrayList<>(4);
+	private Set<RuleResultType> result=new TreeSet<>((o1,o2)->{
+			System.out.println(o1.getRuleStatusType().ordinal()-o2.getRuleStatusType().ordinal());
+			return o2.getRuleStatusType().ordinal()-o1.getRuleStatusType().ordinal();			
+		});
 
 	private Collection<Entity> suspiciousDomains;
 	
@@ -22,12 +25,12 @@ public class RedeemingRequestRuleContext {
 	public void setExitOnResult(boolean exitOnResult) {
 		this.exitOnResult = exitOnResult;
 	}
-	public List<RuleResultType> getResult() {
+	public Collection<RuleResultType> getResult() {
 		return result;
 	}
-	public void setResult(List<RuleResultType> result) {
-		this.result = result;
-	}
+//	public void setResult(List<RuleResultType> result) {
+//		this.result = result;
+//	}
     
 	public void setSuspiciousDomains(Collection<Entity> suspiciousDomains) {
 		this.suspiciousDomains = suspiciousDomains;

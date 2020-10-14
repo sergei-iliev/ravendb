@@ -24,7 +24,7 @@ public class RedeemingRequestEngine {
 		context = this.create();
 	}
 
-	public List<RuleResultType> execute(RedeemingRequests redeemingRequest,boolean exitOnResult) {
+	public Collection<RuleResultType> execute(RedeemingRequests redeemingRequest,boolean exitOnResult) {
 		context.reset();
 		context.setExitOnResult(exitOnResult);
 		first.execute(context,redeemingRequest);
