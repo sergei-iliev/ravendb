@@ -10,7 +10,6 @@ public class RedeemingRequestRuleContext {
 
 	private boolean exitOnResult;
 	private Set<RuleResultType> result=new TreeSet<>((o1,o2)->{
-			System.out.println(o1.getRuleStatusType().ordinal()-o2.getRuleStatusType().ordinal());
 			return o2.getRuleStatusType().ordinal()-o1.getRuleStatusType().ordinal();			
 		});
 
