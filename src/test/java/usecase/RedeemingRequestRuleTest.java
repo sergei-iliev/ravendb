@@ -59,8 +59,8 @@ public class RedeemingRequestRuleTest {
 			redeemingRequests.setCreationDate(Date.from(yesterday.toInstant()));
 			
 			
-			List<RuleResultType> list=engine.execute(redeemingRequests,true);
-		    System.out.println(list);
+			//List<RuleResultType> list=engine.execute(redeemingRequests,true);
+		    //System.out.println(list);
 		}
 	}
 	

@@ -50,15 +50,18 @@ public enum TestDatabase {
 		entity=createRedeemingRequestEntity("Minko1 and Macarena","696f-4258-baef-55b6aa6550b11","ffff2675-a072-4b6b-ab66-cb599a29147d1", "1", new Date(), "com.moregames.makemoney2", "PayPal", "sergei.iliev-facilitator@gmail.com", "US");
 		entity.setProperty("ua_channel", "vungle");
 		entity.setProperty("ip_address", "123.0.0.23");
+		entity.setProperty("full_address", "baba tonka 26 for accson");
 		ds.put(entity);
 		crearePaiedUsersEntity(entity,0.9,"USD",createDate(14, 1, 2020));
 		
 		entity=createRedeemingRequestEntity("Minko1 and Macarena","696f-4258-baef-55b6aa6550b12","ffff2675-a072-4b6b-ab66-cb599a29147d2", "1", new Date(), "com.moregames.makemoney", "PayPal", "sergei.iliev-facilitator@gmail.com", "US");		
+		entity.setProperty("full_address", "baba tonka 3456 for accson");
 		ds.put(entity);		
 		crearePaiedUsersEntity(entity,0.9,"USD",createDate(12, 1, 2020));	
 
 		entity=createRedeemingRequestEntity("Minko1 and Macarena","696f-4258-baef-55b6aa6550b13","ffff2675-a072-4b6b-ab66-cb599a29147d3", "1", new Date(), "com.moregames.makemoney", "PayPal", "sergei.iliev-facilitator@gmail.com", "US");		
 		entity.setProperty("is_paid", false);
+		entity.setProperty("full_address", "Mega tonka 6 for accson");
 		ds.put(entity);		
 		crearePaiedUsersEntity(entity,0.9,"USD",createDate(15, 1, 2020));	
 		createRedeemingRequestsEmailJob(entity.getKey());
@@ -67,6 +70,7 @@ public enum TestDatabase {
 		
 		entity=createRedeemingRequestEntity("Spas","90dd-47a1-9b47-a8892a20c7e9","bbbb2675-a072-4b6b-ab66-cb599a29147d", "3.1", new Date(), "com.moregames.makemoney", "Amazon", "sergei.iliev@gmail.com", "US");
 		entity.setProperty("ua_channel", "organic");
+		entity.setProperty("full_address", "Skripal tonka 6 for accson");
 		//put create in the past
 		ZonedDateTime now=ZonedDateTime.now();
 		ZonedDateTime yesterday=now.minusHours(22);		
@@ -77,6 +81,7 @@ public enum TestDatabase {
 		createRedeemingRequestsEmailJob(entity.getKey());
 		
 		entity=createRedeemingRequestEntity("Gurmen","8957-48bb-a089-de0adca6a91e","cccc1675-a072-4b6b-ab66-cb599a291BAA", "1.1", new Date(), "com.moregames.makemoney", "Amazon", "sergei.iliev@gmail.com", "DE");		
+		entity.setProperty("full_address", "Skripal tonka 2136 for accson");
 		crearePaiedUsersEntity(entity,15,"EUR",createDate(12, 1, 2020));
 		createRedeemingRequestsEmailJob(entity.getKey());
 		

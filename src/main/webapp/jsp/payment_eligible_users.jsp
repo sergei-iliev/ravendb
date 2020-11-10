@@ -197,15 +197,15 @@
 				<table class="table" id="searchResultTable">
 					<thead>
 						<tr>
-							<th scope="col">V</th>
+							<th scope="col"></th>
 							<th scope="col">Find</th>
-							<th scope="col">user_guid</th>
-							<th scope="col">date</th>
-							<th scope="col">amount</th>
-							<th scope="col">type</th>
-							<th scope="col">email</th>
-							<th scope="col">country</th>
-							<th scope="col">paypal_account</th>
+							<th scope="col">GUID</th>
+							<th scope="col">Date</th>
+							<th scope="col">Amount</th>
+							<th scope="col">Type</th>							
+							<th scope="col">Address</th>
+							<th scope="col">Country</th>
+							<th scope="col">Emails</th>
 							<th scope="col">Paid</th>
 						</tr>
 					</thead>
@@ -254,21 +254,43 @@
 								   </c:if>	   
 							    </c:if>
 							    								
-								</td>
+								</td>								
 								<td>
+								<table  class="table table-bordered">
+								<tr><td>
+								<span><strong>Name</strong></span>
+								<div>${entity.redeemingRequest.fullName}</div>								
+								</td></tr>
+								<tr><td>
+								<span><strong>Address</strong></span>
+								<div>${entity.redeemingRequest.fullAddress}</div>								
+								</td></tr>								
+								</table>
+								</td>
+								<td>${entity.redeemingRequest.countryCode}</td>
+								<td>								
+									<table  class="table table-bordered"><tr>
+									<td>
+									<span><strong>Emial</strong></span>
 								 	<div id='email_field_${loop.index}'>${entity.redeemingRequest.email}</div>
 								    <br>
 								    <a href="#" class="edit_email" data-index="${loop.index}" data-entitykey="${entity.redeemingRequest.key}"><i class="fa fa-pencil-square-o"></i></a>
 								    <a href="#" class="send_user_email" data-index="${loop.index}" data-entitykey="${entity.redeemingRequest.key}"><i class="fa fa-at"></i></a> 
-								</td>
-								<td>${entity.redeemingRequest.countryCode}</td>
-								<td>
-									<div id='paypal_account_field_${loop.index}'>${entity.redeemingRequest.paypalAccount}</div>
-									<br>
-								    <a href="#"  class="edit_paypal_acount" data-index="${loop.index}" data-entitykey="${entity.redeemingRequest.key}"><i class="fa fa-pencil-square-o"></i></a>
-								    <c:if test="${entity.redeemingRequest.payPalType eq true}">								     
-								    	<a href="#"  class="send_paypal_validation_email" data-index="${loop.index}" data-entitykey="${entity.redeemingRequest.key}"><i class="fa fa-paper-plane"></i></a> 							
-								    </c:if>
+									</td>
+									</tr>
+									<tr>
+									<td>
+									<span><strong>PayPal</strong></span>
+										<div id='paypal_account_field_${loop.index}'>${entity.redeemingRequest.paypalAccount}</div>
+										<br>
+								    	<a href="#"  class="edit_paypal_acount" data-index="${loop.index}" data-entitykey="${entity.redeemingRequest.key}"><i class="fa fa-pencil-square-o"></i></a>
+								    	<c:if test="${entity.redeemingRequest.payPalType eq true}">								     
+								    		<a href="#"  class="send_paypal_validation_email" data-index="${loop.index}" data-entitykey="${entity.redeemingRequest.key}"><i class="fa fa-paper-plane"></i></a> 							
+								    	</c:if>
+								    </td>
+								    </tr>
+								    </table>
+								    
 								</td>
 								<td>
 								<button type="button" class="btn btn-primary btn-sm" data-href="${entity.redeemingRequest.link2}" value="Paid"
