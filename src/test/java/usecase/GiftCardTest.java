@@ -128,6 +128,41 @@ public class GiftCardTest {
 		   };
  
 	}
+	
+	private static final String customerDisplayName="JustPlay GmbH";
+	private static final String customerIdentifier="justplaygmbh";
+	@Test
+	public void createGiftCardAccountTest() throws Throwable {
+		   Configuration.environment=Configuration.environment.PRODUCTION;
+		   RaasClient raasClient=new  RaasClient(Constants.PROD_PLATFORM_IDENTIFIER,Constants.PROD_PLATFORM_KEY);
+		   List<CustomerModel> customers= raasClient.getCustomers().getAllCustomers();
+		   for(CustomerModel customer:customers){
+			   System.out.println(customer.getCustomerIdentifier()+"::"+customer.getDisplayName()+"::"+customer.getStatus());
+		   }
+		   
+	       CreateCustomerRequestModel createCustomerRequestModel = new CreateCustomerRequestModel();
+	       createCustomerRequestModel.setCustomerIdentifier(customerIdentifier);
+	       createCustomerRequestModel.setDisplayName(customerDisplayName);
+	       CustomerModel customer=null;
+	       try{
+	    	   customer=raasClient.getCustomers().getCustomer(customerIdentifier);	    	   	    	   
+	       }catch(RaasGenericException e){	    	   	    	   
+	    	   //in case it exists
+	           customer=null;
+	       }
+	       
+	       if(customer==null){
+    	     try{
+	    	   customer = raasClient.getCustomers().createCustomer(createCustomerRequestModel);	       
+	         }catch(RaasGenericException e){
+	    	   System.out.println(e.getHttpPhrase());
+	         }
+	       }
+	       
+	       System.out.println(customer);
+    	   
+		   
+	}
 	/*
 	@Test
 	public void createUserGiftCardTest() throws Throwable {
