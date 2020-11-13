@@ -203,7 +203,7 @@
 							<th scope="col">Date</th>
 							<th scope="col">Amount</th>
 							<th scope="col">Type</th>							
-							<th scope="col">Address</th>
+							<th scope="col">Details</th>
 							<th scope="col">Country</th>
 							<th scope="col">Emails</th>
 							<th scope="col">Paid</th>
@@ -271,7 +271,7 @@
 								<td>								
 									<table  class="table table-bordered"><tr>
 									<td>
-									<span><strong>Emial</strong></span>
+									<span><strong>Email</strong></span>
 								 	<div id='email_field_${loop.index}'>${entity.redeemingRequest.email}</div>
 								    <br>
 								    <a href="#" class="edit_email" data-index="${loop.index}" data-entitykey="${entity.redeemingRequest.key}"><i class="fa fa-pencil-square-o"></i></a>
