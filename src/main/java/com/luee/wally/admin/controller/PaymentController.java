@@ -217,7 +217,7 @@ public class PaymentController implements Controller {
 		// convert currency to EUR
 		BigDecimal eurAmount;
 		try {
-			eurAmount = paymentRepository.convert(Double.parseDouble(redeemingRequests.getAmount()), currencyCode);
+			eurAmount = paymentRepository.convert(Double.parseDouble(redeemingRequests.getAmount()), currencyCode,"EUR");
 		} catch (Exception e) {
 			logger.log(Level.SEVERE, "Currency converter for : " + currencyCode, e);
 			resp.getWriter().write("Unable to convert currency to EUR");

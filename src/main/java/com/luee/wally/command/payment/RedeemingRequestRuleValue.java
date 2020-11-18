@@ -39,7 +39,10 @@ public class RedeemingRequestRuleValue {
 				return RuleStatusType.Red;
 			case SUSPICIOUS_EMAIL_DOMAIN_YELLOW:
 				return RuleStatusType.Yellow;
-				
+			case TOTAL_AD_REV_LESS_THEN_40:
+				return RuleStatusType.Red;
+			case TOTAL_AD_REV_LESS_THEN_20:
+				return RuleStatusType.Yellow;	
 			default:
 				return RuleStatusType.Green;
 			}

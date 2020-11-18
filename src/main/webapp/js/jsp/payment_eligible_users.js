@@ -106,10 +106,13 @@ payment.PaymentEligibleUsersView = Backbone.View.extend({
 				data:formData,
 				success: function(data, textStatus, jQxhr ){			          
  					let map=JSON.parse(data);
- 					
+ 					console.log(map);
  					let rule_status_result="<ul><li>Time to cash out : <strong>"+map.cashout+"</strong></li>";
  					if(map.coinspergame!=null){
  						rule_status_result+="<li>Played <strong>"+map.coinspergame+"</strong> games</li>";
+ 					}
+ 					if(map.totaladdrev!=null){
+ 						rule_status_result+="<li>Ad rev too low : "+map.totaladdrev+"</li>";
  					}
  					if(map.uachannel!=null){
  						rule_status_result+="<li>UA Channel : <strong>"+map.uachannel+"</strong></li>";

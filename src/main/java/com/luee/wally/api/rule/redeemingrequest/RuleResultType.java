@@ -28,7 +28,9 @@ public enum RuleResultType{
     COINS_PER_GAME_EQUAL_0(RuleStatusType.Red),
     COINS_PER_GAME_LESS_THEN_3(RuleStatusType.Yellow),
     SUSPICIOUS_EMAIL_DOMAIN_RED(RuleStatusType.Red),
-    SUSPICIOUS_EMAIL_DOMAIN_YELLOW(RuleStatusType.Yellow)
+    SUSPICIOUS_EMAIL_DOMAIN_YELLOW(RuleStatusType.Yellow),
+    TOTAL_AD_REV_LESS_THEN_20(RuleStatusType.Yellow),
+    TOTAL_AD_REV_LESS_THEN_40(RuleStatusType.Red)
     ;	
 	private RuleStatusType ruleStatusType; 
 	private RuleResultType(RuleStatusType ruleStatusType) {

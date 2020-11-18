@@ -14,6 +14,7 @@ public class RedeemingRequestEngine {
 	
 	public RedeemingRequestEngine() {
 		first=(new TimeToCashLess24OrganicRule());
+		first.setNext(new AdRevRule());
 		first.setNext(new TimeToCashLess24NonOrganicRule());
 		first.setNext(new TimeToCashLess48OrganicRule());
 		first.setNext(new FullNameDifferentUserRule());
@@ -21,7 +22,7 @@ public class RedeemingRequestEngine {
 		first.setNext(new FullAddressDifferentUserRule());
 		first.setNext(new IpAddressDifferentUserRule());
 		first.setNext(new EmailDomainUserRule());
-		context = this.create();
+		context = new RedeemingRequestRuleContext();
 	}
 
 	public Collection<RuleResultType> execute(RedeemingRequests redeemingRequest,boolean exitOnResult) {
@@ -31,13 +32,5 @@ public class RedeemingRequestEngine {
 		return context.getResult();
 	}
 	
-	private RedeemingRequestRuleContext create(){
-		RedeemingRequestRuleContext context = new RedeemingRequestRuleContext();
-		SuspiciousEmailDomainRepository suspiciousEmailDomainRepository=new SuspiciousEmailDomainRepository();
-		Collection<Entity> entities=suspiciousEmailDomainRepository.findEntities("suspicious_email_domains", null, null);
-		context.setSuspiciousDomains(entities);
-		
-		return context;
-	}
 
 }

@@ -149,7 +149,7 @@ public class PaymentService extends AbstractService {
 		// convert currency to EUR
 		BigDecimal eurAmount;
 		try {
-			eurAmount = paymentRepository.convert(Double.parseDouble(form.getAmount()), form.getCurrency());
+			eurAmount = paymentRepository.convert(Double.parseDouble(form.getAmount()), form.getCurrency(),"EUR");
 		} catch (Exception e) {
 			logger.log(Level.SEVERE, "Currency converter for : " + form.getCurrency(), e);
 			throw e;
@@ -221,7 +221,7 @@ public class PaymentService extends AbstractService {
 
 		BigDecimal eurAmount;
 		try {
-			eurAmount = paymentRepository.convert(Double.parseDouble(form.getAmount()), currencyCode);
+			eurAmount = paymentRepository.convert(Double.parseDouble(form.getAmount()), currencyCode,"EUR");
 		} catch (Exception e) {
 			logger.log(Level.SEVERE, "Currency converter for : " + currencyCode + " and amount: " + form.getAmount(),
 					e);
@@ -380,7 +380,7 @@ public class PaymentService extends AbstractService {
 		BigDecimal eurAmount;
 		try {
 			eurAmount = paymentRepository.convert(Double.parseDouble(redeemingRequests.getAmount()),
-					giftCardCountryCode.getCurrency());
+					giftCardCountryCode.getCurrency(),"EUR");
 		} catch (Exception e) {
 			logger.log(Level.SEVERE, "Currency converter for : " + giftCardCountryCode.getCurrency(), e);
 			throw new RestResponseException(100, "Unable to convert currency");
@@ -406,7 +406,7 @@ public class PaymentService extends AbstractService {
 		 * BigDecimal eurAmount = currentValue.divide(rateValue,2,
 		 * BigDecimal.ROUND_HALF_EVEN);
 		 */
-		BigDecimal eurAmount = paymentRepository.convert(form.getAmount(), form.getCurrencyCode());
+		BigDecimal eurAmount = paymentRepository.convert(form.getAmount(), form.getCurrencyCode(),"EUR");
 		paymentRepository.saveUserPayment(form, redeemingRequests, eurAmount);
 
 	}

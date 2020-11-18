@@ -7,12 +7,15 @@ import java.util.Date;
 import java.util.List;
 
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 import com.luee.wally.admin.repository.PaidUsersRepository;
+import com.luee.wally.admin.repository.PaymentRepository;
 import com.luee.wally.api.rule.redeemingrequest.RedeemingRequestEngine;
 import com.luee.wally.api.rule.redeemingrequest.RuleResultType;
 import com.luee.wally.api.service.PaidUsersService;
@@ -41,6 +44,29 @@ public class RedeemingRequestRuleTest {
 		helper.tearDown();
 	}
 
+	@Test
+	public void adRevRuleTest(){
+		TestDatabase.INSTANCE.generateDB();
+
+		
+		PaymentService paymentService = new PaymentService();
+		
+		PaymentEligibleUserForm form = new PaymentEligibleUserForm();
+		form.setStartDate(null);
+		form.setEndDate(null);
+		form.getPackageNames().clear();
+		form.getCountryCodes().clear();
+		
+		
+		
+		Collection<RedeemingRequests> entities = paymentService.searchEligibleUsers(form);
+		
+		RedeemingRequestEngine engine=new RedeemingRequestEngine();
+		for(RedeemingRequests redeemingRequests:entities){			
+			Collection<RuleResultType> list=engine.execute(redeemingRequests,false);	
+		}
+		
+	}
 	@Test
 	public void timeToCashLess24OrganicRuleTest(){
 		TestDatabase.INSTANCE.generateDB();
