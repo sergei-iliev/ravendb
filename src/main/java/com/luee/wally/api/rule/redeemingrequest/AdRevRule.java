@@ -24,6 +24,10 @@ public class AdRevRule extends RedeemingRequestRule {
 	public void execute(RedeemingRequestRuleContext context, RedeemingRequests redeemingRequests) {
 		BigDecimal maxRev=BigDecimal.valueOf(redeemingRequests.getMaxRev());
 		double amount=Double.parseDouble(redeemingRequests.getAmount());
+		
+		if(Double.compare(amount,40)>0){
+			amount=40;
+		}
 		BigDecimal usdAmount;
 		
 		if(redeemingRequests.getType().equalsIgnoreCase("PayPal")){
