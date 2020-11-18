@@ -69,10 +69,19 @@ public class PaymentRuleService extends AbstractService {
 				break;
 			}			
 		}
-		if(ruleResults.contains(RuleResultType.TOTAL_AD_REV_LESS_THEN_20)||ruleResults.contains(RuleResultType.TOTAL_AD_REV_LESS_THEN_40)){
-			result.put("totaladdrev", redeemingRequest.getMaxRev());	
+		for(RuleResultType ruleResult:ruleResults){
+			if(ruleResult==RuleResultType.TOTAL_AD_REV_LESS_THEN_20){
+				Map<String,String> object=new HashMap<>(1);
+				object.put("name","Ad rev low");
+				object.put("text",redeemingRequest.getMaxRev()+" USD");
+				result.put("totaladdrev", object);	
+			}else if(ruleResult==RuleResultType.TOTAL_AD_REV_LESS_THEN_40){
+				Map<String,String> object=new HashMap<>(1);
+				object.put("name","Ad rev very low");
+				object.put("text",redeemingRequest.getMaxRev()+" USD");				
+				result.put("totaladdrev",object);	
+			}
 		}
-		
 		//illegal domains
 		
 		for(RuleResultType ruleResult:ruleResults){			

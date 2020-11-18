@@ -46,6 +46,7 @@ public class AdRevRule extends RedeemingRequestRule {
 	    }
 		BigDecimal v20=usdAmount.divide(BigDecimal.valueOf(20));
 		BigDecimal v40=usdAmount.divide(BigDecimal.valueOf(40));
+		
 		if( maxRev.compareTo(v40)<0){
 			   context.getResult().add(RuleResultType.TOTAL_AD_REV_LESS_THEN_40);
 			   if(context.isExitOnResult()){

@@ -32,11 +32,11 @@ public enum TestDatabase {
 	}
 	private  void createRedeemingRequests(){
 		DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
-		Entity entity=createRedeemingRequestEntity("Sergey Iliev","15b5-4e3a-b398-8792a9a9f530","48bb2675-a072-4b6b-ab66-cb599a29147d", "111", new Date(), "com.moregames.makemoney1", "PayPal", "sergei.iliev-facilitator@gmail1.com", "DE");		
+		Entity entity=createRedeemingRequestEntity("Sergey Iliev","15b5-4e3a-b398-8792a9a9f530","48bb2675-a072-4b6b-ab66-cb599a29147d", "5", new Date(), "com.moregames.makemoney1", "PayPal", "sergei.iliev-facilitator@gmail1.com", "ES");		
 		entity.setProperty("ua_channel", "organic");
 		entity.setProperty("ip_address", "123.0.0.23");		
 		entity.setProperty("full_address", "baba tonka 6 for accson");
-		entity.setProperty("max_rev", (double)0.7);
+		entity.setProperty("max_rev", (double)1.559953);
 		ds.put(entity);		
 		crearePaiedUsersEntity(entity,1.8,"EUR",createDate(30, 12, 2019));
 		
