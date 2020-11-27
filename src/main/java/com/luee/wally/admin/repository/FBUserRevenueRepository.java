@@ -25,13 +25,13 @@ import com.google.appengine.api.datastore.ReadPolicy.Consistency;
 import com.google.appengine.api.datastore.Transaction;
 import com.google.appengine.api.datastore.TransactionOptions;
 
-public class UserRevenueRepository extends AbstractRepository {
-	private final Logger logger = Logger.getLogger(UserRevenueRepository.class.getName());
+public class FBUserRevenueRepository extends AbstractRepository {
+	private final Logger logger = Logger.getLogger(FBUserRevenueRepository.class.getName());
 
 	public Entity getUserRevPackage(String packageName) {
 		DatastoreService ds = createDatastoreService(Consistency.STRONG);
 		Filter filter = new FilterPredicate("package_name", FilterOperator.EQUAL, packageName);
-		Query q = new Query("user_rev_package");
+		Query q = new Query("user_rev_package_fb");
 		q.setFilter(filter);
 		PreparedQuery pq = ds.prepare(q);
 		return pq.asSingleEntity();
@@ -43,34 +43,25 @@ public class UserRevenueRepository extends AbstractRepository {
 		Entity entity = getUserRevPackage(packageName);
 		
 		if(entity==null) {
-			entity = new Entity("user_rev_package");
+			entity = new Entity("user_rev_package_fb");
 			entity.setProperty("package_name", packageName);
 		}
 		entity.setProperty("last_used_date", date);		
 		ds.put(entity);		
 	}
 
-//	public Entity getLastAffEntryByGaid(String gaid) {
-//		DatastoreService ds = createDatastoreService(Consistency.STRONG);
-//
-//		Filter userGuidFilter = new FilterPredicate("gaid", FilterOperator.EQUAL, gaid);
-//
-//		Query q = new Query("affs");
-//		q.setFilter(userGuidFilter);
-//		PreparedQuery pq = ds.prepare(q);
-//		List<Entity> entities = pq.asList(FetchOptions.Builder.withDefaults());
-//
-//		Comparator<Entity> comparator = createDateComparator("date");
-//		return entities.stream().max(comparator).orElse(null);
-//	}
-
-	public Entity getUserDailyRevenueByGaid(String gaid) {
+	public Entity getUserDailyRevenueByGaid(String gaid,String date) {
 		DatastoreService ds = createDatastoreService(Consistency.STRONG);
 
-		Filter userGuidFilter = new FilterPredicate("gaid", FilterOperator.EQUAL, gaid);
+		Filter gaidFilter = new FilterPredicate("gaid",FilterOperator.EQUAL,gaid);
 
-		Query q = new Query("user_daily_revenue");
-		q.setFilter(userGuidFilter);
+		Filter revDateFilter = new FilterPredicate("rev_check_date",FilterOperator.EQUAL,date);
+
+
+		CompositeFilter filter = CompositeFilterOperator.and(gaidFilter,revDateFilter);
+
+		Query q = new Query("user_daily_revenue_fb");
+		q.setFilter(filter);
 		PreparedQuery pq = ds.prepare(q);
 		try {
 			Entity entity = pq.asSingleEntity();
@@ -126,4 +117,21 @@ public class UserRevenueRepository extends AbstractRepository {
 				"failed to log data for aff key:" + affs.getKey() + ", gaid:" + affs.getProperty("gaid"));
 	}
 	
+//	public Entity getJob(String jobName,String processingDate){
+//		DatastoreService ds = createDatastoreService(Consistency.STRONG);
+//
+//		Filter nameFilter = new FilterPredicate("job_name",
+//                FilterOperator.EQUAL,jobName);
+//
+//		Filter processingDateFilter = new FilterPredicate("processing_date",
+//                FilterOperator.EQUAL,
+//                processingDate);
+//
+//
+//		Query q = new Query("jobs_fb");
+//		CompositeFilter filter = CompositeFilterOperator.and(nameFilter,processingDateFilter);
+//		q.setFilter(filter);
+//		PreparedQuery pq = ds.prepare(q);		
+//		return pq.asSingleEntity();						
+//	}
 }

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -115,5 +116,19 @@ public class AbstractRepository {
 		}
 		// Get Datastore service with the given configuration
 		return DatastoreServiceFactory.getDatastoreService(datastoreConfig);
+	}
+	
+	public Entity getLastAffEntryByGaid(String gaid) {
+		DatastoreService ds = createDatastoreService(Consistency.STRONG);
+
+		Filter userGuidFilter = new FilterPredicate("gaid", FilterOperator.EQUAL, gaid);
+
+		Query q = new Query("affs");
+		q.setFilter(userGuidFilter);
+		PreparedQuery pq = ds.prepare(q);
+		List<Entity> entities = pq.asList(FetchOptions.Builder.withDefaults());
+
+		Comparator<Entity> comparator = createDateComparator("date");
+		return entities.stream().max(comparator).orElse(null);
 	}
 }

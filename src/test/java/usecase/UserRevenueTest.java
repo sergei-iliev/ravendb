@@ -32,11 +32,13 @@ import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestC
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 import com.luee.wally.admin.controller.ConfirmEmailController;
 import com.luee.wally.admin.controller.ImportController;
+import com.luee.wally.admin.repository.FBUserRevenueRepository;
 import com.luee.wally.admin.repository.PaidUsersRepository;
 import com.luee.wally.admin.repository.PaymentRepository;
 import com.luee.wally.admin.repository.UserRevenueRepository;
 import com.luee.wally.api.service.ConfirmEmailService;
 import com.luee.wally.api.service.InvoiceService;
+import com.luee.wally.api.service.impex.FBUserRevenueService;
 import com.luee.wally.api.service.impex.ImportService;
 import com.luee.wally.csv.PaidUsers2018;
 import com.luee.wally.entity.RedeemingRequests;
@@ -303,4 +305,19 @@ public class UserRevenueTest {
 		System.out.println(ent);
 		
 	}	
+	
+	@Test
+	public void fbUserRevenueReadCSVTest() throws Exception {
+		//demo affs users
+		Entity redeemingRequest=new Entity("affs");
+		redeemingRequest.setProperty("gaid", "92c656f9-a94d-4845-8b54-ee7d2932791f");
+		redeemingRequest.setProperty("date", new Date());
+		
+		FBUserRevenueRepository repository=new FBUserRevenueRepository();
+		repository.save(redeemingRequest);
+		
+		FBUserRevenueService fbUserRevenueService=new FBUserRevenueService();
+		String date = fbUserRevenueService.getYesterdayDate();
+		fbUserRevenueService.processFBUserRevenueAggregated("2020-10-12");
+	}
 }

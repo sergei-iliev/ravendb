@@ -2,6 +2,8 @@ package com.luee.wally.api.service;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceConfig;
@@ -17,7 +19,13 @@ public class AbstractService {
 		throwable.printStackTrace(pw);
 		return sw.toString();
 	}
-
+	
+	public String getYesterdayDate(){		 
+		Date yesterday=new Date(System.currentTimeMillis()-24*60*60*1000);
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+		return format.format(yesterday);
+	}
+	
 	protected DatastoreService createDatastoreService() {
 		return this.createDatastoreService(Consistency.EVENTUAL);
 	}

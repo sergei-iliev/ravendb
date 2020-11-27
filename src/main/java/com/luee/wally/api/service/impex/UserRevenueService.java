@@ -23,6 +23,7 @@ import com.google.appengine.api.datastore.EmbeddedEntity;
 import com.google.appengine.api.datastore.Entity;
 import com.luee.wally.admin.repository.UserRevenueRepository;
 import com.luee.wally.api.ConnectionMgr;
+import com.luee.wally.api.service.AbstractService;
 import com.luee.wally.command.PackageURLGroup;
 import com.luee.wally.constants.PackageNameConstants;
 import com.luee.wally.csv.UserLevelRevenue;
@@ -32,24 +33,19 @@ import com.luee.wally.json.RevenueLinkVO;
 //BASED ON REST API
 //https://docs.google.com/document/d/1CoGRN_NzmMCVNUCQsdtbU0jm5VgEmtlkV8YTCsYNajE/edit
 	
-public class UserRevenueService {
+public class UserRevenueService extends AbstractService{
 	private final Logger logger = Logger.getLogger(UserRevenueService.class.getName());
 
 	private ImportService importService;
 
 	
-	private UserRevenueRepository userRevenueRepository=new UserRevenueRepository();
+	private UserRevenueRepository userRevenueRepository;
 	
 	public UserRevenueService() {
 		importService = new ImportService();
 		userRevenueRepository=new UserRevenueRepository();
 	}
-	
-	public String getYesterdayDate(){		 
-		Date yesterday=new Date(System.currentTimeMillis()-24*60*60*1000);
-		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-		return format.format(yesterday);
-	}
+
 	
 	/*
 	 * Process User Revenue for a particular date in format "yyyy-MM-dd"
@@ -221,29 +217,5 @@ public class UserRevenueService {
 		}		
 		return true;
 	  	
-	}	
-	/*
-	 * mark job as INCOMPLETE
-	 * job entry must exist
-	 */
-	public boolean resetJobFailure(String jobName,String status,String date){
-		
-		Entity entity =userRevenueRepository.getJob(jobName, date); 
-		Objects.requireNonNull(entity,"Job entity does not exists for date: "+date);
-		
-		Integer attempts=((Long)entity.getProperty("attempts")).intValue();
-		int counter=0;
-		if(attempts!=null){
-			counter=attempts.intValue();
-		}
-		counter++;
-		
-		entity.setProperty("attempts",counter);
-		entity.setProperty("status", status);
-		entity.setProperty("last_update_time", new Date());
-		
-		userRevenueRepository.save(entity);
-		
-		return counter<50;
-	}	
+	}		
 }
