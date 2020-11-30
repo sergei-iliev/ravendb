@@ -63,23 +63,22 @@ public class FBUserRevenueService extends AbstractService{
 			// group package entries per user 
 			Map<String, List<String>> userLevelRevenuesByUserMap = userLevelRevenues.stream()
 				    .collect(Collectors.groupingBy( FBUserLevelRevenue::getIDFA,Collectors.mapping(FBUserLevelRevenue::getEncryptedCPM, Collectors.toList())));
-			userLevelRevenuesByUserMap.entrySet().forEach(					
-					e->{
-						e.getValue().forEach(l->{
-						  System.out.println(e.getKey()+"::"+l);
-					    });
-						}
-					);
+//			userLevelRevenuesByUserMap.entrySet().forEach(					
+//					e->{
+//						e.getValue().forEach(l->{
+//						  System.out.println(e.getKey()+"::"+l);
+//					    });
+//						}
+//					);
 			for (Map.Entry<String,List<String>> userLevelRevenue : userLevelRevenuesByUserMap.entrySet()) {	
 				//read user revenue aff table
 				Entity affs=fbUserRevenueRepository.getLastAffEntryByGaid(userLevelRevenue.getKey());
 				if(affs==null){  //no user present
-					logger.warning("no user present for guid:"+userLevelRevenue.getKey());
 					continue;
 				}
 				Entity fbUserDailyRevenue = fbUserRevenueRepository.getUserDailyRevenueByGaid(userLevelRevenue.getKey(),date);
 				if(fbUserDailyRevenue==null){
-					fbUserDailyRevenue = new Entity("user_daily_revenue_rb");
+					fbUserDailyRevenue = new Entity("user_daily_revenue_fb");
 					fbUserDailyRevenue.setProperty("gaid", userLevelRevenue.getKey());
 					fbUserDailyRevenue.setProperty("aff_key",affs.getKey());										 
 					fbUserDailyRevenue.setProperty("rev_check_date",date);
@@ -110,7 +109,10 @@ public class FBUserRevenueService extends AbstractService{
 				
 				fbUserRevenueRepository.save(fbUserDailyRevenue);
 			}
+
 			
+			//mark package as complete for this date
+			fbUserRevenueRepository.saveUserRevPackage(revenueLink.getPackageName(), date);				
 		}
 		
 		return unfinishedPackagesCount==0; 	

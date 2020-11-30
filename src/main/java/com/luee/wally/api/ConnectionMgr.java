@@ -20,8 +20,7 @@ INSTANCE;
 		
 		// Set HTTP request method.
 		conn.setRequestMethod("GET");		
-		conn.setRequestProperty("User-Agent", USER_AGENT);
-		conn.setRequestProperty("Accept-Language", "en-US,en;q=0.9");
+		conn.setRequestProperty("Referrer Policy", "strict-origin-when-cross-origin");
 		conn.setRequestProperty("Accept", "application/json");		
 
 		
