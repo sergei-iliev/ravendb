@@ -22,6 +22,19 @@ import com.luee.wally.api.service.impex.UserRevenueService;
 public class UserRevenueReportsController implements Controller{
 	private final Logger logger = Logger.getLogger(UserRevenueReportsController.class.getName());
 	
+	
+	/*
+	 * Activate job by get request for any date
+	 */
+	public void runUserAdRevenueDailyReportByDate(HttpServletRequest req, HttpServletResponse resp)
+			throws ServletException, IOException {
+		String date=(String) req.getParameter("date");
+		
+	  	Queue queue = QueueFactory.getQueue("user-rev-job");
+	  	queue.add(TaskOptions.Builder.withUrl("/administration/job/user/revenue/background").param("date", date).method(Method.POST));
+	 
+	}
+	
 	/*
 	 * Activated by cron job on daily bases FB
 	 */
@@ -75,6 +88,16 @@ public class UserRevenueReportsController implements Controller{
 	       }
 	}	
 	
+	/*
+	 * Activate job by get request for any date
+	 */
+	public void runfbUserAdRevenueDailyReportByDate(HttpServletRequest req, HttpServletResponse resp)
+			throws ServletException, IOException {
+		String date=(String) req.getParameter("date");
+		
+	  	Queue queue = QueueFactory.getQueue("user-rev-job-fb");
+	  	queue.add(TaskOptions.Builder.withUrl("/administration/job/user/revenue/background/fb").param("date", date).method(Method.POST));	 
+	}
 	/*
 	 * Activated by cron job on daily bases FB
 	 */

@@ -66,6 +66,9 @@ INSTANCE;
     	 httpGetRouteList.put("/administration/job/giftcard/account/balance", new Route(new GiftCardController(),"checkGiftCardAccountBalanceJob"));
     	 httpGetRouteList.put("/administration/job/user/revenue/daily",new Route(new UserRevenueReportsController(),"runUserAdRevenueDailyReport"));
     	 httpGetRouteList.put("/administration/job/user/revenue/daily/fb",new Route(new UserRevenueReportsController(),"runfbUserAdRevenueDailyReport"));
+    	 httpGetRouteList.put("/administration/job/user/revenue/run",new Route(new UserRevenueReportsController(),"runUserAdRevenueDailyReportByDate"));
+    	 httpGetRouteList.put("/administration/job/user/revenue/run/fb",new Route(new UserRevenueReportsController(),"runfbUserAdRevenueDailyReportByDate"));
+    	 
     	 
     	 httpGetRouteList.put("/administration/payment/paidusers", new Route(new PaidUsersController(),"index"));
     	 httpGetRouteList.put("/administration/payment/confirmemail", new Route(new ConfirmEmailController(),"index"));
