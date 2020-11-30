@@ -64,7 +64,8 @@ INSTANCE;
     	 httpGetRouteList.put("/administration/job/reports/payment/external/yesterday", new Route(new PaymentReportsController(),"getExternalPaymentReportForYesterday"));
     	 httpGetRouteList.put("/administration/job/redeemingrequest/email/reminder", new Route(new EmailTemplateController(),"redeemingRequestEmailJob"));
     	 httpGetRouteList.put("/administration/job/giftcard/account/balance", new Route(new GiftCardController(),"checkGiftCardAccountBalanceJob"));
-    	 httpGetRouteList.put("/administration/job/user/revenue/daily/fb",new Route(new UserRevenueReportsController(),"fbUserAdRevenueDailyReportJob"));
+    	 httpGetRouteList.put("/administration/job/user/revenue/daily",new Route(new UserRevenueReportsController(),"runUserAdRevenueDailyReport"));
+    	 httpGetRouteList.put("/administration/job/user/revenue/daily/fb",new Route(new UserRevenueReportsController(),"runfbUserAdRevenueDailyReport"));
     	 
     	 httpGetRouteList.put("/administration/payment/paidusers", new Route(new PaidUsersController(),"index"));
     	 httpGetRouteList.put("/administration/payment/confirmemail", new Route(new ConfirmEmailController(),"index"));
@@ -95,6 +96,7 @@ INSTANCE;
     	 httpPostRouteList.put("/administration/payment/eligibleusers/rules/status", new Route(new PaymentController(),"getRedeemingRequestRuleResult"));
     	 httpPostRouteList.put("/administration/payment/confirmemail", new Route(new ConfirmEmailController(),"confirmEmail"));
     	 httpPostRouteList.put("/administration/job/user/revenue/background/fb",new Route(new UserRevenueReportsController(),"runfbUserAdRevenueDailyReportInBackground"));
+    	 httpPostRouteList.put("/administration/job/user/revenue/background",new Route(new UserRevenueReportsController(),"runUserAdRevenueDailyReportInBackground"));
     	 
     	 httpPostRouteList.put("/administration/search/template", new Route(new SearchFilterTemplateController(),"saveSearchFilterTemplate"));
     	 httpPostRouteList.put("/administration/payment/removal/reason", new Route(new PaymentController(),"saveUserPaymentRemovalReason"));
@@ -103,7 +105,7 @@ INSTANCE;
     	 httpPostRouteList.put("/administration/payment/user/paypal", new Route(new PaymentController(),"sendPayPal"));
     	 httpPostRouteList.put("/administration/payment/user/paypal/validate", new Route(new PaymentController(),"validatePayPalAccount"));
     	 
-    	 httpPostRouteList.put("/administration/job/payment/user/external", new Route(new PaymentController(),"payExternal")); 
+
     	 httpPostRouteList.put("/administration/job/payment/user/external/email", new Route(new EmailTemplateController(),"externalPaymentSentEmail")); 
 
     	 

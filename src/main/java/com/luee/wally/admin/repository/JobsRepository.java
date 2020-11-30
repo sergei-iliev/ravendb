@@ -71,10 +71,10 @@ public class JobsRepository extends AbstractRepository{
 			entity.setProperty("attempts",1);
 		}
 		else {
-			long attempts = (Long) entity.getProperty("attempts");
-			entity.setProperty("last_updated_date", new Date());
+			//long attempts = (Long) entity.getProperty("attempts");
+			entity.setProperty("last_update_time", new Date());
 			entity.setProperty("status", status.name());
-			entity.setProperty("attempts", (attempts+1));
+			//entity.setProperty("attempts", (attempts+1));
 		}
 		
 		

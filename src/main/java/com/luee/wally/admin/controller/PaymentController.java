@@ -124,6 +124,7 @@ public class PaymentController implements Controller {
 	/*
 	 * REST complient API mode
 	 */
+	/*
 	public void payExternal(HttpServletRequest req, HttpServletResponse resp) throws Exception {
 		PaymentService paymentService = new PaymentService();
 		MailService mailService = new MailService();
@@ -202,7 +203,7 @@ public class PaymentController implements Controller {
 		}
 		
 	}
-
+*/
 	public void sendPayPal(HttpServletRequest req, HttpServletResponse resp) throws Exception {
 		String key = (String) req.getParameter("key");
 
