@@ -100,6 +100,6 @@ public class JobsRepository extends AbstractRepository{
 		
 		this.save(entity);
 		
-		return attempts<50;
+		return attempts<200;
 	}	
 }

@@ -70,7 +70,7 @@ public class UserRevenueReportsController implements Controller{
 			 }else{
 				 result=jobsRepository.resetJobFailure(JobsRepository.USER_REVENUE_JOB, JobStatus.INCOMPLETE.name(), date);
 				 if(result){
-					 long DELAY_MS =10*60*1000;  //10 minutes		
+					 long DELAY_MS =1*60*1000;  //1 minutes		
 					 Queue queue = QueueFactory.getDefaultQueue();	
 					 queue.add(TaskOptions.Builder.withUrl("/cron/user/revenue/background").param("date", date).method(Method.POST).countdownMillis(DELAY_MS));			
 				 }
@@ -132,7 +132,7 @@ public class UserRevenueReportsController implements Controller{
 			 }else{
 				 result=jobsRepository.resetJobFailure(JobsRepository.FB_USER_REVENUE_JOB, JobStatus.INCOMPLETE.name(), date);
 				 if(result){
-					 long DELAY_MS =10*60*1000;  //10 minutes		
+					 long DELAY_MS =1*60*1000;  //1 minutes		
 					 Queue queue = QueueFactory.getDefaultQueue();	
 					 queue.add(TaskOptions.Builder.withUrl("/administration/job/user/revenue/background/fb").param("date", date).method(Method.POST).countdownMillis(DELAY_MS));			
 				 }
