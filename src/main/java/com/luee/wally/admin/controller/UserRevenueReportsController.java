@@ -72,7 +72,7 @@ public class UserRevenueReportsController implements Controller{
 				 if(result){
 					 long DELAY_MS =1*60*1000;  //1 minutes		
 					 Queue queue = QueueFactory.getDefaultQueue();	
-					 queue.add(TaskOptions.Builder.withUrl("/cron/user/revenue/background").param("date", date).method(Method.POST).countdownMillis(DELAY_MS));			
+					 queue.add(TaskOptions.Builder.withUrl("/administration/job/user/revenue/background").param("date", date).method(Method.POST).countdownMillis(DELAY_MS));			
 				 }
 				 else{
 					 jobsRepository.saveJobEntry(JobsRepository.USER_REVENUE_JOB, JobStatus.ABORTED, date);
