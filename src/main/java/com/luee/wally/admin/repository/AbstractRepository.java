@@ -27,7 +27,10 @@ import com.google.appengine.api.datastore.ReadPolicy.Consistency;
 import com.luee.wally.api.service.UserService;
 
 public class AbstractRepository {
-	private final Logger logger = Logger.getLogger(AbstractRepository.class.getName());
+	public final Logger logger = Logger.getLogger(AbstractRepository.class.getName());
+	
+	public static final int CURSOR_SIZE = 1000;
+	
 	public void save(Entity entity) {
 		DatastoreService ds = createDatastoreService(Consistency.STRONG);
 		ds.put(entity);
@@ -118,17 +121,4 @@ public class AbstractRepository {
 		return DatastoreServiceFactory.getDatastoreService(datastoreConfig);
 	}
 	
-	public Entity getLastAffEntryByGaid(String gaid) {
-		DatastoreService ds = createDatastoreService(Consistency.STRONG);
-
-		Filter userGuidFilter = new FilterPredicate("gaid", FilterOperator.EQUAL, gaid);
-
-		Query q = new Query("affs");
-		q.setFilter(userGuidFilter);
-		PreparedQuery pq = ds.prepare(q);
-		List<Entity> entities = pq.asList(FetchOptions.Builder.withDefaults());
-
-		Comparator<Entity> comparator = createDateComparator("date");
-		return entities.stream().max(comparator).orElse(null);
-	}
 }

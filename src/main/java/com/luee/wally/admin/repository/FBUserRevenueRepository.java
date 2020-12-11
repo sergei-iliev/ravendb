@@ -1,27 +1,35 @@
 package com.luee.wally.admin.repository;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.ConcurrentModificationException;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
+import com.google.appengine.api.datastore.Cursor;
 import com.google.appengine.api.datastore.DatastoreFailureException;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreTimeoutException;
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.FetchOptions;
+import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.PreparedQuery.TooManyResultsException;
 import com.google.appengine.api.datastore.Query;
+import com.google.appengine.api.datastore.QueryResultList;
 import com.google.appengine.api.datastore.Query.CompositeFilter;
 import com.google.appengine.api.datastore.Query.CompositeFilterOperator;
 import com.google.appengine.api.datastore.Query.Filter;
 import com.google.appengine.api.datastore.Query.FilterOperator;
 import com.google.appengine.api.datastore.Query.FilterPredicate;
 import com.google.appengine.api.datastore.ReadPolicy.Consistency;
+import com.luee.wally.entity.Affs;
 import com.google.appengine.api.datastore.Transaction;
 import com.google.appengine.api.datastore.TransactionOptions;
 
@@ -35,6 +43,11 @@ public class FBUserRevenueRepository extends AbstractRepository {
 		q.setFilter(filter);
 		PreparedQuery pq = ds.prepare(q);
 		return pq.asSingleEntity();
+	}
+	
+	public Map<String,Entity> getFacebookPackageNameTokenMap() {
+		Collection<Entity> entities=this.findEntities("facebook_package_token",null,null);
+		return entities.stream().collect(Collectors.toMap(e->(String)e.getProperty("package_name"), Function.identity(),(a,b)->a));	
 	}
 	
 	public  void saveUserRevPackage(String packageName, String date) {
@@ -85,53 +98,34 @@ public class FBUserRevenueRepository extends AbstractRepository {
 
 	}
 
-	public void saveAffsTotalAdRev(Entity affs, Entity userDailyRev) {
-		DatastoreService ds = createDatastoreService(Consistency.STRONG);
+	public Collection<Entity> getUserDailyRevenueByAffsKey(Key key) {
+		DatastoreService ds = createDatastoreService(Consistency.EVENTUAL);
 
-		TransactionOptions options = TransactionOptions.Builder.withXG(true);
-		Transaction txn = ds.beginTransaction(options);
-		for (int i = 1; i <= 10; i++) {
-			try {
-
-				ds.put(txn, affs);
-				userDailyRev.setProperty("aff_key", affs.getKey());
-				ds.put(txn, userDailyRev);
-				txn.commit();
-				return; // in case of success , loop out
-			} catch (ConcurrentModificationException | DatastoreTimeoutException | DatastoreFailureException
-					| IllegalStateException e) {
-				logger.warning(" Got concurrent update exception. Trying again. " + i);
-				logger.log(Level.SEVERE, "caught exception", e);
-				try {
-					Thread.sleep(500); // wait some time
-				} catch (InterruptedException ie) {
-				}
-				continue;
-			} finally {
-				if (txn.isActive()) {
-					txn.rollback();
-				}
+		Filter filter = new FilterPredicate("aff_key",FilterOperator.EQUAL,key);				
+		Query query = new Query("user_daily_revenue_fb");
+		query.setFilter(filter);
+		PreparedQuery preparedQuery = ds.prepare(query);
+		
+		Cursor cursor = null;
+		QueryResultList<Entity> results;
+		Collection<Entity> entities=new ArrayList<>();
+		do {
+			FetchOptions fetchOptions;
+			if (cursor != null) {
+				fetchOptions = FetchOptions.Builder.withLimit(CURSOR_SIZE).startCursor(cursor);
+			} else {
+				fetchOptions = FetchOptions.Builder.withLimit(CURSOR_SIZE);
 			}
-		}
-		logger.log(Level.SEVERE,
-				"failed to log data for aff key:" + affs.getKey() + ", gaid:" + affs.getProperty("gaid"));
+
+			results = preparedQuery.asQueryResultList(fetchOptions);
+            entities.addAll(results);		
+			
+			cursor = results.getCursor();
+		} while (results.size() > 0);
+				
+		return entities;		
+
 	}
 	
-//	public Entity getJob(String jobName,String processingDate){
-//		DatastoreService ds = createDatastoreService(Consistency.STRONG);
-//
-//		Filter nameFilter = new FilterPredicate("job_name",
-//                FilterOperator.EQUAL,jobName);
-//
-//		Filter processingDateFilter = new FilterPredicate("processing_date",
-//                FilterOperator.EQUAL,
-//                processingDate);
-//
-//
-//		Query q = new Query("jobs_fb");
-//		CompositeFilter filter = CompositeFilterOperator.and(nameFilter,processingDateFilter);
-//		q.setFilter(filter);
-//		PreparedQuery pq = ds.prepare(q);		
-//		return pq.asSingleEntity();						
-//	}
+
 }

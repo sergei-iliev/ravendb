@@ -8,12 +8,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 </head>
-<script src="../js/jquery/jquery.min.js"></script> 
+<script src="../../js/jquery/jquery.min.js"></script> 
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-<link rel="stylesheet" href="../css/bootstrap/bootstrap.min.css">         
-<script src="../js/bootstrap/bootstrap.min.js"></script> 
-<script src="../js/jsp/index.js"></script> 
+<link rel="stylesheet" href="../../css/bootstrap/bootstrap.min.css">         
+<script src="../../js/bootstrap/bootstrap.min.js"></script> 
+<script src="../../js/jsp/fb_affs_search.js"></script> 
 <body>
 	<jsp:include page="/jsp/fragments/header.jsp">
 		<jsp:param name="activeMenuItem" value="index" />
@@ -28,9 +28,9 @@
   					${success}
 				</div>	
 			 </c:if> 
-			 <h4>Affs Revenue</h4>
+			 <h4>Affs Revenue Facebook</h4>
 			 <div class="mt-5">
-                <form class="form-horizontal" id="search-form" method="post" action="/administration/search">
+                <form class="form-horizontal" id="search-form" method="post" action="/administration/search/fb">
                     <fieldset>
                     <!-- 
                         <legend class="text-center header">Contact us</legend>
@@ -95,11 +95,6 @@
                         <div class="form-group">
                             <div class="col-md-12 text-center">
                                 <button type="submit" class="btn btn-primary btn-lg mt-5" name="submit" value="search">Search</button>
-                            </div>
-                        </div>                     
-                        <div class="form-group">
-                            <div class="col-md-12 text-center">
-                                <button  type="submit" class="btn btn-primary btn-lg mt-5" name="submit" value="export">Export</button>
                             </div>
                         </div>         
                         </div>               

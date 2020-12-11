@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 
 import com.google.appengine.api.datastore.EmbeddedEntity;
 import com.google.appengine.api.datastore.Entity;
+import com.luee.wally.admin.repository.AffsRepository;
 import com.luee.wally.admin.repository.FBUserRevenueRepository;
 import com.luee.wally.api.ConnectionMgr;
 import com.luee.wally.api.service.AbstractService;
@@ -34,9 +35,12 @@ public class FBUserRevenueService extends AbstractService{
 	
 	private FBUserRevenueRepository fbUserRevenueRepository;
 	
+	private AffsRepository affsRepository;
+	
 	public FBUserRevenueService() {
 		importService = new FBImportService();
 		fbUserRevenueRepository=new FBUserRevenueRepository();
+		affsRepository=new AffsRepository();
 	}
 	/*
 	 * Process User Revenue for a particular date in format "yyyy-MM-dd"
@@ -63,16 +67,16 @@ public class FBUserRevenueService extends AbstractService{
 			// group package entries per user 
 			Map<String, List<String>> userLevelRevenuesByUserMap = userLevelRevenues.stream()
 				    .collect(Collectors.groupingBy( FBUserLevelRevenue::getIDFA,Collectors.mapping(FBUserLevelRevenue::getEncryptedCPM, Collectors.toList())));
-//			userLevelRevenuesByUserMap.entrySet().forEach(					
-//					e->{
-//						e.getValue().forEach(l->{
-//						  System.out.println(e.getKey()+"::"+l);
-//					    });
-//						}
-//					);
+			userLevelRevenuesByUserMap.entrySet().forEach(					
+					e->{
+						e.getValue().forEach(l->{
+						  System.out.println(e.getKey()+"::"+l);
+					    });
+						}
+					);
 			for (Map.Entry<String,List<String>> userLevelRevenue : userLevelRevenuesByUserMap.entrySet()) {	
 				//read user revenue aff table
-				Entity affs=fbUserRevenueRepository.getLastAffEntryByGaid(userLevelRevenue.getKey());
+				Entity affs=affsRepository.getLastAffEntryByGaid(userLevelRevenue.getKey());
 				if(affs==null){  //no user present
 					continue;
 				}

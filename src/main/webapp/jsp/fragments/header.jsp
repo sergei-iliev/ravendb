@@ -7,15 +7,37 @@
       </button>
       <div class="collapse navbar-collapse" id="navbarCollapse">
         <ul class="navbar-nav mr-auto">
+		  <li class="nav-item dropdown ${param.activeMenuItem eq 'index' ? 'active' : ''}">
+        	<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          		Affs Revenue
+        	</a>
+        	<div class="dropdown-menu" aria-labelledby="navbarDropdown">
+          		<a class="dropdown-item" href="/administration">Affs Revenue</a>
+          		<a class="dropdown-item" href="/administration/revenue/fb">Affs Revenue with FB</a>           		       	
+        	</div>
+      	  </li>        
+        <!-- 
           <li class="nav-item ${param.activeMenuItem eq 'index' ? 'active' : ''}">        
             <a class="nav-link" href="/administration">Affs Revenue<span class="sr-only">(current)</span></a>
           </li>
+         -->  
           <li class="nav-item ${param.activeMenuItem eq 'exportgaid' ? 'active' : ''}">   
             <a class="nav-link" href="/administration/exportgaid">Export Gaid</a>
-          </li>          
+          </li>
+          <li class="nav-item dropdown ${param.activeMenuItem eq 'campaign' ? 'active' : ''}">
+        	<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          		Campaign Revenue
+        	</a>
+        	<div class="dropdown-menu" aria-labelledby="navbarDropdown">
+          		<a class="dropdown-item" href="/administration/campaign">Campaign Revenue</a>
+          		<a class="dropdown-item" href="/administration/campaign/fb">Campaign Revenue with FB</a>           		       	
+        	</div>
+      	  </li>  
+      	  <!-- 
           <li class="nav-item ${param.activeMenuItem eq 'campaign' ? 'active' : ''}">   
             <a class="nav-link" href="/administration/campaign">Campaign Revenue</a>
           </li>
+           -->          
           <li class="nav-item dropdown">
         	<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
           		Import

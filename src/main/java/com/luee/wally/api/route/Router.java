@@ -16,6 +16,8 @@ import com.luee.wally.admin.controller.ApplicationSettingsController;
 import com.luee.wally.admin.controller.CampaignSearchController;
 import com.luee.wally.admin.controller.ConfirmEmailController;
 import com.luee.wally.admin.controller.EmailTemplateController;
+import com.luee.wally.admin.controller.ExportToolController;
+import com.luee.wally.admin.controller.FBAffsSearchController;
 import com.luee.wally.admin.controller.GiftCardController;
 import com.luee.wally.admin.controller.ImportController;
 import com.luee.wally.admin.controller.LoginController;
@@ -50,7 +52,10 @@ INSTANCE;
         //get
     	 httpGetRouteList.put("/administration/login", new Route(new LoginController(),"index"));
     	 httpGetRouteList.put("/administration", new Route(new AffsSearchController(),"index"));
+    	 httpGetRouteList.put("/administration/revenue/fb", new Route(new FBAffsSearchController(),"index"));
     	 httpGetRouteList.put("/administration/exportgaid", new Route(new AffsSearchController(),"exportGaid"));
+    	 //DELETE ME
+    	 //httpGetRouteList.put("/administration/tool", new Route(new ExportToolController(),"runExportTool"));
     	 
     	 httpGetRouteList.put("/administration/logout", new Route(new LoginController(),"logout"));
     	 httpGetRouteList.put("/administration/campaign", new Route(new CampaignSearchController(),"index"));
@@ -87,8 +92,8 @@ INSTANCE;
     	 
     	 //*********post*******
     	 httpPostRouteList.put("/administration/search", new Route(new AffsSearchController(),"search"));
-    	 httpPostRouteList.put("/administration/exportgaid/run", new Route(new AffsSearchController(),"runExportGaid"));
-    	
+    	 httpPostRouteList.put("/administration/exportgaid/run", new Route(new AffsSearchController(),"runExportGaid"));    	
+    	 httpPostRouteList.put("/administration/search/fb", new Route(new FBAffsSearchController(),"search"));
     	 
     	 httpPostRouteList.put("/administration/campaign/search", new Route(new CampaignSearchController(),"search"));
     	 httpPostRouteList.put("/administration/login", new Route(new LoginController(),"login"));

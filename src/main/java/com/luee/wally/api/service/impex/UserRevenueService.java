@@ -21,6 +21,7 @@ import java.util.logging.Logger;
 
 import com.google.appengine.api.datastore.EmbeddedEntity;
 import com.google.appengine.api.datastore.Entity;
+import com.luee.wally.admin.repository.AffsRepository;
 import com.luee.wally.admin.repository.UserRevenueRepository;
 import com.luee.wally.api.ConnectionMgr;
 import com.luee.wally.api.service.AbstractService;
@@ -41,9 +42,13 @@ public class UserRevenueService extends AbstractService{
 	
 	private UserRevenueRepository userRevenueRepository;
 	
+	private AffsRepository affsRepository;
+	
+	
 	public UserRevenueService() {
 		importService = new ImportService();
 		userRevenueRepository=new UserRevenueRepository();
+		affsRepository=new AffsRepository();
 	}
 
 	
@@ -83,7 +88,7 @@ public class UserRevenueService extends AbstractService{
 			for (Map.Entry<String,BigDecimal> userLevelRevenue : aggregatedUserRevenueMap.entrySet()) {				
 				
 				//read user revenue history table
-				Entity affs=userRevenueRepository.getLastAffEntryByGaid(userLevelRevenue.getKey());
+				Entity affs=affsRepository.getLastAffEntryByGaid(userLevelRevenue.getKey());
 				if(affs==null){  //no user present
 					continue;
 				}

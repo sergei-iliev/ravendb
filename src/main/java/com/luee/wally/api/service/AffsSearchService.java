@@ -25,6 +25,8 @@ import com.google.appengine.api.datastore.Query.FilterOperator;
 import com.google.appengine.api.datastore.Query.FilterPredicate;
 import com.google.appengine.api.datastore.QueryResultList;
 import com.google.appengine.api.datastore.ReadPolicy;
+import com.luee.wally.admin.repository.AbstractRepository;
+import com.luee.wally.admin.repository.AffsRepository;
 import com.luee.wally.admin.repository.CloudStorageRepository;
 import com.luee.wally.admin.repository.PaidUsersRepository;
 import com.luee.wally.api.service.impex.GenerateCSV;
@@ -37,12 +39,13 @@ import com.luee.wally.entity.PaidUser;
 public class AffsSearchService extends AbstractService{
 	private final Logger logger = Logger.getLogger(AffsSearchService.class.getName());
 
-	private static final int CURSOR_SIZE = 1000;
 
 	private Collection<String> searchHeader = Arrays.asList("experiment", "count", "sum_total_ad_rev", "avr_total_ad_rev",
 			"sum_offerwall_rev", "avr_offerwall_rev","paid_users_total","avr_paid_users");
 
 	private Collection<String> exportHeader = Arrays.asList("user_guid","date","experiment","offerwall_rev","total_ad_rev");
+	
+	private AffsRepository affsRepository=new AffsRepository();
 	
 	public void createExportFile(Writer writer, AffsSearchForm form, Collection<Affs> content)
 			throws IOException {
@@ -137,21 +140,17 @@ public class AffsSearchService extends AbstractService{
 
 		
 		DatastoreService ds = createDatastoreService();
-		Query query = createQuery(affsSearchForm.getStartDate(), affsSearchForm.getEndDate(),affsSearchForm.getCountryCode(),null, affsSearchForm.getPackageName());
+		Query query = affsRepository.createQuery(affsSearchForm.getStartDate(), affsSearchForm.getEndDate(),affsSearchForm.getCountryCode(),null, affsSearchForm.getPackageName());
 		PreparedQuery preparedQuery = ds.prepare(query);
 
 		QueryResultList<Entity> results;
-		
-
-		
-		
 
 		do {
 			FetchOptions fetchOptions;
 			if (cursor != null) {
-				fetchOptions = FetchOptions.Builder.withLimit(CURSOR_SIZE).startCursor(cursor);
+				fetchOptions = FetchOptions.Builder.withLimit(AbstractRepository.CURSOR_SIZE).startCursor(cursor);
 			} else {
-				fetchOptions = FetchOptions.Builder.withLimit(CURSOR_SIZE);
+				fetchOptions = FetchOptions.Builder.withLimit(AbstractRepository.CURSOR_SIZE);
 			}
 
 			results = preparedQuery.asQueryResultList(fetchOptions);
@@ -226,7 +225,7 @@ public class AffsSearchService extends AbstractService{
 		
 		DatastoreService ds = createDatastoreService();
 
-		Query query = createQuery(startDate, endDate, country, experiment, packageName);
+		Query query = affsRepository.createQuery(startDate, endDate, country, experiment, packageName);
 
 		PreparedQuery preparedQuery = ds.prepare(query);
 
@@ -237,9 +236,9 @@ public class AffsSearchService extends AbstractService{
 		do {
 			FetchOptions fetchOptions;
 			if (cursor != null) {
-				fetchOptions = FetchOptions.Builder.withLimit(CURSOR_SIZE).startCursor(cursor);
+				fetchOptions = FetchOptions.Builder.withLimit(AbstractRepository.CURSOR_SIZE).startCursor(cursor);
 			} else {
-				fetchOptions = FetchOptions.Builder.withLimit(CURSOR_SIZE);
+				fetchOptions = FetchOptions.Builder.withLimit(AbstractRepository.CURSOR_SIZE);
 			}
 
 			results = preparedQuery.asQueryResultList(fetchOptions);
@@ -291,7 +290,7 @@ public class AffsSearchService extends AbstractService{
 		
 		DatastoreService ds = createDatastoreService();
 
-		Query query = createQuery(startDate, endDate, country, experiment, packageName);
+		Query query = affsRepository.createQuery(startDate, endDate, country, experiment, packageName);
 
 		PreparedQuery preparedQuery = ds.prepare(query);
 
@@ -307,9 +306,9 @@ public class AffsSearchService extends AbstractService{
 		do {
 			FetchOptions fetchOptions;
 			if (cursor != null) {
-				fetchOptions = FetchOptions.Builder.withLimit(CURSOR_SIZE).startCursor(cursor);
+				fetchOptions = FetchOptions.Builder.withLimit(AbstractRepository.CURSOR_SIZE).startCursor(cursor);
 			} else {
-				fetchOptions = FetchOptions.Builder.withLimit(CURSOR_SIZE);
+				fetchOptions = FetchOptions.Builder.withLimit(AbstractRepository.CURSOR_SIZE);
 			}
 
 			results = preparedQuery.asQueryResultList(fetchOptions);
@@ -359,7 +358,7 @@ public class AffsSearchService extends AbstractService{
 			int minRevCount=0;
 			// loop for each guid
 			for (String gaid : gaids) {			
-				Query query=createQuery(startDate, endDate, gaid);
+				Query query=affsRepository.createQuery(startDate, endDate, gaid);
 	
 				PreparedQuery preparedQuery = ds.prepare(query);
 				QueryResultList<Entity> results = preparedQuery.asQueryResultList(FetchOptions.Builder.withDefaults());
@@ -396,59 +395,5 @@ public class AffsSearchService extends AbstractService{
 		return new AffsSearchResult(null, totalAdRev, offerwallRev,totalPaidUsers,count,minRevCount);
 	}
 	
-	private Query createQuery(Date startDate, Date endDate, String gaid) {
-		Query query = new Query("affs");
-		Collection<Filter> predicates = new ArrayList<>();
-
-	
-		
-		if (startDate != null) {
-			predicates.add(new FilterPredicate("date", FilterOperator.GREATER_THAN_OR_EQUAL, startDate));
-		}
-		if (endDate != null) {
-			predicates.add(new FilterPredicate("date", FilterOperator.LESS_THAN, endDate));
-		}
-		if (gaid != null) {
-			predicates.add(new FilterPredicate("gaid", FilterOperator.EQUAL, gaid));
-		}
-
-
-		if (predicates.size() > 1) {
-			query.setFilter(Query.CompositeFilterOperator.and(predicates));
-		} else {
-			query.setFilter(predicates.iterator().next());
-		}
-
-		return query;
-	}
-	private Query createQuery(Date startDate, Date endDate, String country, String experiment, String packageName) {
-
-		Query query = new Query("affs");
-		Collection<Filter> predicates = new ArrayList<>();
-
-		if (startDate != null) {
-			predicates.add(new FilterPredicate("date", FilterOperator.GREATER_THAN_OR_EQUAL, startDate));
-		}
-		if (endDate != null) {
-			predicates.add(new FilterPredicate("date", FilterOperator.LESS_THAN, endDate));
-		}
-		if (country != null) {
-			predicates.add(new FilterPredicate("country_code", FilterOperator.EQUAL, country));
-		}
-		if (experiment != null) {
-			predicates.add(new FilterPredicate("experiment", FilterOperator.EQUAL, experiment));
-		}
-		if (packageName != null) {
-			predicates.add(new FilterPredicate("package_name", FilterOperator.EQUAL, packageName));
-		}
-
-		if (predicates.size() > 1) {
-			query.setFilter(Query.CompositeFilterOperator.and(predicates));
-		} else {
-			query.setFilter(predicates.iterator().next());
-		}
-
-		return query;
-	}
 
 }

@@ -70,4 +70,10 @@ public interface Constants {
 	public static final int SENT =2;
 	
 	public static final String ENTITY_REDEEMING_REQUEST_ID ="REDEEMING_REQUEST_ENTITY";
+	
+	/***********************Facebook AIR Audience impression metrics *************************************/
+	public static final String AGENT_NAME="BackedSoft";	
+	public static final String FB_AIR_ACCESS_TOKEN="EAAIONUgazeUBADBmxXcernhbZAOsg1t3rtzqdHCaA0iVZCazflv7CkpS3WmUMC2iLxwuD2lKgfixe5ePGFyytb0YB6jKg7Feg1f3XBxrXu4gkLYFSWVNXPkuT2h0E4ngqhUpd9XVUCzoKbOZBGMhR2LvJAMg7Lw8MByL3pxDPRJIqKkZBEeVZCO810Nelg1AXn5Od0C3hGgZDZD";
+	public static final String FB_AIR_APP_ID="578571959193061";
+	
 }
