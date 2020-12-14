@@ -27,9 +27,7 @@ public class FBAffsSearchResult extends AffsSearchResult{
 		}else{
 		  return BigDecimal.ZERO;	
 		}
-	}
-	
-	
+	}	
 	
 
 }

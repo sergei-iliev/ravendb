@@ -56,9 +56,19 @@ public class FBAffsSearchController implements Controller {
 							"*************************Task in the Facebook background started ********************");
 					FBAffsSearchService fbAffsSearchService = new FBAffsSearchService();
 					Collection<Pair<Collection<Key>, FBAffsSearchResult>> fbAffsSearchResults = fbAffsSearchService.processAffsSearch(form);
+					
+					// read USD rate
+					ImportService importService = new ImportService();
+					String formatedDate = Utilities.formatedDate(new Date(), "yyyy-MM-dd");
+					ExchangeRateVO rate = importService.getExchangeRates(formatedDate, "EUR", "USD");
+					BigDecimal rateValue = BigDecimal.valueOf(rate.getRates().get("USD"));
+
+					
 					for(Pair<Collection<Key>, FBAffsSearchResult> pair:fbAffsSearchResults){
 						Collection<Key> affsKeys=pair.getKey();
 						FBAffsSearchResult fbAffsSearchResult=pair.getValue();
+						//set rate value
+						fbAffsSearchResult.setRateValue(rateValue);
 						Map<String, Map<String, List<String>>> datePackageEcpmsMap=fbAffsSearchService.getECPMs(affsKeys);
 						
 						BigDecimal sum=fbAffsSearchService.calculateFBUserRevenue(datePackageEcpmsMap);

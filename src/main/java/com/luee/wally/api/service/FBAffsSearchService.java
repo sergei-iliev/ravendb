@@ -242,18 +242,22 @@ public class FBAffsSearchService extends AbstractService {
 		// name has a correspondent app_id and token in facebook db
 		Map<String, Entity> packageNameMap = fbUserRevenueRepository.getFacebookPackageNameTokenMap();
         BigDecimal amount=BigDecimal.ZERO; 
-		for (Map.Entry<String, Map<String, List<String>>> entry : ecpms.entrySet()) { // by
+		for (Map.Entry<String, Map<String, List<String>>> dateToPackageEcpms : ecpms.entrySet()) { // by
 																						// date
 																						// group
-			for (Map.Entry<String, List<String>> packageToEcpms : entry.getValue().entrySet()) { // by
+			for (Map.Entry<String, List<String>> packageToEcpms : dateToPackageEcpms.getValue().entrySet()) { // by
 																									// packageName
-																									// group
+																									// group				
 				Entity packageToken = packageNameMap.get(packageToEcpms.getKey());
 				if (packageToken == null) {
-					throw new IOException("Unable to find facebook token for package: " + packageToEcpms.getKey());
+					//throw new IOException("Unable to find facebook token for package: " + packageToEcpms.getKey());
+					logger.warning("Unable to find facebook token for package: " + packageToEcpms.getKey());
+					continue;
 				}
 				String appId = (String) packageToken.getProperty("facebook_app_id");
 				String token = (String) packageToken.getProperty("token");
+				
+				logger.warning(String.format("Current input: date: %s ,package: %s ,appId: %s , size: %d",dateToPackageEcpms.getKey(),packageToEcpms.getKey(),appId,packageToEcpms.getValue().size()));
                 //for ech separate date and package ids in it
 				BigDecimal subamount=this.calculateFBUserRevenue(appId, token, packageToEcpms.getValue()); 
 				amount=amount.add(subamount);
@@ -319,7 +323,7 @@ public class FBAffsSearchService extends AbstractService {
 		String queryId=fetchQueryIdFromFBAir(appId,token,batchOfEcpms);
 		String result=null;
 		for (int i = 0; i < FB_AIR_WAIT_LOOP; i++) {			
-			result=fetchResultFromFBAirByQueryId(queryId);
+			result=fetchResultFromFBAirByQueryId(appId,token,queryId);
 			
 			switch (result) {
 			case FBAirConstants.both_ecpms_and_queries_passed_in_request:
@@ -390,12 +394,12 @@ public class FBAffsSearchService extends AbstractService {
 	 * Pass 2 to get result by query Id
 	 */
 
-	public String fetchResultFromFBAirByQueryId(String queryId) throws IOException {
-		String url = String.format("https://graph.facebook.com/%s/aggregate_revenue", Constants.FB_AIR_APP_ID);
+	public String fetchResultFromFBAirByQueryId(String appId, String token,String queryId) throws IOException {
+		String url = String.format("https://graph.facebook.com/%s/aggregate_revenue", appId);
 
 		Map<String, Object> input = new HashMap<>();
 		input.put("query_ids", Arrays.asList(queryId));
-		input.put("access_token", Constants.FB_AIR_ACCESS_TOKEN);
+		input.put("access_token",token);
 
 		String content = JSONUtils.writeObject(input);
 
