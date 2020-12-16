@@ -12,6 +12,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -259,7 +260,7 @@ public class FBAffsSearchService extends AbstractService {
 				
 				logger.warning(String.format("Current input: date: %s ,package: %s ,appId: %s , size: %d",dateToPackageEcpms.getKey(),packageToEcpms.getKey(),appId,packageToEcpms.getValue().size()));
                 //for ech separate date and package ids in it
-				BigDecimal subamount=this.calculateFBUserRevenue(appId, token, packageToEcpms.getValue()); 
+				BigDecimal subamount=this.calculateFBUserRevenue(packageToEcpms.getKey(),dateToPackageEcpms.getKey(),appId, token, packageToEcpms.getValue()); 
 				amount=amount.add(subamount);
 			}
 
@@ -271,16 +272,21 @@ public class FBAffsSearchService extends AbstractService {
 	/*
 	 * run FB AIR keeping a rule icpms count<500 and count <2000
 	 */
-	public BigDecimal calculateFBUserRevenue(String appId, String token, List<String> ecpms) throws IOException {
+	public BigDecimal calculateFBUserRevenue(String packageName,String date,String appId, String token, List<String> ecpms) throws IOException {
 
 		int size = ecpms.size();
 		if(size<=FB_AIR_LOWER_LIMIT){
-			logger.severe("Lower limit is "+FB_AIR_LOWER_LIMIT+" , provided size is "+size+ " for appid:"+appId);
+			logger.severe("Lower limit is "+FB_AIR_LOWER_LIMIT+" , provided size is "+size+ " for packageName: "+packageName+" and date: "+date);
 			return BigDecimal.ZERO;
 		}
         BigDecimal amount=BigDecimal.ZERO; 
 		if (size <= FB_AIR_UPPER_LIMIT) { // 1 butch of icpms -> one shot
-			return processFBUserRevenue(appId, token, ecpms);
+		   try{	
+			  return processFBUserRevenue(appId, token, ecpms);
+		   }catch(IOException e){
+			   logger.log(Level.SEVERE,"FB AIR error for packageName: "+packageName+" and date: "+date,e);
+			   return BigDecimal.ZERO;
+		   }
 		} else { // split into chunks since more then 2000 ecpms available
 			int listIndex = 0;
 			Collection<String> batchOfEcpms = new ArrayList<>();
@@ -292,16 +298,24 @@ public class FBAffsSearchService extends AbstractService {
 						listIndex++;
 					}
 					// fire FB processing result for the chunk
-					BigDecimal subamount=this.processFBUserRevenue(appId, token, batchOfEcpms);
-					amount=amount.add(subamount);
+					try{
+						BigDecimal subamount=this.processFBUserRevenue(appId, token, batchOfEcpms);
+						amount=amount.add(subamount);   
+					}catch(IOException e){
+					   logger.log(Level.SEVERE,"FB AIR error for packageName: "+packageName+" and date: "+date,e);					
+					}					
 				} else { // last chunk
 					while (listIndex < size) {
 						batchOfEcpms.add(ecpms.get(listIndex));
 						listIndex++;
 					}
 					// fire FB processing result for last chunk
-					BigDecimal subamount=this.processFBUserRevenue(appId, token, batchOfEcpms);
-					amount=amount.add(subamount);
+					try{
+						BigDecimal subamount=this.processFBUserRevenue(appId, token, batchOfEcpms);
+						amount=amount.add(subamount);
+					}catch(IOException e){
+						logger.log(Level.SEVERE,"FB AIR error for packageName: "+packageName+" and date: "+date,e);	
+					}
 				}
 
 			}
