@@ -334,7 +334,8 @@ public class FBAffsSearchService extends AbstractService {
 	 */
 	private BigDecimal processFBUserRevenue(String appId, String token, Collection<String> batchOfEcpms)
 			throws IOException {
-		String queryId=fetchQueryIdFromFBAir(appId,token,batchOfEcpms);
+		int requestId=counter.incrementAndGet();
+		String queryId=fetchQueryIdFromFBAir(requestId, appId,token,batchOfEcpms);
 		String result=null;
 		for (int i = 0; i < FB_AIR_WAIT_LOOP; i++) {			
 			result=fetchResultFromFBAirByQueryId(appId,token,queryId);
@@ -349,7 +350,7 @@ public class FBAffsSearchService extends AbstractService {
 								+ " appId: " + appId + " queryId: " + queryId);
 			case FBAirConstants.forbidden:
 				throw new IOException(
-						"Response from server: " + FBAirConstants.forbidden + " appId: " + appId + " token: " + token);
+						"Response from server: " + FBAirConstants.forbidden + " appId: " + appId + " token: " + token+" requestId: "+requestId);
 			case FBAirConstants.no_valid_query_ids_passed_in_request:
 				throw new IOException("Response from server: " + FBAirConstants.no_valid_query_ids_passed_in_request
 						+ " appId: " + appId + " queryId: " + queryId);
@@ -366,11 +367,13 @@ public class FBAffsSearchService extends AbstractService {
 				break;
 			case FBAirConstants.internal_error:
 				throw new IOException("Response from server: " + FBAirConstants.internal_error + " appId: " + appId
-						+ " queryId : " + queryId);
+						+ " queryId : " + queryId+" requestId: "+requestId);
 			case FBAirConstants.too_few_ecpms:
 				throw new IOException("Response from server: " + FBAirConstants.too_few_ecpms + " appId: " + appId
 						+ " batch size: " + batchOfEcpms.size());
-
+			case FBAirConstants.internal_second_request_error:
+				throw new IOException("Query response from server: " + FBAirConstants.internal_second_request_error + " appId: " + appId
+						+ " batch size: " + batchOfEcpms.size());
 			default: // must be the money
 			    
 				return new BigDecimal(result);
@@ -384,11 +387,11 @@ public class FBAffsSearchService extends AbstractService {
 	/*
 	 * Pass 1 to get query id
 	 */
-	private String fetchQueryIdFromFBAir(String appId, String token, Collection<String> icpms) throws IOException {
+	private String fetchQueryIdFromFBAir(int requestId,String appId, String token, Collection<String> icpms) throws IOException {
 		String url = String.format("https://graph.facebook.com/%s/aggregate_revenue", appId);
 
 		Map<String, Object> input = new HashMap<>();
-		input.put("request_id", counter.incrementAndGet());
+		input.put("request_id", requestId);
 		input.put("ecpms", icpms);
 		input.put("access_token", token);
 
@@ -420,7 +423,12 @@ public class FBAffsSearchService extends AbstractService {
 		String result = ConnectionMgr.INSTANCE.postJSON(url, content);
 		Map<String, Object> map = JSONUtils.readObject(result, Map.class);
 		Map<String, String> resultMap = (Map) map.get("query_ids");
-		return resultMap.get(queryId);
+		if(resultMap==null||resultMap.get(queryId)==null){
+		   logger.log(Level.SEVERE,"Unknown raw response from FB :"+result);
+		   return FBAirConstants.internal_second_request_error;  //let it go
+		}else{
+		   return resultMap.get(queryId);
+		}
 	}
 
 }

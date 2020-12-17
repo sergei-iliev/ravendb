@@ -22,6 +22,8 @@ public interface FBAirConstants {
 	
 	public static final String internal_error = "internal_error";
 	
+	public static final String internal_second_request_error = "internal_second_request_error";
+	
 	public static final String too_few_ecpms = "too_few_ecpms";
 	
 	
