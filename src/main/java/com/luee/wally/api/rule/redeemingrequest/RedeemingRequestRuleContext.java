@@ -1,7 +1,10 @@
 package com.luee.wally.api.rule.redeemingrequest;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -16,7 +19,7 @@ public class RedeemingRequestRuleContext {
 	private Set<RuleResultType> result=new TreeSet<>((o1,o2)->{
 			return o2.getRuleStatusType().ordinal()-o1.getRuleStatusType().ordinal();			
 		});
-
+	
 	private Collection<Entity> suspiciousDomains;
 
 	private Map<String,String> payPalCountryCodeMap;

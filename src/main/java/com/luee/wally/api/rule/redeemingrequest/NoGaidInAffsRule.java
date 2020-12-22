@@ -1,7 +1,5 @@
 package com.luee.wally.api.rule.redeemingrequest;
 
-import java.util.Collection;
-
 import com.google.appengine.api.datastore.Entity;
 import com.luee.wally.admin.repository.AffsRepository;
 import com.luee.wally.entity.RedeemingRequests;
@@ -19,7 +17,8 @@ public class NoGaidInAffsRule extends RedeemingRequestRule {
 		Entity affs=affsRepository.findEntity("affs", "user_guid",redeemingRequests.getUserGuid());
 		if(affs!=null){
 			   String gaid=(String)affs.getProperty("gaid");
-			   if(gaid==null||gaid.trim().length()==0){
+			   
+			   if(gaid==null||gaid.trim().length()==0||"null".equals(gaid)){
 			    context.getResult().add(RuleResultType.NO_GAID_VALUE);
 			    if(context.isExitOnResult()){
 					  return; 

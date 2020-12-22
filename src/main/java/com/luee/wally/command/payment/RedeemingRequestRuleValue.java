@@ -42,7 +42,9 @@ public class RedeemingRequestRuleValue {
 			case TOTAL_AD_REV_LESS_THEN_40:
 				return RuleStatusType.Red;
 			case TOTAL_AD_REV_LESS_THEN_20:
-				return RuleStatusType.Yellow;	
+				return RuleStatusType.Yellow;
+			case NO_GAID_VALUE:
+				return RuleStatusType.Red;
 			default:
 				return RuleStatusType.Green;
 			}

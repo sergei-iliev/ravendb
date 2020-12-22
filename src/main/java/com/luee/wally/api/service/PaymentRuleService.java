@@ -30,7 +30,7 @@ public class PaymentRuleService extends AbstractService {
 
 		RedeemingRequestEngine engine = new RedeemingRequestEngine();
 		for (RedeemingRequests redeemingRequest : redeemingRequests) {
-			Collection<RuleResultType> list = engine.execute(redeemingRequest, false);
+			Collection<RuleResultType> list = engine.execute(redeemingRequest, false);			
 			result.add(new RedeemingRequestRuleValue(redeemingRequest, list.isEmpty() ? null : list.iterator().next()));
 		}
 		return result;
@@ -44,7 +44,6 @@ public class PaymentRuleService extends AbstractService {
 		//execute rules for a record
 		RedeemingRequestEngine engine = new RedeemingRequestEngine();
 		Collection<RuleResultType> ruleResults= engine.execute(redeemingRequest, false);
-		
 		
 		Date date = redeemingRequest.getDate();
 		Date creationDate = redeemingRequest.getCreationDate();
@@ -61,6 +60,7 @@ public class PaymentRuleService extends AbstractService {
 		}else{
 		  result.put("uachannel","none");	
 		}
+		
 		//coins
 		for(RuleResultType ruleResult:ruleResults){
 			if(ruleResult==RuleResultType.COINS_PER_GAME_EQUAL_0||ruleResult==RuleResultType.COINS_PER_GAME_LESS_THEN_3){
@@ -80,8 +80,12 @@ public class PaymentRuleService extends AbstractService {
 				object.put("name","Ad rev very low");
 				object.put("text",redeemingRequest.getMaxRev()+" USD");				
 				result.put("totaladdrev",object);	
+			}else if(ruleResult==RuleResultType.NO_GAID_VALUE){
+				result.put("nogaidvalue","User is missing  Google Advertising ID");					
 			}
+			
 		}
+		
 		//illegal domains
 		
 		for(RuleResultType ruleResult:ruleResults){			

@@ -67,13 +67,13 @@ public class FBUserRevenueService extends AbstractService{
 			// group package entries per user 
 			Map<String, List<String>> userLevelRevenuesByUserMap = userLevelRevenues.stream()
 				    .collect(Collectors.groupingBy( FBUserLevelRevenue::getIDFA,Collectors.mapping(FBUserLevelRevenue::getEncryptedCPM, Collectors.toList())));
-			userLevelRevenuesByUserMap.entrySet().forEach(					
-					e->{
-						e.getValue().forEach(l->{
-						  System.out.println(e.getKey()+"::"+l);
-					    });
-						}
-					);
+//			userLevelRevenuesByUserMap.entrySet().forEach(					
+//					e->{
+//						e.getValue().forEach(l->{
+//						  System.out.println(e.getKey()+"::"+l);
+//					    });
+//						}
+//					);
 			for (Map.Entry<String,List<String>> userLevelRevenue : userLevelRevenuesByUserMap.entrySet()) {	
 				//read user revenue aff table
 				Entity affs=affsRepository.getLastAffEntryByGaid(userLevelRevenue.getKey());

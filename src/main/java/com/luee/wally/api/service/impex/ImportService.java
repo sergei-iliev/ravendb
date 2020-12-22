@@ -71,7 +71,7 @@ public class ImportService {
 		}
 		
 		list.sort((d1,d2) -> ((Date)d1.getProperty("date")).compareTo((Date)d2.getProperty("date")));
-		list.forEach(l->System.out.println(l.getProperty("date")));
+		
 		Entity lowerDateEntity=null,upperDateEntity=null;
 		for(Entity entity:list){
 		   Date entityDate=(Date)entity.getProperty("date");
@@ -203,8 +203,8 @@ public class ImportService {
 	
 	
 	public void createPDFInCloudStore(Entity redeemingRequest,PaidUsers2018 paidUsers2018,String namePrefix,String invoiceNumber)throws Exception{
-        PdfAttachment attachment=new PdfAttachment();
-        attachment.setFileName("user_credit_notes_2018_with_id/PaidUsers2018_"+invoiceNumber+".pdf");
+        PdfAttachment attachment=new PdfAttachment();        
+        attachment.setFileName(namePrefix+invoiceNumber+".pdf");
         attachment.setContentType("application/pdf");       
         InvoiceService invoiceService = new InvoiceService();
         attachment.readFromStream(invoiceService.createInvoice(redeemingRequest,paidUsers2018,invoiceNumber)); 

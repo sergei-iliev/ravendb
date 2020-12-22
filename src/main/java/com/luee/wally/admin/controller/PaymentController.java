@@ -409,7 +409,8 @@ public class PaymentController implements Controller {
 		// run rules
 		PaymentRuleService paymentRuleService = new PaymentRuleService();
 		Collection<RedeemingRequestRuleValue> result = paymentRuleService.executeRedeemingRequestRules(entities);
-	
+				
+
 		// filter out result based on color flag
 		if (form.getColorFlag() != RuleStatusType.None) {
 			result = result.stream().filter(r -> r.getRuleStatus() == form.getColorFlag()).collect(Collectors.toList());
