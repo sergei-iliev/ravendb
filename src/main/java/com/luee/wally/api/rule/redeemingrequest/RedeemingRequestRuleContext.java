@@ -63,9 +63,6 @@ public class RedeemingRequestRuleContext {
 	public Collection<RuleResultType> getResult() {
 		return result;
 	}
-//	public void setResult(List<RuleResultType> result) {
-//		this.result = result;
-//	}
     
 	public void setSuspiciousDomains(Collection<Entity> suspiciousDomains) {
 		this.suspiciousDomains = suspiciousDomains;

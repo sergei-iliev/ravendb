@@ -571,7 +571,7 @@ public class UserRevenueTest {
 //		s.addAll(Arrays.asList(s25));
 		
 		FBAffsSearchService service=new FBAffsSearchService();			    
-		service.prepareFBUserRevenue("2","2",acpms);
+
 		
 //		String result=service.fetchResultFromFBAirByQueryId("9e5634d5-8f94-43dc-a5e9-68e4115d7585");
 //		System.out.println(result);

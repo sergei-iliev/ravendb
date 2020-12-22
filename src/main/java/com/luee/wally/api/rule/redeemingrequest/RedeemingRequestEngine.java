@@ -13,7 +13,8 @@ public class RedeemingRequestEngine {
 	private RedeemingRequestRuleContext context;
 	
 	public RedeemingRequestEngine() {
-		first=(new TimeToCashLess24OrganicRule());
+		first=new NoGaidInAffsRule();
+		first.setNext(new TimeToCashLess24OrganicRule());		
 		first.setNext(new AdRevRule());
 		first.setNext(new TimeToCashLess24NonOrganicRule());
 		first.setNext(new TimeToCashLess48OrganicRule());

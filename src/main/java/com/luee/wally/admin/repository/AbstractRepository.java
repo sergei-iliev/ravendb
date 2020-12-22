@@ -49,6 +49,15 @@ public class AbstractRepository {
 			return null;
 		}
 	}
+	
+	public Entity findEntity(String tableName,String fieldName,String value) {		
+		DatastoreService ds = createDatastoreService(Consistency.EVENTUAL);
+		Query query = new Query(tableName);
+		query.setFilter(new FilterPredicate(fieldName, FilterOperator.EQUAL, value));
+		
+		PreparedQuery pq = ds.prepare(query);
+		return pq.asSingleEntity();	
+	}
 
 	public void deleteEntity(Key key) {
 		DatastoreService ds = createDatastoreService(Consistency.STRONG);

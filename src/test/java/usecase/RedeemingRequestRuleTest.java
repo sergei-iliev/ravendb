@@ -106,6 +106,5 @@ public class RedeemingRequestRuleTest {
 		    System.out.println(engine.execute(redeemingRequests,false));		    
 		}
 		
-	}	
-
+	}		
 }
