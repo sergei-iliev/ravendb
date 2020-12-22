@@ -115,7 +115,7 @@ payment.PaymentEligibleUsersView = Backbone.View.extend({
  						rule_status_result+="<li>"+map.totaladdrev.name+" : "+map.totaladdrev.text+"</li>";
  					}
  					if(map.nogaidvalue!=null){
- 						rule_status_result+="<li><strong>"+map.nogaidvalue+"</strong></li>";	
+ 						rule_status_result+="<li>"+map.nogaidvalue+"</li>";	
  					}
  					if(map.uachannel!=null){
  						rule_status_result+="<li>UA Channel : <strong>"+map.uachannel+"</strong></li>";

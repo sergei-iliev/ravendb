@@ -16,8 +16,7 @@ public class NoGaidInAffsRule extends RedeemingRequestRule {
 	public void execute(RedeemingRequestRuleContext context, RedeemingRequests redeemingRequests) {		
 		Entity affs=affsRepository.findEntity("affs", "user_guid",redeemingRequests.getUserGuid());
 		if(affs!=null){
-			   String gaid=(String)affs.getProperty("gaid");
-			   
+			   String gaid=(String)affs.getProperty("gaid");			   
 			   if(gaid==null||gaid.trim().length()==0||"null".equals(gaid)){
 			    context.getResult().add(RuleResultType.NO_GAID_VALUE);
 			    if(context.isExitOnResult()){

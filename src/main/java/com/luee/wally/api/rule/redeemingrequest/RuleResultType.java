@@ -19,7 +19,7 @@ import com.luee.wally.command.payment.RuleStatusType;
 *
  */
 public enum RuleResultType{	
-    NO_GAID_VALUE(RuleStatusType.Red),
+    NO_GAID_VALUE(RuleStatusType.Yellow),
     TIME_TO_CACH_LESS_24_ORGANIC(RuleStatusType.Red),
     TIME_TO_CACH_LESS_24_NON_ORGANIC(RuleStatusType.Yellow),
     TIME_TO_CACH_LESS_48_ORGANIC(RuleStatusType.Yellow),
