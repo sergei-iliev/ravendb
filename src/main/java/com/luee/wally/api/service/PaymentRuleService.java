@@ -82,6 +82,8 @@ public class PaymentRuleService extends AbstractService {
 				result.put("totaladdrev",object);	
 			}else if(ruleResult==RuleResultType.NO_GAID_VALUE){
 				result.put("nogaidvalue","User is missing  Google Advertising ID");					
+			}else if(ruleResult==RuleResultType.UA_CHANNEL_ORGANIC_AMOUNT_50||ruleResult==RuleResultType.UA_CHANNEL_ORGANIC_AMOUNT_100){
+				result.put("uachannelorganicamount","Amount is high and user is organic");
 			}
 			
 		}

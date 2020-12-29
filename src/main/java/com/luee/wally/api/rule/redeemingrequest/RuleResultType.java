@@ -18,8 +18,8 @@ import com.luee.wally.command.payment.RuleStatusType;
 
 *
  */
-public enum RuleResultType{	
-    NO_GAID_VALUE(RuleStatusType.Yellow),
+public enum RuleResultType{	      
+    UA_CHANNEL_ORGANIC_AMOUNT_100(RuleStatusType.Red),
     TIME_TO_CACH_LESS_24_ORGANIC(RuleStatusType.Red),
     TIME_TO_CACH_LESS_24_NON_ORGANIC(RuleStatusType.Yellow),
     TIME_TO_CACH_LESS_48_ORGANIC(RuleStatusType.Yellow),
@@ -30,8 +30,10 @@ public enum RuleResultType{
     COINS_PER_GAME_LESS_THEN_3(RuleStatusType.Yellow),
     SUSPICIOUS_EMAIL_DOMAIN_RED(RuleStatusType.Red),
     SUSPICIOUS_EMAIL_DOMAIN_YELLOW(RuleStatusType.Yellow),
-    TOTAL_AD_REV_LESS_THEN_20(RuleStatusType.Yellow),
-    TOTAL_AD_REV_LESS_THEN_40(RuleStatusType.Red)
+    TOTAL_AD_REV_LESS_THEN_20(RuleStatusType.Yellow),    
+    TOTAL_AD_REV_LESS_THEN_40(RuleStatusType.Red),
+    UA_CHANNEL_ORGANIC_AMOUNT_50(RuleStatusType.Yellow),
+    NO_GAID_VALUE(RuleStatusType.Yellow), 
     ;	
 	private RuleStatusType ruleStatusType; 
 	private RuleResultType(RuleStatusType ruleStatusType) {
