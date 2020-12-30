@@ -45,6 +45,11 @@ public class RedeemingRequestRuleValue {
 				return RuleStatusType.Yellow;
 			case NO_GAID_VALUE:
 				return RuleStatusType.Yellow;
+			case UA_CHANNEL_ORGANIC_AMOUNT_100:
+				return RuleStatusType.Red;
+			case UA_CHANNEL_ORGANIC_AMOUNT_50:
+				return RuleStatusType.Yellow;
+				
 			default:
 				return RuleStatusType.Green;
 			}

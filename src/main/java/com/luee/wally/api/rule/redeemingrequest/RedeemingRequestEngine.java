@@ -14,6 +14,7 @@ public class RedeemingRequestEngine {
 	
 	public RedeemingRequestEngine() {
 		first=new NoGaidInAffsRule();
+		first.setNext(new UAChannelOrganicAmount());
 		first.setNext(new TimeToCashLess24OrganicRule());		
 		first.setNext(new AdRevRule());
 		first.setNext(new TimeToCashLess24NonOrganicRule());
