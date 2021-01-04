@@ -313,7 +313,7 @@ public class PaidUsersService {
 	    return list.stream().sorted(Comparator.comparing(PaidUser::getDate)).collect(Collectors.toList());
 	}
 	
-	public void checkVPNUsageAsync(Key redeeming_request_id,String ipAddress,String countryCode) throws IOException{
+	public void checkVPNUsageAsync(String key,String ipAddress,String countryCode) throws IOException{
 		
 		String url=String.format(Constants.VPN_SERVICE_URL,ipAddress,countryCode);
 		String result = ConnectionMgr.INSTANCE.getJSON(url);
@@ -322,9 +322,9 @@ public class PaidUsersService {
 		Boolean isUsingVpn=(Boolean)map.get("isUsingVpn");
 		
 		PaidUsersRepository paidUsersRepository=new PaidUsersRepository();
-		Entity redeemingRequest=paidUsersRepository.findEntityByKey(redeeming_request_id);
+		Entity redeemingRequest=paidUsersRepository.findEntityByKey(key);
 		if(redeemingRequest==null){
-			throw new IOException("Unable to find entity by key :"+redeeming_request_id);
+			throw new IOException("Unable to find entity by key :"+key);
 		}
 		
 		redeemingRequest.setProperty("is_using_vpn", isUsingVpn);

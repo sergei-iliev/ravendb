@@ -122,6 +122,7 @@ INSTANCE;
     	 httpPostRouteList.put("/administration/payment/paidusers/search/byemail", new Route(new PaidUsersController(),"searchByEmail"));    	 
     	 httpPostRouteList.put("/administration/payment/paidusers/search/byguid", new Route(new PaidUsersController(),"searchByGuid"));    	 
     	 httpPostRouteList.put("/administration/payment/paidusers/search/groupby",new Route(new PaidUsersController(),"searchGroupBy"));
+    	 httpPostRouteList.put("/administration/payment/paidusers/checkvpnusage", new Route(new PaidUsersController(),"checkVPNUsageAsync"));
     	 //email template
     	 httpPostRouteList.put("/administration/email/template/send", new Route(new EmailTemplateController(),"sendEmailTemplate"));
     
