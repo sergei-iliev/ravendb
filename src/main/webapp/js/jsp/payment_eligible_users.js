@@ -119,7 +119,10 @@ payment.PaymentEligibleUsersView = Backbone.View.extend({
  					}
  					if(map.uachannelorganicamount!=null){
  						rule_status_result+="<li>"+map.uachannelorganicamount+"</li>";
- 					}
+ 					} 					
+ 					if(map.usingvpn!=null){
+ 						rule_status_result+="<li>"+map.usingvpn+"</li>";
+ 					} 					
  					if(map.uachannel!=null){
  						rule_status_result+="<li>UA Channel : <strong>"+map.uachannel+"</strong></li>";
  					}

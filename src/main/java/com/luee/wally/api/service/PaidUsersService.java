@@ -1,5 +1,6 @@
 package com.luee.wally.api.service;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -14,13 +15,16 @@ import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.luee.wally.admin.repository.PaidUsersRepository;
+import com.luee.wally.api.ConnectionMgr;
 import com.luee.wally.command.PaidUserGroupByForm;
 import com.luee.wally.command.PaidUserSearchForm;
 import com.luee.wally.command.PaidUserGroupByForm.GroupByType;
 import com.luee.wally.command.PaidUserGroupByResult;
 import com.luee.wally.command.viewobject.PaidUserGroupByVO;
+import com.luee.wally.constants.Constants;
 import com.luee.wally.entity.PaidUser;
 import com.luee.wally.entity.RedeemingRequests;
+import com.luee.wally.json.JSONUtils;
 
 public class PaidUsersService {
 	private final Logger logger = Logger.getLogger(PaidUsersService.class.getName());
@@ -307,5 +311,23 @@ public class PaidUsersService {
 	    PaidUsersRepository paidUsersRepository=new PaidUsersRepository();
 	    Collection<PaidUser> list= paidUsersRepository.findPaidUsersByGuid(form.getUserGuid());
 	    return list.stream().sorted(Comparator.comparing(PaidUser::getDate)).collect(Collectors.toList());
+	}
+	
+	public void checkVPNUsageAsync(Key redeeming_request_id,String ipAddress,String countryCode) throws IOException{
+		
+		String url=String.format(Constants.VPN_SERVICE_URL,ipAddress,countryCode);
+		String result = ConnectionMgr.INSTANCE.getJSON(url);
+		
+		Map<String, Object> map = JSONUtils.readObject(result, Map.class);
+		Boolean isUsingVpn=(Boolean)map.get("isUsingVpn");
+		
+		PaidUsersRepository paidUsersRepository=new PaidUsersRepository();
+		Entity redeemingRequest=paidUsersRepository.findEntityByKey(redeeming_request_id);
+		if(redeemingRequest==null){
+			throw new IOException("Unable to find entity by key :"+redeeming_request_id);
+		}
+		
+		redeemingRequest.setProperty("is_using_vpn", isUsingVpn);
+		paidUsersRepository.save(redeemingRequest);
 	}
 }

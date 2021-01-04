@@ -14,6 +14,7 @@ public class RedeemingRequestEngine {
 	
 	public RedeemingRequestEngine() {
 		first=new NoGaidInAffsRule();
+		first.setNext(new UsingVPNRule());
 		first.setNext(new UAChannelOrganicAmount());
 		first.setNext(new TimeToCashLess24OrganicRule());		
 		first.setNext(new AdRevRule());
@@ -24,6 +25,7 @@ public class RedeemingRequestEngine {
 		first.setNext(new FullAddressDifferentUserRule());
 		first.setNext(new IpAddressDifferentUserRule());
 		first.setNext(new EmailDomainUserRule());
+
 		context = new RedeemingRequestRuleContext();
 	}
 

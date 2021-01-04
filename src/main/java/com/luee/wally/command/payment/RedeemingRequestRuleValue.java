@@ -49,7 +49,8 @@ public class RedeemingRequestRuleValue {
 				return RuleStatusType.Red;
 			case UA_CHANNEL_ORGANIC_AMOUNT_50:
 				return RuleStatusType.Yellow;
-				
+			case USING_VPN:
+				return RuleStatusType.Red;
 			default:
 				return RuleStatusType.Green;
 			}

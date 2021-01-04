@@ -19,7 +19,8 @@ import com.luee.wally.command.payment.RuleStatusType;
 *
  */
 public enum RuleResultType{	      
-    UA_CHANNEL_ORGANIC_AMOUNT_100(RuleStatusType.Red),
+	USING_VPN(RuleStatusType.Red),
+	UA_CHANNEL_ORGANIC_AMOUNT_100(RuleStatusType.Red),
     TIME_TO_CACH_LESS_24_ORGANIC(RuleStatusType.Red),
     TIME_TO_CACH_LESS_24_NON_ORGANIC(RuleStatusType.Yellow),
     TIME_TO_CACH_LESS_48_ORGANIC(RuleStatusType.Yellow),

@@ -92,19 +92,21 @@ public class RedeemingRequestRuleTest {
 	
 
 	@Test
-	public void nameOrAddressOrIpRuleTest(){
-		TestDatabase.INSTANCE.generateDB();
-		PaymentService paymentService = new PaymentService();
-		
-		PaymentEligibleUserForm form = new PaymentEligibleUserForm();
-		form.setStartDate(null);
-		form.setEndDate(null);
-		Collection<RedeemingRequests> entities = paymentService.searchEligibleUsers(form);
-        
-		RedeemingRequestEngine engine=new RedeemingRequestEngine();
-		for(RedeemingRequests redeemingRequests:entities){								
-		    System.out.println(engine.execute(redeemingRequests,false));		    
-		}
+	public void nameOrAddressOrIpRuleTest()throws Exception{
+		PaidUsersService paymentService=new PaidUsersService();
+		paymentService.checkVPNUsage(null,"79.153.241.118", "ES");
+//		TestDatabase.INSTANCE.generateDB();
+//		PaymentService paymentService = new PaymentService();
+//		
+//		PaymentEligibleUserForm form = new PaymentEligibleUserForm();
+//		form.setStartDate(null);
+//		form.setEndDate(null);
+//		Collection<RedeemingRequests> entities = paymentService.searchEligibleUsers(form);
+//        
+//		RedeemingRequestEngine engine=new RedeemingRequestEngine();
+//		for(RedeemingRequests redeemingRequests:entities){								
+//		    System.out.println(engine.execute(redeemingRequests,false));		    
+//		}
 		
 	}		
 }

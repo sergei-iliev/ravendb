@@ -24,12 +24,14 @@ public class RedeemingRequests {
 	private List<Long> coinsPerGame;
 	private boolean confirmedEmail;
 	private double maxRev; // always in dollars
-
+    private boolean usingVPN;
+    
 	public static RedeemingRequests valueOf(Entity entity) {
 
 		RedeemingRequests redeemingRequests = new RedeemingRequests();
 		redeemingRequests.key = KeyFactory.keyToString(entity.getKey());
 		redeemingRequests.setAmount((String) entity.getProperty("amount"));
+		redeemingRequests.setUsingVPN((Boolean) entity.getProperty("is_using_vpn"));
 		redeemingRequests.setMaxRev((Double) entity.getProperty("max_rev"));
 		redeemingRequests.setFullName((String) entity.getProperty("full_name"));
 		redeemingRequests.setUserGuid((String) entity.getProperty("user_guid"));
@@ -226,6 +228,17 @@ public class RedeemingRequests {
 		this.countryCode = countryCode;
 	}
 
+	public boolean isUsingVPN() {
+		return usingVPN;
+	}
+	
+	public void setUsingVPN(Boolean usingVPN) {
+		if(usingVPN==null){
+		  this.usingVPN = false;	
+		}else{
+		  this.usingVPN = usingVPN;
+		}
+	}
 	public String getLink1() {
 		return link1;
 	}
