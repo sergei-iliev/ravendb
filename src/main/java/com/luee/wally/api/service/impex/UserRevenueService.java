@@ -199,7 +199,7 @@ public class UserRevenueService extends AbstractService{
 
 
 		try {
-			String response = ConnectionMgr.INSTANCE.getCSV(revenue.getUrl());
+			String response = ConnectionMgr.INSTANCE.getCSV(revenue.getAd_revenue_report_url());
 			return importService.importCSVText(response);
 
 		} catch (Exception e) {

@@ -8,6 +8,8 @@ public class RevenueLinkVO implements ValueObject{
 
 	private String packageName;
 	
+	private String ad_revenue_report_url;
+	
 	public String getStatus() {
 		return status;
 	}
@@ -30,5 +32,13 @@ public class RevenueLinkVO implements ValueObject{
 	
 	public void setPackageName(String packageName) {
 		this.packageName = packageName;
+	}
+	
+	public String getAd_revenue_report_url() {
+		return ad_revenue_report_url;
+	}
+	
+	public void setAd_revenue_report_url(String ad_revenue_report_url) {
+		this.ad_revenue_report_url = ad_revenue_report_url;
 	}
 }

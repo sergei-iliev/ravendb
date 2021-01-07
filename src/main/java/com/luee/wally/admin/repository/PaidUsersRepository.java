@@ -86,7 +86,33 @@ public class PaidUsersRepository extends AbstractRepository{
 			     }
 	
 		}
+	  	public String findPaidUsersExternal(String cursorStr,Collection<Entity> result,Date startDate,Date endDate){
+		     DatastoreService  ds= createDatastoreService(Consistency.EVENTUAL);
+		
+		     PreparedQuery pq = ds.prepare(createPaidUsersExternalQuery(startDate,endDate));
+	
+		     QueryResultList<Entity> results;
+		     
+		     Cursor cursor=cursorStr==null?null:Cursor.fromWebSafeString(cursorStr);
+	     
+	    	 FetchOptions fetchOptions;	 
+	    	 if(cursor!=null){	 
+	    		 fetchOptions = FetchOptions.Builder.withLimit(Constants.CURSOR_SIZE).startCursor(cursor);
+	    	 }else{
+	    		 fetchOptions = FetchOptions.Builder.withLimit(Constants.CURSOR_SIZE);	 
+	    	 }
+	     	    	 
+	    	 results = pq.asQueryResultList(fetchOptions);
+	    	 result.addAll(results);		    	
+	    	 
+		     cursor=results.getCursor();	
+		     if(results.size()>0){
+		    	return cursor.toWebSafeString(); 
+		     }else{
+		    	return null; 
+		     }
 
+	  	}
 	    public Collection<PaidUser> findPaidUsersByGuid(String userGuid){
 		     DatastoreService ds = createDatastoreService(Consistency.EVENTUAL);			 
 			 PreparedQuery pq = ds.prepare(createPaidUsersQuery(userGuid));
@@ -144,6 +170,26 @@ public class PaidUsersRepository extends AbstractRepository{
 			if(type!=null&&type.trim().length()>0){						   
 			   predicates.add(new FilterPredicate("type", FilterOperator.EQUAL  ,type));			
 			}
+			
+			if(predicates.size()>1){
+				query.setFilter(Query.CompositeFilterOperator.and(predicates));			
+			}else{
+				query.setFilter(predicates.iterator().next());
+			}
+			return query.addSort("date",SortDirection.ASCENDING);	
+		}
+		
+		private Query createPaidUsersExternalQuery(Date startDate,Date endDate){
+			Query query = new Query("paid_users_external");
+			Collection<Filter> predicates=new ArrayList<>();
+			
+			
+			if(startDate!=null){
+				predicates.add(new FilterPredicate("date", FilterOperator.GREATER_THAN_OR_EQUAL, startDate));
+			}
+			if(endDate!=null){
+				predicates.add(new FilterPredicate("date", FilterOperator.LESS_THAN , endDate));
+			}            
 			
 			if(predicates.size()>1){
 				query.setFilter(Query.CompositeFilterOperator.and(predicates));			

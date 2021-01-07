@@ -16,7 +16,7 @@ import com.luee.wally.admin.controller.ApplicationSettingsController;
 import com.luee.wally.admin.controller.CampaignSearchController;
 import com.luee.wally.admin.controller.ConfirmEmailController;
 import com.luee.wally.admin.controller.EmailTemplateController;
-import com.luee.wally.admin.controller.ExportToolController;
+import com.luee.wally.admin.controller.ExportController;
 import com.luee.wally.admin.controller.FBAffsSearchController;
 import com.luee.wally.admin.controller.GiftCardController;
 import com.luee.wally.admin.controller.ImportController;
@@ -73,6 +73,8 @@ INSTANCE;
     	 httpGetRouteList.put("/administration/job/user/revenue/daily/fb",new Route(new UserRevenueReportsController(),"runfbUserAdRevenueDailyReport"));
     	 httpGetRouteList.put("/administration/job/user/revenue/run",new Route(new UserRevenueReportsController(),"runUserAdRevenueDailyReportByDate"));
     	 httpGetRouteList.put("/administration/job/user/revenue/run/fb",new Route(new UserRevenueReportsController(),"runfbUserAdRevenueDailyReportByDate"));
+    	 httpGetRouteList.put("/administration/payment/paidusers/export",new Route(new ExportController(),"index"));
+    	 
     	 
     	 
     	 httpGetRouteList.put("/administration/payment/paidusers", new Route(new PaidUsersController(),"index"));
@@ -113,7 +115,9 @@ INSTANCE;
     	 httpPostRouteList.put("/administration/payment/user/paypal", new Route(new PaymentController(),"sendPayPal"));
     	 httpPostRouteList.put("/administration/payment/user/paypal/validate", new Route(new PaymentController(),"validatePayPalAccount"));
     	 
-
+    	 httpPostRouteList.put("/administration/payment/paidusers/export",new Route(new ExportController(),"exportPaidUsers"));
+    	 
+    	 
     	 httpPostRouteList.put("/administration/job/payment/user/external/email", new Route(new EmailTemplateController(),"externalPaymentSentEmail")); 
 
     	 

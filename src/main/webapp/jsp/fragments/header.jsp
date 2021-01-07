@@ -55,7 +55,8 @@
           		<a class="dropdown-item" href="/administration/payment/eligibleusers">Eligible Users</a>
           		<a class="dropdown-item" href="/administration/payment/paidusers">Paid Users</a> 
           		<a class="dropdown-item" href="/administration/payment/paidusers?groupby">Paid Users Group By</a>   
-          		<a class="dropdown-item" href="/administration/payment/confirmemail">Confirm Email</a>       	
+          		<a class="dropdown-item" href="/administration/payment/confirmemail">Confirm Email</a>
+          		<a class="dropdown-item" href="/administration/payment/paidusers/export">Export Paid User</a>          		       
         	</div>
       	</li>
           <li class="nav-item dropdown ${param.activeMenuItem eq 'users' ? 'active' : ''}">

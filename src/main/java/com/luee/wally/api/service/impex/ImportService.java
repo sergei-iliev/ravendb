@@ -32,6 +32,7 @@ import com.google.cloud.storage.StorageOptions;
 import com.luee.wally.DB;
 import com.luee.wally.admin.repository.CloudStorageRepository;
 import com.luee.wally.api.ConnectionMgr;
+import com.luee.wally.api.service.AbstractService;
 import com.luee.wally.api.service.InvoiceService;
 import com.luee.wally.command.AffsSearchForm;
 import com.luee.wally.command.AffsSearchResult;
@@ -44,8 +45,8 @@ import com.luee.wally.json.ExchangeRateVO;
 import com.luee.wally.json.JSONUtils;
 import com.luee.wally.utils.Utilities;
 
-public class ImportService {
-	private final Logger logger = Logger.getLogger(ExportService.class.getName());
+public class ImportService extends AbstractService{
+	private final Logger logger = Logger.getLogger(ImportService.class.getName());
 	
 	private static final String AD_UNIT_ID="Ad Unit ID";
 	private static final String PLACEMENT="Placement";

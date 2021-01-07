@@ -94,7 +94,7 @@ public class RedeemingRequestRuleTest {
 	@Test
 	public void nameOrAddressOrIpRuleTest()throws Exception{
 		PaidUsersService paymentService=new PaidUsersService();
-		paymentService.checkVPNUsage(null,"79.153.241.118", "ES");
+		paymentService.checkVPNUsageAsync(null,"79.153.241.118", "ES");
 //		TestDatabase.INSTANCE.generateDB();
 //		PaymentService paymentService = new PaymentService();
 //		
