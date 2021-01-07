@@ -68,6 +68,11 @@ public class AbstractRepository {
 		return pq.asSingleEntity();	
 	}
 
+	public void deleteEntities(Collection<Key> keys) {
+		DatastoreService ds = createDatastoreService(Consistency.STRONG);
+		ds.delete(keys);
+		logger.warning("DELETE : "+keys);
+	}
 	public void deleteEntity(Key key) {
 		DatastoreService ds = createDatastoreService(Consistency.STRONG);
 		ds.delete(key);

@@ -28,26 +28,27 @@ import com.google.appengine.api.datastore.TransactionOptions;
 public class UserRevenueRepository extends AbstractRepository {
 	private final Logger logger = Logger.getLogger(UserRevenueRepository.class.getName());
 
-	public Entity getUserRevPackage(String packageName) {
+	public Entity getUserRevPackage(String packageName,String date) {
 		DatastoreService ds = createDatastoreService(Consistency.STRONG);
-		Filter filter = new FilterPredicate("package_name", FilterOperator.EQUAL, packageName);
-		Query q = new Query("user_rev_package");
-		q.setFilter(filter);
+		Filter filter1 = new FilterPredicate("package_name", FilterOperator.EQUAL, packageName);
+		Filter filter2 = new FilterPredicate("last_used_date", FilterOperator.EQUAL, date);
+		Query q = new Query("user_rev_package");		
+		q.setFilter(Query.CompositeFilterOperator.and(filter1,filter2));				
 		PreparedQuery pq = ds.prepare(q);
+		
 		return pq.asSingleEntity();
 	}
 	
-	public  void saveUserRevPackage(String packageName, String date) {
+	public  void createUserRevPackage(String packageName, String date) {
 		DatastoreService ds = createDatastoreService(Consistency.STRONG);
-
-		Entity entity = getUserRevPackage(packageName);
-		
+		Entity entity = getUserRevPackage(packageName,date);
+		//create if it does not exists
 		if(entity==null) {
 			entity = new Entity("user_rev_package");
 			entity.setProperty("package_name", packageName);
+			entity.setProperty("last_used_date", date);
+			ds.put(entity);
 		}
-		entity.setProperty("last_used_date", date);		
-		ds.put(entity);		
 	}
 
 //	public Entity getLastAffEntryByGaid(String gaid) {

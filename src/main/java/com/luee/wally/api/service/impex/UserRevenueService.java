@@ -18,9 +18,11 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import com.google.appengine.api.datastore.EmbeddedEntity;
 import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.Key;
 import com.luee.wally.admin.repository.AffsRepository;
 import com.luee.wally.admin.repository.UserRevenueRepository;
 import com.luee.wally.api.ConnectionMgr;
@@ -156,7 +158,7 @@ public class UserRevenueService extends AbstractService{
 			aggregatedUserRevenueMap=null;
 			
 			//mark package as complete for this date
-			userRevenueRepository.saveUserRevPackage(revenueLink.getPackageName(), date);	
+			userRevenueRepository.createUserRevPackage(revenueLink.getPackageName(), date);	
 		}
 		return unfinishedPackagesCount==0; 		
 	}	
@@ -212,15 +214,21 @@ public class UserRevenueService extends AbstractService{
 
 
 	private boolean isUserRevPackageProcessed(String packageName,String date){		
-		Entity userRevPackage= userRevenueRepository.getUserRevPackage(packageName);
+		Entity userRevPackage= userRevenueRepository.getUserRevPackage(packageName,date);
 		if(userRevPackage==null){
 			return false;
 		}
-
-		if(!date.equals(userRevPackage.getProperty("last_used_date"))){
-			return false;
-		}		
+//
+//		if(!date.equals(userRevPackage.getProperty("last_used_date"))){
+//			return false;
+//		}		
 		return true;
 	  	
 	}		
+	
+	public void deleteUserRevPackages(String date){
+		Collection<Entity> entities=userRevenueRepository.findEntities("user_rev_package", "last_used_date", date);
+		Collection<Key> keys=entities.stream().map(Entity::getKey).collect(Collectors.toList());		
+		userRevenueRepository.deleteEntities(keys);		
+	}
 }

@@ -57,6 +57,7 @@ public class UserRevenueReportsController implements Controller{
 	}
 	private void processUserRevenueInBackground(String date) {
 		JobsRepository jobsRepository=new JobsRepository();
+		
 		UserRevenueService userRevenueService = new UserRevenueService();
 		
 		 try{
@@ -67,6 +68,8 @@ public class UserRevenueReportsController implements Controller{
 			 boolean result=userRevenueService.processUserRevenueAggregated(date);
 			 if(result){
 				 jobsRepository.saveJobEntry(JobsRepository.USER_REVENUE_JOB, JobStatus.FINISHED, date);
+				 //delete corresponding entries in user_rev_package
+				 userRevenueService.deleteUserRevPackages(date);
 			 }else{
 				 result=jobsRepository.resetJobFailure(JobsRepository.USER_REVENUE_JOB, JobStatus.INCOMPLETE.name(), date);
 				 if(result){
