@@ -36,7 +36,8 @@ public class UserRevenueRepository extends AbstractRepository {
 		q.setFilter(Query.CompositeFilterOperator.and(filter1,filter2));				
 		PreparedQuery pq = ds.prepare(q);
 		
-		return pq.asSingleEntity();
+		List<Entity> entities=pq.asList(FetchOptions.Builder.withDefaults());
+		return entities.isEmpty()?null:entities.get(0);					
 	}
 	
 	public  void createUserRevPackage(String packageName, String date) {

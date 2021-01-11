@@ -158,7 +158,6 @@ public class PaidUsersRepository extends AbstractRepository{
 			Query query = new Query("paid_users");
 			Collection<Filter> predicates=new ArrayList<>();
 			
-			
 			if(startDate!=null){
 				predicates.add(new FilterPredicate("date", FilterOperator.GREATER_THAN_OR_EQUAL, startDate));
 			}

@@ -30,6 +30,11 @@
   					${success}
 				</div>	
 			 </c:if> 
+             <c:if test="${error!=null}">
+				<div class="alert alert-danger" role="alert">
+  					${error}
+				</div>	
+			 </c:if> 
 			 <h4>Export Paid Users</h4>
 			 <div class="mt-5">
                 <form class="form-horizontal" id="search-form" method="post" action="/administration/payment/paidusers/export">
@@ -53,7 +58,7 @@
 					<div class="col-3 mt-3">
 					<input  type="checkbox" 
 									name="external" id="externalId" value="true"
-									<c:if test="${(webform.groupByLocale != null)&&(webform.groupByLocale eq 'country')}">
+									<c:if test="${webform.external == true}">
 										checked
 									</c:if>	
 									> 
