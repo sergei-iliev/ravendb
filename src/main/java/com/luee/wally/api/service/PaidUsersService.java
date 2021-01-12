@@ -29,6 +29,8 @@ import com.luee.wally.json.JSONUtils;
 public class PaidUsersService {
 	private final Logger logger = Logger.getLogger(PaidUsersService.class.getName());
 
+	PaidUsersRepository paidUsersRepository=new PaidUsersRepository();
+	
 	public Collection<PaidUserGroupByVO> searchGroupBy(PaidUserGroupByForm form){
 		
 	    /*
@@ -37,7 +39,7 @@ public class PaidUsersService {
 	     */
 		Collection<Entity> output=new ArrayList<>();
 		Collection<Entity> result=new ArrayList<>();
-	    PaidUsersRepository paidUsersRepository=new PaidUsersRepository();
+	    
 	    
 	    /*
 	     * Split filtering to first fetching data from paid_users and then filtering over redeeming_requests
@@ -231,7 +233,7 @@ public class PaidUsersService {
 	public Collection<PaidUser> search(PaidUserSearchForm form){
 		Collection<Entity> output=new ArrayList<>();
 		Collection<Entity> result=new ArrayList<>();
-	    PaidUsersRepository paidUsersRepository=new PaidUsersRepository();
+
 	    
 	    /*
 	     * Split filtering to first fetching data from paid_users and then filtering over redeeming_requests
@@ -301,14 +303,12 @@ public class PaidUsersService {
     	return result;
     }
 	public Collection<PaidUser> searchByEmail(PaidUserSearchForm form){
-	    PaidUsersRepository paidUsersRepository=new PaidUsersRepository();
 	    Collection<PaidUser> list= paidUsersRepository.findPaidUsersByEmail(form.getEmail(),form.getPaypalAccount());
 	    return list.stream().sorted(Comparator.comparing(PaidUser::getDate)).collect(Collectors.toList());
 	    
 	}
 	
 	public Collection<PaidUser> searchByGuid(PaidUserSearchForm form){
-	    PaidUsersRepository paidUsersRepository=new PaidUsersRepository();
 	    Collection<PaidUser> list= paidUsersRepository.findPaidUsersByGuid(form.getUserGuid());
 	    return list.stream().sorted(Comparator.comparing(PaidUser::getDate)).collect(Collectors.toList());
 	}
@@ -321,7 +321,6 @@ public class PaidUsersService {
 		Map<String, Object> map = JSONUtils.readObject(result, Map.class);
 		Boolean isUsingVpn=(Boolean)map.get("isUsingVpn");
 		
-		PaidUsersRepository paidUsersRepository=new PaidUsersRepository();
 		Entity redeemingRequest=paidUsersRepository.findEntityByKey(key);
 		if(redeemingRequest==null){
 			throw new IOException("Unable to find entity by key :"+key);

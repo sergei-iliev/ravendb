@@ -5,6 +5,7 @@ import java.util.Date;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 
 public class PaidUser {
@@ -32,7 +33,17 @@ public class PaidUser {
 		paidUser.setType((String) entity.getProperty("type"));
 		paidUser.setDate((Date) entity.getProperty("date"));
 		paidUser.setPaypalAccount((String) entity.getProperty("paypal_account"));
-		paidUser.redeemingRequestKey=((String) entity.getProperty("redeeming_request_key"));
+		/*
+		 * We may store both types Key(old inherited) and String
+		 */
+		if(entity.getProperty("redeeming_request_key") instanceof String){
+			paidUser.redeemingRequestKey=((String) entity.getProperty("redeeming_request_key"));	
+		}else{
+			
+			Key key=((Key) entity.getProperty("redeeming_request_key"));
+			paidUser.redeemingRequestKey=(KeyFactory.keyToString(key));
+		}
+		
 		paidUser.paidCurrency=((String) entity.getProperty("paid_currency"));
 		paidUser.email=((String) entity.getProperty("email_address"));
 		paidUser.eurCurrency=BigDecimal.valueOf((double)entity.getProperty("eur_currency"));

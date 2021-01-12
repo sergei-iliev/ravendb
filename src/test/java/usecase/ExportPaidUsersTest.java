@@ -11,6 +11,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
 
 import javax.servlet.ServletException;
 
@@ -72,64 +73,48 @@ public class ExportPaidUsersTest {
 	@Test
 	public void exportPaidUsersTest() throws Exception {
 		DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
-		TestDatabase.INSTANCE.generateDB();			
 		
-		ExportPaidUsersForm form = new ExportPaidUsersForm();
-		ZonedDateTime now=ZonedDateTime.now();
-		ZonedDateTime yesterday=now.minusYears(3);		
-		form.setStartDate(Date.from(yesterday.toInstant()));
-		form.setEndDate(new Date());
+		Entity redeemingRequest=new Entity("redeeming_request_id");
+		redeemingRequest.setIndexedProperty("name","Sergey");
+		redeemingRequest.setIndexedProperty("email","first@gmail.com");
+		ds.put(redeemingRequest);
 		
-		String formatedStartDate = Utilities.formatedDate(form.getStartDate(), "yyyy_MM_dd");
-		String formatedEndDate = Utilities.formatedDate(form.getEndDate(), "yyyy_MM_dd");
-		
-		String prefix = "2020111111";
-		int count = 0;
-		String invoiceNumber;
-		
-		Collection<PaidUser> paidUsers = null;
-		Collection<PaidUserExternal> paidUserExternals = null;
+		Entity redeemingRequest1=new Entity("redeeming_request_id");
+		redeemingRequest1.setIndexedProperty("email","second@yahoo.com");
+		redeemingRequest1.setIndexedProperty("name","Sergey");		
+		ds.put(redeemingRequest1);
 
-		Collection<Pair<PaidUser, RedeemingRequests>> paidUserPairs = new ArrayList<>();
-		Collection<Pair<PaidUserExternal, RedeemingRequests>> paidUserExternalPairs = new ArrayList<>();
 		
-		ExportService exportService = new ExportService();
-		PaidUsersRepository paidUsersRepository = new PaidUsersRepository();
+		Entity paidUser=new Entity("paid_user");
+		paidUser.setProperty("user", "user1");
+		paidUser.setProperty("redeeming_request_key", redeemingRequest.getKey());
+		paidUser.setProperty("eur_currency",12.0);
+		paidUser.setProperty("paid_user_success",true);
+		paidUser.setProperty("email_sent_success",true);
+		ds.put(paidUser);
 		
-		paidUsers = exportService.findPaidUsersByDate(form.getStartDate(), form.getEndDate());
-		for (PaidUser user : paidUsers) {
-			Collection<Entity> entities = paidUsersRepository.findEntities("redeeming_requests_new",
-					"user_guid", user.getUserGuid());
-			if (entities.size() > 1) {
-				throw new ServletException("Too many entities for user_guid: " + user.getUserGuid());
-			}
-
-			if (entities.size() == 0) {
-				System.out.println( "No user entry found for - " + user.getUserGuid());
-				continue;
-			}
-
-			RedeemingRequests redeemingRequest = RedeemingRequests.valueOf(entities.iterator().next());
-			invoiceNumber = prefix + String.valueOf(count++);
-			user.setInvoiceNumber(invoiceNumber);
-			paidUserPairs.add(new ImmutablePair<>(user, redeemingRequest));
-			// create pdf in cloud store
-			
-			exportService.createPDFInCloudStore(redeemingRequest, user,
-					createCloudStoragePath("user_credit_notes_2020_with_id/PaidUsers2020_",formatedStartDate,formatedEndDate), invoiceNumber);
-		}
-		// create CSV
-		//saveCSVFile(paidUserPairs);		
+		Entity paidUser1=new Entity("paid_user");
+		paidUser1.setProperty("user", "user2");
+		paidUser1.setProperty("eur_currency",12.0);
+		paidUser1.setProperty("paid_user_success",true);
+		paidUser1.setProperty("email_sent_success",true);
+		
+		paidUser1.setProperty("redeeming_request_key", KeyFactory.keyToString(redeemingRequest.getKey()));
+		ds.put(paidUser1);
+		
+		PaidUsersRepository paidUsersRepository=new PaidUsersRepository();
+		Collection<Entity> list=paidUsersRepository.findEntities("paid_user", null, null);
+		Collection<PaidUser> paidUsers=list.stream().map(PaidUser::valueOf).collect(Collectors.toList());
+		System.out.println(paidUsers);
+		
+		
+		
+		
+		
+		
+		
 	}
 
-	private String createCloudStoragePath(String prefix,String startDate,String endDate){
-		StringBuilder sb=new StringBuilder();
-		sb.append(prefix);
-		sb.append(startDate);
-		sb.append("_");
-		sb.append(endDate);
-		sb.append("_");
-		return sb.toString();
-	}
+
 	
 }

@@ -17,9 +17,11 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import com.google.appengine.api.ThreadManager;
 import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.KeyFactory;
 import com.luee.wally.admin.repository.CloudStorageRepository;
 import com.luee.wally.admin.repository.PaidUsersRepository;
 import com.luee.wally.api.route.Controller;
+import com.luee.wally.api.service.PaidUsersService;
 import com.luee.wally.api.service.impex.ExportService;
 import com.luee.wally.command.ExportPaidUsersForm;
 import com.luee.wally.entity.PaidUser;
@@ -50,7 +52,7 @@ public class ExportController implements Controller {
 			public void run() {
 				try {
 					logger.log(Level.WARNING,
-							"*************************Task in the background started ********************");
+							"*************************Export paid user in the background started ********************");
 
 					String prefix = "2020111111";
 					int count = 0;
@@ -61,6 +63,7 @@ public class ExportController implements Controller {
 					
 					ExportService exportService = new ExportService();
 					PaidUsersRepository paidUsersRepository = new PaidUsersRepository();
+					PaidUsersService paidUsersService=new PaidUsersService();
 
 					Collection<PaidUser> paidUsers = null;
 					Collection<PaidUserExternal> paidUserExternals = null;
@@ -97,18 +100,15 @@ public class ExportController implements Controller {
 					} else {
 						paidUsers = exportService.findPaidUsersByDate(form.getStartDate(), form.getEndDate());
 						for (PaidUser user : paidUsers) {
-							Collection<Entity> entities = paidUsersRepository.findEntities("redeeming_requests_new",
-									"user_guid", user.getUserGuid());
-							if (entities.size() > 1) {
-								throw new ServletException("Too many entities for user_guid: " + user.getUserGuid());
-							}
+							
+							Entity entity = paidUsersRepository.findEntityByKey(KeyFactory.stringToKey(user.getRedeemingRequestKey()));
 
-							if (entities.size() == 0) {
-								logger.log(Level.SEVERE, "No user entry found for - " + user.getUserGuid());
+							if (entity == null) {
+								logger.log(Level.SEVERE, "No user entry found for - " + user.getRedeemingRequestKey());
 								continue;
 							}
 
-							RedeemingRequests redeemingRequest = RedeemingRequests.valueOf(entities.iterator().next());
+							RedeemingRequests redeemingRequest = RedeemingRequests.valueOf(entity);
 							invoiceNumber = prefix + String.valueOf(count++);
 							user.setInvoiceNumber(invoiceNumber);
 							paidUserPairs.add(new ImmutablePair<>(user, redeemingRequest));
