@@ -21,7 +21,6 @@ import com.google.appengine.api.datastore.KeyFactory;
 import com.luee.wally.admin.repository.CloudStorageRepository;
 import com.luee.wally.admin.repository.PaidUsersRepository;
 import com.luee.wally.api.route.Controller;
-import com.luee.wally.api.service.PaidUsersService;
 import com.luee.wally.api.service.impex.ExportService;
 import com.luee.wally.command.ExportPaidUsersForm;
 import com.luee.wally.entity.PaidUser;
@@ -40,8 +39,8 @@ public class ExportController implements Controller {
 
 	public void exportPaidUsers(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		ExportPaidUsersForm form = ExportPaidUsersForm.parse(req);
-		if(form.getStartDate()==null||form.getEndDate()==null){
-			req.setAttribute("error", "Start and End dates are mandatory");
+		if(form.getStartDate()==null||form.getEndDate()==null||form.getInvoiceBase()==null){
+			req.setAttribute("error", "Form fields are mandatory");
 			req.setAttribute("webform",form);
 			req.getRequestDispatcher("/jsp/export_paid_users.jsp").forward(req, resp);
 			return;
@@ -54,49 +53,38 @@ public class ExportController implements Controller {
 					logger.log(Level.WARNING,
 							"*************************Export paid user in the background started ********************");
 
-					String prefix = "2020111111";
+					String prefix = form.getInvoiceBase();					
 					int count = 0;
 					String invoiceNumber;
 			
 					String formatedStartDate = Utilities.formatedDate(form.getStartDate(), "yyyy_MM_dd");
 					String formatedEndDate = Utilities.formatedDate(form.getEndDate(), "yyyy_MM_dd");
 					
+					String internalFolder="user_credit_notes_2020_with_id/"+createCloudStoragePath(formatedStartDate,formatedEndDate,"internal");
+					String externalFolder="user_credit_notes_2020_with_id/"+createCloudStoragePath(formatedStartDate,formatedEndDate,"external");
+					
 					ExportService exportService = new ExportService();
 					PaidUsersRepository paidUsersRepository = new PaidUsersRepository();
-					PaidUsersService paidUsersService=new PaidUsersService();
+					
 
 					Collection<PaidUser> paidUsers = null;
 					Collection<PaidUserExternal> paidUserExternals = null;
 
 					Collection<Pair<PaidUser, RedeemingRequests>> paidUserPairs = new ArrayList<>();
-					Collection<Pair<PaidUserExternal, RedeemingRequests>> paidUserExternalPairs = new ArrayList<>();
+					
 
 					if (form.isExternal()) {
 						paidUserExternals = exportService.findPaidUsersExternalByDate(form.getStartDate(),
 								form.getEndDate());
-						for (PaidUserExternal user : paidUserExternals) {
-							Collection<Entity> entities = paidUsersRepository.findEntities("paid_users_external",
-									"redeeming_request_id", user.getRedeemingRequestId());
-							if (entities.size() > 1) {
-								throw new ServletException(
-										"Too many entities for redeeming_request_id: " + user.getRedeemingRequestId());
-							}
-
-							if (entities.size() == 0) {
-								logger.log(Level.SEVERE, "No user entry found for redeeming_request_id - "
-										+ user.getRedeemingRequestId());
-								continue;
-							}
-							RedeemingRequests redeemingRequest = RedeemingRequests.valueOf(entities.iterator().next());
+						for (PaidUserExternal user : paidUserExternals) {							
 							invoiceNumber = prefix + String.valueOf(count++);
 							user.setInvoiceNumber(invoiceNumber);
-							paidUserExternalPairs.add(new ImmutablePair<>(user, redeemingRequest));
+					
 							// create pdf in cloud store
-							exportService.createPDFInCloudStore(redeemingRequest, user,
-									createCloudStoragePath("user_credit_notes_2020_with_id/PaidUsersExternal2020_",formatedStartDate,formatedEndDate), invoiceNumber);
+							exportService.createPDFInCloudStore(user,externalFolder,"invoices","PaidUser_"+invoiceNumber, invoiceNumber);									         
 						}
 						// create CSV
-						_saveCSVFile(paidUserExternalPairs,createCloudStoragePath("user_revenue_external/users_revenue_2020_",formatedStartDate,formatedEndDate));
+						_saveCSVFile(paidUserExternals,externalFolder,"credit_notes.csv");
 					} else {
 						paidUsers = exportService.findPaidUsersByDate(form.getStartDate(), form.getEndDate());
 						for (PaidUser user : paidUsers) {
@@ -113,11 +101,10 @@ public class ExportController implements Controller {
 							user.setInvoiceNumber(invoiceNumber);
 							paidUserPairs.add(new ImmutablePair<>(user, redeemingRequest));
 							// create pdf in cloud store
-							exportService.createPDFInCloudStore(redeemingRequest, user,
-									createCloudStoragePath("user_credit_notes_2020_with_id/PaidUsers2020_",formatedStartDate,formatedEndDate), invoiceNumber);
+							exportService.createPDFInCloudStore(redeemingRequest, user,internalFolder,"invoices","PaidUser_"+invoiceNumber, invoiceNumber);
 						}
 						// create CSV
-						saveCSVFile(paidUserPairs,createCloudStoragePath("user_revenue/users_revenue_2020_",formatedStartDate,formatedEndDate));
+						saveCSVFile(paidUserPairs,internalFolder,"credit_notes.csv");
 					}
 
 				} catch (Exception e) {
@@ -130,35 +117,34 @@ public class ExportController implements Controller {
 		req.setAttribute("webform",form);
 		req.getRequestDispatcher("/jsp/export_paid_users.jsp").forward(req, resp);
 	}
-	private String createCloudStoragePath(String prefix,String startDate,String endDate){
-		StringBuilder sb=new StringBuilder();
-		sb.append(prefix);
+	private String createCloudStoragePath(String startDate,String endDate,String sufix){
+		StringBuilder sb=new StringBuilder();		
 		sb.append(startDate);
 		sb.append("_");
 		sb.append(endDate);
 		sb.append("_");
+		sb.append(sufix);
 		return sb.toString();
 	}
-	private void saveCSVFile(Collection<Pair<PaidUser, RedeemingRequests>> entities,String cloudStoragePath) throws IOException {
+	private void saveCSVFile(Collection<Pair<PaidUser, RedeemingRequests>> entities,String folder,String name) throws IOException {
 		ExportService exportService = new ExportService();
 
 		try (Writer writer = new StringWriter()) {
 			exportService.createCSVFile(writer, entities);
 
 			CloudStorageRepository cloudStorageRepository = new CloudStorageRepository();
-			//cloudStorageRepository.save(writer, "user_revenue/users_revenue_2020");
-			cloudStorageRepository.save(writer, cloudStoragePath);
+			cloudStorageRepository.save(writer, folder+"/"+name);
 		}
 	}
 
-	private void _saveCSVFile(Collection<Pair<PaidUserExternal, RedeemingRequests>> entities,String cloudStoragePath) throws IOException {
+	private void _saveCSVFile(Collection<PaidUserExternal> entities,String folder,String name) throws IOException {
 		ExportService exportService = new ExportService();
 
 		try (Writer writer = new StringWriter()) {
 			exportService._createCSVFile(writer, entities);
 
 			CloudStorageRepository cloudStorageRepository = new CloudStorageRepository();
-			cloudStorageRepository.save(writer, "user_revenue_external/users_revenue_2020");
+			cloudStorageRepository.save(writer, folder+"/"+name);
 		}
 	}
 }

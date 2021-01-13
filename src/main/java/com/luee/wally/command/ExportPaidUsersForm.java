@@ -8,7 +8,7 @@ import javax.servlet.ServletRequest;
 public class ExportPaidUsersForm implements WebForm{
 	private Date startDate, endDate;
 	private boolean external;
-	
+	private String invoiceBase;
     
 	public static ExportPaidUsersForm parse(ServletRequest req) throws ServletException{
 		ExportPaidUsersForm form = new ExportPaidUsersForm();
@@ -16,10 +16,22 @@ public class ExportPaidUsersForm implements WebForm{
 		form.setStartDate(form.parseDate(req.getParameter("startDate")));
 		form.setEndDate(form.parseDate(req.getParameter("endDate")));
         form.external=Boolean.parseBoolean(req.getParameter("external"));		
-
+        form.setInvoiceBase(req.getParameter("invoiceBase"));
+        System.out.println();
 		return form;
 	}
 
+	public String getInvoiceBase() {
+		return invoiceBase;
+	}
+	
+	public void setInvoiceBase(String invoiceBase) {
+		if(invoiceBase==null||invoiceBase.trim().length()==0){
+			this.invoiceBase = null;	
+		}else{
+		    this.invoiceBase = invoiceBase;
+		}
+	}
 	public String getEndDateAsText() {
 		if(endDate!=null){
 			return formatedDate(endDate, "yyyy-MM-dd");

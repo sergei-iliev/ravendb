@@ -31,16 +31,16 @@ import com.luee.wally.utils.Utilities;
 
 public class InvoiceService extends AbstractService{
 	
-	public InputStream createInvoice(RedeemingRequests redeemingRequest,PaidUserExternal paidUser,String invoiceNumber) throws Exception{
+	public InputStream createInvoice(PaidUserExternal paidUserExternal,String invoiceNumber) throws Exception{
 	    ByteArrayOutputStream output=new ByteArrayOutputStream();
 		Document document = new Document();
 		PdfWriter.getInstance(document,output);		
 	    
 		Paragraph title=setHeader();
 		
-		long diffInSec = Math.abs(redeemingRequest.getDate().getTime() - (redeemingRequest.getCreationDate()).getTime());
-		long days = TimeUnit.DAYS.convert(diffInSec, TimeUnit.MILLISECONDS);
-		long workInDays=3*days;
+		//long diffInSec = Math.abs(paidUserExternal.getDate().getTime() - (paidUserExternal.getDate()).getTime());
+		//long days = TimeUnit.DAYS.convert(diffInSec, TimeUnit.MILLISECONDS);
+		//long workInDays=3*days;
 		
 		PdfPTable topTable = new PdfPTable(2);
 		topTable.setHorizontalAlignment(Element.ALIGN_RIGHT);
@@ -48,7 +48,7 @@ public class InvoiceService extends AbstractService{
 		topTable.addCell(getIRDCell("Credit Note No"));
 		topTable.addCell(getIRDCell("Date"));
 		topTable.addCell(getIRDCell(invoiceNumber)); // pass invoice number
-		topTable.addCell(getIRDCell(paidUser.getDate().toString())); // pass invoice date	
+		topTable.addCell(getIRDCell(paidUserExternal.getDate().toString())); // pass invoice date	
 				
 		PdfPTable addressTable = new PdfPTable(3);
 		addressTable.setSpacingBefore(12);
@@ -60,25 +60,25 @@ public class InvoiceService extends AbstractService{
 		addressTable.addCell(getCell("",12, PdfPCell.ALIGN_LEFT, Font.BOLD));
 		addressTable.addCell(getCell("From",12, PdfPCell.ALIGN_LEFT, Font.BOLD));	
 		
-		addressTable.addCell(getCell((String) redeemingRequest.getFullName(),10, PdfPCell.ALIGN_LEFT));
+		addressTable.addCell(getCell((String) paidUserExternal.getFullName(),10, PdfPCell.ALIGN_LEFT));
 		addressTable.addCell(getCell("",12, PdfPCell.ALIGN_LEFT, Font.BOLD));
 		addressTable.addCell(getCell("Soft Baked Apps GmbH (haftungsbeschränkt)",10, PdfPCell.ALIGN_LEFT));
 		
-		addressTable.addCell(getCell(Objects.toString("Address: "+(String) redeemingRequest.getFullAddress(), ""),10, PdfPCell.ALIGN_LEFT));
+		addressTable.addCell(getCell(Objects.toString("Address: "+(String) paidUserExternal.getAddress(), ""),10, PdfPCell.ALIGN_LEFT));
 		addressTable.addCell(getCell("",12, PdfPCell.ALIGN_LEFT, Font.BOLD));
 		addressTable.addCell(getCell("Schinkestrasse 14",10, PdfPCell.ALIGN_LEFT));
 		
 		
-		addressTable.addCell(getCell("Country: "+Objects.toString((String) redeemingRequest.getCountryCode(), ""),10, PdfPCell.ALIGN_LEFT));
+		addressTable.addCell(getCell("Country: "+Objects.toString((String) paidUserExternal.getCountryCode(), ""),10, PdfPCell.ALIGN_LEFT));
 		addressTable.addCell(getCell("",12, PdfPCell.ALIGN_LEFT, Font.BOLD));
 		addressTable.addCell(getCell("12047, Berlin, Germany",10, PdfPCell.ALIGN_LEFT));
 		
 		
-		addressTable.addCell(getCell("Email: "+Objects.toString((String) redeemingRequest.getEmail(), "") ,10, PdfPCell.ALIGN_LEFT));
+		addressTable.addCell(getCell("Email: "+Objects.toString((String) paidUserExternal.getEmail(), "") ,10, PdfPCell.ALIGN_LEFT));
 		addressTable.addCell(getCell("",12, PdfPCell.ALIGN_LEFT, Font.BOLD));
 		addressTable.addCell(getCell("VAT ID: DE300857037",10, PdfPCell.ALIGN_LEFT));
 		
-		addressTable.addCell(getCell("Internal user ID:"+Objects.toString(redeemingRequest.getUserGuid(), "") ,10, PdfPCell.ALIGN_LEFT));
+		addressTable.addCell(getCell("Internal user ID:"+Objects.toString(paidUserExternal.getRedeemingRequestId(), "") ,10, PdfPCell.ALIGN_LEFT));
 		addressTable.addCell(getCell(" ",12, PdfPCell.ALIGN_LEFT, Font.BOLD));
 		addressTable.addCell(getCell(" ",10, PdfPCell.ALIGN_LEFT));
 		
@@ -91,25 +91,25 @@ public class InvoiceService extends AbstractService{
 		billTable.addCell(getBillHeaderCell("Qty"));
 		billTable.addCell(getBillHeaderCell("Amount"));
 		
-		billTable.addCell(getBillRowCell("Interaction and usage of mobile app - "+String.valueOf(workInDays) +" hours"));				
-		if(paidUser.getPaidCurrency().equals("EUR")){
-			billTable.addCell(getBillRowCell(Utilities.formatPrice(paidUser.getEurCurrency())));
+		//billTable.addCell(getBillRowCell("Interaction and usage of mobile app - "+String.valueOf(workInDays) +" hours"));				
+		if(paidUserExternal.getPaidCurrency().equals("EUR")){
+			billTable.addCell(getBillRowCell(Utilities.formatPrice(paidUserExternal.getEurCurrency())));
 			billTable.addCell(getBillRowCell("1"));
-			billTable.addCell(getBillRowCell(Utilities.formatPrice(paidUser.getEurCurrency())+" EUR"));
+			billTable.addCell(getBillRowCell(Utilities.formatPrice(paidUserExternal.getEurCurrency())+" EUR"));
 		}else{
-			billTable.addCell(getBillRowCell(paidUser.getAmount()));
+			billTable.addCell(getBillRowCell(paidUserExternal.getAmount()));
 			billTable.addCell(getBillRowCell("1"));
-			billTable.addCell(getBillRowCell(paidUser.getAmount()+" "+paidUser.getPaidCurrency()));			
+			billTable.addCell(getBillRowCell(paidUserExternal.getAmount()+" "+paidUserExternal.getPaidCurrency()));			
 		}
 		
 		PdfPTable validity = new PdfPTable(1);
 		validity.setWidthPercentage(100);	
 		
-		if(redeemingRequest.getType()!=null){
-		  if(((String) redeemingRequest.getType()).equalsIgnoreCase("paypal")){
-			validity.addCell(getValidityCell(" * Paid through "+(String) redeemingRequest.getType()));
+		if(paidUserExternal.getType()!=null){
+		  if(((String) paidUserExternal.getType()).equalsIgnoreCase("paypal")){
+			validity.addCell(getValidityCell(" * Paid through "+(String) paidUserExternal.getType()));
 		  }else{
-			validity.addCell(getValidityCell(" * Paid through "+(String) redeemingRequest.getType()+" voucher"));  
+			validity.addCell(getValidityCell(" * Paid through "+(String) paidUserExternal.getType()+" voucher"));  
 		  }
 		}
 		PdfPCell summaryL = new PdfPCell (validity);
@@ -121,10 +121,10 @@ public class InvoiceService extends AbstractService{
 		accounts.setWidthPercentage(100);
 
 		String total;
-		if(paidUser.getPaidCurrency().equals("EUR")){
-		  total=("Total: "+Utilities.formatPrice(paidUser.getEurCurrency())+" EUR");
+		if(paidUserExternal.getPaidCurrency().equals("EUR")){
+		  total=("Total: "+Utilities.formatPrice(paidUserExternal.getEurCurrency())+" EUR");
 		}else{
-		  total=("Total: "+(paidUser.getAmount()+" "+paidUser.getPaidCurrency()+" ("+ Utilities.formatPrice(paidUser.getEurCurrency())+" EUR)"));	
+		  total=("Total: "+(paidUserExternal.getAmount()+" "+paidUserExternal.getPaidCurrency()+" ("+ Utilities.formatPrice(paidUserExternal.getEurCurrency())+" EUR)"));	
 		}
 		
 		accounts.addCell(getAccountsCellR(total));

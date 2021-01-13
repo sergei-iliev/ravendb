@@ -54,6 +54,12 @@
     					<input class="form-control" type="date" value="${webform.endDateAsText}" data-date-format="MM/DD/YYYY" name="endDate" id="endDateId">
   					</div>  					
 				</div>
+                <div class="form-label-group">
+                   <div class="col-3 mt-3">
+                           	<label for="invoiceBaseId">Invoice Base</label>                                
+                            <input name="invoiceBase" class="form-control" id="invoiceBaseId" value="${webform.invoiceBase}">      						      					    	
+                   </div>
+                </div>				
 				<div class="form-label-group">
 					<div class="col-3 mt-3">
 					<input  type="checkbox" 

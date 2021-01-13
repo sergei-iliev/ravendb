@@ -68,26 +68,26 @@ public class ExportService extends AbstractService{
 	/*
 	 * External payment
 	 */
-	public void _createCSVFile(Writer writer, Collection<Pair<PaidUserExternal,RedeemingRequests>> entities)
+	public void _createCSVFile(Writer writer, Collection<PaidUserExternal> entities)
 			throws IOException {
 		GenerateCSV.INSTANCE.writeLine(writer, HEADER);
 		Collection<String> line = new ArrayList<String>();
-		for (Pair<PaidUserExternal, RedeemingRequests> entity : entities) {
+		for (PaidUserExternal entity : entities) {
 			// item
-			line.add(entity.getLeft().getDate().toString());
-			line.add(entity.getRight().getUserGuid());
-			line.add((String)entity.getRight().getCountryCode());
-			line.add((String)entity.getRight().getFullName());
-			if(entity.getLeft().getPaidCurrency().equals("EUR")){
+			line.add(entity.getDate().toString());
+			line.add(entity.getRedeemingRequestId());
+			line.add(entity.getCountryCode());
+			line.add(entity.getFullName());
+			if(entity.getPaidCurrency().equals("EUR")){
 				line.add("EUR");
-				line.add(Utilities.formatPrice(entity.getLeft().getEurCurrency()));				
+				line.add(Utilities.formatPrice(entity.getEurCurrency()));				
 			}else{				
-				line.add(entity.getLeft().getPaidCurrency());
-				line.add(entity.getLeft().getAmount());
+				line.add(entity.getPaidCurrency());
+				line.add(entity.getAmount());
 			}			
-			line.add(Utilities.formatPrice(entity.getLeft().getEurCurrency()));	
-			line.add((String)entity.getLeft().getType());
-			line.add((String)entity.getLeft().getInvoiceNumber());
+			line.add(Utilities.formatPrice(entity.getEurCurrency()));	
+			line.add(entity.getType());
+			line.add(entity.getInvoiceNumber());
 			
 			GenerateCSV.INSTANCE.writeLine(writer, line);
 			line.clear();
@@ -97,9 +97,9 @@ public class ExportService extends AbstractService{
 	/*
 	 * User payment
 	 */
-	public void createPDFInCloudStore(RedeemingRequests redeemingRequest,PaidUser paidUser,String namePrefix,String invoiceNumber)throws Exception{
-        PdfAttachment attachment=new PdfAttachment();        
-        attachment.setFileName(namePrefix+invoiceNumber+".pdf");
+	public void createPDFInCloudStore(RedeemingRequests redeemingRequest,PaidUser paidUser,String folder,String subfolder,String fileName,String invoiceNumber)throws Exception{
+		PdfAttachment attachment=new PdfAttachment();               
+        attachment.setFileName(folder+"/"+subfolder+"/"+fileName+".pdf");
         attachment.setContentType("application/pdf");       
         InvoiceService invoiceService = new InvoiceService();
         attachment.readFromStream(invoiceService.createInvoice(redeemingRequest,paidUser,invoiceNumber)); 
@@ -110,12 +110,12 @@ public class ExportService extends AbstractService{
 	/*
 	 * External user payment
 	 */
-	public void createPDFInCloudStore(RedeemingRequests redeemingRequest,PaidUserExternal paidUser,String namePrefix,String invoiceNumber)throws Exception{
-        PdfAttachment attachment=new PdfAttachment();        
-        attachment.setFileName(namePrefix+invoiceNumber+".pdf");
+	public void createPDFInCloudStore(PaidUserExternal paidUser,String folder,String subfolder,String fileName,String invoiceNumber)throws Exception{
+		PdfAttachment attachment=new PdfAttachment();                
+        attachment.setFileName(folder+"/"+subfolder+"/"+fileName+".pdf");
         attachment.setContentType("application/pdf");       
         InvoiceService invoiceService = new InvoiceService();
-        attachment.readFromStream(invoiceService.createInvoice(redeemingRequest,paidUser,invoiceNumber)); 
+        attachment.readFromStream(invoiceService.createInvoice(paidUser,invoiceNumber)); 
         
 	    CloudStorageRepository cloudStorageRepository=new CloudStorageRepository();
 	    cloudStorageRepository.saveFile(attachment);               
