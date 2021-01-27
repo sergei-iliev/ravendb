@@ -2,6 +2,8 @@ package com.luee.wally.utils;
 
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
 import com.luee.wally.constants.Constants;
@@ -29,7 +31,10 @@ public final class Utilities {
 		  SimpleDateFormat formater = new SimpleDateFormat(format);//("yyyy-MM-dd");
 		  return formater.format(date);
 	}
-	
+	public static String formatedDate(ZonedDateTime date,String format){		 		  
+		  DateTimeFormatter formater = DateTimeFormatter.ofPattern(format);
+		  return formater.format(date);
+	}
     public static String formatPrice(BigDecimal price) {
         if (price == null) {
             return BigDecimal.ZERO.toString();

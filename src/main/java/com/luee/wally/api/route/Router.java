@@ -23,6 +23,7 @@ import com.luee.wally.admin.controller.ImportController;
 import com.luee.wally.admin.controller.LoginController;
 import com.luee.wally.admin.controller.PaidUsersController;
 import com.luee.wally.admin.controller.PaymentController;
+import com.luee.wally.admin.controller.PaymentOrderTransactionController;
 import com.luee.wally.admin.controller.PaymentReportsController;
 import com.luee.wally.admin.controller.SearchFilterTemplateController;
 import com.luee.wally.admin.controller.UserRevenueReportsController;
@@ -127,6 +128,7 @@ INSTANCE;
     	 httpPostRouteList.put("/administration/payment/paidusers/search/byguid", new Route(new PaidUsersController(),"searchByGuid"));    	 
     	 httpPostRouteList.put("/administration/payment/paidusers/search/groupby",new Route(new PaidUsersController(),"searchGroupBy"));
     	 httpPostRouteList.put("/administration/job/payment/paidusers/checkvpnusage", new Route(new PaidUsersController(),"checkVPNUsageAsync"));
+    	 httpPostRouteList.put("/administration/job/order/transactions", new Route(new PaymentOrderTransactionController(),"runOrderTransactionReport"));
     	 //email template
     	 httpPostRouteList.put("/administration/email/template/send", new Route(new EmailTemplateController(),"sendEmailTemplate"));
     

@@ -38,6 +38,11 @@ public class ApplicationSettingsRepository extends AbstractRepository {
 	public static final String TANGO_CARD_PLATFORM_IDENTIFIER = "TANGO_CARD_PLATFORM_IDENTIFIER";//"SoftBakedAppsTest";
 	public static final String TANGO_CARD_PLATFORM_KEY = "TANGO_CARD_PLATFORM_KEY";//"cJouiuWlNHJQQgKYXRCDoejyepZ$jeGnVSEx$KD?DdW";
 
+	public static final String JP_TANGO_CARD_CUSTOMER_NAME="JP_TANGO_CARD_CUSTOMER_NAME";
+	public static final String JP_TANGO_CARD_PLATFORM_IDENTIFIER="JP_TANGO_CARD_PLATFORM_IDENTIFIER";
+	public static final String JP_TANGO_CARD_PLATFORM_KEY="JP_TANGO_CARD_PLATFORM_KEY";
+	public static final String JP_TANGO_CARD_ACCOUNT_NAME="JP_TANGO_CARD_ACCOUNT_NAME";
+	
 	public static final String TANGO_CARD_EMAIL_TEMPLATE_SUBJECT ="TANGO_CARD_EMAIL_TEMPLATE_SUBJECT"; //"Your reward from %s!";
 	public static final String TANGO_CARD_EMAIL_TEMPLATE_MESSAGE ="TANGO_CARD_EMAIL_TEMPLATE_MESSAGE"; //"Congratulations! You just received your reward from %s.";
 
@@ -53,6 +58,11 @@ public class ApplicationSettingsRepository extends AbstractRepository {
 	public static final String SECRET_AES_KEY ="SECRET_AES_KEY";
 	
 	public static final String SUPPORT_EMAIL ="SUPPORT_EMAIL";
+	
+	public static final String PAYPAL_MERCHANT_API_USERNAME="PAYPAL_MERCHANT_API_USERNAME";	
+	public static final String PAYPAL_MERCHANT_API_PASSWORD="PAYPAL_MERCHANT_API_PASSWORD";	
+	public static final String PAYPAL_MERCHANT_API_SIGNATURE="PAYPAL_MERCHANT_API_SIGNATURE";
+
 	
 	
 	public Map<String, String> getApplicationSettings() {

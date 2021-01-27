@@ -44,8 +44,9 @@ public interface Constants {
 	
 	public static final String ACCOUNT_EMAIL="admin@softbakedapps.com";
 	
-	public static final String PLATFORM_IDENTIFIER ="SoftBakedAppsTest";
-	public static final String PLATFORM_KEY="cJouiuWlNHJQQgKYXRCDoejyepZ$jeGnVSEx$KD?DdW";
+	public static final String PLATFORM_IDENTIFIER ="PLATFORM_IDENTIFIER";
+	public static final String PLATFORM_KEY="PLATFORM_KEY";
+	public static final String TANGO_CARD_CUSTOMER="TANGO_CARD_CUSTOMER";
 	
 	public static final String PROD_PLATFORM_IDENTIFIER ="SoftBakedAppsGmbH-920";
 	public static final String PROD_PLATFORM_KEY="ipPKTHdSRqtgJF!hIRsR$jFJDKEnmYdDJfD$tiBppoK";
@@ -53,6 +54,8 @@ public interface Constants {
 	public static final String PROD_PLATFORM_ACCOUNT ="A88393817";
 	
 	public static final double TANGO_CARD_ACCOUNT_BALANCE_THRESHOLD =8000.0;
+	
+	public static final String TANGO_CARD_API_URL="https://api.tangocard.com/raas/v2";
 	
 	//public static final String EMAIL_TEMPLATE_SUBJECT ="Your reward from %s!";
 	//public static final String EMAIL_TEMPLATE_MESSAGE ="Congratulations! You just received your reward from %s.";
@@ -77,5 +80,7 @@ public interface Constants {
 	public static final String FB_AIR_APP_ID="578571959193061";
 	
 	public static final String VPN_SERVICE_URL="https://ps-forwarding-server.appspot.com/c/s?ip=%s&country=%s";
+	
+	
 	
 }

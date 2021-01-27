@@ -1,66 +1,41 @@
 package usecase;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.InputStream;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.net.URL;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Calendar;
+import java.math.BigDecimal;
+import java.time.Instant;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Collection;
-import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
-import java.util.UUID;
+import java.util.Map;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
+import org.joda.time.DateTime;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.appengine.api.datastore.DatastoreService;
-import com.google.appengine.api.datastore.DatastoreServiceFactory;
-import com.google.appengine.api.datastore.Entity;
-import com.google.appengine.api.datastore.FetchOptions;
-import com.google.appengine.api.datastore.PreparedQuery;
-import com.google.appengine.api.datastore.Query;
 import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
-import com.luee.wally.DB;
-import com.luee.wally.admin.controller.ImportController;
-import com.luee.wally.api.ConnectionMgr;
-import com.luee.wally.api.service.GiftCardService;
-import com.luee.wally.api.service.InvoiceService;
-import com.luee.wally.api.service.impex.ImportService;
+import com.luee.wally.api.service.PaymentOrderTransactionsService;
+import com.luee.wally.api.tangocard.client.OrdersApi;
+import com.luee.wally.api.tangocard.client.model.OrderListView;
 import com.luee.wally.command.Email;
+import com.luee.wally.command.order.OrderTransactionResult;
 import com.luee.wally.constants.Constants;
-import com.luee.wally.csv.PaidUsers2018;
-import com.luee.wally.json.ExchangeRateVO;
+import com.luee.wally.utils.Utilities;
 import com.tangocard.raas.Configuration;
 import com.tangocard.raas.RaasClient;
 import com.tangocard.raas.exceptions.RaasGenericException;
 import com.tangocard.raas.models.AccountModel;
-import com.tangocard.raas.models.BillingAddressModel;
 import com.tangocard.raas.models.BrandModel;
 import com.tangocard.raas.models.CatalogModel;
-import com.tangocard.raas.models.CreateAccountInput;
-import com.tangocard.raas.models.CreateAccountRequestModel;
-import com.tangocard.raas.models.CreateCreditCardRequestModel;
 import com.tangocard.raas.models.CreateCustomerRequestModel;
-import com.tangocard.raas.models.CreateOrderRequestModel;
-import com.tangocard.raas.models.CreditCardModel;
 import com.tangocard.raas.models.CustomerModel;
+import com.tangocard.raas.models.GetOrdersInput;
+import com.tangocard.raas.models.GetOrdersResponseModel;
 import com.tangocard.raas.models.ItemModel;
-import com.tangocard.raas.models.NameEmailModel;
-import com.tangocard.raas.models.NewCreditCardModel;
-import com.tangocard.raas.models.OrderModel;
-import com.tangocard.raas.models.SystemStatusResponseModel;
 
 public class GiftCardTest {
 
@@ -162,6 +137,83 @@ public class GiftCardTest {
 	       System.out.println(customer);
     	   
 		   
+	}
+	@Test
+	public void getGiftCardOrdersTest() throws Exception {
+		ZonedDateTime now=ZonedDateTime.now();
+		ZonedDateTime yesterday=now.minusDays(1);
+		   
+		ZonedDateTime yesterdayStart=yesterday.truncatedTo(ChronoUnit.DAYS);
+		ZonedDateTime yesterdayEnd=yesterdayStart.plusHours(24);
+		
+		Map<String,String> configMap=new HashMap<>();
+		configMap.put(Constants.PLATFORM_IDENTIFIER,Constants.PROD_PLATFORM_IDENTIFIER);
+		configMap.put(Constants.PLATFORM_KEY,Constants.PROD_PLATFORM_KEY);
+		
+		PaymentOrderTransactionsService paymentOrderTransactionsService=new PaymentOrderTransactionsService();
+		Collection<OrderTransactionResult> orderTransactionResults=paymentOrderTransactionsService.getGiftCardOrderTransactions(Instant.from(yesterdayStart).toString(),Instant.from(yesterdayEnd).toString(),configMap);
+	    //group by
+		Map<String,BigDecimal> map= paymentOrderTransactionsService.getOrderTransactionsGroupBy(orderTransactionResults);
+		//get the sum in usd
+		String formattedDate = Utilities.formatedDate(yesterday, "yyyy-MM-dd");
+		BigDecimal usdSum=paymentOrderTransactionsService.calculateTotal(map, formattedDate, "USD");
+		
+		//get the sum in eur		
+		BigDecimal eurSum=paymentOrderTransactionsService.calculateTotal(map, formattedDate, "EUR");
+		 
+        System.out.println(map);
+        System.out.println(usdSum);
+        System.out.println(eurSum);
+        
+        	   	
+	}
+	/*
+	 * OLD RAAS SDK CLIENT
+	 *  G71971146::SoftBakedAppsGmbH-920::active
+		A88393817
+		G43915119::JustPlayGmbH::active
+		A60855040
+	 */
+	@Test
+	public void getGiftCardTransactionHistoryTest() throws Throwable {
+		   
+		   Configuration.environment=Configuration.environment.PRODUCTION;
+		   RaasClient raasClient=new  RaasClient(Constants.PROD_PLATFORM_IDENTIFIER,Constants.PROD_PLATFORM_KEY);
+		   List<CustomerModel> customers= raasClient.getCustomers().getAllCustomers();
+		   for(CustomerModel customer:customers){
+			   System.out.println(customer.getCustomerIdentifier()+"::"+customer.getDisplayName()+"::"+customer.getStatus());
+			   customer.getAccounts().forEach(a->{
+				   System.out.println(a.getAccountIdentifier());
+			   });
+		   }
+		   
+//		   DateTime now=DateTime.now();
+//		   DateTime yesterday=now.minusDays(1);
+//			   
+//		   DateTime yesterdayStart=yesterday.withTimeAtStartOfDay();
+//		   DateTime yesterdayEnd=yesterdayStart.plusHours(24);
+//			
+//		   GetOrdersInput getOrdersInput = new GetOrdersInput();
+//		    
+//		   getOrdersInput.setStartDate(DateTime.now());
+//		   //getOrdersInput.setEndDate(yesterdayEnd);
+//		   getOrdersInput.setPage(4);
+//		   
+//		   getOrdersInput.setElementsPerBlock(100);
+//	       GetOrdersResponseModel ordersResponseModel = raasClient.getOrders().getOrders(getOrdersInput);
+//	       System.out.println(ordersResponseModel.getPage().getTotalCount());
+//	       System.out.println(ordersResponseModel.getPage().getResultCount());
+//	       System.out.println(ordersResponseModel.getPage().getNumber());
+//	       
+//	       ordersResponseModel.getOrders().forEach(o->{
+//	    	   
+//	    	   if(o.getStatus().equals("COMPLETE"))
+//	    	    System.out.println(o.getCreatedAt()+"::"+ o.getAmountCharged().getValue()+"::"+o.getAmountCharged().getExchangeRate()+"::"+o.getAmountCharged().getTotal()+"::"+o.getAmountCharged().getCurrencyCode()+"::"+o.getStatus());  
+//	       });
+	       
+		
+		
+	       //System.out.println("Get Orders: " + json(getOrdersResponseModel));
 	}
 	/*
 	@Test
