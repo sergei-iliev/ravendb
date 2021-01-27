@@ -34,13 +34,13 @@ public class PaymentOrderTransactionController implements Controller {
 		String platformKey=applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.TANGO_CARD_PLATFORM_KEY);	
 		String customerName=applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.TANGO_CARD_CUSTOMER_NAME);
 		
-		processTangoCardOrderTransactions(customerName, platformIdentifier,platformKey,"Tango Card PS");
+		processTangoCardOrderTransactions(platformIdentifier,platformKey,customerName,"Tango Card PS");
 		
 		platformIdentifier=applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.JP_TANGO_CARD_PLATFORM_IDENTIFIER);
 		platformKey=applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.JP_TANGO_CARD_PLATFORM_KEY);		
 		customerName=applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.JP_TANGO_CARD_CUSTOMER_NAME);
 		
-		processTangoCardOrderTransactions(customerName,platformIdentifier,platformKey,"Tango Card JP");
+		processTangoCardOrderTransactions(platformIdentifier,platformKey,customerName,"Tango Card JP");
 		
 		
 	}

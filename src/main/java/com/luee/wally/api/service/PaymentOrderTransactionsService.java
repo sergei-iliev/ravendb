@@ -49,7 +49,7 @@ public class PaymentOrderTransactionsService extends AbstractService{
 		Collection<OrderTransactionResult> result=new LinkedList<>();
 		String platformIdentifier=configMap.get(Constants.PLATFORM_IDENTIFIER);
 		String platformKey=configMap.get(Constants.PLATFORM_KEY);
-		String customerName=configMap.get(Constants.CUSTOMER_NAME);
+		String customerName=configMap.get(Constants.TANGO_CARD_CUSTOMER);
 		
 	    OrdersApi ordersApi=new OrdersApi(platformIdentifier,platformKey);
 			 
