@@ -2,6 +2,7 @@ package com.luee.wally.admin.controller;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Collection;
@@ -27,7 +28,7 @@ public class PaymentOrderTransactionController implements Controller {
 			throws Exception{
 		
 		
-		processPayPalOrderTransactions();
+		//processPayPalOrderTransactions();
 		//Tango card PS
 	    ApplicationSettingsService applicationSettingsService=new ApplicationSettingsService(); 
 		String platformIdentifier=applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.TANGO_CARD_PLATFORM_IDENTIFIER);
@@ -46,7 +47,7 @@ public class PaymentOrderTransactionController implements Controller {
 	}
 	private void processTangoCardOrderTransactions(String platformIdentifier,String platformKey,String customerName, String title)throws Exception{
 	    //Yesterday report
-		ZonedDateTime now=ZonedDateTime.now();
+		ZonedDateTime now=ZonedDateTime.now(ZoneOffset.UTC);
 		ZonedDateTime yesterday=now.minusDays(1);
 		   
 		ZonedDateTime yesterdayStart=yesterday.truncatedTo(ChronoUnit.DAYS);
@@ -100,7 +101,7 @@ public class PaymentOrderTransactionController implements Controller {
 			
 				
 	    //Yesterday report
-		ZonedDateTime now=ZonedDateTime.now();
+		ZonedDateTime now=ZonedDateTime.now(ZoneOffset.UTC);
 		ZonedDateTime yesterday=now.minusDays(1);
 		   
 		ZonedDateTime yesterdayStart=yesterday.truncatedTo(ChronoUnit.DAYS);
