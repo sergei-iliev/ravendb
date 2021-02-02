@@ -2,13 +2,16 @@ package com.luee.wally.entity;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.logging.Logger;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
+import com.luee.wally.api.service.PaidUsersService;
 
 public class PaidUser {
+	
 	private String key;
 	private String userGuid;
 	private String amount;
@@ -25,6 +28,8 @@ public class PaidUser {
 	private String link;   
 
 	public static PaidUser valueOf(Entity entity) {
+		
+		
 		PaidUser paidUser = new PaidUser();
 		paidUser.key = KeyFactory.keyToString(entity.getKey());
 		paidUser.setAmount((String) entity.getProperty("amount"));
@@ -36,10 +41,11 @@ public class PaidUser {
 		/*
 		 * We may store both types Key(old inherited) and String
 		 */
-		if(entity.getProperty("redeeming_request_key") instanceof String){
+		if(entity.getProperty("redeeming_request_key")==null){
+			paidUser.redeemingRequestKey=null;	
+		}else if(entity.getProperty("redeeming_request_key") instanceof String){
 			paidUser.redeemingRequestKey=((String) entity.getProperty("redeeming_request_key"));	
-		}else{
-			
+		}else{									
 			Key key=((Key) entity.getProperty("redeeming_request_key"));
 			paidUser.redeemingRequestKey=(KeyFactory.keyToString(key));
 		}

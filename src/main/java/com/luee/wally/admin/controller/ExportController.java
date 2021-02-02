@@ -88,20 +88,26 @@ public class ExportController implements Controller {
 					} else {
 						paidUsers = exportService.findPaidUsersByDate(form.getStartDate(), form.getEndDate());
 						for (PaidUser user : paidUsers) {
-							
-							Entity entity = paidUsersRepository.findEntityByKey(KeyFactory.stringToKey(user.getRedeemingRequestKey()));
-
-							if (entity == null) {
-								logger.log(Level.SEVERE, "No user entry found for - " + user.getRedeemingRequestKey());
-								continue;
-							}
-
-							RedeemingRequests redeemingRequest = RedeemingRequests.valueOf(entity);
 							invoiceNumber = prefix + String.valueOf(count++);
 							user.setInvoiceNumber(invoiceNumber);
-							paidUserPairs.add(new ImmutablePair<>(user, redeemingRequest));
-							// create pdf in cloud store
-							exportService.createPDFInCloudStore(redeemingRequest, user,internalFolder,"invoices","PaidUser_"+invoiceNumber, invoiceNumber);
+							
+							if(user.getRedeemingRequestKey()!=null){
+								Entity entity = paidUsersRepository.findEntityByKey(KeyFactory.stringToKey(user.getRedeemingRequestKey()));
+
+								if (entity == null) {
+									logger.log(Level.SEVERE, "No user entry found for - " + user.getRedeemingRequestKey());
+									continue;
+								}
+
+								RedeemingRequests redeemingRequest = RedeemingRequests.valueOf(entity);
+								paidUserPairs.add(new ImmutablePair<>(user, redeemingRequest));
+								// create pdf in cloud store
+								exportService.createPDFInCloudStore(redeemingRequest, user,internalFolder,"invoices","PaidUser_"+invoiceNumber, invoiceNumber);								
+							}else{
+								paidUserPairs.add(new ImmutablePair<>(user, null));
+								// create pdf in cloud store
+								exportService.createPDFInCloudStore(null, user,internalFolder,"invoices","PaidUser_"+invoiceNumber, invoiceNumber);																
+							}
 						}
 						// create CSV
 						saveCSVFile(paidUserPairs,internalFolder,"credit_notes.csv");

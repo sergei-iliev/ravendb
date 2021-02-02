@@ -168,7 +168,7 @@ public class PayPalTest {
 		});
 		String formattedDate = Utilities.formatedDate(yesterday, "yyyy-MM-dd");
 		
-		Map<String,BigDecimal> map= paymentOrderTransactionsService.getPayPalOrderTransactionsGroupBy(result);
+		Map<String,BigDecimal> map= paymentOrderTransactionsService.getOrderTransactionsGroupBy(result);
 		System.out.println(map);
 		BigDecimal sum=paymentOrderTransactionsService.calculateTotal(map, formattedDate, "USD");
 	    System.out.println("USD="+sum);

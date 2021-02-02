@@ -142,7 +142,9 @@ public class InvoiceService extends AbstractService{
 
 		return  new ByteArrayInputStream(output.toByteArray());
 	}
-	
+	/*
+	 * Redeeming request could be null
+	 */
 	public InputStream createInvoice(RedeemingRequests redeemingRequest,PaidUser paidUser,String invoiceNumber) throws Exception{
 	    ByteArrayOutputStream output=new ByteArrayOutputStream();
 		Document document = new Document();
@@ -151,11 +153,12 @@ public class InvoiceService extends AbstractService{
 		
 	    
 		Paragraph title=setHeader();
-		
-		long diffInSec = Math.abs(redeemingRequest.getDate().getTime() - (redeemingRequest.getCreationDate()).getTime());
-		long days = TimeUnit.DAYS.convert(diffInSec, TimeUnit.MILLISECONDS);
-		long workInDays=3*days;
-		
+		long workInDays=0;
+		if(redeemingRequest!=null){
+		  long diffInSec = Math.abs(redeemingRequest.getDate().getTime() - (redeemingRequest.getCreationDate()).getTime());
+		  long days = TimeUnit.DAYS.convert(diffInSec, TimeUnit.MILLISECONDS);
+		  workInDays=3*days;
+		}
 		PdfPTable topTable = new PdfPTable(2);
 		topTable.setHorizontalAlignment(Element.ALIGN_RIGHT);
 		topTable.setWidthPercentage(160 / 4f);
@@ -173,26 +176,26 @@ public class InvoiceService extends AbstractService{
 		addressTable.addCell(getCell("To",12, PdfPCell.ALIGN_LEFT, Font.BOLD));
 		addressTable.addCell(getCell("",12, PdfPCell.ALIGN_LEFT, Font.BOLD));
 		addressTable.addCell(getCell("From",12, PdfPCell.ALIGN_LEFT, Font.BOLD));	
-		
-		addressTable.addCell(getCell((String) redeemingRequest.getFullName(),10, PdfPCell.ALIGN_LEFT));
+			
+		addressTable.addCell(getCell(redeemingRequest!=null?(String) redeemingRequest.getFullName():"",10, PdfPCell.ALIGN_LEFT));
 		addressTable.addCell(getCell("",12, PdfPCell.ALIGN_LEFT, Font.BOLD));
 		addressTable.addCell(getCell("Soft Baked Apps GmbH (haftungsbeschränkt)",10, PdfPCell.ALIGN_LEFT));
 		
-		addressTable.addCell(getCell(Objects.toString("Address: "+(String) redeemingRequest.getFullAddress(), ""),10, PdfPCell.ALIGN_LEFT));
+		addressTable.addCell(getCell(Objects.toString("Address: "+(redeemingRequest!=null?(String) redeemingRequest.getFullAddress():""), ""),10, PdfPCell.ALIGN_LEFT));
 		addressTable.addCell(getCell("",12, PdfPCell.ALIGN_LEFT, Font.BOLD));
 		addressTable.addCell(getCell("Schinkestrasse 14",10, PdfPCell.ALIGN_LEFT));
 		
 		
-		addressTable.addCell(getCell("Country: "+Objects.toString((String) redeemingRequest.getCountryCode(), ""),10, PdfPCell.ALIGN_LEFT));
+		addressTable.addCell(getCell("Country: "+(redeemingRequest!=null?Objects.toString((String) redeemingRequest.getCountryCode(), ""):""),10, PdfPCell.ALIGN_LEFT));
 		addressTable.addCell(getCell("",12, PdfPCell.ALIGN_LEFT, Font.BOLD));
 		addressTable.addCell(getCell("12047, Berlin, Germany",10, PdfPCell.ALIGN_LEFT));
 		
 		
-		addressTable.addCell(getCell("Email: "+Objects.toString((String) redeemingRequest.getEmail(), "") ,10, PdfPCell.ALIGN_LEFT));
+		addressTable.addCell(getCell("Email: "+(redeemingRequest!=null?Objects.toString((String) redeemingRequest.getEmail(), ""):paidUser.getEmail()) ,10, PdfPCell.ALIGN_LEFT));
 		addressTable.addCell(getCell("",12, PdfPCell.ALIGN_LEFT, Font.BOLD));
 		addressTable.addCell(getCell("VAT ID: DE300857037",10, PdfPCell.ALIGN_LEFT));
 		
-		addressTable.addCell(getCell("Internal user ID:"+Objects.toString(redeemingRequest.getUserGuid(), "") ,10, PdfPCell.ALIGN_LEFT));
+		addressTable.addCell(getCell("Internal user ID:"+(redeemingRequest!=null?Objects.toString(redeemingRequest.getUserGuid(), ""):"") ,10, PdfPCell.ALIGN_LEFT));
 		addressTable.addCell(getCell(" ",12, PdfPCell.ALIGN_LEFT, Font.BOLD));
 		addressTable.addCell(getCell(" ",10, PdfPCell.ALIGN_LEFT));
 		
@@ -219,11 +222,11 @@ public class InvoiceService extends AbstractService{
 		PdfPTable validity = new PdfPTable(1);
 		validity.setWidthPercentage(100);	
 		
-		if(redeemingRequest.getType()!=null){
-		  if(((String) redeemingRequest.getType()).equalsIgnoreCase("paypal")){
-			validity.addCell(getValidityCell(" * Paid through "+(String) redeemingRequest.getType()));
+		if(paidUser.getType()!=null){
+		  if(((String) paidUser.getType()).equalsIgnoreCase("paypal")){
+			validity.addCell(getValidityCell(" * Paid through "+(String) paidUser.getType()));
 		  }else{
-			validity.addCell(getValidityCell(" * Paid through "+(String) redeemingRequest.getType()+" voucher"));  
+			validity.addCell(getValidityCell(" * Paid through "+(String) paidUser.getType()+" voucher"));  
 		  }
 		}
 		PdfPCell summaryL = new PdfPCell (validity);

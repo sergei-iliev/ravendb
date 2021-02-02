@@ -48,8 +48,8 @@ public class ExportService extends AbstractService{
 			// item
 			line.add(entity.getLeft().getDate().toString());
 			line.add(entity.getLeft().getUserGuid());
-			line.add((String)entity.getRight().getCountryCode());
-			line.add((String)entity.getRight().getFullName());
+			line.add(entity.getRight()!=null?entity.getRight().getCountryCode():"");
+			line.add(entity.getRight()!=null?entity.getRight().getFullName():"");
 			if(entity.getLeft().getPaidCurrency().equals("EUR")){
 				line.add("EUR");
 				line.add(Utilities.formatPrice(entity.getLeft().getEurCurrency()));				
