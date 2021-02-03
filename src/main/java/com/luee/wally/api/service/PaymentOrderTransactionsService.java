@@ -135,16 +135,17 @@ public class PaymentOrderTransactionsService extends AbstractService{
 	public void sendEmail(Map<String,BigDecimal> map,BigDecimal balance,BigDecimal usdSum,BigDecimal eurSum,String subject,String emailTo,String emailFrom)throws IOException{
 		 StringBuffer sb=new StringBuffer();
 		 if(balance!=null){
-			 sb.append("Current balance for account in USD: "+balance+"\r\n");	 
+		 sb.append("- current balance     "+Utilities.formatPrice(balance)+"<br>");	 
 		 }
 		 
-		 sb.append("Total amount paid in EUR: "+eurSum+"\r\n");
-		 sb.append("Total amount paid in USD: "+usdSum+"\r\n");
+		 sb.append("- amount paid in USD  "+Utilities.formatPrice(usdSum)+"<br>");
+		 sb.append("- amount paid in EUR  "+Utilities.formatPrice(eurSum)+"<br>");
 		 
-		 for(Map.Entry<String,BigDecimal> entry: map.entrySet()){
-			 sb.append(" "+entry.getKey()+" - "+Utilities.formatPrice(entry.getValue())+"\r\n");	 
-		 }		 		 
-		 
+		 if(map.size()>1){ //tango card has a single value only
+			 for(Map.Entry<String,BigDecimal> entry: map.entrySet()){
+				 sb.append(" "+entry.getKey()+" - "+Utilities.formatPrice(entry.getValue())+"<br>");	 
+			 }		 		 
+		 }
 		 
 		 Email email=new Email();
 		 email.setTo(emailTo);
