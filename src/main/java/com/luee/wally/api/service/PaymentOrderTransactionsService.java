@@ -132,8 +132,12 @@ public class PaymentOrderTransactionsService extends AbstractService{
 		return total;
 	}
 	
-	public void sendEmail(Map<String,BigDecimal> map,BigDecimal usdSum,BigDecimal eurSum,String subject,String emailTo,String emailFrom)throws IOException{
+	public void sendEmail(Map<String,BigDecimal> map,BigDecimal balance,BigDecimal usdSum,BigDecimal eurSum,String subject,String emailTo,String emailFrom)throws IOException{
 		 StringBuffer sb=new StringBuffer();
+		 if(balance!=null){
+			 sb.append("Current balance for account in USD: "+balance+"\r\n");	 
+		 }
+		 
 		 sb.append("Total amount paid in EUR: "+eurSum+"\r\n");
 		 sb.append("Total amount paid in USD: "+usdSum+"\r\n");
 		 

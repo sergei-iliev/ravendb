@@ -1,6 +1,7 @@
 package com.luee.wally.api.service;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Objects;
@@ -10,6 +11,8 @@ import java.util.logging.Logger;
 import org.apache.commons.io.IOUtils;
 
 import com.luee.wally.admin.repository.ApplicationSettingsRepository;
+import com.luee.wally.api.tangocard.client.AccountsApi;
+import com.luee.wally.api.tangocard.client.model.AccountView;
 import com.luee.wally.command.Email;
 import com.luee.wally.constants.Constants;
 import com.luee.wally.entity.RedeemingRequests;
@@ -70,6 +73,11 @@ public class GiftCardService {
 			  }					   						  
 		    }
 		}
+	}
+	public BigDecimal getGiftCardAccountBalance(String platformIdentifier,String platformKey,String accountIdentifier)throws Exception{
+       AccountsApi accountsApi=new AccountsApi(platformIdentifier, platformKey);
+       AccountView accountView=accountsApi.getAccount(accountIdentifier);
+       return accountView.getCurrentBalance();
 	}
 	public OrderModel sendGiftCard(RedeemingRequests redeemingRequests,String unitid,String from)throws RestResponseException{
 		ApplicationSettingsService applicationSettingsService=new ApplicationSettingsService();
@@ -135,8 +143,5 @@ public class GiftCardService {
 	     
 	        		
 	}
-	
-	private String json(Object object) throws Exception {
-        return JSONUtils.convertToString(object);		
-    }
+
 }

@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.luee.wally.admin.repository.ApplicationSettingsRepository;
 import com.luee.wally.api.route.Controller;
 import com.luee.wally.api.service.ApplicationSettingsService;
+import com.luee.wally.api.service.GiftCardService;
 import com.luee.wally.api.service.MailService;
 import com.luee.wally.api.service.PaymentOrderTransactionsService;
 import com.luee.wally.command.Email;
@@ -24,29 +25,36 @@ import com.luee.wally.utils.Utilities;
 
 public class PaymentOrderTransactionController implements Controller {
 	
+	/*
+	 * Execute as GAE job
+	 */
 	public void runOrderTransactionReport(HttpServletRequest req, HttpServletResponse resp)
 			throws Exception{
 		
 		
 		//processPayPalOrderTransactions();
+		
 		//Tango card PS
 	    ApplicationSettingsService applicationSettingsService=new ApplicationSettingsService(); 
 		String platformIdentifier=applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.TANGO_CARD_PLATFORM_IDENTIFIER);
 		String platformKey=applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.TANGO_CARD_PLATFORM_KEY);	
 		String customerName=applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.TANGO_CARD_CUSTOMER_NAME);
+		String accountName=applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.TANGO_CARD_ACCOUNT_NAME);
 		
-		processTangoCardOrderTransactions(platformIdentifier,platformKey,customerName,"Tango Card PS");
+		processTangoCardOrderTransactions(platformIdentifier,platformKey,customerName,accountName,"Tango Card PS");
 		
 		platformIdentifier=applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.JP_TANGO_CARD_PLATFORM_IDENTIFIER);
 		platformKey=applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.JP_TANGO_CARD_PLATFORM_KEY);		
 		customerName=applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.JP_TANGO_CARD_CUSTOMER_NAME);
+		accountName=applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.JP_TANGO_CARD_ACCOUNT_NAME);
 		
-		processTangoCardOrderTransactions(platformIdentifier,platformKey,customerName,"Tango Card JP");
+		processTangoCardOrderTransactions(platformIdentifier,platformKey,customerName,accountName,"Tango Card JP");
 		
 		
 	}
-	private void processTangoCardOrderTransactions(String platformIdentifier,String platformKey,String customerName, String title)throws Exception{
-	    //Yesterday report
+	private void processTangoCardOrderTransactions(String platformIdentifier,String platformKey,String customerName,String accountName, String title)throws Exception{
+	    GiftCardService giftCardService=new GiftCardService();
+		//Yesterday report
 		ZonedDateTime now=ZonedDateTime.now(ZoneOffset.UTC);
 		ZonedDateTime yesterday=now.minusDays(1);
 		   
@@ -73,13 +81,16 @@ public class PaymentOrderTransactionController implements Controller {
 		//get the sum in eur		
 		BigDecimal eurSum=paymentOrderTransactionsService.calculateTotal(map, formattedDate, "EUR");
 		
+		//get account balance;
+		BigDecimal balance=giftCardService.getGiftCardAccountBalance(platformIdentifier, platformKey, accountName);
+		
         String emailTo=applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.PAYMENT_REPORT_EMAIL_1);
         String emailFrom=applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.NO_REPLY_EMAIL);
         
-		paymentOrderTransactionsService.sendEmail(map, usdSum, eurSum, title+" total at "+formattedDate, emailTo, emailFrom);
+		paymentOrderTransactionsService.sendEmail(map,balance, usdSum, eurSum, title+" total at "+formattedDate, emailTo, emailFrom);
         		 		 
 		emailTo=applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.PAYMENT_REPORT_EMAIL_2);
-		paymentOrderTransactionsService.sendEmail(map, usdSum, eurSum, title+" total at "+formattedDate, emailTo, emailFrom);	
+		paymentOrderTransactionsService.sendEmail(map,balance, usdSum, eurSum, title+" total at "+formattedDate, emailTo, emailFrom);	
 
 		
 	}
@@ -122,10 +133,10 @@ public class PaymentOrderTransactionController implements Controller {
         String emailTo=applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.PAYMENT_REPORT_EMAIL_1);
         String emailFrom=applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.NO_REPLY_EMAIL);
         
-		paymentOrderTransactionsService.sendEmail(map, usdSum, eurSum, "PayPal total at "+formattedDate, emailTo, emailFrom);
+		paymentOrderTransactionsService.sendEmail(map,null, usdSum, eurSum, "PayPal total at "+formattedDate, emailTo, emailFrom);
         		 		 
 		emailTo=applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.PAYMENT_REPORT_EMAIL_2);
-		paymentOrderTransactionsService.sendEmail(map, usdSum, eurSum, "PayPal total at "+formattedDate, emailTo, emailFrom);	
+		paymentOrderTransactionsService.sendEmail(map,null, usdSum, eurSum, "PayPal total at "+formattedDate, emailTo, emailFrom);	
 		
 	}
 

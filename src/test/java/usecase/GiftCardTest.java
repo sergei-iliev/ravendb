@@ -18,8 +18,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
+import com.luee.wally.api.service.GiftCardService;
 import com.luee.wally.api.service.PaymentOrderTransactionsService;
+import com.luee.wally.api.tangocard.client.AccountsApi;
 import com.luee.wally.api.tangocard.client.OrdersApi;
+import com.luee.wally.api.tangocard.client.model.AccountView;
 import com.luee.wally.api.tangocard.client.model.OrderListView;
 import com.luee.wally.command.Email;
 import com.luee.wally.command.order.OrderTransactionResult;
@@ -70,7 +73,16 @@ public class GiftCardTest {
 		   }
 
 	}
-	
+	@Test
+	public void getGiftCardAcountBalanceTest() throws Throwable {
+		   //Configuration.environment=Configuration.environment.PRODUCTION;
+		   //GiftCardService giftCardService=new GiftCardService();
+		   //BigDecimal balance=giftCardService.getGiftCardAccountBalance(Constants.PROD_PLATFORM_IDENTIFIER, Constants.PROD_PLATFORM_KEY, "A88393817");
+		   AccountsApi accountsApi=new AccountsApi(Constants.PROD_PLATFORM_IDENTIFIER, Constants.PROD_PLATFORM_KEY);
+		   AccountView accountView= accountsApi.getAccount("A88393817");
+		   System.out.println(accountView.getCurrentBalance());	
+		   
+	}
 	@Test
 	public void getAcountsTest() throws Throwable {
 		   Configuration.environment=Configuration.environment.PRODUCTION;

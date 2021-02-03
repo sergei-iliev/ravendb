@@ -74,6 +74,7 @@ INSTANCE;
     	 httpGetRouteList.put("/administration/job/user/revenue/daily/fb",new Route(new UserRevenueReportsController(),"runfbUserAdRevenueDailyReport"));
     	 httpGetRouteList.put("/administration/job/user/revenue/run",new Route(new UserRevenueReportsController(),"runUserAdRevenueDailyReportByDate"));
     	 httpGetRouteList.put("/administration/job/user/revenue/run/fb",new Route(new UserRevenueReportsController(),"runfbUserAdRevenueDailyReportByDate"));
+    	 httpGetRouteList.put("/administration/job/order/transactions", new Route(new PaymentOrderTransactionController(),"runOrderTransactionReport"));
     	 httpGetRouteList.put("/administration/payment/paidusers/export",new Route(new ExportController(),"index"));
     	 
     	 
@@ -128,7 +129,7 @@ INSTANCE;
     	 httpPostRouteList.put("/administration/payment/paidusers/search/byguid", new Route(new PaidUsersController(),"searchByGuid"));    	 
     	 httpPostRouteList.put("/administration/payment/paidusers/search/groupby",new Route(new PaidUsersController(),"searchGroupBy"));
     	 httpPostRouteList.put("/administration/job/payment/paidusers/checkvpnusage", new Route(new PaidUsersController(),"checkVPNUsageAsync"));
-    	 httpPostRouteList.put("/administration/job/order/transactions", new Route(new PaymentOrderTransactionController(),"runOrderTransactionReport"));
+    	 
     	 //email template
     	 httpPostRouteList.put("/administration/email/template/send", new Route(new EmailTemplateController(),"sendEmailTemplate"));
     
