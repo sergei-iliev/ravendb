@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -17,6 +18,7 @@ import com.google.appengine.api.datastore.ReadPolicy.Consistency;
 import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 import com.luee.wally.admin.repository.PaidUsersRepository;
+import com.luee.wally.admin.repository.UserRepository;
 import com.luee.wally.api.ConnectionMgr;
 import com.luee.wally.api.service.PaidUsersService;
 import com.luee.wally.api.service.impex.ExportService;
@@ -26,6 +28,7 @@ import com.luee.wally.command.PaidUserGroupByResult;
 import com.luee.wally.command.viewobject.PaidUserGroupByVO;
 import com.luee.wally.entity.PaidUser;
 import com.luee.wally.entity.PaidUserExternal;
+import com.luee.wally.entity.RedeemingRequests;
 import com.luee.wally.json.JSONUtils;
 import com.luee.wally.json.RevenueLinkVO;
 import com.luee.wally.utils.TestDatabase;
@@ -263,5 +266,34 @@ public class PayedUserTest {
 			entity.setProperty("invoice_number", "5434444");				
 			ds.put(entity);
 		}
+	}
+	
+	@Test
+	public void unremovePaiedUserTest() throws Exception{
+		DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
+		UserRepository userRepository=new UserRepository();
+		PaidUsersService paidUsersService=new PaidUsersService();
+		
+		Entity redeeming = new Entity("redeeming_requests_new");		
+		redeeming.setIndexedProperty("removal_reason", "Suspected fraud");		
+		redeeming.setIndexedProperty("user_guid","12345");		
+		redeeming.setIndexedProperty("date",new Date());
+		redeeming.setIndexedProperty("creation_date",new Date());
+		redeeming.setIndexedProperty("type", "Removed");
+		redeeming.setIndexedProperty("is_paid", false);	
+		redeeming.setIndexedProperty("max_rev", 1.2);
+		redeeming.setIndexedProperty("confirmed_email", false);	
+
+		ds.put(redeeming);
+       
+		Assert.assertTrue(userRepository.findEntities("redeeming_requests_new", null, null).size()==1);
+		
+		Collection<RedeemingRequests> list= paidUsersService.getRedeemingRequestsRemoved("12345", "Suspected fraud");
+		Assert.assertTrue(list.size()==1);
+		
+		userRepository.deleteEntity(list.iterator().next().getKey());
+		
+		Assert.assertTrue(userRepository.findEntities("redeeming_requests_new", null, null).size()==0);
+		
 	}
 }

@@ -5,22 +5,27 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.taskqueue.Queue;
 import com.google.appengine.api.taskqueue.QueueFactory;
 import com.google.appengine.api.taskqueue.TaskOptions;
 import com.google.appengine.api.taskqueue.TaskOptions.Method;
+import com.luee.wally.admin.repository.UserRepository;
 import com.luee.wally.api.route.Controller;
 import com.luee.wally.api.service.PaidUsersService;
 import com.luee.wally.command.PaidUserGroupByForm;
 import com.luee.wally.command.PaidUserGroupByForm.GroupByType;
 import com.luee.wally.command.PaidUserGroupByResult;
 import com.luee.wally.command.PaidUserSearchForm;
+import com.luee.wally.command.UnremoveUserForm;
 import com.luee.wally.command.viewobject.PaidUserGroupByVO;
+import com.luee.wally.entity.RedeemingRequests;
 
 public class PaidUsersController implements Controller {
 	private final Logger logger = Logger.getLogger(PaidUsersController.class.getName());
@@ -118,6 +123,51 @@ public class PaidUsersController implements Controller {
 		
 		PaidUsersService paidUsersService=new PaidUsersService();
 		paidUsersService.checkVPNUsageAsync(key, ipAddress, countryCode);
+		
+	}
+	
+	public void unremove(HttpServletRequest req, HttpServletResponse resp)throws ServletException, IOException{
+		UserRepository userRepository=new UserRepository();
+		Collection<Entity> entities=userRepository.findEntities("user_payments_removal_reasons",null, null);
+		Collection<String> removalReasons=entities.stream().map(e->(String)e.getProperty("removal_reason")).collect(Collectors.toList());
+		
+		req.setAttribute("removalReasons",removalReasons);
+		req.getRequestDispatcher("/jsp/unremove_user.jsp").forward(req, resp);
+	}
+	
+	public void unremoveUser(HttpServletRequest req, HttpServletResponse resp)throws ServletException, IOException{
+		UserRepository userRepository=new UserRepository();
+		Collection<Entity> entities=userRepository.findEntities("user_payments_removal_reasons",null, null);
+		Collection<String> removalReasons=entities.stream().map(e->(String)e.getProperty("removal_reason")).collect(Collectors.toList());
+		
+		
+		UnremoveUserForm unremoveUserForm=UnremoveUserForm.parse(req);
+		req.setAttribute("webform",unremoveUserForm);
+		req.setAttribute("removalReasons",removalReasons);
+
+		if(unremoveUserForm.getRemovalReason()==null||unremoveUserForm.getUserGuid()==null){
+			req.setAttribute("error","Invalid input parameters");
+			req.getRequestDispatcher("/jsp/unremove_user.jsp").forward(req, resp);			
+			return;
+		}
+		PaidUsersService paidUsersService=new PaidUsersService();
+		Collection<RedeemingRequests> redeemingRequests=paidUsersService.getRedeemingRequestsRemoved(unremoveUserForm.getUserGuid(),unremoveUserForm.getRemovalReason());
+		
+		if(redeemingRequests.size()==0){
+			req.setAttribute("error","The redeeming request wasn’t found and therefore wasn’t removed.");			
+			req.getRequestDispatcher("/jsp/unremove_user.jsp").forward(req, resp);
+		}else if(redeemingRequests.size()==1){
+			//delete from DB
+			RedeemingRequests redeemingRequest=redeemingRequests.iterator().next();
+			userRepository.deleteEntity(redeemingRequest.getKey()); 
+			req.setAttribute("success","The redeeming request was unremoved.");	
+			req.getRequestDispatcher("/jsp/unremove_user.jsp").forward(req, resp);			
+		}else{  //more then 1 record
+			req.setAttribute("error","Error. More than one removed redeeming request was found for the user.");
+			req.getRequestDispatcher("/jsp/unremove_user.jsp").forward(req, resp);
+		}
+		
+		
 		
 	}
 }

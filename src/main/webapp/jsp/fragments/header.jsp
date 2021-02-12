@@ -56,7 +56,9 @@
           		<a class="dropdown-item" href="/administration/payment/paidusers">Paid Users</a> 
           		<a class="dropdown-item" href="/administration/payment/paidusers?groupby">Paid Users Group By</a>   
           		<a class="dropdown-item" href="/administration/payment/confirmemail">Confirm Email</a>
-          		<a class="dropdown-item" href="/administration/payment/paidusers/export">Export Paid User</a>          		       
+          		<a class="dropdown-item" href="/administration/payment/paidusers/export">Export Paid User</a>
+          		<a class="dropdown-item" href="/administration/payment/user/unremove">Unremove User</a>
+          		           		      
         	</div>
       	</li>
           <li class="nav-item dropdown ${param.activeMenuItem eq 'users' ? 'active' : ''}">
@@ -64,8 +66,7 @@
           		Users
         	</a>
         	<div class="dropdown-menu" aria-labelledby="navbarDropdown">
-          		<a class="dropdown-item" href="/administration/users/data/delete">User data removal</a>
-          		       	
+          		<a class="dropdown-item" href="/administration/users/data/delete">User data removal</a>				           		       	
         	</div>
       	</li>      	
       	<li class="nav-item ${param.activeMenuItem eq 'settings' ? 'active' : ''}">   

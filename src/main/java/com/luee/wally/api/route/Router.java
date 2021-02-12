@@ -80,6 +80,7 @@ INSTANCE;
     	 
     	 
     	 httpGetRouteList.put("/administration/payment/paidusers", new Route(new PaidUsersController(),"index"));
+    	 httpGetRouteList.put("/administration/payment/user/unremove", new Route(new PaidUsersController(),"unremove"));
     	 httpGetRouteList.put("/administration/payment/confirmemail", new Route(new ConfirmEmailController(),"index"));
     	 
     	 httpGetRouteList.put("/administration/settings", new Route(new ApplicationSettingsController(),"index"));
@@ -129,7 +130,7 @@ INSTANCE;
     	 httpPostRouteList.put("/administration/payment/paidusers/search/byguid", new Route(new PaidUsersController(),"searchByGuid"));    	 
     	 httpPostRouteList.put("/administration/payment/paidusers/search/groupby",new Route(new PaidUsersController(),"searchGroupBy"));
     	 httpPostRouteList.put("/administration/job/payment/paidusers/checkvpnusage", new Route(new PaidUsersController(),"checkVPNUsageAsync"));
-    	 
+    	 httpPostRouteList.put("/administration/payment/user/unremoveuser", new Route(new PaidUsersController(),"unremoveUser"));
     	 //email template
     	 httpPostRouteList.put("/administration/email/template/send", new Route(new EmailTemplateController(),"sendEmailTemplate"));
     

@@ -29,6 +29,7 @@ public enum TestDatabase {
 		createPayPalCurrencyMap();	
 		createEmailTemplates();
 		createSuspiciousEmailDomainsTable();
+		createUserRemovalReason();
 	}
 	private  void createRedeemingRequests(){
 		DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
@@ -511,5 +512,23 @@ public enum TestDatabase {
 		LocalDate localDate = new LocalDate(year, month, day);
 		return localDate.toDate();
 	}
-	
+	private void createUserRemovalReason(){
+		DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
+		Entity entity = new Entity("user_payments_removal_reasons");	
+		entity.setIndexedProperty("removal_reason","No paypal account found");		
+		ds.put(entity);
+		
+		entity = new Entity("user_payments_removal_reasons");	
+		entity.setIndexedProperty("removal_reason","No amazon account found");		
+		ds.put(entity);		
+		
+		entity = new Entity("user_payments_removal_reasons");	
+		entity.setIndexedProperty("removal_reason","Suspected fraud");		
+		ds.put(entity);		
+		
+		entity = new Entity("user_payments_removal_reasons");	
+		entity.setIndexedProperty("removal_reason","Payments through website only");		
+		ds.put(entity);		
+		
+	}
 }

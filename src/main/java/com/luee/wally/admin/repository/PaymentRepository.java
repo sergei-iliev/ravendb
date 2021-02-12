@@ -266,7 +266,22 @@ public class PaymentRepository extends AbstractRepository {
 
 		return list;
 	}
+	
+	public Collection<Entity> findRedeemingRequestsRemoved(String userGuid, String removalReason) {
+		DatastoreService ds = createDatastoreService(Consistency.EVENTUAL);
 
+		Query query = new Query("redeeming_requests_new");
+		CompositeFilter filter = CompositeFilterOperator.and(				
+				new FilterPredicate("user_guid", FilterOperator.EQUAL, userGuid),
+				new FilterPredicate("removal_reason", FilterOperator.EQUAL, removalReason),
+				new FilterPredicate("type", FilterOperator.EQUAL,"Removed"),
+				new FilterPredicate("is_paid", FilterOperator.EQUAL,Boolean.FALSE)
+				);
+		query.setFilter(filter);
+		PreparedQuery pq = ds.prepare(query);
+		return pq.asList(FetchOptions.Builder.withDefaults());		
+	}
+	
 	public int countEligibleUsersByIP(String ipAddress, String userGuid) {
 		DatastoreService ds = createDatastoreService(Consistency.EVENTUAL);
 

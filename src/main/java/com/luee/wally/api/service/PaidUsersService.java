@@ -15,9 +15,11 @@ import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.luee.wally.admin.repository.PaidUsersRepository;
+import com.luee.wally.admin.repository.PaymentRepository;
 import com.luee.wally.api.ConnectionMgr;
 import com.luee.wally.command.PaidUserGroupByForm;
 import com.luee.wally.command.PaidUserSearchForm;
+import com.luee.wally.command.UnremoveUserForm;
 import com.luee.wally.command.PaidUserGroupByForm.GroupByType;
 import com.luee.wally.command.PaidUserGroupByResult;
 import com.luee.wally.command.viewobject.PaidUserGroupByVO;
@@ -30,7 +32,12 @@ public class PaidUsersService {
 	private final Logger logger = Logger.getLogger(PaidUsersService.class.getName());
 
 	PaidUsersRepository paidUsersRepository=new PaidUsersRepository();
+	PaymentRepository paymentRepository=new PaymentRepository();
 	
+	public Collection<RedeemingRequests> getRedeemingRequestsRemoved(String userGuid,String removalReason){
+		Collection<Entity> entities= paymentRepository.findRedeemingRequestsRemoved(userGuid, removalReason);
+		return entities.stream().map(RedeemingRequests::valueOf).collect(Collectors.toList());
+	}
 	public Collection<PaidUserGroupByVO> searchGroupBy(PaidUserGroupByForm form){
 		
 	    /*
