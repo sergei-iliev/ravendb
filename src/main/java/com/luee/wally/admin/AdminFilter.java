@@ -14,7 +14,9 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.google.api.client.http.HttpStatusCodes;
 import com.luee.wally.api.route.Router;
+import com.luee.wally.entity.User;
 import com.luee.wally.utils.TestDatabase;
 import com.luee.wally.utils.Utilities;
 
@@ -45,7 +47,7 @@ public class AdminFilter implements Filter {
 //        }
         
         Utilities.domain= request.getServerName();
-        String loginedUser = (String) request.getSession().getAttribute("login");
+        User loggedUser = (User) request.getSession().getAttribute("user");
  
         //let resource go on
         if(request.getRequestURI().matches(".*(css|jpg|png|gif|js)")){        	
@@ -73,11 +75,17 @@ public class AdminFilter implements Filter {
         	rd.forward(request, response);
             return;        	
         }
-        if(loginedUser==null){					
+        if(loggedUser==null){					
 			response.sendRedirect("/administration/login");        	
         	return;
         }        
-        
+        //permissions?
+        if(!loggedUser.isAdmin()){	//QA
+        	if (!request.getRequestURI().startsWith("/administration/qa")) {
+        		response.sendError(HttpStatusCodes.STATUS_CODE_FORBIDDEN,"Permission denied");
+        		return;
+        	}
+        }
         if(Router.INSTANCE.hasPath(request.getMethod(),request.getRequestURI())){
           Router.INSTANCE.execute(request.getRequestURI(), request, response);
         }else{

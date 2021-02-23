@@ -8,7 +8,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.luee.wally.admin.repository.ApplicationSettingsRepository;
 import com.luee.wally.api.service.ApplicationSettingsService;
+import com.luee.wally.api.service.UserService;
 import com.luee.wally.constants.Constants;
+import com.luee.wally.entity.User;
 
 
 public class LoginController implements com.luee.wally.api.route.Controller{
@@ -20,20 +22,21 @@ public class LoginController implements com.luee.wally.api.route.Controller{
 	public void login(HttpServletRequest req, HttpServletResponse resp)throws ServletException, IOException{
         String email=(String)req.getParameter("email");
         String password=(String)req.getParameter("password");
-        ApplicationSettingsService applicationSettingsService=new ApplicationSettingsService();
         
-		if(email.equals(applicationSettingsService.getApplicationSetting(ApplicationSettingsRepository.LOGIN_EMAIL))
-				&&password.equals(applicationSettingsService.getApplicationSetting(ApplicationSettingsRepository.LOGIN_PASSWORD))){
-          req.getSession().setAttribute("login","ADMIN_USER");
+        UserService userService=new UserService();
+        User user=userService.getUser(email, password);
+        if(user!=null){	          
+          req.getSession().setAttribute("user",user);
       	  req.getSession().setMaxInactiveInterval(60*15);
-  		  resp.sendRedirect("/administration");
+      	  if(user.isAdmin()){	
+      		  resp.sendRedirect("/administration");
+      	  }else{
+      		resp.sendRedirect("/administration/qa");
+      	  }
 		}else{
-		  req.setAttribute("error","Wrong user name or password.");
+		  req.setAttribute("error","Wrong user email or password.");
 		  req.getRequestDispatcher("/jsp/login.jsp").forward(req, resp);
 		}
-        
-        
-        
 		
 	}
 

@@ -67,6 +67,7 @@
         	</a>
         	<div class="dropdown-menu" aria-labelledby="navbarDropdown">
           		<a class="dropdown-item" href="/administration/users/data/delete">User data removal</a>				           		       	
+				<a class="dropdown-item" href="/administration/users/guid/exists">User guid exists</a>          		
         	</div>
       	</li>      	
       	<li class="nav-item ${param.activeMenuItem eq 'settings' ? 'active' : ''}">   

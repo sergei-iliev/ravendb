@@ -1,15 +1,23 @@
 package com.luee.wally.api.service;
 
+import java.io.IOException;
+import java.io.Writer;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 
 import com.google.appengine.api.datastore.Entity;
 import com.luee.wally.admin.repository.PaidUsersRepository;
 import com.luee.wally.admin.repository.UserRepository;
+import com.luee.wally.entity.User;
 
 public class UserService {
 	private final Logger logger = Logger.getLogger(UserService.class.getName());
@@ -17,17 +25,49 @@ public class UserService {
 	private UserRepository userRepository=new UserRepository();		
 	private PaidUsersRepository paidUsersRepository=new PaidUsersRepository();
 	
+	public Map<String,Long> countUserGuids(List<String> userGuids){		
+		Collection<Entity> entities=new ArrayList<>();
+		Collection<String> sublist=new ArrayList<>(10);
+		int i=0;
+		for(String userGuid:userGuids){
+		    sublist.add(userGuid);		   
+			i++;
+			if(i==10){
+		        entities.addAll(userRepository.findAffsByUserGuids(sublist)); //accumulate all		        
+				sublist.clear();
+				i=0;
+			}
+		}
+		if(i>0){ //do the left over
+		   entities.addAll(userRepository.findAffsByUserGuids(sublist)); //accumulate all    		   
+		}
+		
+		return entities.stream().collect(Collectors.groupingBy(e->(String)e.getProperty("user_guid"), Collectors.counting()));		
+	}
+	
+	public void createUserGuidFile(Writer writer,Map<String,Long> existsGuidMap,Collection<String>  notExistsGiuids)throws IOException{
+		writer.append("Existing user_guids: ");
+		writer.append(existsGuidMap.size()+"\r\n");
+		
+		writer.append("Non existing user_guids: ");
+		writer.append(notExistsGiuids.size()+"\r\n");
+		for(String userGuid:notExistsGiuids){
+			writer.append(userGuid+"\r\n");
+		}
+						
+	}
+	
 	public int deleteUserDataByEmail(String email){
 	    int count=0;
 		Collection<String> emails=(this.convertToEmails(email));
 		//1. affs
-		Collection<Entity> affs = userRepository.getRecordsByEmails(emails, "affs", "email");
+		Collection<Entity> affs = paidUsersRepository.getRecordsByEmails(emails, "affs", "email");
 		// 2.search RR email
-		Collection<Entity> redeemingRequestEmails = userRepository.getRecordsByEmails(emails,
+		Collection<Entity> redeemingRequestEmails = paidUsersRepository.getRecordsByEmails(emails,
 				"redeeming_requests_new", "email");
 		
 		// 3.search RR paypal
-		Collection<Entity> redeemingRequestPayPals = userRepository.getRecordsByEmails(emails,
+		Collection<Entity> redeemingRequestPayPals = paidUsersRepository.getRecordsByEmails(emails,
 				"redeeming_requests_new", "paypal_account");
 		
 		if(affs.isEmpty()&&redeemingRequestEmails.isEmpty()&&redeemingRequestPayPals.isEmpty()){
@@ -77,10 +117,10 @@ public class UserService {
 	public int deleteUserDataByGuid(String guid){
 		int count=0;
 		//1. affs
-		Collection<Entity> affs = userRepository.getRecordsByEmails(Collections.singleton(guid), "affs", "user_guid");
+		Collection<Entity> affs = paidUsersRepository.getRecordsByEmails(Collections.singleton(guid), "affs", "user_guid");
 		
 		// 2.redeeming_requests_new 
-		Collection<Entity> redeemingRequests = userRepository.getRecordsByEmails(Collections.singleton(guid), "redeeming_requests_new", "user_guid");
+		Collection<Entity> redeemingRequests = paidUsersRepository.getRecordsByEmails(Collections.singleton(guid), "redeeming_requests_new", "user_guid");
 		
 		if(affs.isEmpty()&&redeemingRequests.isEmpty()){
 			throw new IllegalAccessError("User guid '"+guid+"' was not found in our system.");
@@ -135,4 +175,12 @@ public class UserService {
 		}		
 	}
 	
+	public User getUser(String email,String password){		
+		Entity entity=userRepository.findEntity("user","email",email);
+		if(entity!=null&&entity.getProperty("password").equals(password)){
+		   return User.valueOf(entity);
+		}else{
+		   return null;
+		}
+	}
 }

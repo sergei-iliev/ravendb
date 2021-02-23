@@ -33,6 +33,13 @@ import com.luee.wally.entity.PaidUser;
 public class PaidUsersRepository extends AbstractRepository{
 	  private final Logger logger = Logger.getLogger(PaidUsersRepository.class.getName());
 	
+	 public Collection<Entity> getRecordsByEmails(Collection<String> emails,String tableName,String fieldName){
+			DatastoreService ds = createDatastoreService(Consistency.STRONG);
+			Query query=this.filterByOr(tableName, fieldName, emails);
+			PreparedQuery pq = ds.prepare(query);
+			QueryResultList<Entity> entities = pq.asQueryResultList(FetchOptions.Builder.withDefaults());		
+			return entities;
+	  }
 	  /*
 	   * In memory filtering
 	   */

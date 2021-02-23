@@ -17,7 +17,6 @@ public class ExportPaidUsersForm implements WebForm{
 		form.setEndDate(form.parseDate(req.getParameter("endDate")));
         form.external=Boolean.parseBoolean(req.getParameter("external"));		
         form.setInvoiceBase(req.getParameter("invoiceBase"));
-        System.out.println();
 		return form;
 	}
 

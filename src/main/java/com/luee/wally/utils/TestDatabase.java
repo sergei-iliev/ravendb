@@ -16,11 +16,13 @@ import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.datastore.Text;
 import com.luee.wally.command.payment.RuleStatusType;
+import com.luee.wally.entity.User;
 
 public enum TestDatabase {
 	INSTANCE;
 	
 	public  void generateDB(){
+		createUsers();
 		createAffs();
 		createRedeemingRequests();
 		createAmazonGiftCardMap();
@@ -30,6 +32,21 @@ public enum TestDatabase {
 		createEmailTemplates();
 		createSuspiciousEmailDomainsTable();
 		createUserRemovalReason();
+	}
+	private  void createUsers(){
+		DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
+		Entity admin=new Entity("user");
+		admin.setIndexedProperty("email","1@1");
+		admin.setIndexedProperty("password","1");
+		admin.setProperty("role",User.UserRole.ADMIN_ROLE.name());
+		ds.put(admin);
+		
+		Entity qa=new Entity("user");
+		qa.setIndexedProperty("email","2@2");
+		qa.setIndexedProperty("password","2");
+		qa.setProperty("role",User.UserRole.QA_ROLE.name());
+		ds.put(qa);
+		
 	}
 	private  void createRedeemingRequests(){
 		DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
@@ -175,7 +192,22 @@ public enum TestDatabase {
 		   //entity.setProperty("gaid","c292bc0e-7eaf-4452-896f-46ffba6b229e");
 		   entity.setProperty("user_guid","bbbb2675-a072-4b6b-ab66-cb599a29147d");
 		   ds.put(entity);
+
+		   entity = new Entity("affs");	
+		   entity.setProperty("date", new Date());
+		   entity.setProperty("experiment","surprise_update|dismiss_notif|gradual_game_release|game_coins_formula|balance_formula|threshold_20");
+		   entity.setProperty("country_code","US");
+		   entity.setProperty("package_name","com.moregames.makemoney");		   
+		   entity.setProperty("user_guid","dddd2675-a072-4b6b-ab66-cb599a29147d");
+		   ds.put(entity);
 		   
+		   entity = new Entity("affs");	
+		   entity.setProperty("date", new Date());
+		   entity.setProperty("experiment","surprise_update|dismiss_notif|gradual_game_release|game_coins_formula|balance_formula|threshold_20");
+		   entity.setProperty("country_code","US");
+		   entity.setProperty("package_name","com.moregames.makemoney");		   
+		   entity.setProperty("user_guid","eeee2675-a072-4b6b-ab66-cb599a29147d");
+		   ds.put(entity);
 	}
 	
 	private  void createPayPalCurrencyMap(){

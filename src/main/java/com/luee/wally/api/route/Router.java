@@ -25,6 +25,7 @@ import com.luee.wally.admin.controller.PaidUsersController;
 import com.luee.wally.admin.controller.PaymentController;
 import com.luee.wally.admin.controller.PaymentOrderTransactionController;
 import com.luee.wally.admin.controller.PaymentReportsController;
+import com.luee.wally.admin.controller.QAController;
 import com.luee.wally.admin.controller.SearchFilterTemplateController;
 import com.luee.wally.admin.controller.UserRevenueReportsController;
 import com.luee.wally.admin.controller.UsersController;
@@ -55,8 +56,7 @@ INSTANCE;
     	 httpGetRouteList.put("/administration", new Route(new AffsSearchController(),"index"));
     	 httpGetRouteList.put("/administration/revenue/fb", new Route(new FBAffsSearchController(),"index"));
     	 httpGetRouteList.put("/administration/exportgaid", new Route(new AffsSearchController(),"exportGaid"));
-    	 //DELETE ME
-    	 //httpGetRouteList.put("/administration/tool", new Route(new ExportToolController(),"runExportTool"));
+
     	 
     	 httpGetRouteList.put("/administration/logout", new Route(new LoginController(),"logout"));
     	 httpGetRouteList.put("/administration/campaign", new Route(new CampaignSearchController(),"index"));
@@ -84,16 +84,16 @@ INSTANCE;
     	 httpGetRouteList.put("/administration/payment/confirmemail", new Route(new ConfirmEmailController(),"index"));
     	 
     	 httpGetRouteList.put("/administration/settings", new Route(new ApplicationSettingsController(),"index"));
-    	 httpGetRouteList.put("/administration/settings/cache/clear", new Route(new ApplicationSettingsController(),"clearCache"));
-    	 /*
-    	 httpGetRouteList.put("/administration/api/login/request", new Route(new PaymentLoginController(),"loginRequest"));
-    	 httpGetRouteList.put("/administration/api/login/paypal/token", new Route(new PaymentLoginController(),"payPalLoginToken"));
-    	 httpGetRouteList.put("/administration/api/login/amazon/token", new Route(new PaymentLoginController(),"amazonLoginToken"));
-    	 */
+    	 httpGetRouteList.put("/administration/settings/cache/clear", new Route(new ApplicationSettingsController(),"clearCache"));    	     	 
+    	 
     	 httpGetRouteList.put("/administration/email/template/content", new Route(new EmailTemplateController(),"getEmailTemplateContent"));
     	 httpGetRouteList.put("/administration/email/template/list", new Route(new EmailTemplateController(),"getEmailTemplates"));
     	 
     	 httpGetRouteList.put("/administration/users/data/delete", new Route(new UsersController(),"index"));
+    	 httpGetRouteList.put("/administration/users/guid/exists", new Route(new UsersController(),"userExists"));
+    	 //QA
+    	 httpGetRouteList.put("/administration/qa", new Route(new QAController(),"index"));
+    	 httpGetRouteList.put("/administration/qa/experiment", new Route(new QAController(),"experiment"));
     	 
     	 //*********post*******
     	 httpPostRouteList.put("/administration/search", new Route(new AffsSearchController(),"search"));
@@ -135,7 +135,12 @@ INSTANCE;
     	 httpPostRouteList.put("/administration/email/template/send", new Route(new EmailTemplateController(),"sendEmailTemplate"));
     
     	 httpPostRouteList.put("/administration/users/data/delete", new Route(new UsersController(),"deleteUserData"));
+    	 httpPostRouteList.put("/administration/users/guid/exists", new Route(new UsersController(),"doUserExists"));
     	 
+    	 
+    	 //QA
+    	 httpPostRouteList.put("/administration/qa/experiment", new Route(new QAController(),"doExperiment"));
+
     }
     
     public boolean hasPath(String httpMethod,String url){
