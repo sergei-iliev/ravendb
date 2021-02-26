@@ -9,8 +9,10 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import com.google.appengine.api.datastore.Cursor;
 import com.google.appengine.api.datastore.DatastoreService;
@@ -395,5 +397,42 @@ public class AffsSearchService extends AbstractService{
 		return new AffsSearchResult(null, totalAdRev, offerwallRev,totalPaidUsers,count,minRevCount);
 	}
 	
-
+	public void removeExperiment(String userGuid,String experiment){
+		Collection<Entity> affs=affsRepository.findAffsByUserGuids(Arrays.asList(userGuid));
+		if(affs.size()!=1){
+			throw new IllegalStateException( "Found "+affs.size()+" record number(s).");
+		}
+		
+		Entity entity=affs.iterator().next();		
+		String oldValue=(String) entity.getProperty("experiment");		
+		List<String> experiments=new ArrayList<>(Arrays.asList(oldValue.split("\\|")));
+		
+		if(!experiments.remove(experiment)){
+			throw new IllegalStateException( "Experiment '"+experiment+"' is not found in record value: '"+oldValue+"'");	
+		}
+		
+		String newValue=experiments.stream().collect(Collectors.joining("|"));
+		entity.setProperty("experiment",newValue);
+		affsRepository.save(entity);
+	}
+	
+	public void setExperiment(String userGuid,String experiment){
+		Collection<Entity> affs=affsRepository.findAffsByUserGuids(Arrays.asList(userGuid));
+		if(affs.size()!=1){
+			throw new IllegalStateException( "Found "+affs.size()+" record number(s).");
+		}
+		
+		Entity entity=affs.iterator().next();		
+		String oldValue=(String) entity.getProperty("experiment");		
+		List<String> experiments=new ArrayList<>(Arrays.asList(oldValue.split("\\|")));
+		
+		if(experiments.contains(experiment)){
+			throw new IllegalStateException( "Experiment '"+experiment+"' is already present in record value");	
+		}
+		experiments.add(experiment);
+		String newValue=experiments.stream().collect(Collectors.joining("|"));
+		entity.setProperty("experiment",newValue);
+		affsRepository.save(entity);
+	}
+	
 }

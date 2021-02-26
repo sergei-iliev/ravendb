@@ -23,6 +23,9 @@
         <div class="col-md-12">
             <div class="card card-body bg-light">             			 
 			 <div class="mt-5">
+			 <c:if test="${error!=null}">
+				<span class="error text-danger">${error}</span>	
+			 </c:if> 
                 <form class="form-horizontal" id="search-form" method="post" action="/administration/qa/experiment">
                     <fieldset>
 						<div class="form-label-group mt-3">
@@ -60,6 +63,27 @@
             </div>
         </div>
     </div>
+		<!-- Table  -->
+		<c:if test="${affs!=null}">
+		<div class="row mt-5">
+		<table class="table">
+					<thead>
+						<tr>							
+							<th scope="col">user_guid</th>
+							<th scope="col">experiment</th>							
+						</tr>
+					</thead>
+					<tbody>
+						<c:forEach var="aff" items="${affs}">
+							<tr>
+								<td>${aff.userGuid}</td>
+								<td>${aff.experiment}</td>
+							</tr>
+						</c:forEach>
+					</tbody>
+				</table>				
+		</div>
+		</c:if>    
     </div>
 
 

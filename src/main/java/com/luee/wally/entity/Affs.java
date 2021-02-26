@@ -2,6 +2,8 @@ package com.luee.wally.entity;
 
 import java.util.Date;
 
+import com.google.appengine.api.datastore.Entity;
+
 public class Affs {
 
 	private String userGuid;
@@ -10,6 +12,15 @@ public class Affs {
 	private double offerwallRev;
 	private double totalAdRev;
 	
+	public static Affs valueOf(Entity entity) {
+		Affs affs=new Affs();
+		affs.setDate((Date) entity.getProperty("date"));
+		affs.setTotalAdRev(entity.getProperty("total_ad_rev") == null ? 0 : (double) entity.getProperty("total_ad_rev"));
+		affs.setExperiment((String) entity.getProperty("experiment"));
+		affs.setOfferwallRev(entity.getProperty("offerwall_rev") == null ? 0 : (double) entity.getProperty("offerwall_rev"));
+		affs.setUserGuid((String)entity.getProperty("user_guid"));		
+		return affs;
+	}
 	
 	public String getUserGuid() {
 		return userGuid;

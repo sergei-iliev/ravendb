@@ -20,6 +20,13 @@ import com.google.appengine.api.datastore.ReadPolicy.Consistency;
 public class AffsRepository extends AbstractRepository {
 	private final Logger logger = Logger.getLogger(AffsRepository.class.getName());
 
+	public Collection<Entity> findAffsByUserGuids(Collection<String> userGuids){
+		DatastoreService ds = createDatastoreService(Consistency.EVENTUAL);
+        Query query=this.filterByOr("affs", "user_guid",userGuids);
+		PreparedQuery pq = ds.prepare(query);
+		return pq.asList(FetchOptions.Builder.withDefaults());	
+	}
+	
 	public Entity getLastAffEntryByGaid(String gaid) {
 		DatastoreService ds = createDatastoreService(Consistency.STRONG);
 

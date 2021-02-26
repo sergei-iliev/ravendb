@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 
 import com.google.appengine.api.datastore.Entity;
+import com.luee.wally.admin.repository.AffsRepository;
 import com.luee.wally.admin.repository.PaidUsersRepository;
 import com.luee.wally.admin.repository.UserRepository;
 import com.luee.wally.entity.User;
@@ -22,7 +23,8 @@ import com.luee.wally.entity.User;
 public class UserService {
 	private final Logger logger = Logger.getLogger(UserService.class.getName());
 
-	private UserRepository userRepository=new UserRepository();		
+	private UserRepository userRepository=new UserRepository();	
+	private AffsRepository affsRepository=new AffsRepository();	
 	private PaidUsersRepository paidUsersRepository=new PaidUsersRepository();
 	
 	public Map<String,Long> countUserGuids(List<String> userGuids){		
@@ -33,13 +35,13 @@ public class UserService {
 		    sublist.add(userGuid);		   
 			i++;
 			if(i==10){
-		        entities.addAll(userRepository.findAffsByUserGuids(sublist)); //accumulate all		        
+		        entities.addAll(affsRepository.findAffsByUserGuids(sublist)); //accumulate all		        
 				sublist.clear();
 				i=0;
 			}
 		}
 		if(i>0){ //do the left over
-		   entities.addAll(userRepository.findAffsByUserGuids(sublist)); //accumulate all    		   
+		   entities.addAll(affsRepository.findAffsByUserGuids(sublist)); //accumulate all    		   
 		}
 		
 		return entities.stream().collect(Collectors.groupingBy(e->(String)e.getProperty("user_guid"), Collectors.counting()));		
