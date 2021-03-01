@@ -13,7 +13,7 @@ public class FBAffsSearchResult extends AffsSearchResult{
 	    this(experiment,totalAdRev,offerwallRev, totalPaidUsers, count,0);
 	}
 	public FBAffsSearchResult(String experiment,BigDecimal totalAdRev,BigDecimal offerwallRev,BigDecimal totalPaidUsers,int count,int minRevCount) {
-          super(experiment,totalAdRev,offerwallRev,totalPaidUsers,count,minRevCount);
+          super(experiment,totalAdRev,offerwallRev,BigDecimal.ZERO,totalPaidUsers,count,minRevCount);
 	}
 	public BigDecimal getTotalFBRev() {
 		return totalFBRev;

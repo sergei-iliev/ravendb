@@ -59,22 +59,7 @@ public class CampaignSearchController implements Controller {
 					  		  
 							    CloudStorageRepository cloudStorageRepository=new CloudStorageRepository();
 							    cloudStorageRepository.save(writer,"campaign_ad_rev_search/search"+formatDate(new Date()));
-					  		  }
-					  		  
-//					  		  for(CampaignSearchResult result:campaignSearchResults){
-//					  			logger.log(Level.WARNING,result.getGroupValue());  
-//								logger.log(Level.WARNING,"totalAdRev="+result.getTotalAdRev());
-//								logger.log(Level.WARNING,"offerwallRev="+result.getOfferwallRev());
-//								logger.log(Level.WARNING,"Campaign Records #="+result.getCampaignCount());
-//							    logger.log(Level.WARNING,"Affs Records #="+result.getAffsCount());
-//							    if(result.getAffsCount()!=0){
-//							      BigDecimal avrTotalAdRev=result.getTotalAdRev().divide(new BigDecimal(result.getAffsCount()),4, BigDecimal.ROUND_HALF_EVEN);
-//							      logger.log(Level.WARNING,"avrTotalAdRev="+avrTotalAdRev);
-//							      
-//							      BigDecimal avrOfferwallRev=result.getOfferwallRev().divide(new BigDecimal(result.getAffsCount()),4, BigDecimal.ROUND_HALF_EVEN);
-//							      logger.log(Level.WARNING,"avrOfferwallRev="+avrOfferwallRev);
-//							    }			 			 
-//							 }
+					  		  }					  		  
 					  		  
 					  		  logger.log(Level.WARNING ,"*************************Campaign Search Task finished*****************");
 				   		

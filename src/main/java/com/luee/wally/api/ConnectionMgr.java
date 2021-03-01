@@ -8,6 +8,8 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.luee.wally.constants.Constants;
 
@@ -64,17 +66,18 @@ INSTANCE;
 		}
 		return response.toString();
 	}
-	
-	public  String getJSON(String urlStr) throws MalformedURLException,IOException  {
+	public  String getJSON(String urlStr,Map<String,String> headers) throws MalformedURLException,IOException  {
 		URL url = new URL(urlStr);
 		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 		
 		
 		// Set HTTP request method.
 		conn.setRequestMethod("GET");		
-		conn.setRequestProperty("Referrer Policy", "strict-origin-when-cross-origin");
-		conn.setRequestProperty("Accept", "application/json");		
-
+		if(headers!=null){
+		   headers.entrySet().forEach(e->{	
+			conn.setRequestProperty(e.getKey(),e.getValue());
+		   });
+		}
 		
 		int responseCode = conn.getResponseCode();
 		
@@ -94,6 +97,14 @@ INSTANCE;
 		}
 		
 		return response.toString();
+	}
+	public  String getJSON(String urlStr) throws MalformedURLException,IOException  {
+		//default
+		Map<String,String> headers=new HashMap<String, String>();
+		headers.put("Referrer Policy", "strict-origin-when-cross-origin");
+		headers.put("Accept", "application/json");		
+		
+		return this.getJSON(urlStr, headers);
     }
 
 	public  String getCSV(String urlStr) throws MalformedURLException,IOException  {

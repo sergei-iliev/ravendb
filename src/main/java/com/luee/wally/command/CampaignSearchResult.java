@@ -9,6 +9,8 @@ public class CampaignSearchResult {
 	
 	private final BigDecimal offerwallRev;
 	
+	private final BigDecimal appLikeRev;
+	
 	private BigDecimal totalPaidUsers;
 	
 	private String groupName,groupValue;
@@ -16,13 +18,14 @@ public class CampaignSearchResult {
 	private  BigDecimal rateValue;//EUR to USD rate
 	private int minRevCount;
 	
-	public CampaignSearchResult(BigDecimal totalAdRev,BigDecimal offerwallRev,BigDecimal totalPaidUsers,int affsCount,int campaignCount,int minRevCount) {
+	public CampaignSearchResult(BigDecimal totalAdRev,BigDecimal offerwallRev,BigDecimal appLikeRev,BigDecimal totalPaidUsers,int affsCount,int campaignCount,int minRevCount) {
 	   this.totalAdRev=totalAdRev;
 	   this.affsCount=affsCount;
 	   this.campaignCount=campaignCount;
 	   this.offerwallRev=offerwallRev;
 	   this.totalPaidUsers=totalPaidUsers; 
 	   this.minRevCount=minRevCount;
+	   this.appLikeRev=appLikeRev;
 	}
 	public BigDecimal getAvrTotalAdRev(){
 		if(affsCount!=0){
@@ -39,6 +42,15 @@ public class CampaignSearchResult {
 		}
 		
 	}
+	
+	public BigDecimal getAvrAppLikeRev(){
+		if(affsCount!=0){
+		  return getAppLikeRev().divide(new BigDecimal(getAffsCount()),4, BigDecimal.ROUND_HALF_EVEN);
+		}else{
+		  return BigDecimal.ZERO;	
+		}		
+	}	
+	
 	public BigDecimal getAvrTotalPaidUsers(){
 		if(affsCount!=0){
 		  return totalPaidUsers.divide(new BigDecimal(getAffsCount()),4, BigDecimal.ROUND_HALF_EVEN);
@@ -66,7 +78,10 @@ public class CampaignSearchResult {
 		return offerwallRev;
 	}
 
-
+	public BigDecimal getAppLikeRev() {
+		return appLikeRev;
+	}
+	
 	public String getGroupName() {
 		return groupName;
 	}

@@ -10,23 +10,16 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import com.google.appengine.api.datastore.Cursor;
 import com.google.appengine.api.datastore.DatastoreService;
-import com.google.appengine.api.datastore.DatastoreServiceConfig;
-import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.FetchOptions;
 import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
-import com.google.appengine.api.datastore.Query.Filter;
-import com.google.appengine.api.datastore.Query.FilterOperator;
-import com.google.appengine.api.datastore.Query.FilterPredicate;
 import com.google.appengine.api.datastore.QueryResultList;
-import com.google.appengine.api.datastore.ReadPolicy;
 import com.luee.wally.admin.repository.AbstractRepository;
 import com.luee.wally.admin.repository.AffsRepository;
 import com.luee.wally.admin.repository.CloudStorageRepository;
@@ -42,8 +35,8 @@ public class AffsSearchService extends AbstractService{
 	private final Logger logger = Logger.getLogger(AffsSearchService.class.getName());
 
 
-	private Collection<String> searchHeader = Arrays.asList("experiment", "count", "sum_total_ad_rev", "avr_total_ad_rev",
-			"sum_offerwall_rev", "avr_offerwall_rev","paid_users_total","avr_paid_users");
+	private Collection<String> SEARCH_HEADER = Arrays.asList("experiment", "count", "sum_total_ad_rev", "avr_total_ad_rev",
+			"sum_offerwall_rev", "avr_offerwall_rev","sum_applike_rev_total","avr_applike_rev","paid_users_total","avr_paid_users");
 
 	private Collection<String> exportHeader = Arrays.asList("user_guid","date","experiment","offerwall_rev","total_ad_rev");
 	
@@ -86,7 +79,7 @@ public class AffsSearchService extends AbstractService{
 		// set header
 		writer.append(form.toString() + "\n");
 		// field names
-		convertHeaderToCSV(writer, searchHeader);
+		convertHeaderToCSV(writer, SEARCH_HEADER);
 		// set content
 		convertContentToCSV(writer, content);
 
@@ -104,8 +97,11 @@ public class AffsSearchService extends AbstractService{
 			line.add(item.getOfferwallRev().setScale(4, BigDecimal.ROUND_HALF_EVEN).toString());
 			line.add(item.getAvrOfferwallRev().setScale(4, BigDecimal.ROUND_HALF_EVEN).toString());
 			
+			line.add(item.getAppLikeRev().setScale(4, BigDecimal.ROUND_HALF_EVEN).toString());
+			line.add(item.getAvrAppLikeRev().setScale(4, BigDecimal.ROUND_HALF_EVEN).toString());
+			
 			line.add(item.getTotalPaidUsersUSD().setScale(4, BigDecimal.ROUND_HALF_EVEN).toString());
-			line.add(item.getAvrTotalPaidUsersUSD().setScale(4, BigDecimal.ROUND_HALF_EVEN).toString());
+			line.add(item.getAvrTotalPaidUsersUSD().setScale(4, BigDecimal.ROUND_HALF_EVEN).toString());			
 			
 			GenerateCSV.INSTANCE.writeLine(writer, line);
 			line.clear();
@@ -302,6 +298,7 @@ public class AffsSearchService extends AbstractService{
 		BigDecimal totalAdRev = BigDecimal.ZERO;
 		BigDecimal offerwallRev = BigDecimal.ZERO;
 		BigDecimal totalPaidUsers = BigDecimal.ZERO;
+		BigDecimal appLikeRev = BigDecimal.ZERO;
 		
 		Collection<String> userGuids=new HashSet<>();
 		int count = 0;
@@ -324,6 +321,10 @@ public class AffsSearchService extends AbstractService{
 						.valueOf(e.getProperty("offerwall_rev") == null ? 0 : (double) e.getProperty("offerwall_rev"));
 				offerwallRev = offerwallRev.add(_offerwallRev);
 				
+				BigDecimal _appLikeRev = BigDecimal
+						.valueOf(e.getProperty("applike_rev") == null ? 0 : (double) e.getProperty("applike_rev"));
+				appLikeRev = appLikeRev.add(_appLikeRev);
+				
 				userGuids.add((String)e.getProperty("user_guid"));
 			}
 			
@@ -338,7 +339,7 @@ public class AffsSearchService extends AbstractService{
 			cursor = results.getCursor();
 		} while (results.size() > 0);
 
-		return new AffsSearchResult(experiment, totalAdRev, offerwallRev,totalPaidUsers,count);
+		return new AffsSearchResult(experiment, totalAdRev, offerwallRev,appLikeRev,totalPaidUsers,count);
 
 	}
 
@@ -355,6 +356,8 @@ public class AffsSearchService extends AbstractService{
 			BigDecimal totalAdRev = BigDecimal.ZERO;
 			BigDecimal offerwallRev = BigDecimal.ZERO;
 			BigDecimal totalPaidUsers = BigDecimal.ZERO;
+			BigDecimal appLikeRev = BigDecimal.ZERO;
+			
 			BigDecimal minRevThres=BigDecimal.valueOf(minRevThreshold==null?0.0:minRevThreshold);
 			int count = 0;
 			int minRevCount=0;
@@ -374,6 +377,10 @@ public class AffsSearchService extends AbstractService{
 					BigDecimal _offerwallRev = BigDecimal
 							.valueOf(e.getProperty("offerwall_rev") == null ? 0 : (double) e.getProperty("offerwall_rev"));
 					offerwallRev = offerwallRev.add(_offerwallRev);	
+
+					BigDecimal _appLikeRev = BigDecimal
+							.valueOf(e.getProperty("applike_rev") == null ? 0 : (double) e.getProperty("applike_rev"));
+					appLikeRev = offerwallRev.add(_appLikeRev);	
 					
 					userGuids.add((String)e.getProperty("user_guid"));
 					
@@ -394,7 +401,7 @@ public class AffsSearchService extends AbstractService{
 				
 				count+=results.size();
 			}
-		return new AffsSearchResult(null, totalAdRev, offerwallRev,totalPaidUsers,count,minRevCount);
+		return new AffsSearchResult(null, totalAdRev, offerwallRev,appLikeRev,totalPaidUsers,count,minRevCount);
 	}
 	
 	public void removeExperiment(String userGuid,String experiment){

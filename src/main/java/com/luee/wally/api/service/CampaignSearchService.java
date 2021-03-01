@@ -28,12 +28,12 @@ import com.luee.wally.command.CampaignSearchForm;
 import com.luee.wally.command.CampaignSearchResult;
 import com.luee.wally.constants.Constants;
 
-public class CampaignSearchService {
+public class CampaignSearchService extends AbstractService{
 	private final Logger logger = Logger.getLogger(CampaignSearchService.class.getName());
 	
 	
-	private Collection<String> header = Arrays.asList("*","campaign_count", "affs_count", "sum_total_ad_rev", "avr_total_ad_rev",
-			"sum_offerwall_rev", "avr_offerwall_rev","paid_users_total","avr_paid_users","min_rev_count");
+	private Collection<String> SEARCH_HEADER = Arrays.asList("*","campaign_count", "affs_count", "sum_total_ad_rev", "avr_total_ad_rev",
+			"sum_offerwall_rev", "avr_offerwall_rev","sum_applike_rev_total","avr_applike_rev","paid_users_total","avr_paid_users","min_rev_count");
 
 	public void createFile(Writer writer, CampaignSearchForm form, Collection<CampaignSearchResult> content)
 			throws IOException {
@@ -41,7 +41,7 @@ public class CampaignSearchService {
 		// set header
 		writer.append(form.toString() + "\n");
 		// field names
-		convertHeaderToCSV(writer, header);
+		convertHeaderToCSV(writer, SEARCH_HEADER);
 		// set content
 		convertContentToCSV(writer, content);
 
@@ -60,6 +60,9 @@ public class CampaignSearchService {
 			line.add(item.getOfferwallRev().setScale(4, BigDecimal.ROUND_HALF_EVEN).toString());
 			line.add(item.getAvrOfferwallRev().setScale(4, BigDecimal.ROUND_HALF_EVEN).toString());
 
+			line.add(item.getAppLikeRev().setScale(4, BigDecimal.ROUND_HALF_EVEN).toString());
+			line.add(item.getAvrAppLikeRev().setScale(4, BigDecimal.ROUND_HALF_EVEN).toString());
+			
 			line.add(item.getTotalPaidUsersUSD().setScale(4, BigDecimal.ROUND_HALF_EVEN).toString());
 			line.add(item.getAvrTotalPaidUsersUSD().setScale(4, BigDecimal.ROUND_HALF_EVEN).toString());
 			
@@ -121,6 +124,7 @@ public class CampaignSearchService {
 		 BigDecimal totalAdRev = BigDecimal.ZERO;
 		 BigDecimal offerwallRev = BigDecimal.ZERO;
 		 BigDecimal totalPaidUsers = BigDecimal.ZERO;		 
+		 BigDecimal appLikeRev = BigDecimal.ZERO;
 		 
  		 int affsCount=0,campaignCount  = 0;
 		 int minRevCount=0;
@@ -145,6 +149,7 @@ public class CampaignSearchService {
 	    		    AffsSearchResult affsSearchResult= affsSearchService.processAffsSearch(minRevThreshold, affsIds,startDate,endDate);	 								
 					totalAdRev = totalAdRev.add(affsSearchResult.getTotalAdRev());					
 					offerwallRev = offerwallRev.add(affsSearchResult.getOfferwallRev());
+					appLikeRev=appLikeRev.add(affsSearchResult.getAppLikeRev());
 					totalPaidUsers =totalPaidUsers.add(affsSearchResult.getTotalPaidUsers()); 
 					affsCount+=affsSearchResult.getCount();		
 					minRevCount+=affsSearchResult.getMinRevCount();
@@ -154,20 +159,7 @@ public class CampaignSearchService {
 		     cursor=results.getCursor();		    		    	
 	     }while(results.size()>0);
 		 
-		 return new CampaignSearchResult(totalAdRev, offerwallRev,totalPaidUsers,affsCount,campaignCount,minRevCount);
-	}
-	
-	private DatastoreService createDatastoreService(){
-		 double deadline = 15.0; //seconds
-		 // Construct a read policy for eventual consistency
-		 ReadPolicy policy = new ReadPolicy(ReadPolicy.Consistency.EVENTUAL);
-
-		// Set both the read policy and the call deadline
-		 DatastoreServiceConfig datastoreConfig =
-		    DatastoreServiceConfig.Builder.withReadPolicy(policy).deadline(deadline);
-
-		// Get Datastore service with the given configuration
-		 return DatastoreServiceFactory.getDatastoreService(datastoreConfig);
+		 return new CampaignSearchResult(totalAdRev, offerwallRev,appLikeRev,totalPaidUsers,affsCount,campaignCount,minRevCount);
 	}
 	
 	private Query createCampaignQuery(Date startDate,Date endDate,String country,String packageName,String addNetwork,String campaignId,String sourceId){

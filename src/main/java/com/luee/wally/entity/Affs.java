@@ -11,9 +11,11 @@ public class Affs {
 	private String experiment;
 	private double offerwallRev;
 	private double totalAdRev;
+	private double applikeRev;
 	
 	public static Affs valueOf(Entity entity) {
 		Affs affs=new Affs();
+		affs.setApplikeRev(entity.getProperty("applike_rev") == null ? 0 : (double) entity.getProperty("applike_rev"));
 		affs.setDate((Date) entity.getProperty("date"));
 		affs.setTotalAdRev(entity.getProperty("total_ad_rev") == null ? 0 : (double) entity.getProperty("total_ad_rev"));
 		affs.setExperiment((String) entity.getProperty("experiment"));
@@ -52,7 +54,13 @@ public class Affs {
 	public void setTotalAdRev(double totalAdRev) {
 		this.totalAdRev = totalAdRev;
 	}
+	public double getApplikeRev() {
+		return applikeRev;
+	}
 	
+	public void setApplikeRev(double applikeRev) {
+		this.applikeRev = applikeRev;
+	}
 	
 	
 	

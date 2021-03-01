@@ -322,8 +322,8 @@ public class PaidUsersService {
 	
 	public void checkVPNUsageAsync(String key,String ipAddress,String countryCode) throws IOException{
 		
-		String url=String.format(Constants.VPN_SERVICE_URL,ipAddress,countryCode);
-		String result = ConnectionMgr.INSTANCE.getJSON(url);
+		String url=String.format(Constants.VPN_SERVICE_URL,ipAddress,countryCode);		
+		String result = ConnectionMgr.INSTANCE.getJSON(url,null);
 		
 		Map<String, Object> map = JSONUtils.readObject(result, Map.class);
 		Boolean isUsingVpn=(Boolean)map.get("isUsingVpn");

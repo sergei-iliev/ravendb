@@ -12,16 +12,19 @@ public class AffsSearchResult {
 	
 	private final BigDecimal offerwallRev;
 	
+	private final BigDecimal appLikeRev;
+	
 	private  BigDecimal rateValue;//EUR to USD rate
 	
 	private String experiment;
 	
 	private int minRevCount;
 	
-	public AffsSearchResult(String experiment,BigDecimal totalAdRev,BigDecimal offerwallRev,BigDecimal totalPaidUsers,int count) {
-	    this(experiment,totalAdRev,offerwallRev, totalPaidUsers, count,0);
+	public AffsSearchResult(String experiment,BigDecimal totalAdRev,BigDecimal offerwallRev,BigDecimal appLikeRev,BigDecimal totalPaidUsers,int count) {
+	    this(experiment,totalAdRev,offerwallRev,appLikeRev, totalPaidUsers, count,0);
 	}
-	public AffsSearchResult(String experiment,BigDecimal totalAdRev,BigDecimal offerwallRev,BigDecimal totalPaidUsers,int count,int minRevCount) {
+	public AffsSearchResult(String experiment,BigDecimal totalAdRev,BigDecimal offerwallRev,BigDecimal appLikeRev,BigDecimal totalPaidUsers,int count,int minRevCount) {
+	   this.appLikeRev=appLikeRev;
 	   this.experiment=experiment;
 	   this.totalAdRev=totalAdRev;
 	   this.count=count;
@@ -45,7 +48,14 @@ public class AffsSearchResult {
 		}
 		
 	}
-	
+	public BigDecimal getAvrAppLikeRev(){
+		if(count!=0){
+		  return getAppLikeRev().divide(new BigDecimal(getCount()),4, BigDecimal.ROUND_HALF_EVEN);
+		}else{
+		  return BigDecimal.ZERO;	
+		}
+		
+	}	
 	public BigDecimal getAvrTotalPaidUsers(){
 		if(count!=0){
 		  return totalPaidUsers.divide(new BigDecimal(getCount()),4, BigDecimal.ROUND_HALF_EVEN);
@@ -72,6 +82,10 @@ public class AffsSearchResult {
 		return count;
 	}
 
+	public BigDecimal getAppLikeRev() {
+		return appLikeRev;
+	}
+	
 	public BigDecimal getOfferwallRev() {
 		return offerwallRev;
 	}
