@@ -1,0 +1,45 @@
+{
+	"info": {
+		"name": "Firebase requests",
+		"_postman_id": "81fe3221-c0d6-ec9a-02d3-a64b5c7a4094",
+		"description": "",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "firebase open url notification",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "key=AAAAPdF2cGU:APA91bEeVRhtVihE8a6TrpDanf04JV9iLXtCRMTHUja4vXvptWRvxy18bO6lKTUpN1cOBvnk0ao1HoV2agL7tDTQVp2eJdVB2WB6RUWBvDIyvTvu8lp71VOeDmmKRouv2Gj4zq0jeGhyxDV5eoOBqpoiPB6l3IJacA"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"to\": \"esRNl6UhTlyU0c_PLAoWKB:APA91bFYeG_heTPcZmzRcvLZtZcIVoRjRtYC0SL1Ix0io5vZ37A7m9yzqu5pH-IQVFVzIs7IvZJHM3T7kw77EkCOHqAVUZIQAdJUMm3mVDgFbloyiUbZkTMMSXPImfN_Fa1NhorGe3Wi\",\n     \"data\": {\n        \"title\":\"Congratulations!\",\n        \"text\":\"We have just sent you your payout!\",\n        \"icon_url\": \"https://lh3.googleusercontent.com/NZMR39qnpQf4uqwJQ0CYUGenuyrDqtLiaKhKXpLp2-Hp9OiPIbJyDGfiqRez2vymCwtE=w75\",\n        \"open_url\":\"https://luee-wally-dev.appspot.com/payout_notice.html\",\n        \"notification_type\":\"open_webview_notification\"\n     }\n}"
+				},
+				"url": {
+					"raw": "https://fcm.googleapis.com/fcm/send",
+					"protocol": "https",
+					"host": [
+						"fcm",
+						"googleapis",
+						"com"
+					],
+					"path": [
+						"fcm",
+						"send"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		}
+	]
+}

@@ -380,7 +380,7 @@ public class AffsSearchService extends AbstractService{
 
 					BigDecimal _appLikeRev = BigDecimal
 							.valueOf(e.getProperty("applike_rev") == null ? 0 : (double) e.getProperty("applike_rev"));
-					appLikeRev = offerwallRev.add(_appLikeRev);	
+					appLikeRev = appLikeRev.add(_appLikeRev);	
 					
 					userGuids.add((String)e.getProperty("user_guid"));
 					
