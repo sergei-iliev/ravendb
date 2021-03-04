@@ -11,9 +11,9 @@ public class FirebaseNotificationEventVO implements ValueObject {
 	public FirebaseNotificationEventVO(String to,String title,String text,String iconUrl,String openUrl) {
 	   this.to=to;
 	   data.put("title",title);
-	   data.put("text",title);
-	   data.put("iconUrl",iconUrl);
-	   data.put("openUrl",openUrl);
+	   data.put("text",text);
+	   data.put("icon_url",iconUrl);
+	   data.put("open_url",openUrl);
 	   data.put("notification_type","open_webview_notification");
 	}
 

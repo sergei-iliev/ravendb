@@ -70,8 +70,7 @@ public class AffsSearchService extends AbstractService{
 		
 		Map<String,String> requestHeader=new HashMap<String,String>();
 		requestHeader.put("Content-Type", "application/json");
-		requestHeader.put("Authorization", "key="+firebaseAppKey);
-		
+		requestHeader.put("Authorization", "key="+firebaseAppKey);		
 		return ConnectionMgr.INSTANCE.postJSON(Constants.FIREBASE_NOTIFICATION_URL, json, requestHeader);				
 		
 	}
