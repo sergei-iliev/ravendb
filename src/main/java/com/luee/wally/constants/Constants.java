@@ -1,5 +1,7 @@
 package com.luee.wally.constants;
 
+import com.luee.wally.api.service.AffsSearchService;
+
 public interface Constants {
 
 	//public static final String clientId = "AafeAthS3PRG_dkpJPVTkCgVc-O9pQ6o2PldSIOceWsn7nIm0H404DHDFg4svXJa63Pe8OtM55ySzppG";
@@ -81,6 +83,8 @@ public interface Constants {
 	
 	public static final String VPN_SERVICE_URL="https://ps-forwarding-server.appspot.com/c/s?ip=%s&country=%s";
 	
+	/******************Firebase*******************************/
+	public static final String FIREBASE_NOTIFICATION_URL="https://fcm.googleapis.com/fcm/send";
 	
 	
 }

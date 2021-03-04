@@ -20,6 +20,7 @@ import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 import com.luee.wally.admin.repository.PaidUsersRepository;
 import com.luee.wally.admin.repository.UserRepository;
 import com.luee.wally.api.ConnectionMgr;
+import com.luee.wally.api.service.AffsSearchService;
 import com.luee.wally.api.service.PaidUsersService;
 import com.luee.wally.api.service.impex.ExportService;
 import com.luee.wally.command.PaidUserGroupByForm;
@@ -49,6 +50,15 @@ public class PayedUserTest {
 		helper.tearDown();
 	}
 	
+	@Test
+	public void notifyFirebaseTest()throws Exception{		
+		TestDatabase.INSTANCE.generateDB();
+		AffsSearchService affsSearchService=new AffsSearchService();
+		affsSearchService.notifyPaidUserFirebase("dddd2675-a072-4b6b-ab66-cb599a29147d","Hi man", "you got it all fine",
+				"https://lh3.googleusercontent.com/NZMR39qnpQf4uqwJQ0CYUGenuyrDqtLiaKhKXpLp2-Hp9OiPIbJyDGfiqRez2vymCwtE=w75",
+				"https://luee-wally-dev.appspot.com/payout_notice.html");
+		
+	}
 	@Test
 	public void searchPayedUserGroupByLocaleTest(){				
 		TestDatabase.INSTANCE.generateDB();

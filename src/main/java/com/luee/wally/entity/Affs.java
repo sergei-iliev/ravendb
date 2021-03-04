@@ -12,6 +12,7 @@ public class Affs {
 	private double offerwallRev;
 	private double totalAdRev;
 	private double applikeRev;
+	private String firebaseInstanceId;
 	
 	public static Affs valueOf(Entity entity) {
 		Affs affs=new Affs();
@@ -20,10 +21,17 @@ public class Affs {
 		affs.setTotalAdRev(entity.getProperty("total_ad_rev") == null ? 0 : (double) entity.getProperty("total_ad_rev"));
 		affs.setExperiment((String) entity.getProperty("experiment"));
 		affs.setOfferwallRev(entity.getProperty("offerwall_rev") == null ? 0 : (double) entity.getProperty("offerwall_rev"));
-		affs.setUserGuid((String)entity.getProperty("user_guid"));		
+		affs.setUserGuid((String)entity.getProperty("user_guid"));
+		affs.setFirebaseInstanceId((String)entity.getProperty("firebase_instance_id"));
 		return affs;
 	}
 	
+	public String getFirebaseInstanceId() {
+		return firebaseInstanceId;
+	}
+	public void setFirebaseInstanceId(String firebaseInstanceId) {
+		this.firebaseInstanceId = firebaseInstanceId;
+	}
 	public String getUserGuid() {
 		return userGuid;
 	}

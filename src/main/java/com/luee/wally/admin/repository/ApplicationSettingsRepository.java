@@ -64,6 +64,8 @@ public class ApplicationSettingsRepository extends AbstractRepository {
 	public static final String PAYPAL_MERCHANT_API_SIGNATURE="PAYPAL_MERCHANT_API_SIGNATURE";
 
 	
+	public static final String FIREBASE_APP_KEY="FIREBASE_APP_KEY";
+	
 	
 	public Map<String, String> getApplicationSettings() {
 		Map<String, String> map = new HashMap<>();

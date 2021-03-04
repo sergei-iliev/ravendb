@@ -15,6 +15,7 @@ import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.datastore.Text;
+import com.luee.wally.admin.repository.ApplicationSettingsRepository;
 import com.luee.wally.command.payment.RuleStatusType;
 import com.luee.wally.entity.User;
 
@@ -178,7 +179,7 @@ public enum TestDatabase {
 		   entity.setProperty("experiment","surprise_update|dismiss_notif|gradual_game_release|game_coins_formula|balance_formula|threshold_20");
 		   entity.setProperty("country_code","US");
 		   entity.setProperty("package_name","com.moregames.makemoney");
-		   //entity.setProperty("gaid","c292bc0e-7eaf-4452-896f-46ffba6b229e");
+		   entity.setProperty("firebase_instance_id","eJLuSkXoQC2uSQ37Ctob1P:APA91bE7yoxor_SWL26cMe6W3ewOuQlDdFb6mA8SCLVP6z-WZ_PDENNoO7inVDMzxhoY7U4Oit1VnyBjWtEn1xaF_arPtlakgqWmDu89jkKNVeySWjfEzhf6vkezF1RfsOKKpLSs26q7");
 		   entity.setProperty("user_guid","cccc1675-a072-4b6b-ab66-cb599a291BAA");
 		   entity.setProperty("email","sergei.iliev@gmail.com");
 		   ds.put(entity);
@@ -189,7 +190,7 @@ public enum TestDatabase {
 		   entity.setProperty("experiment","surprise_update|dismiss_notif|gradual_game_release|game_coins_formula|balance_formula|threshold_20");
 		   entity.setProperty("country_code","US");
 		   entity.setProperty("package_name","com.moregames.makemoney");
-		   //entity.setProperty("gaid","c292bc0e-7eaf-4452-896f-46ffba6b229e");
+		   entity.setProperty("firebase_instance_id","eJLuSkXoQC2uSQ37Ctob1P:APA91bE7yoxor_SWL26cMe6W3ewOuQlDdFb6mA8SCLVP6z-WZ_PDENNoO7inVDMzxhoY7U4Oit1VnyBjWtEn1xaF_arPtlakgqWmDu89jkKNVeySWjfEzhf6vkezF1RfsOKKpLSs26q7");
 		   entity.setProperty("user_guid","bbbb2675-a072-4b6b-ab66-cb599a29147d");
 		   ds.put(entity);
 
@@ -198,6 +199,7 @@ public enum TestDatabase {
 		   entity.setProperty("experiment","surprise_update|dismiss_notif|gradual_game_release|game_coins_formula|balance_formula|threshold_20");
 		   entity.setProperty("country_code","US");
 		   entity.setProperty("package_name","com.moregames.makemoney");		   
+		   entity.setProperty("firebase_instance_id","eJLuSkXoQC2uSQ37Ctob1P:APA91bE7yoxor_SWL26cMe6W3ewOuQlDdFb6mA8SCLVP6z-WZ_PDENNoO7inVDMzxhoY7U4Oit1VnyBjWtEn1xaF_arPtlakgqWmDu89jkKNVeySWjfEzhf6vkezF1RfsOKKpLSs26q7");
 		   entity.setProperty("user_guid","dddd2675-a072-4b6b-ab66-cb599a29147d");
 		   ds.put(entity);
 		   
@@ -205,6 +207,7 @@ public enum TestDatabase {
 		   entity.setProperty("date", new Date());
 		   entity.setProperty("experiment","surprise_update|dismiss_notif|gradual_game_release|game_coins_formula|balance_formula|threshold_20");
 		   entity.setProperty("country_code","US");
+		   entity.setProperty("firebase_instance_id","eJLuSkXoQC2uSQ37Ctob1P:APA91bE7yoxor_SWL26cMe6W3ewOuQlDdFb6mA8SCLVP6z-WZ_PDENNoO7inVDMzxhoY7U4Oit1VnyBjWtEn1xaF_arPtlakgqWmDu89jkKNVeySWjfEzhf6vkezF1RfsOKKpLSs26q7");
 		   entity.setProperty("package_name","com.moregames.makemoney");		   
 		   entity.setProperty("user_guid","eeee2675-a072-4b6b-ab66-cb599a29147d");
 		   ds.put(entity);
@@ -473,6 +476,11 @@ public enum TestDatabase {
 		entity.setIndexedProperty("name","SUPPORT_EMAIL");
 		entity.setIndexedProperty("value","sergei.iliev@gmail.com");
 		ds.put(entity);	
+		
+		entity = new Entity("application_settings");	
+		entity.setIndexedProperty("name",ApplicationSettingsRepository.FIREBASE_APP_KEY);
+		entity.setIndexedProperty("value","AAAAPdF2cGU:APA91bEeVRhtVihE8a6TrpDanf04JV9iLXtCRMTHUja4vXvptWRvxy18bO6lKTUpN1cOBvnk0ao1HoV2agL7tDTQVp2eJdVB2WB6RUWBvDIyvTvu8lp71VOeDmmKRouv2Gj4zq0jeGhyxDV5eoOBqpoiPB6l3IJacA");
+		ds.put(entity);
 	}
 	
 	private void createEmailTemplates(){

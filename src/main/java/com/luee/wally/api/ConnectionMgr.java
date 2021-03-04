@@ -16,10 +16,11 @@ import com.luee.wally.constants.Constants;
 public enum ConnectionMgr {
 INSTANCE;
 
-	public  String _postJSON(String _url,String content) throws MalformedURLException,IOException  {
-		return "{}";
-	}
-	public  String postJSON(String _url,String content) throws MalformedURLException,IOException  {
+//	public  String _postJSON(String _url,String content) throws MalformedURLException,IOException  {
+//		return "{}";
+//	}
+	
+	public  String postJSON(String _url,String content,Map<String,String> requestHeader) throws MalformedURLException,IOException  {
 		URL url = new URL(_url);
 		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 		
@@ -27,9 +28,11 @@ INSTANCE;
 		
 		// Set HTTP request method.
 		conn.setRequestMethod("POST");	
-		conn.setRequestProperty("User-Agent", Constants.AGENT_NAME);		
-		conn.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
-		conn.setRequestProperty("Accept", "application/json");
+		if(requestHeader!=null){
+			requestHeader.entrySet().forEach(e->{	
+			conn.setRequestProperty(e.getKey(), e.getValue());
+		  });
+		}
 		conn.setRequestProperty( "Content-Length", Integer.toString( content.length()));
 		conn.setUseCaches( false );
 
@@ -65,6 +68,13 @@ INSTANCE;
 		  }
 		}
 		return response.toString();
+	}
+	public  String postJSON(String _url,String content) throws MalformedURLException,IOException  {
+		Map<String,String> requestHeader=new HashMap<>();
+		requestHeader.put("User-Agent", Constants.AGENT_NAME);		
+		requestHeader.put("Content-Type", "application/json; charset=UTF-8");
+		requestHeader.put("Accept", "application/json");
+		return this.postJSON(_url, content, requestHeader);
 	}
 	public  String getJSON(String urlStr,Map<String,String> headers) throws MalformedURLException,IOException  {
 		URL url = new URL(urlStr);

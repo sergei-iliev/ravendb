@@ -7,12 +7,16 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.appengine.api.datastore.Cursor;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.Entity;
@@ -22,14 +26,19 @@ import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.QueryResultList;
 import com.luee.wally.admin.repository.AbstractRepository;
 import com.luee.wally.admin.repository.AffsRepository;
+import com.luee.wally.admin.repository.ApplicationSettingsRepository;
 import com.luee.wally.admin.repository.CloudStorageRepository;
 import com.luee.wally.admin.repository.PaidUsersRepository;
+import com.luee.wally.api.ConnectionMgr;
 import com.luee.wally.api.service.impex.GenerateCSV;
 import com.luee.wally.command.AffsSearchForm;
 import com.luee.wally.command.AffsSearchResult;
 import com.luee.wally.command.Attachment;
+import com.luee.wally.constants.Constants;
 import com.luee.wally.entity.Affs;
 import com.luee.wally.entity.PaidUser;
+import com.luee.wally.json.FirebaseNotificationEventVO;
+import com.luee.wally.json.JSONUtils;
 
 public class AffsSearchService extends AbstractService{
 	private final Logger logger = Logger.getLogger(AffsSearchService.class.getName());
@@ -38,9 +47,34 @@ public class AffsSearchService extends AbstractService{
 	private Collection<String> SEARCH_HEADER = Arrays.asList("experiment", "count", "sum_total_ad_rev", "avr_total_ad_rev",
 			"sum_offerwall_rev", "avr_offerwall_rev","sum_applike_rev_total","avr_applike_rev","paid_users_total","avr_paid_users");
 
-	private Collection<String> exportHeader = Arrays.asList("user_guid","date","experiment","offerwall_rev","total_ad_rev");
+	private Collection<String> EXPORT_HEADER = Arrays.asList("user_guid","date","experiment","offerwall_rev","total_ad_rev");
 	
 	private AffsRepository affsRepository=new AffsRepository();
+	
+	
+	
+	public String notifyPaidUserFirebase(String userGuid,String title,String text,String iconUrl,String openUrl) throws IOException,JsonProcessingException{
+		Collection<Entity> entities= affsRepository.findAffsByUserGuids(Collections.singleton(userGuid));
+		if(entities.size()!=1){
+			throw new IllegalStateException("There is 0 or more then 1 record in Affs table for user guid : "+userGuid);
+		}
+		Affs affs=Affs.valueOf(entities.iterator().next());
+		String to=affs.getFirebaseInstanceId();
+		
+		ApplicationSettingsService applicationSettingsService=new ApplicationSettingsService();		
+		String firebaseAppKey=applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.FIREBASE_APP_KEY);
+		
+		//data
+		FirebaseNotificationEventVO firebaseNotificationEvent=new FirebaseNotificationEventVO(to, title, text, iconUrl, openUrl);
+		String json=JSONUtils.writeObject(firebaseNotificationEvent,FirebaseNotificationEventVO.class);
+		
+		Map<String,String> requestHeader=new HashMap<String,String>();
+		requestHeader.put("Content-Type", "application/json");
+		requestHeader.put("Authorization", "key="+firebaseAppKey);
+		
+		return ConnectionMgr.INSTANCE.postJSON(Constants.FIREBASE_NOTIFICATION_URL, json, requestHeader);				
+		
+	}
 	
 	public void createExportFile(Writer writer, AffsSearchForm form, Collection<Affs> content)
 			throws IOException {
@@ -48,7 +82,7 @@ public class AffsSearchService extends AbstractService{
 		// set header
 		writer.append(form.toString() + "\n");
 		// field names
-		convertHeaderToCSV(writer, exportHeader);
+		convertHeaderToCSV(writer, EXPORT_HEADER);
 		// set content
 		convertContentExportToCSV(writer, content);
 
