@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -52,7 +53,8 @@ import com.tangocard.raas.models.OrderModel;
 public class PaymentService extends AbstractService {
 
 	private final Logger logger = Logger.getLogger(PaymentService.class.getName());
-
+	private PaymentRepository paymentRepository = new PaymentRepository();
+	
 	public Collection<String> getDefaultPaymentTypes() {
 		return Arrays.asList("PayPal", "Amazon", "Google Play");
 	}
@@ -61,22 +63,20 @@ public class PaymentService extends AbstractService {
 		return Arrays.asList("USD", "EUR", "CAD", "AUD", "GBP");
 	}
 
-	public void editEmail(String email, String key) {
-		PaymentRepository paymentRepository = new PaymentRepository();
+	public void editEmail(String email, String key) {		
 		Entity entity = paymentRepository.getRedeemingRequestsByKey(key);
 		entity.setProperty("email", email);
 		paymentRepository.save(entity);
 	}
 
 	public void editPayPalAccount(String paypal, String key) {
-		PaymentRepository paymentRepository = new PaymentRepository();
+		
 		Entity entity = paymentRepository.getRedeemingRequestsByKey(key);
 		entity.setProperty("paypal_account", paypal);
 		paymentRepository.save(entity);
 	}
 
-	public void validatePayPalAccount(String key) throws IOException {
-		PaymentRepository paymentRepository = new PaymentRepository();
+	public void validatePayPalAccount(String key) throws IOException {		
 		Entity entity = paymentRepository.getRedeemingRequestsByKey(key);
 
 		RedeemingRequests redeemingRequests = RedeemingRequests.valueOf(entity);
@@ -124,7 +124,11 @@ public class PaymentService extends AbstractService {
 		mailService.sendMailGrid(mail);
 
 	}
-
+	
+	public Collection<RedeemingRequests> getRemovedRedeemingRequests(Date startDate,Date endDate,String packageName,boolean paid){
+		return paymentRepository.findEligibleUsers("Removed",startDate, endDate, packageName,paid);		
+	}
+	
 	/*
 	 * Don’t allow any attempt to pay: 1. More than 30 EUR (or an equivalent
 	 * amount in a different currency) within the same transaction. 2. More than
@@ -144,8 +148,7 @@ public class PaymentService extends AbstractService {
 		   logger.log(Level.SEVERE, "Block payment amount : " + form.getAmount());
 		   throw new Exception("Block payment amount : " + form.getAmount()); 
 		}*/
-		
-		PaymentRepository paymentRepository = new PaymentRepository();
+				
 		// convert currency to EUR
 		BigDecimal eurAmount;
 		try {
@@ -184,8 +187,7 @@ public class PaymentService extends AbstractService {
 	 * 1.If the total amount of payments until now is above 0.45 eur (for both paypal and amazon: sum up the same email).
 	   2.If we didn’t send an email of this template to the user yet.
 	 */
-	public void sendExternalUserEmail(String payPalAccount,String email){
-		PaymentRepository paymentRepository = new PaymentRepository();
+	public void sendExternalUserEmail(String payPalAccount,String email){		
 	  //1.
 		Collection<Entity> entities = paymentRepository.getExternalPaidUserByEmail(
 				(payPalAccount == null || "".equals(payPalAccount)) ? email :payPalAccount);
@@ -215,8 +217,7 @@ public class PaymentService extends AbstractService {
 		
 	}
 	public Pair<Integer,String> payExternal(PayExternalForm form) throws IOException {
-		// convert currency to EUR
-		PaymentRepository paymentRepository = new PaymentRepository();
+		// convert currency to EUR		
 		String currencyCode = form.getCurrency();
 
 		BigDecimal eurAmount;
@@ -254,7 +255,7 @@ public class PaymentService extends AbstractService {
 		PayPalService payPalService = new PayPalService();
 		InvoiceService invoiceService = new InvoiceService();
 		MailService mailService = new MailService();
-		PaymentRepository paymentRepository = new PaymentRepository();
+		
 
 		ApplicationSettingsService applicationSettingsService = new ApplicationSettingsService();
 		String toInvoiceMail = applicationSettingsService
@@ -314,8 +315,7 @@ public class PaymentService extends AbstractService {
 	/*
 	 * external/EXTERNAL user payment
 	 */
-	public Pair<Integer,String> sendGiftCard(PayExternalForm form, BigDecimal eurAmount) throws IOException {
-		PaymentRepository paymentRepository = new PaymentRepository();
+	public Pair<Integer,String> sendGiftCard(PayExternalForm form, BigDecimal eurAmount) throws IOException {		
 		GiftCardRepository giftCardRepository = new GiftCardRepository();
 
 		RedeemingRequests redeemingRequests = form.toRedeemingRequests();
@@ -352,8 +352,7 @@ public class PaymentService extends AbstractService {
 
 	}
 
-	public void sendGiftCard(String key) throws JsonProcessingException, RestResponseException {
-		PaymentRepository paymentRepository = new PaymentRepository();
+	public void sendGiftCard(String key) throws JsonProcessingException, RestResponseException {		
 		GiftCardRepository giftCardRepository = new GiftCardRepository();
 
 		Entity entity = paymentRepository.getRedeemingRequestsByKey(key);
@@ -390,8 +389,7 @@ public class PaymentService extends AbstractService {
 				order.getReferenceOrderID());
 	}
 
-	public void pay(PaidUserForm form, Entity redeemingRequests) throws Exception {
-		PaymentRepository paymentRepository = new PaymentRepository();
+	public void pay(PaidUserForm form, Entity redeemingRequests) throws Exception {		
 		/*
 		 * BigDecimal rateValue=BigDecimal.ONE;
 		 * 
@@ -411,13 +409,11 @@ public class PaymentService extends AbstractService {
 
 	}
 
-	public void saveUserPaymentRemovalReason(String key, String reason) throws EntityNotFoundException {
-		PaymentRepository paymentRepository = new PaymentRepository();
+	public void saveUserPaymentRemovalReason(String key, String reason) throws EntityNotFoundException {		
 		paymentRepository.saveUserPaymentRemovalReason(key, reason);
 	}
 
-	public Collection<RedeemingRequests> searchEligibleUsers(PaymentEligibleUserForm form) {
-		PaymentRepository paymentRepository = new PaymentRepository();
+	public Collection<RedeemingRequests> searchEligibleUsers(PaymentEligibleUserForm form) {		
 		Collection<RedeemingRequests> result = new ArrayList<RedeemingRequests>();
 		for (String type : form.getTypes()) {
 			if (form.getPackageNames().size() > 0) {

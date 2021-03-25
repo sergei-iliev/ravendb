@@ -19,10 +19,12 @@ import com.google.appengine.api.taskqueue.TaskOptions.Method;
 import com.luee.wally.admin.repository.UserRepository;
 import com.luee.wally.api.route.Controller;
 import com.luee.wally.api.service.PaidUsersService;
+import com.luee.wally.api.service.PaymentService;
 import com.luee.wally.command.PaidUserGroupByForm;
 import com.luee.wally.command.PaidUserGroupByForm.GroupByType;
 import com.luee.wally.command.PaidUserGroupByResult;
 import com.luee.wally.command.PaidUserSearchForm;
+import com.luee.wally.command.RemovedRedeemingRequestsForm;
 import com.luee.wally.command.UnremoveUserForm;
 import com.luee.wally.command.viewobject.PaidUserGroupByVO;
 import com.luee.wally.entity.RedeemingRequests;
@@ -125,7 +127,21 @@ public class PaidUsersController implements Controller {
 		paidUsersService.checkVPNUsageAsync(key, ipAddress, countryCode);
 		
 	}
-	
+	/*
+	 * list all removed redeeming requests
+	 */
+	public void removed(HttpServletRequest req, HttpServletResponse resp)throws ServletException, IOException{
+		req.setAttribute("webform",new RemovedRedeemingRequestsForm());
+		req.getRequestDispatcher("/jsp/paid_users_removed.jsp").forward(req, resp);
+	}
+	public void getRemovedRedeemingRequests(HttpServletRequest req, HttpServletResponse resp)throws ServletException, IOException{
+		RemovedRedeemingRequestsForm form=RemovedRedeemingRequestsForm.parse(req);
+		PaymentService paymentService=new PaymentService();
+		
+		req.setAttribute("entities",paymentService.getRemovedRedeemingRequests(form.getStartDate(),form.getEndDate(), form.getPackageName(), form.isPaid()));
+		req.setAttribute("webform",form);
+		req.getRequestDispatcher("/jsp/paid_users_removed.jsp").forward(req, resp);
+	}
 	public void unremove(HttpServletRequest req, HttpServletResponse resp)throws ServletException, IOException{
 		UserRepository userRepository=new UserRepository();
 		Collection<Entity> entities=userRepository.findEntities("user_payments_removal_reasons",null, null);

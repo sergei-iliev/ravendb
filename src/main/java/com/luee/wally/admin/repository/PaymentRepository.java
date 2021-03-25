@@ -339,13 +339,40 @@ public class PaymentRepository extends AbstractRepository {
 		return count;
 
 	}
+	public Collection<RedeemingRequests> findEligibleUsers(String type,Date startDate, Date endDate,String packageName, boolean paid) {
+		DatastoreService ds = createDatastoreService(Consistency.EVENTUAL);
 
+		PreparedQuery pq = ds
+				.prepare(createEligibleUsersQuery(type,startDate, endDate, packageName,null, null,paid));
+
+		Collection<Entity> entities = new LinkedList<>();
+		QueryResultList<Entity> results;
+
+		Cursor cursor = null;
+
+		do {
+			FetchOptions fetchOptions;
+			if (cursor != null) {
+				fetchOptions = FetchOptions.Builder.withLimit(Constants.CURSOR_SIZE).startCursor(cursor);
+			} else {
+				fetchOptions = FetchOptions.Builder.withLimit(Constants.CURSOR_SIZE);
+			}
+
+			results = pq.asQueryResultList(fetchOptions);
+			entities.addAll(results);
+
+			cursor = results.getCursor();
+		} while (results.size() > 0);
+
+		return entities.stream().map(RedeemingRequests::valueOf).collect(Collectors.toList());
+	}
+	
 	public Collection<RedeemingRequests> findEligibleUsers(String type, Date startDate, Date endDate,
 			String packageName, String countryCode, Boolean confirmedEmail) {
 		DatastoreService ds = createDatastoreService(Consistency.EVENTUAL);
 
 		PreparedQuery pq = ds
-				.prepare(createEligibleUsersQuery(type, startDate, endDate, packageName, countryCode, confirmedEmail));
+				.prepare(createEligibleUsersQuery(type, startDate, endDate, packageName, countryCode, confirmedEmail,false));
 
 		Collection<Entity> entities = new LinkedList<>();
 		QueryResultList<Entity> results;
@@ -370,11 +397,11 @@ public class PaymentRepository extends AbstractRepository {
 	}
 
 	private Query createEligibleUsersQuery(String type, Date startDate, Date endDate, String packageName,
-			String countryCode, Boolean confirmedEmail) {
+			String countryCode, Boolean confirmedEmail,boolean paid) {
 		Query query = new Query("redeeming_requests_new");
 		Collection<Filter> predicates = new ArrayList<>();
 
-		predicates.add(new FilterPredicate("is_paid", FilterOperator.EQUAL, false));
+		predicates.add(new FilterPredicate("is_paid", FilterOperator.EQUAL, paid));
 
 		if (confirmedEmail != null) {
 			predicates.add(new FilterPredicate("confirmed_email", FilterOperator.EQUAL, confirmedEmail));

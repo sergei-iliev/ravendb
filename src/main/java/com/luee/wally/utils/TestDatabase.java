@@ -62,6 +62,7 @@ public enum TestDatabase {
 		entity=createRedeemingRequestEntity("Minko","696f-4258-baef-55b6aa6550b1","ffff2675-a072-4b6b-ab66-cb599a29147d", "1111",new Date(), "com.moregames.makemoney", "PayPal", "sergei.iliev-facilitator@gmail.com", "US");
 		entity.setProperty("ua_channel", "supersonic");
 		entity.setProperty("ip_address", "123.0.0.23");
+		entity.setProperty("type", "Removed");
 		entity.setProperty("max_rev", (double)5.8);
 		entity.setProperty("full_address", "baba tonka 6 for accson");
 		ds.put(entity);
