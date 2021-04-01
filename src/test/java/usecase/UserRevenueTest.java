@@ -91,7 +91,7 @@ public class UserRevenueTest {
 		user.setCurrencyCode("EUR");
 		user.setDate("8/13/2019");
 		
-		ExchangeRateVO exchangeRateVO= importService.getExchangeRates(user.getFormatedDate("YYYY-MM-dd"), "USD");
+		ExchangeRateVO exchangeRateVO= importService.getExchangeRates(user.getFormatedDate("YYYY-MM-dd"), "USD","EUR");
 		System.out.println(exchangeRateVO.getRates());
 		
 	}

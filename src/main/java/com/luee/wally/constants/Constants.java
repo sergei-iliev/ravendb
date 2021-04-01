@@ -86,5 +86,5 @@ public interface Constants {
 	/******************Firebase*******************************/
 	public static final String FIREBASE_NOTIFICATION_URL="https://fcm.googleapis.com/fcm/send";
 	
-	
+	public static final String EXCHANGE_RATE_API_KEY="8768a0430e6c0732effd12cb89a00cc7";
 }

@@ -38,7 +38,7 @@
 							</div>
 							<div class="form-label-group mt-3">
 							<div class="col-md-3">
-							<label>Search options</label> 
+							<label>Search options</label>
 							<div class="form-check">
 								<input class="form-check-input" type="radio"
 									name="searchOption" id="searchOption2" value="2"
@@ -48,7 +48,7 @@
 									>
 								<label class="form-check-label" for="searchOption2">
 									Email Address </label>
-							</div>							
+							</div>	
 							<div class="form-check">
 								<input class="form-check-input" type="radio"
 									name="searchOption" id="searchOption1" value="1"
@@ -57,8 +57,18 @@
 										checked
 									</c:if>
 									> <label class="form-check-label"
-									for="searchOption2"> GUID </label>
-							</div>
+									for="searchOption1"> GUID </label>
+							</div>													
+							<div class="form-check">
+								<input class="form-check-input" type="radio"
+									name="searchOption" id="searchOption3" value="3"
+									
+									<c:if test="${webform.searchOption != null&&webform.searchOption eq '3'}">
+										checked
+									</c:if>
+									> <label class="form-check-label"
+									for="searchOption3"> GAID </label>
+							</div>							
 							</div>
 							</div>							
 							<div class="form-group">

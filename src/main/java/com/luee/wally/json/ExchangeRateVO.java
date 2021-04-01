@@ -2,11 +2,15 @@ package com.luee.wally.json;
 
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class ExchangeRateVO implements ValueObject {
 	private Map<String,Double> rates;
 	private String base;
 	private String date;
-
+	private boolean success;
+	
 	// Getter Methods
 
 	public Map<String,Double> getRates() {
@@ -35,4 +39,10 @@ public class ExchangeRateVO implements ValueObject {
 		this.date = date;
 	}
 
+	public boolean isSuccess() {
+		return success;
+	}
+	public void setSuccess(boolean success) {
+		this.success = success;
+	}
 }

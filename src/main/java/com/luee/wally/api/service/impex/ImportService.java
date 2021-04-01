@@ -122,11 +122,11 @@ public class ImportService extends AbstractService{
 		}
 	}
 	public ExchangeRateVO getExchangeRates(String date,String currency)throws Exception{
-		String json=ConnectionMgr.INSTANCE.getJSON("https://api.exchangeratesapi.io/"+date+"?base="+currency);
+		String json=ConnectionMgr.INSTANCE.getJSON("https://api.exchangeratesapi.io/v1/"+date+"?access_key="+Constants.EXCHANGE_RATE_API_KEY+"&base="+currency);		
 		return JSONUtils.readObject(json, ExchangeRateVO.class);
 	}
 	public ExchangeRateVO getExchangeRates(String date,String currency,String symbols)throws Exception{
-		String json=ConnectionMgr.INSTANCE.getJSON("https://api.exchangeratesapi.io/"+date+"?base="+currency+"&symbols="+symbols);
+		String json=ConnectionMgr.INSTANCE.getJSON("https://api.exchangeratesapi.io/v1/"+date+"?access_key="+Constants.EXCHANGE_RATE_API_KEY+"&base="+currency+"&symbols="+symbols);
 		return JSONUtils.readObject(json, ExchangeRateVO.class);
 	}
 	public Collection<PaidUsers2018> importCSVFile()throws Exception{

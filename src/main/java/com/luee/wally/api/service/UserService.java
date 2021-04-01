@@ -58,7 +58,7 @@ public class UserService {
 		}
 						
 	}
-	
+
 	public int deleteUserDataByEmail(String email){
 	    int count=0;
 		Collection<String> emails=(this.convertToEmails(email));
@@ -115,7 +115,44 @@ public class UserService {
 		}
 		return count;
 	}
+	public int deleteUserDataByGaid(String gaid){
+		int count=0;
+		//1. affs
+		Collection<Entity> affs = paidUsersRepository.findEntities("affs", "gaid",gaid);
+		Collection<String> guids=affs.stream().map(e->(String)e.getProperty("user_guid")).collect(Collectors.toList());
+		if(affs.isEmpty()){
+			throw new IllegalAccessError("Gaid '"+gaid+"' was not found in our system.");
+		}		
+		// 2.redeeming_requests_new 
+		Collection<Entity> redeemingRequests = paidUsersRepository.getRecordsByEmails(guids, "redeeming_requests_new", "user_guid");		
+		if(redeemingRequests.isEmpty()){
+			throw new IllegalAccessError("No redeeming requests for Gaid '"+gaid+"' found in our system.");
+		}
+		
+		redeemingRequests.forEach(e->{
+			e.setProperty("full_name","Removed per request from user");
+			e.setProperty("full_address","Removed per request from user");
+			e.setProperty("email","removed@removed.com");
+			e.setProperty("paypal_account","removed@removed.com");
+			userRepository.createOrUpdateEntity(e);
+		});
+		
+		//paid_user
+		redeemingRequests.forEach(rr->{
+			Collection<Entity> paidUsers=  paidUsersRepository.findEntities("paid_users","user_guid",(String)rr.getProperty("user_guid"));
+			paidUsers.forEach(pu->{
+				pu.setProperty("paypal_account", "removed@removed.com");
+				pu.setProperty("email_address","removed@removed.com");
+				paidUsersRepository.createOrUpdateEntity(pu);
+			});
+		});
 
+		for(Entity aff:affs){
+			userRepository.deleteEntity(aff.getKey());
+			count++;
+		}
+		return count;		
+	}
 	public int deleteUserDataByGuid(String guid){
 		int count=0;
 		//1. affs
