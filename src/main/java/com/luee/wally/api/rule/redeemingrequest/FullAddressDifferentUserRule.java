@@ -11,11 +11,14 @@ public class FullAddressDifferentUserRule extends RedeemingRequestRule {
     private PaymentRepository paymentRepository=new PaymentRepository();
     
 	@Override
-	public void execute(RedeemingRequestRuleContext context,RedeemingRequests redeemingRequests) {
-	   	
+	public void execute(RedeemingRequestRuleContext context,RedeemingRequests redeemingRequests) {		
 		int count=paymentRepository.countEligibleUsersByAddress(redeemingRequests.getFullAddress(),redeemingRequests.getUserGuid()); 
 		if(count>0){
-			   context.getResult().add(RuleResultType.FULL_ADDRESS_DIFFERENT_USER);
+			   if(count>4){
+				  context.getResult().add(RuleResultType.FULL_ADDRESS_DIFFERENT_USER_5); 
+			   }else{
+			      context.getResult().add(RuleResultType.FULL_ADDRESS_DIFFERENT_USER);
+			   }
 			   if(context.isExitOnResult()){
 					  return; 
 			   }				

@@ -2,6 +2,7 @@ package com.luee.wally.api.rule.redeemingrequest;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -16,9 +17,11 @@ import com.luee.wally.admin.repository.SuspiciousEmailDomainRepository;
 public class RedeemingRequestRuleContext {
 
 	private boolean exitOnResult;
-	private Set<RuleResultType> result=new TreeSet<>((o1,o2)->{
-			return o2.getRuleStatusType().ordinal()-o1.getRuleStatusType().ordinal();			
-		});
+//	private Set<RuleResultType> result=new TreeSet<>((o1,o2)->{
+//			return o2.getRuleStatusType().ordinal()-o1.getRuleStatusType().ordinal();			
+//		});
+	
+	private Set<RuleResultType> result=EnumSet.noneOf(RuleResultType.class); 
 	
 	private Collection<Entity> suspiciousDomains;
 

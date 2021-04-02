@@ -7,14 +7,17 @@ public class IpAddressDifferentUserRule extends RedeemingRequestRule {
     private PaymentRepository paymentRepository=new PaymentRepository();
     
 	@Override
-	public void execute(RedeemingRequestRuleContext context,RedeemingRequests redeemingRequests) {
-	   	
+	public void execute(RedeemingRequestRuleContext context,RedeemingRequests redeemingRequests) {	   	
 		int count=paymentRepository.countEligibleUsersByIP(redeemingRequests.getIpAddress(),redeemingRequests.getUserGuid()); 
 		if(count>0){
-			   context.getResult().add(RuleResultType.IP_ADDRESS_DIFFERENT_USER);
-			   if(context.isExitOnResult()){
-					  return; 
-			   }				
+			if(count>2){
+			   context.getResult().add(RuleResultType.IP_ADDRESS_DIFFERENT_USER_3);	
+			}else{
+			   context.getResult().add(RuleResultType.IP_ADDRESS_DIFFERENT_USER);			   
+			}
+			if(context.isExitOnResult()){
+				  return; 
+		    }
 		}
 		
 		if (next != null) {
