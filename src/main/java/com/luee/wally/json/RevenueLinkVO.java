@@ -10,6 +10,8 @@ public class RevenueLinkVO implements ValueObject{
 	
 	private String ad_revenue_report_url;
 	
+	private String fb_estimated_revenue_url;
+	
 	public String getStatus() {
 		return status;
 	}
@@ -40,5 +42,13 @@ public class RevenueLinkVO implements ValueObject{
 	
 	public void setAd_revenue_report_url(String ad_revenue_report_url) {
 		this.ad_revenue_report_url = ad_revenue_report_url;
+	}
+	
+	public void setFb_estimated_revenue_url(String fb_estimated_revenue_url) {
+		this.fb_estimated_revenue_url = fb_estimated_revenue_url;
+	}
+	
+	public String getFb_estimated_revenue_url() {
+		return fb_estimated_revenue_url;
 	}
 }
