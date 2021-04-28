@@ -46,17 +46,18 @@ public class FBUserRevenueService extends AbstractService{
 	 * Process User Revenue for a particular date in format "yyyy-MM-dd"
 	 * #3 - prosess links sequencially to avoid time out
 	 */
-	public boolean processFBUserRevenueAggregated(String date)throws Exception{
+	public Collection<String> processFBUserRevenueAggregated(String date)throws Exception{
 		Objects.requireNonNull(date, "Date to process daily revenue is null");
-		
+		Collection<String> unfinishedPackages=new ArrayList<>();
 		// for each package iterate
-		int unfinishedPackagesCount=0;	
+		//int unfinishedPackagesCount=0;	
 		for (PackageURLGroup packageURLGroup : FBPackageNameConstants.packageURLGroups) {
 			
 			RevenueLinkVO revenueLink=this.getUserLevelRevenueLink(packageURLGroup, date);
 			if(revenueLink==null){
-			   unfinishedPackagesCount++;	
-			   continue;	
+			   //unfinishedPackagesCount++;	
+				unfinishedPackages.add(packageURLGroup.getPackageName());
+				continue;	
 			}
 			//skip if package is  processed for this date
 			if(isUserRevPackageProcessed(revenueLink.getPackageName(), date)){
@@ -119,7 +120,8 @@ public class FBUserRevenueService extends AbstractService{
 			fbUserRevenueRepository.saveUserRevPackage(revenueLink.getPackageName(), date);				
 		}
 		
-		return unfinishedPackagesCount==0; 	
+		//return unfinishedPackagesCount==0;
+		return unfinishedPackages;
 	}
 	
 	private boolean isUserRevPackageProcessed(String packageName,String date){		

@@ -58,16 +58,17 @@ public class UserRevenueService extends AbstractService{
 	 * Process User Revenue for a particular date in format "yyyy-MM-dd"
 	 * #3 - prosess links sequencially to avoid time out
 	 */
-	public boolean processUserRevenueAggregated(String date)throws Exception{
+	public Collection<String> processUserRevenueAggregated(String date)throws Exception{
 		Objects.requireNonNull(date, "Date to process daily revenue is null");
-		
+		Collection<String> unfinishedPackages=new ArrayList<>();
 		// for each package iterate
-		int unfinishedPackagesCount=0;	
+		//int unfinishedPackagesCount=0;	
 		for (PackageURLGroup packageURLGroup : PackageNameConstants.packageURLGroups) {
 
 			RevenueLinkVO revenueLink=this.getUserLevelRevenueLink(packageURLGroup, date);
 			if(revenueLink==null){
-			   unfinishedPackagesCount++;	
+			   unfinishedPackages.add(packageURLGroup.getPackageName());
+			   //unfinishedPackagesCount++;	
 			   continue;	
 			}
 
@@ -160,7 +161,8 @@ public class UserRevenueService extends AbstractService{
 			//mark package as complete for this date
 			userRevenueRepository.createUserRevPackage(revenueLink.getPackageName(), date);	
 		}
-		return unfinishedPackagesCount==0; 		
+		//return unfinishedPackagesCount==0;
+		return unfinishedPackages;
 	}	
 	
 	/*

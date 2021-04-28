@@ -1,6 +1,7 @@
 package com.luee.wally.admin.controller;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -13,11 +14,15 @@ import com.google.appengine.api.taskqueue.Queue;
 import com.google.appengine.api.taskqueue.QueueFactory;
 import com.google.appengine.api.taskqueue.TaskOptions;
 import com.google.appengine.api.taskqueue.TaskOptions.Method;
+import com.luee.wally.admin.repository.ApplicationSettingsRepository;
 import com.luee.wally.admin.repository.JobsRepository;
 import com.luee.wally.admin.repository.JobsRepository.JobStatus;
 import com.luee.wally.api.route.Controller;
+import com.luee.wally.api.service.ApplicationSettingsService;
+import com.luee.wally.api.service.MailService;
 import com.luee.wally.api.service.impex.FBUserRevenueService;
 import com.luee.wally.api.service.impex.UserRevenueService;
+import com.luee.wally.command.Email;
 
 public class UserRevenueReportsController implements Controller{
 	private final Logger logger = Logger.getLogger(UserRevenueReportsController.class.getName());
@@ -65,13 +70,14 @@ public class UserRevenueReportsController implements Controller{
 			 Objects.requireNonNull(date,"You must provide a valid date");
 			 logger.log(Level.WARNING, "Task in the background started for date="+date);
 			 jobsRepository.saveJobEntry(JobsRepository.USER_REVENUE_JOB, JobStatus.STARTED, date);
-			 boolean result=userRevenueService.processUserRevenueAggregated(date);
-			 if(result){
+			 
+			 Collection<String> unfinishedPackages=userRevenueService.processUserRevenueAggregated(date);
+			 if(unfinishedPackages.isEmpty()){
 				 jobsRepository.saveJobEntry(JobsRepository.USER_REVENUE_JOB, JobStatus.FINISHED, date);
 				 //delete corresponding entries in user_rev_package
 				 userRevenueService.deleteUserRevPackages(date);
 			 }else{
-				 result=jobsRepository.resetJobFailure(JobsRepository.USER_REVENUE_JOB, JobStatus.INCOMPLETE.name(), date);
+				 boolean result=jobsRepository.resetJobFailure(JobsRepository.USER_REVENUE_JOB, JobStatus.INCOMPLETE.name(), date);
 				 if(result){
 					 long DELAY_MS =1*60*1000;  //1 minutes		
 					 Queue queue = QueueFactory.getDefaultQueue();	
@@ -79,6 +85,7 @@ public class UserRevenueReportsController implements Controller{
 				 }
 				 else{
 					 jobsRepository.saveJobEntry(JobsRepository.USER_REVENUE_JOB, JobStatus.ABORTED, date);
+					 sendEmailJobAbortAlert(date,unfinishedPackages);
 				 }
      }			
 
@@ -129,11 +136,11 @@ public class UserRevenueReportsController implements Controller{
 		 try{
 	  	     FBUserRevenueService fbUserRevenueService = new FBUserRevenueService();
 	 		 jobsRepository.saveJobEntry(JobsRepository.FB_USER_REVENUE_JOB, JobStatus.STARTED, date);
-			 boolean result=fbUserRevenueService.processFBUserRevenueAggregated(date);
-			 if(result){
+	 		 Collection<String> unfinishedPackages=fbUserRevenueService.processFBUserRevenueAggregated(date);
+			 if(unfinishedPackages.isEmpty()){
 				 jobsRepository.saveJobEntry(JobsRepository.FB_USER_REVENUE_JOB, JobStatus.FINISHED, date);
 			 }else{
-				 result=jobsRepository.resetJobFailure(JobsRepository.FB_USER_REVENUE_JOB, JobStatus.INCOMPLETE.name(), date);
+				 boolean result=jobsRepository.resetJobFailure(JobsRepository.FB_USER_REVENUE_JOB, JobStatus.INCOMPLETE.name(), date);
 				 if(result){
 					 long DELAY_MS =1*60*1000;  //1 minutes		
 					 Queue queue = QueueFactory.getDefaultQueue();	
@@ -141,6 +148,7 @@ public class UserRevenueReportsController implements Controller{
 				 }
 				 else{
 					 jobsRepository.saveJobEntry(JobsRepository.FB_USER_REVENUE_JOB, JobStatus.ABORTED, date);
+					 sendEmailJobAbortAlert(date,unfinishedPackages);
 				 }
     }			
 
@@ -151,6 +159,43 @@ public class UserRevenueReportsController implements Controller{
 				jobsRepository.saveJobEntry(JobsRepository.FB_USER_REVENUE_JOB, JobStatus.ABORTED, date);					
 
 	       }	
+	}
+	
+	private void sendEmailJobAbortAlert(String date,Collection<String> unfinishedPackages)throws IOException{
+		ApplicationSettingsService applicationSettingsService = new ApplicationSettingsService();
+		String supportEmail = applicationSettingsService
+				.getApplicationSettingCached(ApplicationSettingsRepository.SUPPORT_EMAIL);
+		
+		String email1 = applicationSettingsService
+				.getApplicationSettingCached(ApplicationSettingsRepository.PAYMENT_REPORT_EMAIL_1);		
+		
+		String email2 = applicationSettingsService
+				.getApplicationSettingCached(ApplicationSettingsRepository.PAYMENT_REPORT_EMAIL_2);
+		
+		Email mail = new Email();
+		mail.setFrom(supportEmail);
+		mail.setFromName("user.revenue.job");
+		mail.setTo(email1);
+		mail.setToName("support");
+
+		
+		mail.setCC(email2);
+		mail.setCCName("support");
+				
+		mail.setSubject("Max Revenue Import has Failed for "+date);
+		
+		StringBuilder sb=new StringBuilder();
+		sb.append("The Max revenue import for "+date+" has failed. please check logs.<br><br>");
+		sb.append("Affected apps:<br>");
+		unfinishedPackages.forEach(p->{
+			sb.append(p);sb.append("<br>");
+		});		
+		mail.setContent(sb.toString());
+
+		
+		MailService mailService = new MailService();
+		
+		mailService.sendMailGrid(mail);
 	}
 
 }
