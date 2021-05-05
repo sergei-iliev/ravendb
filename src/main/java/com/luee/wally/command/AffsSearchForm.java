@@ -1,7 +1,5 @@
 package com.luee.wally.command;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
@@ -18,6 +16,7 @@ public class AffsSearchForm implements WebForm{
 	private Collection<String> experiments=new HashSet<>();
 	private String packageName;
     private String submitType="search";
+    private boolean allExperiments;
     
 	public static AffsSearchForm parse(ServletRequest req) throws ServletException{
 		AffsSearchForm form = new AffsSearchForm();
@@ -32,8 +31,8 @@ public class AffsSearchForm implements WebForm{
 		}
 		form.setCountryCode((req.getParameter("country").length() == 0 ? null : req.getParameter("country")));
 		form.setPackageName((req.getParameter("packageName").length() == 0 ? null : req.getParameter("packageName")));
-		
-
+		form.setAllExperiments((req.getParameter("allExperiments")!= null ?true:false));
+        
 		return form;
 	}
 
@@ -89,6 +88,12 @@ public class AffsSearchForm implements WebForm{
 	public void setPackageName(String packageName) {
 		this.packageName=packageName;
 	}
+	public boolean isAllExperiments() {
+		return allExperiments;
+	}
+	public void setAllExperiments(boolean allExperiments) {
+		this.allExperiments = allExperiments;
+	}
 	@JsonIgnore
 	public boolean isEmpty(){
 		return experiments.isEmpty()&&packageName==null&&countryCode.length()==1&&startDate==null&&endDate==null;
@@ -107,6 +112,7 @@ public class AffsSearchForm implements WebForm{
 		sb.append("country:"+(countryCode==null?"":countryCode)+"\r\n");
 		sb.append("experiment:"+experiments+"\r\n");
 		sb.append("packageName:"+(packageName==null?"":packageName)+"\r\n");
+		sb.append("Group by all experiments:"+(allExperiments)+"\r\n");
 		return sb.toString();
 	}
 }

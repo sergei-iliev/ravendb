@@ -28,8 +28,10 @@ import com.google.appengine.api.datastore.Query.FilterOperator;
 import com.google.appengine.api.datastore.Query.FilterPredicate;
 import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
+import com.luee.wally.admin.repository.AffsRepository;
 import com.luee.wally.admin.repository.CloudStorageRepository;
 import com.luee.wally.api.service.AffsSearchService;
+import com.luee.wally.api.service.AffsService;
 import com.luee.wally.api.service.CampaignSearchService;
 import com.luee.wally.api.service.PaymentService;
 import com.luee.wally.command.AffsSearchForm;
@@ -55,7 +57,30 @@ public class DBTestCase {
 
 		helper.tearDown();
 	}
-
+	@Test
+	public void createAffsUserCountryEntityTest() throws Exception {
+		AffsRepository affsRepository=new AffsRepository();
+		AffsService affsService = new AffsService();
+		boolean res=affsService.saveUserAccessCountry("AA1", "BG");
+	    Assert.assertTrue(res);
+	    
+		res=affsService.saveUserAccessCountry("AA1", "BG");
+	    Assert.assertFalse(res);
+ 
+	    Collection<Entity> entities= affsRepository.findEntities("affs_user_countries","user_guid", "AA1");
+	    Assert.assertTrue(entities.size()==1);
+	    
+		res=affsService.saveUserAccessCountry("AA1", "US");
+	    Assert.assertTrue(res);
+	    
+	    entities= affsRepository.findEntities("affs_user_countries","user_guid", "AA1");
+	    Assert.assertTrue(entities.size()==1);
+	    Assert.assertTrue(((List<String>)entities.iterator().next().getProperty("country_code")).size()==2);
+	    
+	    
+	    
+	    
+	}	
 	@Test
 	public void createAffsCountEntityTest() throws Exception {
 		DatastoreService ds = DatastoreServiceFactory.getDatastoreService();

@@ -18,6 +18,7 @@ import com.google.appengine.api.taskqueue.TaskOptions;
 import com.google.appengine.api.taskqueue.TaskOptions.Method;
 import com.luee.wally.admin.repository.UserRepository;
 import com.luee.wally.api.route.Controller;
+import com.luee.wally.api.service.AffsService;
 import com.luee.wally.api.service.PaidUsersService;
 import com.luee.wally.api.service.PaymentService;
 import com.luee.wally.command.PaidUserGroupByForm;
@@ -127,6 +128,21 @@ public class PaidUsersController implements Controller {
 		paidUsersService.checkVPNUsageAsync(key, ipAddress, countryCode);
 		
 	}
+	/*
+	 * Async task
+	 */
+	public void checkUserCountriesAsync(HttpServletRequest req, HttpServletResponse resp)throws ServletException, IOException{
+		String key=Objects.requireNonNull(req.getParameter("key"));
+		String userGuid=Objects.requireNonNull(req.getParameter("userGuid"));
+		
+		AffsService affsService=new AffsService();
+		List<String> countries=affsService.getAffsUserCountries(userGuid);
+		
+		PaidUsersService paidUsersService=new PaidUsersService();
+		paidUsersService.saveUserCountries(key, countries);
+		
+	}	
+	
 	/*
 	 * list all removed redeeming requests
 	 */

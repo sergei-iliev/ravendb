@@ -130,6 +130,7 @@ INSTANCE;
     	 httpPostRouteList.put("/administration/payment/paidusers/search/byguid", new Route(new PaidUsersController(),"searchByGuid"));    	 
     	 httpPostRouteList.put("/administration/payment/paidusers/search/groupby",new Route(new PaidUsersController(),"searchGroupBy"));
     	 httpPostRouteList.put("/administration/job/payment/paidusers/checkvpnusage", new Route(new PaidUsersController(),"checkVPNUsageAsync"));
+    	 httpPostRouteList.put("/administration/job/payment/paidusers/checkcountrylist", new Route(new PaidUsersController(),"checkUserCountriesAsync"));
     	 httpPostRouteList.put("/administration/payment/user/unremoveuser", new Route(new PaidUsersController(),"unremoveUser"));
     	 httpPostRouteList.put("/administration/payment/paidusers/search/removed",new Route(new PaidUsersController(),"getRemovedRedeemingRequests"));
     	 

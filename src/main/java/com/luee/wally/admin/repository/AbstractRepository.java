@@ -60,7 +60,7 @@ public class AbstractRepository {
 	}
 	
 	public Entity findEntity(String tableName,String fieldName,String value) {		
-		DatastoreService ds = createDatastoreService(Consistency.EVENTUAL);
+		DatastoreService ds = createDatastoreService(Consistency.STRONG);
 		Query query = new Query(tableName);
 		query.setFilter(new FilterPredicate(fieldName, FilterOperator.EQUAL, value));
 		

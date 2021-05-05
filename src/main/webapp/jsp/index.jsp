@@ -69,7 +69,15 @@
                              </div>
                             </div>
                             <div class="row mt-3">
-                            <div class="col-md-2">
+                            <div class="col-md-8">
+                               <div class="form-check">
+    								<input type="checkbox" name="allExperiments" class="form-check-input" id="all_experiments_id" 
+    								<c:if test="${webform.allExperiments == true}">
+										checked
+									</c:if>	
+    								>
+    								<label class="form-check-label" for="all_experiments_id">Group by All Experiments</label>
+  							   </div>
                               <button class="btn" id="add-btn"><i class="fa fa-arrow-down"></i></button>
                               <button class="btn" id="remove-btn"><i class="fa fa-arrow-up"></i></button>
                             </div>

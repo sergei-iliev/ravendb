@@ -336,4 +336,9 @@ public class PaidUsersService {
 		redeemingRequest.setProperty("is_using_vpn", isUsingVpn);
 		paidUsersRepository.save(redeemingRequest);
 	}
+	public void saveUserCountries(String redeemingRequestKey, List<String> countries){
+		Entity redeemingRequest=paidUsersRepository.findEntityByKey(redeemingRequestKey);
+		redeemingRequest.setProperty("user_countries", countries);
+		paidUsersRepository.save(redeemingRequest);		
+	}
 }

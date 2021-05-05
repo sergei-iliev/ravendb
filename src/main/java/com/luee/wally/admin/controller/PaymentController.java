@@ -17,19 +17,16 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
-import org.apache.http.HttpStatus;
-
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.EntityNotFoundException;
-import com.google.appengine.api.memcache.Expiration;
+import com.luee.wally.admin.repository.AffsRepository;
 import com.luee.wally.admin.repository.ApplicationSettingsRepository;
 import com.luee.wally.admin.repository.InvoiceRepository;
 import com.luee.wally.admin.repository.PaymentRepository;
 import com.luee.wally.admin.repository.SearchFilterTemplateRepository;
 import com.luee.wally.api.lock.MemoryCacheLock;
 import com.luee.wally.api.route.Controller;
+import com.luee.wally.api.service.AffsService;
 import com.luee.wally.api.service.ApplicationSettingsService;
 import com.luee.wally.api.service.InvoiceService;
 import com.luee.wally.api.service.MailService;
@@ -38,16 +35,13 @@ import com.luee.wally.api.service.PaymentRuleService;
 import com.luee.wally.api.service.PaymentService;
 import com.luee.wally.command.Email;
 import com.luee.wally.command.PaidUserForm;
-import com.luee.wally.command.PayExternalForm;
 import com.luee.wally.command.PaymentEligibleUserForm;
 import com.luee.wally.command.PdfAttachment;
 import com.luee.wally.command.invoice.PayoutResult;
 import com.luee.wally.command.payment.RedeemingRequestRuleValue;
 import com.luee.wally.command.payment.RuleStatusType;
-import com.luee.wally.constants.Constants;
 import com.luee.wally.entity.RedeemingRequests;
 import com.luee.wally.entity.SearchFilterTemplate;
-import com.luee.wally.exception.AESSecurityException;
 import com.luee.wally.exception.RestResponseException;
 import com.luee.wally.json.JSONUtils;
 import com.paypal.api.payments.ErrorDetails;
@@ -57,30 +51,32 @@ public class PaymentController implements Controller {
 	private final Logger logger = Logger.getLogger(PaymentController.class.getName());
 /*
 	public void test(HttpServletRequest req, HttpServletResponse resp) throws Exception {
-		String rid = (req.getParameter("rid"));
-		String KEY=String.format("%s|%s",Constants.ENTITY_REDEEMING_REQUEST_ID,rid);
-		logger.warning(KEY);
-		if (!MemoryCacheLock.INSTANCE.lock(MemoryCacheLock.EXTERNAL_PAYMENT_LOCK)) {
-			resp.getWriter().write("TIMEOUT on " + KEY);
-			return;
-		}
+		String userGuid = (req.getParameter("userguid"));
+		String country = (req.getParameter("country"));
+		
+		
+		logger.warning(userGuid);
+		
 		try {
-			if(!MemoryCacheLock.INSTANCE.lockPrimaryKeyTimeout(KEY,Expiration.byDeltaSeconds(30))){
-				resp.getWriter().write("RECORD LOCKED "+KEY);
+			if(!MemoryCacheLock.INSTANCE.lock(userGuid)){
+				resp.getWriter().write("Timout ");
 				return;
 			}
+			AffsService affsService = new AffsService();
+			affsService.saveUserAccessCountry(userGuid, country);
+			
+			Thread.currentThread().sleep(5000);
 			
 		} finally {			
-			MemoryCacheLock.INSTANCE.unlock(MemoryCacheLock.EXTERNAL_PAYMENT_LOCK);
+			MemoryCacheLock.INSTANCE.unlock(userGuid);
 		}
-		
-		try{
-			logger.warning("*****PROCESSING long interval " + KEY);
-			Thread.currentThread().sleep(8000);
-		}finally{
-			MemoryCacheLock.INSTANCE.unlockPrimaryKey(KEY);	
-		}
-		resp.getWriter().write("SUCCESS on " + KEY);
+	
+		AffsRepository affsRepository=new AffsRepository();	
+	    Collection<Entity> entities= affsRepository.findEntities("affs_user_countries","user_guid", userGuid);
+	    
+	    
+	    resp.getWriter().write("Size= " + entities.size()+"<br>");
+		resp.getWriter().write("Values= " + entities.iterator().next().getProperty("country_code"));
 		// resp.setContentType("application/json");
 		// resp.setCharacterEncoding("UTF-8");
 		// String json = "{" + "\"paid_successfully\": true," +

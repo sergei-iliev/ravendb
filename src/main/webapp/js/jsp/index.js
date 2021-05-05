@@ -20,6 +20,19 @@ jQuery(document).ready(function(){
 	    	    text: option
 	    	}));
 	 });
+	 $('#all_experiments_id').change(function() {
+	        if(this.checked) {	        	
+	        	$('#experimentsId').attr('disabled', 'disabled');
+	        	$('#experimentId').attr('disabled', 'disabled');
+	        	$('#add-btn').attr('disabled', 'disabled');
+	        	$('#remove-btn').attr('disabled', 'disabled');
+	        }else{
+	        	$('#experimentsId').removeAttr('disabled');
+	        	$('#experimentId').removeAttr('disabled');
+	        	$('#add-btn').removeAttr('disabled');
+	        	$('#remove-btn').removeAttr('disabled');
+	        }	                
+	 });
 	 $("#p-remove-btn").click(function(e){
 		 e.preventDefault();
 		 $('#packageNamesId').find('option:selected').remove();		 
@@ -30,4 +43,11 @@ jQuery(document).ready(function(){
 	        //$("#packageNamesId option").prop("selected", "selected");
 	        
 	 });
+	 
+	 if($('#all_experiments_id').is(":checked")){
+     	$('#experimentsId').attr('disabled', 'disabled');
+    	$('#experimentId').attr('disabled', 'disabled');
+    	$('#add-btn').attr('disabled', 'disabled');
+    	$('#remove-btn').attr('disabled', 'disabled');
+	 }
 });
