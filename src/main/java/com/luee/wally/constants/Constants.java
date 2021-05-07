@@ -1,5 +1,8 @@
 package com.luee.wally.constants;
 
+import java.util.Arrays;
+import java.util.List;
+
 import com.luee.wally.api.service.AffsSearchService;
 
 public interface Constants {
@@ -87,4 +90,6 @@ public interface Constants {
 	public static final String FIREBASE_NOTIFICATION_URL="https://fcm.googleapis.com/fcm/send";
 	
 	public static final String EXCHANGE_RATE_API_KEY="8768a0430e6c0732effd12cb89a00cc7";
+	
+	public static final List<String> ALLOWED_USER_COUNTIES_CONNECTION_FROM=Arrays.asList("FR","US","DE","CA","AU","GB","UK","RU","IT","ES","PT","NL","BE","AT","IE","CH","NZ","SE","FI","DK","PL","NO","UA","PR","ZZ");
 }

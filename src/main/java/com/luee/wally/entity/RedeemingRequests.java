@@ -1,5 +1,6 @@
 package com.luee.wally.entity;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -24,8 +25,9 @@ public class RedeemingRequests {
 	private List<Long> coinsPerGame;
 	private boolean confirmedEmail;
 	private double maxRev; // always in dollars
-    private boolean usingVPN;
-    
+	private boolean usingVPN;
+	private List<String> userCountriesConnectedFrom;
+
 	public static RedeemingRequests valueOf(Entity entity) {
 
 		RedeemingRequests redeemingRequests = new RedeemingRequests();
@@ -48,6 +50,7 @@ public class RedeemingRequests {
 		redeemingRequests.setFullAddress((String) entity.getProperty("full_address"));
 		redeemingRequests.setPaid((Boolean) entity.getProperty("is_paid"));
 		redeemingRequests.setCoinsPerGame((List) entity.getProperty("coins_per_game"));
+		redeemingRequests.setUserCountriesConnectedFrom((List) entity.getProperty("user_countries"));
 		redeemingRequests.setConfirmedEmail((Boolean) entity.getProperty("confirmed_email"));
 		// redeemingRequests.setLink1("/administration/payment/test?amount="+redeemingRequests.amount+"&user_guid="+redeemingRequests.userGuid);
 		// redeemingRequests.setLink2("/administration/payment/test?amount="+redeemingRequests.amount+"&user_guid="+redeemingRequests.userGuid);
@@ -64,6 +67,14 @@ public class RedeemingRequests {
 		}
 
 		return redeemingRequests;
+	}
+
+	public void setUserCountriesConnectedFrom(List<String> userCountriesConnectedFrom) {
+		this.userCountriesConnectedFrom = userCountriesConnectedFrom;
+	}
+
+	public List<String> getUserCountriesConnectedFrom() {
+		return userCountriesConnectedFrom;
 	}
 
 	public boolean isConfirmedEmail() {
@@ -231,14 +242,15 @@ public class RedeemingRequests {
 	public boolean isUsingVPN() {
 		return usingVPN;
 	}
-	
+
 	public void setUsingVPN(Boolean usingVPN) {
-		if(usingVPN==null){
-		  this.usingVPN = false;	
-		}else{
-		  this.usingVPN = usingVPN;
+		if (usingVPN == null) {
+			this.usingVPN = false;
+		} else {
+			this.usingVPN = usingVPN;
 		}
 	}
+
 	public String getLink1() {
 		return link1;
 	}

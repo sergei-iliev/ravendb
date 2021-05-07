@@ -5,12 +5,14 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import com.google.appengine.api.datastore.Entity;
 import com.luee.wally.admin.repository.PaymentRepository;
@@ -18,6 +20,7 @@ import com.luee.wally.admin.repository.SuspiciousEmailDomainRepository;
 import com.luee.wally.api.rule.redeemingrequest.RedeemingRequestEngine;
 import com.luee.wally.api.rule.redeemingrequest.RuleResultType;
 import com.luee.wally.command.payment.RedeemingRequestRuleValue;
+import com.luee.wally.constants.Constants;
 import com.luee.wally.entity.RedeemingRequests;
 
 public class PaymentRuleService extends AbstractService {
@@ -30,7 +33,7 @@ public class PaymentRuleService extends AbstractService {
 
 		RedeemingRequestEngine engine = new RedeemingRequestEngine();
 		for (RedeemingRequests redeemingRequest : redeemingRequests) {
-			Collection<RuleResultType> list = engine.execute(redeemingRequest, false);			
+			Collection<RuleResultType> list = engine.execute(redeemingRequest, false);
 			result.add(new RedeemingRequestRuleValue(redeemingRequest, list.isEmpty() ? null : list.iterator().next()));
 		}
 		return result;
@@ -151,7 +154,18 @@ public class PaymentRuleService extends AbstractService {
 				object.put("url", redeemingRequest.ipAddressLink());
 				objects.add(object);
 			}
+			if(ruleResult==RuleResultType.USER_COUNTRIES_CONNECTED_FROM_RED||ruleResult==RuleResultType.USER_COUNTRIES_CONNECTED_FROM_YELLOW){
+				List<String> countriesConnectedFrom=redeemingRequest.getUserCountriesConnectedFrom();												
+				Set<String> unique=new HashSet<>(countriesConnectedFrom);
+				Collection<String> forbidden= countriesConnectedFrom.stream().filter(element -> !Constants.ALLOWED_USER_COUNTIES_CONNECTION_FROM.contains(element)).collect(Collectors.toList());
+				if(forbidden.size()>0){				  	
+				  result.put("usercountriesfrom","User is from an unsupported country. Was found connected from: "+forbidden);		
+				}else if(unique.size()>=2){				   	
+				  result.put("usercountriesfrom","User was found connected from "+unique.size()+" countries: "+unique); 			    	
+				}				 							
+			}
 		}
+
 		
 		return result;
 	}

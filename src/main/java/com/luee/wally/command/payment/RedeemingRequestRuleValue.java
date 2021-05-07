@@ -23,11 +23,14 @@ public class RedeemingRequestRuleValue {
 	public RuleStatusType getRuleStatus() {
 		if (ruleResultType != null) {
 			switch (ruleResultType) {
+			case USER_COUNTRIES_CONNECTED_FROM_RED:
+				return RuleStatusType.Red;			
 			case TIME_TO_CACH_LESS_24_ORGANIC:
 				return RuleStatusType.Red;
 			case TIME_TO_CACH_LESS_24_NON_ORGANIC:
 			case TIME_TO_CACH_LESS_48_ORGANIC:
 			case FULL_NAME_DIFFERENT_USER:
+			case USER_COUNTRIES_CONNECTED_FROM_YELLOW:
 			case FULL_ADDRESS_DIFFERENT_USER:
 			case IP_ADDRESS_DIFFERENT_USER:
 				return RuleStatusType.Yellow;

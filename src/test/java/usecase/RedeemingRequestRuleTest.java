@@ -2,9 +2,12 @@ package usecase;
 
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -23,6 +26,7 @@ import com.luee.wally.api.service.PaymentReportsService;
 import com.luee.wally.api.service.PaymentService;
 import com.luee.wally.command.PaidUserSearchForm;
 import com.luee.wally.command.PaymentEligibleUserForm;
+import com.luee.wally.constants.Constants;
 import com.luee.wally.entity.RedeemingRequests;
 import com.luee.wally.utils.TestDatabase;
 import com.luee.wally.utils.Utilities;
@@ -112,5 +116,12 @@ public class RedeemingRequestRuleTest {
 		    System.out.println(engine.execute(redeemingRequests,false));		    
 		}
 		
-	}		
+	}	
+	@Test
+	public void userCountriesConnectedTest()throws Exception{
+		List<String> countriesConnectedFrom=Arrays.asList("BG","FR");						
+		boolean forbidden = countriesConnectedFrom.stream().anyMatch(element -> !Constants.ALLOWED_USER_COUNTIES_CONNECTION_FROM.contains(element));
+        Assert.assertTrue(forbidden);
+		
+	}
 }

@@ -19,10 +19,11 @@ import com.luee.wally.command.payment.RuleStatusType;
 *
  */
 public enum RuleResultType{	      
+	USER_COUNTRIES_CONNECTED_FROM_RED(RuleStatusType.Red),
 	USING_VPN(RuleStatusType.Red),
 	UA_CHANNEL_ORGANIC_AMOUNT_100(RuleStatusType.Red),
     TIME_TO_CACH_LESS_24_ORGANIC(RuleStatusType.Red),
-    SUSPICIOUS_EMAIL_DOMAIN_RED(RuleStatusType.Red),
+    SUSPICIOUS_EMAIL_DOMAIN_RED(RuleStatusType.Red),    
     COINS_PER_GAME_EQUAL_0(RuleStatusType.Red),
     TOTAL_AD_REV_LESS_THEN_40(RuleStatusType.Red),
     FULL_ADDRESS_DIFFERENT_USER_5(RuleStatusType.Red),      //more then 5 counts
@@ -34,6 +35,7 @@ public enum RuleResultType{
     IP_ADDRESS_DIFFERENT_USER(RuleStatusType.Yellow),    
     COINS_PER_GAME_LESS_THEN_3(RuleStatusType.Yellow),    
     SUSPICIOUS_EMAIL_DOMAIN_YELLOW(RuleStatusType.Yellow),
+    USER_COUNTRIES_CONNECTED_FROM_YELLOW(RuleStatusType.Yellow),
     TOTAL_AD_REV_LESS_THEN_20(RuleStatusType.Yellow),        
     UA_CHANNEL_ORGANIC_AMOUNT_50(RuleStatusType.Yellow),
     NO_GAID_VALUE(RuleStatusType.Yellow), 

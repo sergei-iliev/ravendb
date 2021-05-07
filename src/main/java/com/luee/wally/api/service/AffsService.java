@@ -79,11 +79,10 @@ public class AffsService extends AbstractService{
     	String countryCode=(String)entity.getProperty("country_code");
     	result.add(countryCode);
     	entity=affsRepository.findEntity("affs_user_countries","user_guid",userGuid);
-    	if(entity==null){
-    		throw new IllegalStateException("affs_user_countries entity for user_guid: "+userGuid+" does not exist");	
+    	if(entity!=null){
+        	ArrayList<String> countryCodes = (ArrayList<String>) entity.getProperty("country_code");
+        	result.addAll(countryCodes);	
        	}
-    	ArrayList<String> countryCodes = (ArrayList<String>) entity.getProperty("country_code");
-    	result.addAll(countryCodes);
     	return result;
     }
 }

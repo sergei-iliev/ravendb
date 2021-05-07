@@ -3,6 +3,7 @@ package com.luee.wally.utils;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -94,6 +95,7 @@ public enum TestDatabase {
 		
 		entity=createRedeemingRequestEntity("Viola","e701-4678-8d39-0c2485204f3b","aaaa2675-a072-4b6b-ab66-cb599a29147d", "122", new Date(), "com.moregames.makemoney", "Amazon", "sergei_iliev@yahoo.com", "GB");		
 		entity.setProperty("max_rev", (double)3.7);
+		entity.setProperty("user_countries",Arrays.asList("GB","FR","BG","RO"));
 		entity.setProperty("ip_address", "1.0.0.3");
 		ds.put(entity);
 		
