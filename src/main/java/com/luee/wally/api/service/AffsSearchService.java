@@ -11,6 +11,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -227,21 +228,26 @@ public class AffsSearchService extends AbstractService{
      */
 	public Collection<Affs> processAffsExport(AffsSearchForm affsSearchForm) {
 		Collection<Affs> affsExportResults = new ArrayList<>();
+		Collection<String> experiments=new LinkedList<>();
+		if(affsSearchForm.isAllExperiments()){
+			//fetch all experiments in this filter
+			experiments.addAll(this.getExperiments(affsSearchForm.getStartDate(), affsSearchForm.getEndDate(),affsSearchForm.getCountryCode(), affsSearchForm.getPackageName()));
+		}else{
+			experiments.addAll(affsSearchForm.getExperiments());
+		}
+		System.out.println(experiments);
+		if (experiments.size() > 0) {
 
-		if (affsSearchForm.getExperiments().size() > 0) {
-
-			for (String experiment : affsSearchForm.getExperiments()) {
+			for (String experiment : experiments) {
 				Collection<Affs> result = processAffsExport(affsSearchForm.getStartDate(), affsSearchForm.getEndDate(),
 						affsSearchForm.getCountryCode(), experiment, affsSearchForm.getPackageName());
 				affsExportResults.addAll(result);
 			}
 
 		} else {
-			String experiment = affsSearchForm.getExperiments().isEmpty() ? null
-					: affsSearchForm.getExperiments().iterator().next();
 
 			Collection<Affs> result = processAffsExport(affsSearchForm.getStartDate(), affsSearchForm.getEndDate(),
-					affsSearchForm.getCountryCode(), experiment, affsSearchForm.getPackageName());
+					affsSearchForm.getCountryCode(), null, affsSearchForm.getPackageName());
 			affsExportResults.addAll(result);
 
 		}
@@ -294,21 +300,23 @@ public class AffsSearchService extends AbstractService{
 	public Collection<AffsSearchResult> processAffsSearch(AffsSearchForm affsSearchForm) {
 
 		Collection<AffsSearchResult> affsSearchResults = new ArrayList<>();
-
-		if (affsSearchForm.getExperiments().size() > 0) {
-
-			for (String experiment : affsSearchForm.getExperiments()) {
+		Collection<String> experiments=new LinkedList<>();
+		if(affsSearchForm.isAllExperiments()){
+			//fetch all experiments in this filter
+			experiments.addAll(this.getExperiments(affsSearchForm.getStartDate(), affsSearchForm.getEndDate(),affsSearchForm.getCountryCode(), affsSearchForm.getPackageName()));
+		}else{
+			experiments.addAll(affsSearchForm.getExperiments());
+		}
+		if (experiments.size() > 0) {
+			for (String experiment : experiments) {
 				AffsSearchResult result = processAffsSearch(affsSearchForm.getStartDate(), affsSearchForm.getEndDate(),
 						affsSearchForm.getCountryCode(), experiment, affsSearchForm.getPackageName());
 				affsSearchResults.add(result);
 			}
 
 		} else {
-			String experiment = affsSearchForm.getExperiments().isEmpty() ? null
-					: affsSearchForm.getExperiments().iterator().next();
-
 			AffsSearchResult result = processAffsSearch(affsSearchForm.getStartDate(), affsSearchForm.getEndDate(),
-					affsSearchForm.getCountryCode(), experiment, affsSearchForm.getPackageName());
+					affsSearchForm.getCountryCode(), null, affsSearchForm.getPackageName());
 			affsSearchResults.add(result);
 
 		}
@@ -455,7 +463,37 @@ public class AffsSearchService extends AbstractService{
 		entity.setProperty("experiment",newValue);
 		affsRepository.save(entity);
 	}
-	
+	/*
+	 * fetch all unique experiments for current filter
+	 */
+	private Collection<String> getExperiments(Date startDate, Date endDate, String country,String packageName) {		
+		Collection<String> experiments=new HashSet<>();
+		DatastoreService ds = createDatastoreService();
+		Query query = affsRepository.createQuery(startDate, endDate, country, null, packageName);
+		PreparedQuery preparedQuery = ds.prepare(query);
+
+		QueryResultList<Entity> results;
+		Cursor cursor = null;
+				
+		do {
+			FetchOptions fetchOptions;
+			if (cursor != null) {
+				fetchOptions = FetchOptions.Builder.withLimit(AbstractRepository.CURSOR_SIZE).startCursor(cursor);
+			} else {
+				fetchOptions = FetchOptions.Builder.withLimit(AbstractRepository.CURSOR_SIZE);
+			}
+
+			results = preparedQuery.asQueryResultList(fetchOptions);
+			
+			for (Entity e : results) {
+				experiments.add((String)e.getProperty("experiment"));						
+			}		
+			cursor = results.getCursor();
+		} while (results.size() > 0);
+
+		return experiments;
+	}
+
 	public void setExperiment(String userGuid,String experiment){
 		Collection<Entity> affs=affsRepository.findAffsByUserGuids(Arrays.asList(userGuid));
 		if(affs.size()!=1){

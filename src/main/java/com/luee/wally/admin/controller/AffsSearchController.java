@@ -121,27 +121,6 @@ public class AffsSearchController implements Controller {
 							cloudStorageRepository.save(writer, "affs_ad_rev_search/search" + formatDate(new Date()));
 						}
 
-						// for(AffsSearchResult result:affsSearchResults){
-						// logger.log(Level.WARNING,"experiment="+result.getExperiment());
-						// logger.log(Level.WARNING,"totalAdRev="+result.getTotalAdRev());
-						// logger.log(Level.WARNING,"offerwallRev="+result.getOfferwallRev());
-						//
-						// logger.log(Level.WARNING,"Records
-						// #="+result.getCount());
-						// if(result.getCount()!=0){
-						// BigDecimal
-						// avrTotalAdRev=result.getTotalAdRev().divide(new
-						// BigDecimal(result.getCount()),4,
-						// BigDecimal.ROUND_HALF_EVEN);
-						// logger.log(Level.WARNING,"avrTotalAdRev="+avrTotalAdRev);
-						//
-						// BigDecimal
-						// avrOfferwallRev=result.getOfferwallRev().divide(new
-						// BigDecimal(result.getCount()),4,
-						// BigDecimal.ROUND_HALF_EVEN);
-						// logger.log(Level.WARNING,"avrOfferwallRev="+avrOfferwallRev);
-						// }
-						// }
 
 						logger.log(Level.WARNING, "*************************Background task finished*****************");
 

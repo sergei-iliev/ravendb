@@ -114,9 +114,6 @@ payment.PaymentEligibleUsersView = Backbone.View.extend({
  					if(map.totaladdrev!=null){
  						rule_status_result+="<li>"+map.totaladdrev.name+" : "+map.totaladdrev.text+"</li>";
  					}
- 					if(map.totaladdrev!=null){
- 						rule_status_result+="<li>"+map.totaladdrev.name+" : "+map.totaladdrev.text+"</li>";
- 					}
  					if(map.usercountriesfrom!=null){
  						rule_status_result+="<li>"+map.usercountriesfrom+"</li>";	
  					}

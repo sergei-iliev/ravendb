@@ -95,7 +95,7 @@ public enum TestDatabase {
 		
 		entity=createRedeemingRequestEntity("Viola","e701-4678-8d39-0c2485204f3b","aaaa2675-a072-4b6b-ab66-cb599a29147d", "122", new Date(), "com.moregames.makemoney", "Amazon", "sergei_iliev@yahoo.com", "GB");		
 		entity.setProperty("max_rev", (double)3.7);
-		entity.setProperty("user_countries",Arrays.asList("GB","FR","BG","RO"));
+		//entity.setProperty("user_countries",Arrays.asList("GB","FR","BG","RO"));
 		entity.setProperty("ip_address", "1.0.0.3");
 		ds.put(entity);
 		
@@ -225,7 +225,7 @@ public enum TestDatabase {
 		   ds.put(entity);
 		   entity = new Entity("affs");	
 		   entity.setProperty("date", new Date());
-		   entity.setProperty("experiment","surprise_update|dismiss_notif|gradual_game_release|game_coins_formula|balance_formula|threshold_20");
+		   entity.setProperty("experiment","game_coins_formula|balance_formula|threshold_20");
 		   entity.setProperty("country_code","US");
 		   entity.setProperty("firebase_instance_id","eJLuSkXoQC2uSQ37Ctob1P:APA91bE7yoxor_SWL26cMe6W3ewOuQlDdFb6mA8SCLVP6z-WZ_PDENNoO7inVDMzxhoY7U4Oit1VnyBjWtEn1xaF_arPtlakgqWmDu89jkKNVeySWjfEzhf6vkezF1RfsOKKpLSs26q7");
 		   entity.setProperty("package_name","com.moregames.makemoney");		   
