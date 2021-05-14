@@ -99,7 +99,8 @@ public class RedeemingRequestRuleTest {
 	public void nameOrAddressOrIpRuleTest()throws Exception{
 		//PaidUsersService paymentUsersService=new PaidUsersService();
 		//https://ps-forwarding-server.appspot.com/c/s?ip=2001:8a0:b96b:5300:18a1:77d9:fc88:7d3&country=PT
-		//paymentService.checkVPNUsageAsync(null,"2001:8a0:b96b:5300:18a1:77d9:fc88:7d3", "PT");
+		//paymentUsersService.checkVPNUsageAsync(null,"128.90.22.179", "GB");
+		
 		TestDatabase.INSTANCE.generateDB();
 
 		PaymentService paymentService = new PaymentService();

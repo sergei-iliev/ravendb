@@ -327,6 +327,7 @@ public class PaidUsersService {
 		
 		Map<String, Object> map = JSONUtils.readObject(result, Map.class);
 		Boolean isUsingVpn=(Boolean)map.get("isUsingVpn");
+		Integer fraudScore=(Integer)map.get("fraudScore");
 		
 		Entity redeemingRequest=paidUsersRepository.findEntityByKey(key);
 		if(redeemingRequest==null){
@@ -334,6 +335,8 @@ public class PaidUsersService {
 		}
 		
 		redeemingRequest.setProperty("is_using_vpn", isUsingVpn);
+		redeemingRequest.setProperty("ip_fraud_score", fraudScore);
+		
 		paidUsersRepository.save(redeemingRequest);
 	}
 	public void saveUserCountries(String redeemingRequestKey, List<String> countries){
