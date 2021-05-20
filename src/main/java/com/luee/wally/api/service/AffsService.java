@@ -33,27 +33,30 @@ public class AffsService extends AbstractService{
 					String apiKey = applicationSettingsService
 							.getApplicationSettingCached(ApplicationSettingsRepository.TENJIN_APP_KEY);
 					Objects.requireNonNull(apiKey,"Tejin api key must not be NULL");
-					boolean isEventAdded=false;
+				
 					AffsService affsService = new AffsService();
 					try {
 						if(!MemoryCacheLock.INSTANCE.lock(advertisingId)){
 							Logger.getLogger(AffsService.class.getName()).log(Level.SEVERE, "Distributed LOCK TIMEOUT:");	
 							return;
 						}	
+						Entity entity=affsRepository.findEntity("tenjin_events","gaid",advertisingId);
+						if(entity!=null&&isOneTimeOnly){
+							ArrayList<String> events = (ArrayList<String>) entity.getProperty("events");
+							//event should not repeat
+							if(events.contains(event)){
+								return;
+							}
+						}
+																		
+						affsService.sendTenjinEvent(advertisingId,bundleId,event, apiKey);
 						
-						isEventAdded=affsService.saveTenjinEvent(advertisingId, event);
+						affsService.saveTenjinEvent(advertisingId, event);
 
 					} finally {			
 						MemoryCacheLock.INSTANCE.unlock(advertisingId);
 					}	
 					
-					//send event to Tanjin
-					if(isOneTimeOnly){
-						if(!isEventAdded){ //already exists -> don't send event
-						  return; 	
-						}
-					}												
-					affsService.sendTenjinEvent(advertisingId,bundleId,event, apiKey);
 					
 				} catch (Exception e) {
 					Logger.getLogger(AffsService.class.getName()).log(Level.SEVERE, "Tenjin service:", e);
@@ -96,33 +99,26 @@ public class AffsService extends AbstractService{
 		requestHeader.put("Content-Type", "application/json; charset=UTF-8");
 		requestHeader.put("Accept", "application/json");		
 
-		String url=String.format(Constants.TENJIN_CUSTOM_EVENT_URL_POST,advertisingId,bundelId,event);
+		String url=String.format(Constants.TENJIN_CUSTOM_EVENT_URL,advertisingId,bundelId,event);
 		ConnectionMgr.INSTANCE.postJSON(url, "", requestHeader);					
     }
     /*
      * TRUE if event is added to the entity
      */
-    private boolean saveTenjinEvent(String advertisingId,String event){
-		Entity entity=affsRepository.findEntity("tenjin_event","gaid",advertisingId);
+    private void saveTenjinEvent(String advertisingId,String event){
+		Entity entity=affsRepository.findEntity("tenjin_events","gaid",advertisingId);
 		if(entity==null){ //no record
 			  ArrayList<String> list=new ArrayList<String>(1);
 			  list.add(event);
-	          entity=new Entity("events");
+	          entity=new Entity("tenjin_events");
 	          entity.setIndexedProperty("gaid",advertisingId);
 	          entity.setProperty("events",list);
-	          affsRepository.save(entity);
-	          return true;
+	          affsRepository.save(entity);	          
 		}else{
-			ArrayList<String> events = (ArrayList<String>) entity.getProperty("events");
-			//event should not repeat
-			if(events.contains(event)){
-				return false;
-			}	        	  	
-			
+			ArrayList<String> events = (ArrayList<String>) entity.getProperty("events");				        	  			
 			events.add(event);
 			entity.setProperty("events",events);
-        	affsRepository.save(entity);
-        	return true;						
+        	affsRepository.save(entity);        	
 		}
 			
     }
