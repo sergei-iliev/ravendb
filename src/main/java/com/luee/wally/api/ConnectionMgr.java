@@ -89,13 +89,21 @@ INSTANCE;
 		   });
 		}
 		
-		int responseCode = conn.getResponseCode();
+		int responseCode = conn.getResponseCode();		
+		StringBuffer response = new StringBuffer();
 		
-		if(responseCode!=200){
-			throw new IOException("Invalid response from remote code:"+responseCode+", url:"+urlStr);
+		if(responseCode!=200&&responseCode!=202){
+			try(BufferedReader in = new BufferedReader(
+			        new InputStreamReader(conn.getErrorStream()))){
+			 String inputLine;		 
+			 while ((inputLine = in.readLine()) != null) {
+					response.append(inputLine);
+					response.append("\r\n");
+			  }
+			}
+			throw new IOException("Invalid response from remote code:"+responseCode+", url:"+urlStr+", message:"+response);
 		}
 		
-		StringBuffer response = new StringBuffer();
 		
 		try(BufferedReader in = new BufferedReader(
 		        new InputStreamReader(conn.getInputStream()))){

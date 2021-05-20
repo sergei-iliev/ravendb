@@ -1,21 +1,66 @@
 package com.luee.wally.api.service;
 
 import java.util.ArrayList;
+import java.util.Base64;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.google.appengine.api.ThreadManager;
 import com.google.appengine.api.datastore.Entity;
 import com.luee.wally.admin.repository.AffsRepository;
+import com.luee.wally.admin.repository.ApplicationSettingsRepository;
+import com.luee.wally.api.ConnectionMgr;
 import com.luee.wally.api.lock.MemoryCacheLock;
+import com.luee.wally.constants.Constants;
 
 public class AffsService extends AbstractService{
 	private final Logger logger = Logger.getLogger(AffsService.class.getName());
 
 	private AffsRepository affsRepository=new AffsRepository();
 	
-	
+	//GAID==advertisingId
+	public void trackTenjinEventForGaidAsync(String advertisingId,String bundleId,String event,boolean isOneTimeOnly){
+    	ThreadManager.createBackgroundThread(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					//read api key
+					ApplicationSettingsService applicationSettingsService = new ApplicationSettingsService();
+					String apiKey = applicationSettingsService
+							.getApplicationSettingCached(ApplicationSettingsRepository.TENJIN_APP_KEY);
+					Objects.requireNonNull(apiKey,"Tejin api key must not be NULL");
+					boolean isEventAdded=false;
+					AffsService affsService = new AffsService();
+					try {
+						if(!MemoryCacheLock.INSTANCE.lock(advertisingId)){
+							Logger.getLogger(AffsService.class.getName()).log(Level.SEVERE, "Distributed LOCK TIMEOUT:");	
+							return;
+						}	
+						
+						isEventAdded=affsService.saveTenjinEvent(advertisingId, event);
+
+					} finally {			
+						MemoryCacheLock.INSTANCE.unlock(advertisingId);
+					}	
+					
+					//send event to Tanjin
+					if(isOneTimeOnly){
+						if(!isEventAdded){ //already exists -> don't send event
+						  return; 	
+						}
+					}												
+					affsService.sendTenjinEvent(advertisingId,bundleId,event, apiKey);
+					
+				} catch (Exception e) {
+					Logger.getLogger(AffsService.class.getName()).log(Level.SEVERE, "Tenjin service:", e);
+				}
+			}
+		}).start();		
+	}
     public static void saveUserAccessCountryAsync(String userGuid,String countryCode){
     	
     	
@@ -43,7 +88,44 @@ public class AffsService extends AbstractService{
     	
     	
     }
+    
+    public void sendTenjinEvent(String advertisingId,String bundelId,String event,String apiKey)throws Exception{
+		Map<String,String> requestHeader=new HashMap<String,String>();
+		requestHeader.put("Authorization", "Basic "+Base64.getEncoder().encodeToString(apiKey.getBytes()));				
+		requestHeader.put("User-Agent", Constants.AGENT_NAME);		
+		requestHeader.put("Content-Type", "application/json; charset=UTF-8");
+		requestHeader.put("Accept", "application/json");		
 
+		String url=String.format(Constants.TENJIN_CUSTOM_EVENT_URL_POST,advertisingId,bundelId,event);
+		ConnectionMgr.INSTANCE.postJSON(url, "", requestHeader);					
+    }
+    /*
+     * TRUE if event is added to the entity
+     */
+    private boolean saveTenjinEvent(String advertisingId,String event){
+		Entity entity=affsRepository.findEntity("tenjin_event","gaid",advertisingId);
+		if(entity==null){ //no record
+			  ArrayList<String> list=new ArrayList<String>(1);
+			  list.add(event);
+	          entity=new Entity("events");
+	          entity.setIndexedProperty("gaid",advertisingId);
+	          entity.setProperty("events",list);
+	          affsRepository.save(entity);
+	          return true;
+		}else{
+			ArrayList<String> events = (ArrayList<String>) entity.getProperty("events");
+			//event should not repeat
+			if(events.contains(event)){
+				return false;
+			}	        	  	
+			
+			events.add(event);
+			entity.setProperty("events",events);
+        	affsRepository.save(entity);
+        	return true;						
+		}
+			
+    }
     
     public boolean saveUserAccessCountry(String userGuid,String countryCode){
         Entity entity=affsRepository.findEntity("affs_user_countries","user_guid",userGuid);

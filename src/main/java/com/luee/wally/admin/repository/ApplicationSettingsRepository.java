@@ -65,7 +65,7 @@ public class ApplicationSettingsRepository extends AbstractRepository {
 
 	
 	public static final String FIREBASE_APP_KEY="FIREBASE_APP_KEY";
-	
+	public static final String TENJIN_APP_KEY="TENJIN_APP_KEY";
 	
 	public Map<String, String> getApplicationSettings() {
 		Map<String, String> map = new HashMap<>();

@@ -2,6 +2,7 @@ package com.luee.wally.admin.controller;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -91,8 +92,13 @@ public class UserRevenueReportsController implements Controller{
 
    	  logger.log(Level.WARNING ,"Background task finished");
    	  }catch(Exception e){
-	    	   
-				logger.log(Level.SEVERE, "user revenue service:", e);
+   		  		logger.log(Level.SEVERE, "user revenue service:", e);		
+   		  		try{
+   		  			sendEmailJobAbortAlert(date,Collections.EMPTY_LIST);
+   		  		}catch(IOException ee){
+   		  			logger.log(Level.SEVERE, "error sending email alert:", ee);
+   		  		}
+				
 				jobsRepository.saveJobEntry(JobsRepository.USER_REVENUE_JOB, JobStatus.ABORTED, date);
 
 	       }
@@ -153,9 +159,13 @@ public class UserRevenueReportsController implements Controller{
     }			
 
   	  logger.log(Level.WARNING ,"Background task finished");
-  	  }catch(Exception e){
-	    	   
+  	  }catch(Exception e){	    	   
 				logger.log(Level.SEVERE, "user revenue service:", e);
+   		  		try{
+   		  			sendEmailJobAbortAlert(date,Collections.EMPTY_LIST);
+   		  		}catch(IOException ee){
+   		  			logger.log(Level.SEVERE, "error sending email alert:", ee);
+   		  		}				
 				jobsRepository.saveJobEntry(JobsRepository.FB_USER_REVENUE_JOB, JobStatus.ABORTED, date);					
 
 	       }	
