@@ -61,7 +61,7 @@ public class UserRevenueReportsController implements Controller{
 		String date=(String) req.getParameter("date");
 		processUserRevenueInBackground(date);
 	}
-	private void processUserRevenueInBackground(String date) {
+	private void processUserRevenueInBackground(String date) throws IOException{
 		JobsRepository jobsRepository=new JobsRepository();
 		
 		UserRevenueService userRevenueService = new UserRevenueService();
@@ -92,14 +92,17 @@ public class UserRevenueReportsController implements Controller{
 
    	  logger.log(Level.WARNING ,"Background task finished");
    	  }catch(Exception e){
-   		  		logger.log(Level.SEVERE, "user revenue service:", e);		
-   		  		try{
-   		  			sendEmailJobAbortAlert(date,Collections.EMPTY_LIST);
-   		  		}catch(IOException ee){
-   		  			logger.log(Level.SEVERE, "error sending email alert:", ee);
-   		  		}
-				
-				jobsRepository.saveJobEntry(JobsRepository.USER_REVENUE_JOB, JobStatus.ABORTED, date);
+   		  		 logger.log(Level.SEVERE, "user revenue service:", e);	
+				 boolean result=jobsRepository.resetJobFailure(JobsRepository.USER_REVENUE_JOB, JobStatus.INCOMPLETE.name(), date);
+				 if(result){
+					 long DELAY_MS =1*60*1000;  //1 minutes		
+					 Queue queue = QueueFactory.getDefaultQueue();	
+					 queue.add(TaskOptions.Builder.withUrl("/administration/job/user/revenue/background").param("date", date).method(Method.POST).countdownMillis(DELAY_MS));			
+				 }
+				 else{
+					 jobsRepository.saveJobEntry(JobsRepository.USER_REVENUE_JOB, JobStatus.ABORTED, date);	   		  		
+	   		  		 sendEmailJobAbortAlert(date,Collections.EMPTY_LIST);
+				 }  		  		
 
 	       }
 	}	
@@ -137,7 +140,7 @@ public class UserRevenueReportsController implements Controller{
 	}
 	
 	
-	private void processFBUserRevenueInBackground(String date) {
+	private void processFBUserRevenueInBackground(String date) throws IOException{
 	     JobsRepository jobsRepository=new JobsRepository();
 		 try{
 	  	     FBUserRevenueService fbUserRevenueService = new FBUserRevenueService();
@@ -161,12 +164,16 @@ public class UserRevenueReportsController implements Controller{
   	  logger.log(Level.WARNING ,"Background task finished");
   	  }catch(Exception e){	    	   
 				logger.log(Level.SEVERE, "user revenue service:", e);
-   		  		try{
-   		  			sendEmailJobAbortAlert(date,Collections.EMPTY_LIST);
-   		  		}catch(IOException ee){
-   		  			logger.log(Level.SEVERE, "error sending email alert:", ee);
-   		  		}				
-				jobsRepository.saveJobEntry(JobsRepository.FB_USER_REVENUE_JOB, JobStatus.ABORTED, date);					
+				 boolean result=jobsRepository.resetJobFailure(JobsRepository.FB_USER_REVENUE_JOB, JobStatus.INCOMPLETE.name(), date);
+				 if(result){
+					 long DELAY_MS =1*60*1000;  //1 minutes		
+					 Queue queue = QueueFactory.getDefaultQueue();	
+					 queue.add(TaskOptions.Builder.withUrl("/administration/job/user/revenue/background/fb").param("date", date).method(Method.POST).countdownMillis(DELAY_MS));			
+				 }
+				 else{
+					 jobsRepository.saveJobEntry(JobsRepository.FB_USER_REVENUE_JOB, JobStatus.ABORTED, date);
+					 sendEmailJobAbortAlert(date,Collections.EMPTY_LIST);
+				 }									
 
 	       }	
 	}

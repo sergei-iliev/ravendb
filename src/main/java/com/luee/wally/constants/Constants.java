@@ -94,7 +94,7 @@ public interface Constants {
 	public static final List<String> ALLOWED_USER_COUNTIES_CONNECTION_FROM=Arrays.asList("FR","US","DE","CA","AU","GB","UK","RU","IT","ES","PT","NL","BE","AT","IE","CH","NZ","SE","FI","DK","PL","NO","UA","PR","ZZ");
 	
 	/******************Tenjin*******************************/
-	public static final String TENJIN_CUSTOM_EVENT_URL = "https://track.tenjin.io/v0/event?advertising_id=%s&bundle_id=%s&event=%s&platform=android&sdk_version=server&value=Nil";
+	public static final String TENJIN_CUSTOM_EVENT_URL = "https://track.tenjin.io/v0/event?advertising_id=%s&bundle_id=%s&event=%s&platform=android&sdk_version=server&value=Nil&country=%s";
 	
 	
 

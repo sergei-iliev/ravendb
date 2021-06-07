@@ -48,8 +48,10 @@ public class AffsService extends AbstractService{
 								return;
 							}
 						}
-																		
-						affsService.sendTenjinEvent(advertisingId,bundleId,event, apiKey);
+						Entity affs=affsRepository.findEntity("affs","gaid", advertisingId);
+						Objects.requireNonNull(affs,"affs entity  must not be null for gaid="+advertisingId);
+						
+						affsService.sendTenjinEvent(advertisingId,bundleId,event, apiKey,(String)affs.getProperty("country_code"));
 						
 						affsService.saveTenjinEvent(advertisingId, event);
 
@@ -59,7 +61,7 @@ public class AffsService extends AbstractService{
 					
 					
 				} catch (Exception e) {
-					Logger.getLogger(AffsService.class.getName()).log(Level.SEVERE, "Tenjin service:", e);
+					logger.log(Level.SEVERE, "Tenjin service:", e);
 				}
 			}
 		}).start();		
@@ -92,14 +94,14 @@ public class AffsService extends AbstractService{
     	
     }
     
-    public void sendTenjinEvent(String advertisingId,String bundelId,String event,String apiKey)throws Exception{
+    public void sendTenjinEvent(String advertisingId,String bundelId,String event,String apiKey,String countryCode)throws Exception{
 		Map<String,String> requestHeader=new HashMap<String,String>();
 		requestHeader.put("Authorization", "Basic "+Base64.getEncoder().encodeToString(apiKey.getBytes()));				
 		requestHeader.put("User-Agent", Constants.AGENT_NAME);		
 		requestHeader.put("Content-Type", "application/json; charset=UTF-8");
 		requestHeader.put("Accept", "application/json");		
 
-		String url=String.format(Constants.TENJIN_CUSTOM_EVENT_URL,advertisingId,bundelId,event);
+		String url=String.format(Constants.TENJIN_CUSTOM_EVENT_URL,advertisingId,bundelId,event,countryCode);
 		ConnectionMgr.INSTANCE.postJSON(url, "", requestHeader);					
     }
     /*
