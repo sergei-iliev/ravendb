@@ -48,7 +48,7 @@ public class AffsService extends AbstractService{
 								return;
 							}
 						}
-						Entity affs=affsRepository.findEntity("affs","gaid", advertisingId);
+						Entity affs=affsRepository.getLastAffEntryByGaid(advertisingId);
 						Objects.requireNonNull(affs,"affs entity  must not be null for gaid="+advertisingId);
 						
 						affsService.sendTenjinEvent(advertisingId,bundleId,event, apiKey,(String)affs.getProperty("country_code"));
