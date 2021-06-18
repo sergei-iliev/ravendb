@@ -9,6 +9,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.commons.io.IOUtils;
+import org.joda.time.DateTimeUtils;
 
 import com.luee.wally.admin.repository.ApplicationSettingsRepository;
 import com.luee.wally.api.tangocard.client.AccountsApi;
@@ -90,7 +91,9 @@ public class GiftCardService {
 		}
 
 		RaasClient raasClient=new  RaasClient(applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.TANGO_CARD_PLATFORM_IDENTIFIER),applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.TANGO_CARD_PLATFORM_KEY));
-	    String externalRefId = redeemingRequests.getRedeemingRequestId();
+	    raasClient.getSharedHttpClient().setTimeout(20000);  //20 sec
+	    
+		String externalRefId = redeemingRequests.getRedeemingRequestId();
 	       
 	    NameEmailModel recipientNameEmailModel = new NameEmailModel();
 	    recipientNameEmailModel.setFirstName(redeemingRequests.getFirstName());
