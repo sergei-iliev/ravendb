@@ -132,7 +132,7 @@ public class PaymentRuleService extends AbstractService {
 				object.put("url", redeemingRequest.fullNameLink());
 				objects.add(object);
 			}
-			if(ruleResult==RuleResultType.FULL_ADDRESS_DIFFERENT_USER){
+			if(ruleResult==RuleResultType.FULL_ADDRESS_DIFFERENT_USER||ruleResult==RuleResultType.FULL_ADDRESS_DIFFERENT_USER_5){
 				Map<String,String> object=new HashMap<>(3);
 				int count=paymentRepository.countEligibleUsersByAddress(redeemingRequest.getFullAddress(),redeemingRequest.getUserGuid()); 		
 
@@ -143,7 +143,7 @@ public class PaymentRuleService extends AbstractService {
 				object.put("url", redeemingRequest.fullAddressLink());
 				objects.add(object);
 			}
-			if(ruleResult==RuleResultType.IP_ADDRESS_DIFFERENT_USER){
+			if(ruleResult==RuleResultType.IP_ADDRESS_DIFFERENT_USER||ruleResult==RuleResultType.IP_ADDRESS_DIFFERENT_USER_3){
 				Map<String,String> object=new HashMap<>(3);
 				int count=paymentRepository.countEligibleUsersByIP(redeemingRequest.getIpAddress(),redeemingRequest.getUserGuid());
 				

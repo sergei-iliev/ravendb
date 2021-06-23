@@ -54,6 +54,9 @@ public class RedeemingRequestRuleValue {
 				return RuleStatusType.Yellow;
 			case USING_VPN:
 				return RuleStatusType.Red;
+			case FULL_ADDRESS_DIFFERENT_USER_5:	
+			case IP_ADDRESS_DIFFERENT_USER_3:
+				return RuleStatusType.Red;
 			default:
 				return RuleStatusType.Green;
 			}
