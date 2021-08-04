@@ -74,7 +74,7 @@ public class PaymentOrderTransactionsService extends AbstractService{
 		return result;		
 		
 	}
-	public BasicAmountType getPayPalBalance(Map<String,String> configMap)throws Exception{
+	public GetBalanceResponseType getPayPalBalance(Map<String,String> configMap)throws Exception{
 		GetBalanceReq getBalanceReq=new GetBalanceReq();
 		
 		GetBalanceRequestType reqType = new GetBalanceRequestType();
@@ -93,7 +93,7 @@ public class PaymentOrderTransactionsService extends AbstractService{
 		PayPalAPIInterfaceServiceService service = new PayPalAPIInterfaceServiceService(configMap);
 		
 		GetBalanceResponseType getBalanceResponseType=service.getBalance(getBalanceReq);
-		return getBalanceResponseType.getBalance();
+		return getBalanceResponseType;
 	}
 	public Collection<OrderTransactionResult> getPayPalOrderTransactions(String startDate,String endDate,Map<String,String> configMap) throws Exception{
 		TransactionSearchReq transactionSearchReq = new TransactionSearchReq();

@@ -23,6 +23,7 @@ import com.luee.wally.command.order.OrderTransactionResult;
 import com.luee.wally.constants.Constants;
 import com.luee.wally.utils.Utilities;
 
+import urn.ebay.api.PayPalAPI.GetBalanceResponseType;
 import urn.ebay.apis.CoreComponentTypes.BasicAmountType;
 
 public class PaymentOrderTransactionController implements Controller {
@@ -46,9 +47,12 @@ public class PaymentOrderTransactionController implements Controller {
 		configMap.put("acct1.Signature", signature);
 		
 		PaymentOrderTransactionsService paymentOrderTransactionsService=new PaymentOrderTransactionsService();
-		BasicAmountType basicAmountType= paymentOrderTransactionsService.getPayPalBalance(configMap);
-		
-		resp.getWriter().println("Current balance - "+basicAmountType.getValue()+" "+basicAmountType.getCurrencyID().getValue());
+		GetBalanceResponseType basicAmountType= paymentOrderTransactionsService.getPayPalBalance(configMap);
+		resp.getWriter().println("Balance timestamp: "+basicAmountType.getBalanceTimeStamp());
+		resp.getWriter().println("Current balance - "+basicAmountType.getBalance().getValue()+" "+basicAmountType.getBalance().getCurrencyID().getValue());
+		for(BasicAmountType a:basicAmountType.getBalanceHoldings()){
+			resp.getWriter().println(a.getValue()+" "+a.getCurrencyID().getValue());
+		}
 		
 	}
 	/*
