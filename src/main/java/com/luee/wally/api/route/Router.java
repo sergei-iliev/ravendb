@@ -75,6 +75,8 @@ INSTANCE;
     	 httpGetRouteList.put("/administration/job/user/revenue/run",new Route(new UserRevenueReportsController(),"runUserAdRevenueDailyReportByDate"));
     	 httpGetRouteList.put("/administration/job/user/revenue/run/fb",new Route(new UserRevenueReportsController(),"runfbUserAdRevenueDailyReportByDate"));
     	 httpGetRouteList.put("/administration/job/order/transactions", new Route(new PaymentOrderTransactionController(),"runOrderTransactionReport"));
+    	 httpGetRouteList.put("/administration/test/balance", new Route(new PaymentOrderTransactionController(),"testPayPalBalance"));
+    	 
     	 httpGetRouteList.put("/administration/payment/paidusers/export",new Route(new ExportController(),"index"));
     	 httpGetRouteList.put("/administration/payment/paidusers/removed",new Route(new PaidUsersController(),"removed"));
     	 

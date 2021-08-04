@@ -23,8 +23,34 @@ import com.luee.wally.command.order.OrderTransactionResult;
 import com.luee.wally.constants.Constants;
 import com.luee.wally.utils.Utilities;
 
+import urn.ebay.apis.CoreComponentTypes.BasicAmountType;
+
 public class PaymentOrderTransactionController implements Controller {
-	
+	/*
+	 * Delete once tested
+	 */
+	public void testPayPalBalance(HttpServletRequest req, HttpServletResponse resp)
+			throws Exception{
+	    ApplicationSettingsService applicationSettingsService=new ApplicationSettingsService(); 
+		String userName=applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.PAYPAL_MERCHANT_API_USERNAME);
+		String password=applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.PAYPAL_MERCHANT_API_PASSWORD);
+		String signature=applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.PAYPAL_MERCHANT_API_SIGNATURE);
+
+		    
+		String paypalMode=applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.PAYPAL_MODE);
+
+		Map<String,String> configMap = new HashMap<>();		    
+		configMap.put("mode",paypalMode);		
+		configMap.put("acct1.UserName", userName);
+		configMap.put("acct1.Password", password);
+		configMap.put("acct1.Signature", signature);
+		
+		PaymentOrderTransactionsService paymentOrderTransactionsService=new PaymentOrderTransactionsService();
+		BasicAmountType basicAmountType= paymentOrderTransactionsService.getPayPalBalance(configMap);
+		
+		resp.getWriter().println("Current balance - "+basicAmountType.getValue()+" "+basicAmountType.getCurrencyID().getValue());
+		
+	}
 	/*
 	 * Execute as GAE job
 	 */

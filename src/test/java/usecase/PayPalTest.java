@@ -73,6 +73,7 @@ import urn.ebay.api.PayPalAPI.PayPalAPIInterfaceServiceService;
 import urn.ebay.api.PayPalAPI.TransactionSearchReq;
 import urn.ebay.api.PayPalAPI.TransactionSearchRequestType;
 import urn.ebay.api.PayPalAPI.TransactionSearchResponseType;
+import urn.ebay.apis.CoreComponentTypes.BasicAmountType;
 
 
 public class PayPalTest {
@@ -122,7 +123,12 @@ public class PayPalTest {
 		
 		return configMap;
 	}
-	
+	@Test
+	public void payPalAccountBalanceTest() throws Exception {
+		PaymentOrderTransactionsService paymentOrderTransactionsService=new PaymentOrderTransactionsService();
+		BasicAmountType basicAmountType=paymentOrderTransactionsService.getPayPalBalance(getAcctAndConfig());
+		
+	}
 	@Test
 	public void payPalTransactionHistoryTest() throws Exception {
 		

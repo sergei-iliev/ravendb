@@ -17,10 +17,14 @@ import com.luee.wally.constants.Constants;
 import com.luee.wally.json.ExchangeRateVO;
 import com.luee.wally.utils.Utilities;
 
+import urn.ebay.api.PayPalAPI.GetBalanceReq;
+import urn.ebay.api.PayPalAPI.GetBalanceRequestType;
+import urn.ebay.api.PayPalAPI.GetBalanceResponseType;
 import urn.ebay.api.PayPalAPI.PayPalAPIInterfaceServiceService;
 import urn.ebay.api.PayPalAPI.TransactionSearchReq;
 import urn.ebay.api.PayPalAPI.TransactionSearchRequestType;
 import urn.ebay.api.PayPalAPI.TransactionSearchResponseType;
+import urn.ebay.apis.CoreComponentTypes.BasicAmountType;
 import urn.ebay.apis.eBLBaseComponents.PaymentTransactionSearchResultType;
 import urn.ebay.apis.eBLBaseComponents.PaymentTransactionStatusCodeType;
 
@@ -69,6 +73,27 @@ public class PaymentOrderTransactionsService extends AbstractService{
 		});
 		return result;		
 		
+	}
+	public BasicAmountType getPayPalBalance(Map<String,String> configMap)throws Exception{
+		GetBalanceReq getBalanceReq=new GetBalanceReq();
+		
+		GetBalanceRequestType reqType = new GetBalanceRequestType();
+
+		/*
+		(Optional) Indicates whether to return all currencies. It is one of the following values:
+			0  Return only the balance for the primary currency holding.
+			1  Return the balance for each currency holding.
+		Note:
+		This field is available since version 51. 
+		Prior versions return only the balance for the primary currency holding.
+		 */
+		reqType.setReturnAllCurrencies("1");
+		getBalanceReq.setGetBalanceRequest(reqType);
+		
+		PayPalAPIInterfaceServiceService service = new PayPalAPIInterfaceServiceService(configMap);
+		
+		GetBalanceResponseType getBalanceResponseType=service.getBalance(getBalanceReq);
+		return getBalanceResponseType.getBalance();
 	}
 	public Collection<OrderTransactionResult> getPayPalOrderTransactions(String startDate,String endDate,Map<String,String> configMap) throws Exception{
 		TransactionSearchReq transactionSearchReq = new TransactionSearchReq();
