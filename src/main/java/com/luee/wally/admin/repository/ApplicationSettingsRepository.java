@@ -62,7 +62,9 @@ public class ApplicationSettingsRepository extends AbstractRepository {
 	public static final String PAYPAL_MERCHANT_API_USERNAME="PAYPAL_MERCHANT_API_USERNAME";	
 	public static final String PAYPAL_MERCHANT_API_PASSWORD="PAYPAL_MERCHANT_API_PASSWORD";	
 	public static final String PAYPAL_MERCHANT_API_SIGNATURE="PAYPAL_MERCHANT_API_SIGNATURE";
-
+	public static final String PAYPAL_BALANCE_THRESHOLD_USD="PAYPAL_BALANCE_THRESHOLD_USD";
+	public static final String PAYPAL_BALANCE_THRESHOLD_EUR="PAYPAL_BALANCE_THRESHOLD_EUR";
+	
 	
 	public static final String FIREBASE_APP_KEY="FIREBASE_APP_KEY";
 	public static final String TENJIN_APP_KEY="TENJIN_APP_KEY";

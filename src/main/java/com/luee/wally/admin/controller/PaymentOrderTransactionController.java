@@ -1,13 +1,18 @@
 package com.luee.wally.admin.controller;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -27,16 +32,16 @@ import urn.ebay.api.PayPalAPI.GetBalanceResponseType;
 import urn.ebay.apis.CoreComponentTypes.BasicAmountType;
 
 public class PaymentOrderTransactionController implements Controller {
+	private final Logger logger = Logger.getLogger(PaymentOrderTransactionController.class.getName());
 	/*
-	 * Delete once tested
+	   send a report daily at 07:06 GMT with the current balance for EUR and for USD.
+	   Execute as GAE job
 	 */
-	public void testPayPalBalance(HttpServletRequest req, HttpServletResponse resp)
-			throws Exception{
+	public void runPayPalBalanceDaily(HttpServletRequest req, HttpServletResponse resp) throws Exception{
 	    ApplicationSettingsService applicationSettingsService=new ApplicationSettingsService(); 
 		String userName=applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.PAYPAL_MERCHANT_API_USERNAME);
 		String password=applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.PAYPAL_MERCHANT_API_PASSWORD);
 		String signature=applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.PAYPAL_MERCHANT_API_SIGNATURE);
-
 		    
 		String paypalMode=applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.PAYPAL_MODE);
 
@@ -46,15 +51,102 @@ public class PaymentOrderTransactionController implements Controller {
 		configMap.put("acct1.Password", password);
 		configMap.put("acct1.Signature", signature);
 		
+		
 		PaymentOrderTransactionsService paymentOrderTransactionsService=new PaymentOrderTransactionsService();
 		GetBalanceResponseType basicAmountType= paymentOrderTransactionsService.getPayPalBalance(configMap);
-		resp.getWriter().println("Balance timestamp: "+basicAmountType.getBalanceTimeStamp());
-		resp.getWriter().println("Current balance - "+basicAmountType.getBalance().getValue()+" "+basicAmountType.getBalance().getCurrencyID().getValue());
-		for(BasicAmountType a:basicAmountType.getBalanceHoldings()){
-			resp.getWriter().println(a.getValue()+" "+a.getCurrencyID().getValue());
+
+		Optional<BasicAmountType> usdBalance=basicAmountType.getBalanceHoldings().stream().filter(e->e.getCurrencyID().getValue().equalsIgnoreCase("USD")).findFirst();
+		Optional<BasicAmountType> eurBalance=basicAmountType.getBalanceHoldings().stream().filter(e->e.getCurrencyID().getValue().equalsIgnoreCase("EUR")).findFirst();
+
+		String formattedDate = Utilities.formatedDate(new Date(), "yyyy-MM-dd");
+		
+		String emailTo1=applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.PAYMENT_REPORT_EMAIL_1);
+		String emailTo2=applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.PAYMENT_REPORT_EMAIL_2);
+
+		String emailFrom=applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.NO_REPLY_EMAIL);
+        
+		StringBuffer sb=new StringBuffer();
+		sb.append("1. PayPal balance for USD is "+usdBalance.get().getValue()+"<br>");
+		sb.append("2. PayPal balance for EUR is "+eurBalance.get().getValue()+"<br>");
+		
+		Email email=new Email();
+		email.setTo(emailTo1);
+		email.setCC(emailTo2);
+		email.setContent(sb.toString());
+		email.setFrom(emailFrom);
+		email.setSubject("PayPal balance on "+formattedDate);
+			 
+		MailService mailService = new MailService();
+	    mailService.sendMailGrid(email);
+	    
+	}
+
+	
+	/*
+		the alert should run every 1 hour and send an email immediately in case balance goes below threshold.
+	 	Execute as GAE job
+	 */
+	public void runPayPalBalanceThreshold(HttpServletRequest req, HttpServletResponse resp)
+			throws Exception{
+	    ApplicationSettingsService applicationSettingsService=new ApplicationSettingsService(); 
+		String userName=applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.PAYPAL_MERCHANT_API_USERNAME);
+		String password=applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.PAYPAL_MERCHANT_API_PASSWORD);
+		String signature=applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.PAYPAL_MERCHANT_API_SIGNATURE);
+		    
+		String paypalMode=applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.PAYPAL_MODE);
+
+		Map<String,String> configMap = new HashMap<>();		    
+		configMap.put("mode",paypalMode);		
+		configMap.put("acct1.UserName", userName);
+		configMap.put("acct1.Password", password);
+		configMap.put("acct1.Signature", signature);
+		
+		String usdThreshold=applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.PAYPAL_BALANCE_THRESHOLD_USD);
+		String eurThreshold=applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.PAYPAL_BALANCE_THRESHOLD_EUR);
+
+		
+		PaymentOrderTransactionsService paymentOrderTransactionsService=new PaymentOrderTransactionsService();
+		GetBalanceResponseType basicAmountType= paymentOrderTransactionsService.getPayPalBalance(configMap);
+		
+		
+		Optional<BasicAmountType> usdBalance=basicAmountType.getBalanceHoldings().stream().filter(e->e.getCurrencyID().getValue().equalsIgnoreCase("USD")).findFirst();
+		Optional<BasicAmountType> eurBalance=basicAmountType.getBalanceHoldings().stream().filter(e->e.getCurrencyID().getValue().equalsIgnoreCase("EUR")).findFirst();
+		calculateAlert1(usdThreshold,usdBalance.get());
+		calculateAlert1(eurThreshold,eurBalance.get());
+	}
+	
+	private void calculateAlert1(String threshold,BasicAmountType balance) throws IOException{
+		BigDecimal thresholdValue;
+		Objects.requireNonNull(balance, "Balance value is NULL");
+		try {
+			thresholdValue= BigDecimal.valueOf(Double.valueOf(threshold));
+
+		}catch(NumberFormatException e) {
+			logger.severe("Unable to convert String to number: "+threshold+" "+balance.getCurrencyID().getValue());
+			return;	
+		}
+		BigDecimal balanceValue=new BigDecimal(balance.getValue());
+		if(balanceValue.compareTo(thresholdValue)<0) {
+		    ApplicationSettingsService applicationSettingsService=new ApplicationSettingsService(); 
+			String emailTo=applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.PAYMENT_REPORT_EMAIL_1);
+	        String emailFrom=applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.NO_REPLY_EMAIL);
+	        
+			
+			Email email=new Email();
+			email.setTo(emailTo);
+			email.setContent("PayPal balance for "+balance.getCurrencyID().getValue()+" is "+balance.getValue());
+			email.setFrom(emailFrom);
+			email.setSubject("PayPal balance for "+balance.getCurrencyID().getValue()+" is below threshold");
+				 
+			MailService mailService = new MailService();
+		    mailService.sendMailGrid(email);
+			
+			
 		}
 		
 	}
+	
+	
 	/*
 	 * Execute as GAE job
 	 */
