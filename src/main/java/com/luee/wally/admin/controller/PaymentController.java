@@ -257,7 +257,7 @@ public class PaymentController implements Controller {
 					(String) user.getProperty("full_address"), (String) user.getProperty("country_code"),
 					(String) user.getProperty("paypal_account"), invoiceNumber));
 			// send invoice
-			mailService.sendGridInvoice(toInvoiceMail, fromMail, attachment);
+			//mailService.sendGridInvoice(toInvoiceMail, fromMail, attachment);
 			resp.getWriter().write("OK");
 		} catch (PayPalRESTException ppe) {
 			logger.log(Level.SEVERE, ppe.getMessage(), ppe);

@@ -41,26 +41,27 @@ import com.luee.wally.utils.Utilities;
 public class PaymentRepository extends AbstractRepository {
 	private final Logger logger = Logger.getLogger(PaymentRepository.class.getName());
 
+	private ImportService importService = new ImportService();
+	
 	public BigDecimal convert(double amount, String currencyCode,String toTargetCurrencyCode) throws Exception {
 		BigDecimal rateValue = BigDecimal.ONE;
 
 		if (!currencyCode.equalsIgnoreCase(toTargetCurrencyCode)) {
-			MemcacheService memcache = MemcacheServiceFactory.getMemcacheService();
-			Double cachedValue = (Double) memcache.get(currencyCode);
-			if (cachedValue == null) {
-				String formatedDate = Utilities.formatedDate(new Date(), "yyyy-MM-dd");
-				ImportService importService = new ImportService();
-				ExchangeRateVO rate = importService.getExchangeRates(formatedDate,toTargetCurrencyCode, currencyCode);
-				rateValue = BigDecimal.valueOf(rate.getRates().get(currencyCode));
-				memcache.put(currencyCode, rate.getRates().get(currencyCode), Expiration.byDeltaSeconds(3600));
-			} else {
-
-				rateValue = BigDecimal.valueOf(cachedValue);
-			}
+//			MemcacheService memcache = MemcacheServiceFactory.getMemcacheService();
+//			Double cachedValue = (Double) memcache.get(currencyCode);
+//			logger.warning("Found in cache for "+currencyCode+": "+cachedValue);
+//			if (cachedValue == null) {
+				String formatedDate = Utilities.formatedDate(new Date(), "yyyy-MM-dd");				
+				ExchangeRateVO rate = importService.getExchangeRates(formatedDate, currencyCode,toTargetCurrencyCode);				
+				rateValue = BigDecimal.valueOf(rate.getRates().get(toTargetCurrencyCode));
+//				memcache.put(currencyCode, rate.getRates().get(currencyCode), Expiration.byDeltaSeconds(3600));
+//			} else {				
+//				rateValue = BigDecimal.valueOf(cachedValue);
+//			}
 		}
 
 		BigDecimal currentValue = new BigDecimal(amount);
-		BigDecimal eurAmount = currentValue.divide(rateValue, 2, BigDecimal.ROUND_HALF_EVEN);
+		BigDecimal eurAmount = currentValue.multiply(rateValue);
 
 		return eurAmount;
 	}

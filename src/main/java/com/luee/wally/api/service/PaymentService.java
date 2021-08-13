@@ -278,7 +278,7 @@ public class PaymentService extends AbstractService {
 			attachment.readFromStream(invoiceService.createInvoice(payoutResult, form.getFullName(), form.getAddress(),
 					form.getCountryCode(), form.getPaypalAccount(), invoiceNumber));
 			// send invoice
-			mailService.sendGridInvoice(toInvoiceMail, fromMail, attachment);
+			//mailService.sendGridInvoice(toInvoiceMail, fromMail, attachment);
 			
 			return new ImmutablePair<>(HttpStatus.SC_OK, null);
 		} catch (PayPalRESTException ppe) {
