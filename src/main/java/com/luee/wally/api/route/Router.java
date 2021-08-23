@@ -17,6 +17,7 @@ import com.luee.wally.admin.controller.CampaignSearchController;
 import com.luee.wally.admin.controller.ConfirmEmailController;
 import com.luee.wally.admin.controller.EmailTemplateController;
 import com.luee.wally.admin.controller.ExportController;
+import com.luee.wally.admin.controller.ExportToolController;
 import com.luee.wally.admin.controller.FBAffsSearchController;
 import com.luee.wally.admin.controller.GiftCardController;
 import com.luee.wally.admin.controller.ImportController;
@@ -78,7 +79,8 @@ INSTANCE;
     	 httpGetRouteList.put("/administration/job/order/paypal/balance/alert/threshold", new Route(new PaymentOrderTransactionController(),"runPayPalBalanceThreshold"));
     	 httpGetRouteList.put("/administration/job/order/paypal/balance/alert/daily", new Route(new PaymentOrderTransactionController(),"runPayPalBalanceDaily"));
 	 
-    	 
+    	 //deleteme
+    	 httpGetRouteList.put("/administration/job/payment/fix", new Route(new ExportToolController(),"deleteme"));
     	 
     	 
     	 httpGetRouteList.put("/administration/payment/paidusers/export",new Route(new ExportController(),"index"));

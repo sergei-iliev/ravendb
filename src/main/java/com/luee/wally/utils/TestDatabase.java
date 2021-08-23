@@ -58,7 +58,7 @@ public enum TestDatabase {
 		entity.setProperty("full_address", "baba tonka 6 for accson");
 		entity.setProperty("max_rev", (double)1.559953);
 		ds.put(entity);		
-		crearePaiedUsersEntity(entity,1.8,"EUR",createDate(30, 12, 2019));
+		crearePaiedUsersEntity(entity,10.8,"CAD",createDate(1, 12, 2020));
 		
 		entity=createRedeemingRequestEntity("Minko","696f-4258-baef-55b6aa6550b1","48bb2675-a072-4b6b-ab66-cb599a29147d", "1111",new Date(), "com.moregames.makemoney", "PayPal", "sergei.iliev-facilitator@gmail.com", "FR");
 		entity.setProperty("ua_channel", "supersonic");
@@ -67,7 +67,7 @@ public enum TestDatabase {
 		entity.setProperty("max_rev", (double)5.8);
 		entity.setProperty("full_address", "baba tonka 6 for accson");
 		ds.put(entity);
-		crearePaiedUsersEntity(entity,0.8,"USD",createDate(1, 12, 2020));
+		crearePaiedUsersEntity(entity,2.8,"USD",createDate(1, 12, 2020));
 		
 		entity=createRedeemingRequestEntity("Minko1 and Macarena","696f-4258-baef-55b6aa6550b11","ffff2675-a072-4b6b-ab66-cb599a29147d1", "111", new Date(), "com.moregames.makemoney2", "PayPal", "sergei.iliev-facilitator@gmail.com", "US");
 		entity.setProperty("ua_channel", "vungle");
@@ -75,14 +75,14 @@ public enum TestDatabase {
 		entity.setProperty("max_rev", (double)2);
 		entity.setProperty("full_address", "baba tonka 26 for accson");
 		ds.put(entity);
-		crearePaiedUsersEntity(entity,0.9,"USD",createDate(14, 1, 2020));
+		crearePaiedUsersEntity(entity,30,"GBP",createDate(1, 12, 2020));
 		
 		entity=createRedeemingRequestEntity("Minko1 and Macarena","696f-4258-baef-55b6aa6550b12","ffff2675-a072-4b6b-ab66-cb599a29147d2", "1113", new Date(), "com.moregames.makemoney", "PayPal", "sergei.iliev-facilitator@gmail.com", "US");		
 		entity.setProperty("full_address", "baba tonka 3456 for accson");
 		entity.setProperty("ip_address", "1.0.0.2");
 		entity.setProperty("max_rev", (double)15.73);
 		ds.put(entity);		
-		crearePaiedUsersEntity(entity,0.9,"USD",createDate(12, 1, 2020));	
+		crearePaiedUsersEntity(entity,9,"USD",createDate(12, 1, 2020));	
 
 		entity=createRedeemingRequestEntity("Minko1 and Macarena","696f-4258-baef-55b6aa6550b13","ffff2675-a072-4b6b-ab66-cb599a29147d3", "1112", new Date(), "com.moregames.makemoney", "PayPal", "sergei.iliev-facilitator@gmail.com", "US");		
 		entity.setProperty("is_paid", false);
@@ -90,7 +90,7 @@ public enum TestDatabase {
 		entity.setProperty("ip_address", "1.0.0.3");
 		entity.setProperty("max_rev", (double)10.27);
 		ds.put(entity);		
-		crearePaiedUsersEntity(entity,0.9,"USD",createDate(15, 1, 2020));	
+		crearePaiedUsersEntity(entity,90,"EUR",createDate(15, 1, 2020));	
 		createRedeemingRequestsEmailJob(entity.getKey());
 		
 		entity=createRedeemingRequestEntity("Viola","e701-4678-8d39-0c2485204f3b","aaaa2675-a072-4b6b-ab66-cb599a29147d", "122", new Date(), "com.moregames.makemoney", "Amazon", "sergei_iliev@yahoo.com", "GB");		
@@ -111,7 +111,7 @@ public enum TestDatabase {
 		entity.setProperty("ip_address", "77.98.102.111");
 		ds.put(entity);
 		
-		crearePaiedUsersEntity(entity,2.9,"USD",createDate(1, 1, 2022));
+		crearePaiedUsersEntity(entity,2.9,"CAD",createDate(1, 1, 2019));
 		createRedeemingRequestsEmailJob(entity.getKey());
 		
 		entity=createRedeemingRequestEntity("Gurmen","8957-48bb-a089-de0adca6a91e","cccc1675-a072-4b6b-ab66-cb599a291BAA", "90", new Date(), "com.moregames.makemoney", "Amazon", "sergei.iliev@gmail.com", "DE");		

@@ -69,6 +69,7 @@ import com.paypal.api.payments.PayoutItem;
 import com.paypal.api.payments.PayoutSenderBatchHeader;
 import com.paypal.base.rest.APIContext;
 
+import urn.ebay.api.PayPalAPI.GetBalanceResponseType;
 import urn.ebay.api.PayPalAPI.PayPalAPIInterfaceServiceService;
 import urn.ebay.api.PayPalAPI.TransactionSearchReq;
 import urn.ebay.api.PayPalAPI.TransactionSearchRequestType;
@@ -126,7 +127,7 @@ public class PayPalTest {
 	@Test
 	public void payPalAccountBalanceTest() throws Exception {
 		PaymentOrderTransactionsService paymentOrderTransactionsService=new PaymentOrderTransactionsService();
-		BasicAmountType basicAmountType=paymentOrderTransactionsService.getPayPalBalance(getAcctAndConfig());
+		GetBalanceResponseType basicAmountType=paymentOrderTransactionsService.getPayPalBalance(getAcctAndConfig());
 		
 	}
 	@Test
