@@ -80,8 +80,9 @@ INSTANCE;
     	 httpGetRouteList.put("/administration/job/order/paypal/balance/alert/daily", new Route(new PaymentOrderTransactionController(),"runPayPalBalanceDaily"));
 	 
     	 //deleteme
-    	 httpGetRouteList.put("/administration/job/payment/fix", new Route(new ExportToolController(),"deleteme"));
-    	 
+    	 httpGetRouteList.put("/administration/tools/eurocurrency/fix", new Route(new ExportToolController(),"convertToEuro"));
+    	 httpGetRouteList.put("/administration/tools/eurocurrency/fix", new Route(new ExportToolController(),"convertToEuro"));
+    	 httpGetRouteList.put("/administration/monitor/progress", new Route(new ExportToolController(),"getProgressMonitor"));
     	 
     	 httpGetRouteList.put("/administration/payment/paidusers/export",new Route(new ExportController(),"index"));
     	 httpGetRouteList.put("/administration/payment/paidusers/removed",new Route(new PaidUsersController(),"removed"));
@@ -130,7 +131,8 @@ INSTANCE;
     	 
     	 
     	 httpPostRouteList.put("/administration/job/payment/user/external/email", new Route(new EmailTemplateController(),"externalPaymentSentEmail")); 
-
+    	 //deleteme
+    	 httpPostRouteList.put("/administration/tools/eurocurrency/run", new Route(new ExportToolController(),"runConvertEurTool"));
     	 
     	 httpPostRouteList.put("/administration/payment/paidusers/search/general", new Route(new PaidUsersController(),"search")); 
     	 httpPostRouteList.put("/administration/payment/paidusers/search/byemail", new Route(new PaidUsersController(),"searchByEmail"));

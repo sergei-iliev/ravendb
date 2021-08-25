@@ -51,7 +51,7 @@ public class AbstractRepository {
 	}
 	
 	public Entity findEntityByKey(String key) {
-		DatastoreService ds = createDatastoreService(Consistency.EVENTUAL);
+		DatastoreService ds = createDatastoreService(Consistency.STRONG);
 		try {
 			return ds.get(KeyFactory.stringToKey(key));
 		} catch (EntityNotFoundException e) {

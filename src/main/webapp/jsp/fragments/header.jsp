@@ -70,7 +70,15 @@
           		<a class="dropdown-item" href="/administration/users/data/delete">User data removal</a>				           		       	
 				<a class="dropdown-item" href="/administration/users/guid/exists">User guid exists</a>          		
         	</div>
-      	</li>      	
+      	</li>      
+      	<li class="nav-item dropdown ${param.activeMenuItem eq 'tools' ? 'active' : ''}">
+        	<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          		Tools
+        	</a>
+        	<div class="dropdown-menu" aria-labelledby="navbarDropdown">
+          		<a class="dropdown-item" href="/administration/tools/eurocurrency/fix">Update EURO Currency Column</a>				           		       					        	
+        	</div>
+      	</li> 
       	<li class="nav-item ${param.activeMenuItem eq 'settings' ? 'active' : ''}">   
             <a class="nav-link" href="/administration/settings">Application Settings</a>
         </li>
