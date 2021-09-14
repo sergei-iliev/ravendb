@@ -88,15 +88,19 @@ public class UserRevenueTest {
 		ImportService importService=new ImportService();
 		
 		PaidUsers2018 user=new PaidUsers2018();
-		user.setCurrencyCode("EUR");
-		user.setDate("8/13/2019");
+		user.setCurrencyCode("GBP");
+		user.setDate("9/31/2021");
 		
-		ExchangeRateVO exchangeRateVO= importService.getExchangeRates(user.getFormatedDate("YYYY-MM-dd"), "USD","EUR");
+		ExchangeRateVO exchangeRateVO= importService.getExchangeRates(user.getFormatedDate("YYYY-MM-dd"), "GBP","USD");
 		System.out.println(exchangeRateVO.getRates());
 		
 	}
 
-
+	@Test
+	public void getExchangeRatesAdRevTest() throws Exception {
+		 PaymentRepository paymentRepository=new PaymentRepository();
+		 BigDecimal usdAmount=paymentRepository.convert(20, "GBP", "USD");
+	}
 	@Test
 	public void import2019Test() throws Exception {
 	
