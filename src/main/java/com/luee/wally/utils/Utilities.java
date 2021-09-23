@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Base64;
 import java.util.Date;
 
 import com.luee.wally.constants.Constants;
@@ -42,4 +43,9 @@ public final class Utilities {
         return price.setScale(2, BigDecimal.ROUND_HALF_EVEN).toString();
     }
 	
+	public static String createBasicAuthString(String user, String password) {
+        return String.format("Basic %s", Base64.getEncoder()
+                .encodeToString(String.format("%s:%s", user, password)
+                        .getBytes()));
+    }	
 }

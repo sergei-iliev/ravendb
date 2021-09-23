@@ -45,6 +45,9 @@ import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 import com.luee.wally.admin.controller.PaymentController;
 import com.luee.wally.admin.repository.InvoiceRepository;
 import com.luee.wally.admin.repository.PaymentRepository;
+import com.luee.wally.api.ConnectionMgr;
+import com.luee.wally.api.paypal.client.ClientApi;
+import com.luee.wally.api.paypal.client.TransactionsApi;
 import com.luee.wally.api.service.InvoiceService;
 import com.luee.wally.api.service.MailService;
 import com.luee.wally.api.service.PayPalService;
@@ -114,6 +117,8 @@ public class PayPalTest {
 		helper.tearDown();
 	}
 	
+	
+	
 	public static final Map<String,String> getAcctAndConfig(){
 		Map<String,String> configMap = new HashMap<String,String>();		
 		configMap.put("mode", "sandbox");
@@ -160,25 +165,25 @@ public class PayPalTest {
 
 		
 		
-		ZonedDateTime now=ZonedDateTime.now();
-		ZonedDateTime yesterday=now.minusYears(10);
-		   
-		ZonedDateTime yesterdayStart=yesterday.truncatedTo(ChronoUnit.DAYS);
-		ZonedDateTime yesterdayEnd=yesterdayStart.plusHours(24);
-		
-		PaymentOrderTransactionsService paymentOrderTransactionsService=new PaymentOrderTransactionsService();
-		Collection<OrderTransactionResult> result=paymentOrderTransactionsService.getPayPalOrderTransactions(Instant.from(yesterday).toString(),Instant.from(now).toString(),getAcctAndConfig());  
-
-	    
-		result.forEach(r->{
-			System.out.println(r.getValue()+"::"+r.getCurrencyCode()+"::"+r.getTimestamp());
-		});
-		String formattedDate = Utilities.formatedDate(yesterday, "yyyy-MM-dd");
-		
-		Map<String,BigDecimal> map= paymentOrderTransactionsService.getOrderTransactionsGroupBy(result);
-		System.out.println(map);
-		BigDecimal sum=paymentOrderTransactionsService.calculateTotal(map, formattedDate, "USD");
-	    System.out.println("USD="+sum);
+//		ZonedDateTime now=ZonedDateTime.now();
+//		ZonedDateTime yesterday=now.minusYears(10);
+//		   
+//		ZonedDateTime yesterdayStart=yesterday.truncatedTo(ChronoUnit.DAYS);
+//		ZonedDateTime yesterdayEnd=yesterdayStart.plusHours(24);
+//		
+//		PaymentOrderTransactionsService paymentOrderTransactionsService=new PaymentOrderTransactionsService();
+//		Collection<OrderTransactionResult> result=paymentOrderTransactionsService.getPayPalOrderTransactions(Instant.from(yesterday).toString(),Instant.from(now).toString(),getAcctAndConfig());  
+//
+//	    
+//		result.forEach(r->{
+//			System.out.println(r.getValue()+"::"+r.getCurrencyCode()+"::"+r.getTimestamp());
+//		});
+//		String formattedDate = Utilities.formatedDate(yesterday, "yyyy-MM-dd");
+//		
+//		Map<String,BigDecimal> map= paymentOrderTransactionsService.getOrderTransactionsGroupBy(result);
+//		System.out.println(map);
+//		BigDecimal sum=paymentOrderTransactionsService.calculateTotal(map, formattedDate, "USD");
+//	    System.out.println("USD="+sum);
 		
 	}
 	@Test

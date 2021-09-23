@@ -6,6 +6,7 @@ import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -153,8 +154,8 @@ public class PaymentOrderTransactionController implements Controller {
 	public void runOrderTransactionReport(HttpServletRequest req, HttpServletResponse resp)
 			throws Exception{
 		
-		
-		//processPayPalOrderTransactions();
+		//PayPal
+		processPayPalOrderTransactions();
 		
 		//Tango card PS
 	    ApplicationSettingsService applicationSettingsService=new ApplicationSettingsService(); 
@@ -216,23 +217,10 @@ public class PaymentOrderTransactionController implements Controller {
 
 		
 	}
-	private void processPayPalOrderTransactions()throws Exception{				
+	public void processPayPalOrderTransactions()throws Exception{				
 
 	    ApplicationSettingsService applicationSettingsService=new ApplicationSettingsService(); 
-		String userName=applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.PAYPAL_MERCHANT_API_USERNAME);
-		String password=applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.PAYPAL_MERCHANT_API_PASSWORD);
-		String signature=applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.PAYPAL_MERCHANT_API_SIGNATURE);
-
-		    
-		String paypalMode=applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.PAYPAL_MODE);
-
-		Map<String,String> configMap = new HashMap<>();		    
-		configMap.put("mode",paypalMode);		
-		configMap.put("acct1.UserName", userName);
-		configMap.put("acct1.Password", password);
-		configMap.put("acct1.Signature", signature);
-			
-				
+							
 	    //Yesterday report
 		ZonedDateTime now=ZonedDateTime.now(ZoneOffset.UTC);
 		ZonedDateTime yesterday=now.minusDays(1);
@@ -241,24 +229,31 @@ public class PaymentOrderTransactionController implements Controller {
 		ZonedDateTime yesterdayEnd=yesterdayStart.plusHours(24);
 		
 		PaymentOrderTransactionsService paymentOrderTransactionsService=new PaymentOrderTransactionsService();
-		Collection<OrderTransactionResult> orderTransactionResults=paymentOrderTransactionsService.getPayPalOrderTransactions(Instant.from(yesterdayStart).toString(),Instant.from(yesterdayEnd).toString(),configMap);  
-	    //group by
-		Map<String,BigDecimal> map= paymentOrderTransactionsService.getOrderTransactionsGroupBy(orderTransactionResults);
-		//get the sum in usd
-		String formattedDate = Utilities.formatedDate(yesterday, "yyyy-MM-dd");
-		BigDecimal usdSum=paymentOrderTransactionsService.calculateTotal(map, formattedDate, "USD");
+		Collection<OrderTransactionResult> orderTransactionResults=paymentOrderTransactionsService.getPayPalOrderTransactions(yesterdayStart,yesterdayEnd);  
+	    //group by transaction message  "JustPlay" or "PlaySpot"
+		Collection<OrderTransactionResult> justPlayList=new  ArrayList<>();
+		Collection<OrderTransactionResult> playSpotList=new  ArrayList<>();
 		
-		//get the sum in eur		
-		BigDecimal eurSum=paymentOrderTransactionsService.calculateTotal(map, formattedDate, "EUR");
+		orderTransactionResults.forEach(o->{
+			if(o.getTransactionSubject().toLowerCase().contains("justplay")){
+				justPlayList.add(o);
+			}else{
+				playSpotList.add(o);
+			}
+		});
+		String formattedDate = Utilities.formatedDate(yesterday, "yyyy-MM-dd");
+		//group by currency code
+		Map<String,BigDecimal> justPlayMap= paymentOrderTransactionsService.getOrderTransactionsGroupBy(justPlayList);
+		Map<String,BigDecimal> playSpotMap= paymentOrderTransactionsService.getOrderTransactionsGroupBy(playSpotList);								
 		
         
         String emailTo=applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.PAYMENT_REPORT_EMAIL_1);
         String emailFrom=applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.NO_REPLY_EMAIL);
         
-		paymentOrderTransactionsService.sendEmail(map,null, usdSum, eurSum, "PayPal total at "+formattedDate, emailTo, emailFrom);
+		paymentOrderTransactionsService.sendEmail(justPlayMap, "PayPal payments total for "+formattedDate,"Payments for JustPlay:", emailTo, emailFrom);
         		 		 
 		emailTo=applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.PAYMENT_REPORT_EMAIL_2);
-		paymentOrderTransactionsService.sendEmail(map,null, usdSum, eurSum, "PayPal total at "+formattedDate, emailTo, emailFrom);	
+		paymentOrderTransactionsService.sendEmail(playSpotMap,"PayPal payments total for "+formattedDate,"Payments for PlaySpot:", emailTo, emailFrom);	
 		
 	}
 

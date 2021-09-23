@@ -2,12 +2,18 @@ package com.luee.wally.api.service;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.logging.Logger;
 
+import com.luee.wally.admin.repository.ApplicationSettingsRepository;
+import com.luee.wally.api.paypal.client.TransactionsApi;
+import com.luee.wally.api.paypal.client.model.Token;
+import com.luee.wally.api.paypal.client.model.TransactionView;
 import com.luee.wally.api.service.impex.ImportService;
 import com.luee.wally.api.tangocard.client.OrdersApi;
 import com.luee.wally.api.tangocard.client.model.OrderListView;
@@ -33,6 +39,8 @@ import urn.ebay.apis.eBLBaseComponents.PaymentTransactionStatusCodeType;
  */
 public class PaymentOrderTransactionsService extends AbstractService{
 
+	private final Logger logger = Logger.getLogger(PaymentOrderTransactionsService.class.getName());
+	
 	public Collection<OrderTransactionResult> getGiftCardOrderTransactions(String startDate,String endDate,Map<String,String> configMap) throws Exception{
 		Collection<OrderTransactionResult> result=new LinkedList<>();
 		int page=0;
@@ -95,35 +103,58 @@ public class PaymentOrderTransactionsService extends AbstractService{
 		GetBalanceResponseType getBalanceResponseType=service.getBalance(getBalanceReq);
 		return getBalanceResponseType;
 	}
-	public Collection<OrderTransactionResult> getPayPalOrderTransactions(String startDate,String endDate,Map<String,String> configMap) throws Exception{
-		TransactionSearchReq transactionSearchReq = new TransactionSearchReq();
-		TransactionSearchRequestType transactionSearchRequestType = new TransactionSearchRequestType();
-		
-		transactionSearchRequestType.setStartDate(startDate); 
-		transactionSearchRequestType.setEndDate(endDate);		
-		transactionSearchRequestType.setStatus(PaymentTransactionStatusCodeType.SUCCESS);
-		transactionSearchReq.setTransactionSearchRequest(transactionSearchRequestType);
-
-		
-						
-		
-		PayPalAPIInterfaceServiceService service = new PayPalAPIInterfaceServiceService(configMap);		
-		TransactionSearchResponseType txnresponse = service.transactionSearch(transactionSearchReq);
+	
+	public Collection<OrderTransactionResult> getPayPalOrderTransactions(ZonedDateTime startDate,ZonedDateTime endDate) throws Exception{
 		Collection<OrderTransactionResult> result=new LinkedList<>();
+		ApplicationSettingsService applicationSettingsService=new ApplicationSettingsService(); 
+	    String paypalClientId=applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.PAYPAL_CLIENT_ID);
+	    String paypalClientSecret=applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.PAYPAL_CLIENT_SECRET);
+	    String paypalMode=applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.PAYPAL_MODE);
+	    
+	    
+		TransactionsApi transactionsApi=new TransactionsApi(paypalClientId, paypalClientSecret,"sandbox".equalsIgnoreCase(paypalMode)); 	   
+		Token token=transactionsApi.authenticate();
+		//***find first page
+		TransactionView transactionView=transactionsApi.getTransactionsByDate(token.getAccessToken(), startDate, endDate,100,1);           
+           transactionView.getTransactionDetails().forEach(t->{           	
+	    	   BigDecimal fee=t.getTransactionInfo().getFeeAmount().asBigDecimal();
+	    	   BigDecimal amount=t.getTransactionInfo().getTransactionAmount().asBigDecimal();
+	    	   
+        	   OrderTransactionResult orderTransactionResult=new OrderTransactionResult();	    	   
+	    	   orderTransactionResult.setCurrencyCode(t.getTransactionInfo().getTransactionAmount().getCurrencyCode());
+	    	   orderTransactionResult.setTransactionSubject(t.getTransactionInfo().getTransactionSubject());
+	    	   orderTransactionResult.setValue(amount.add(fee));
+	    	   result.add(orderTransactionResult); 
+           });
+       //**is there any more pages    
+           if(transactionView.getTotalPages()>1){
+        	 for(int page=2;page<=transactionView.getTotalPages();page++){
+        	   
+        	   transactionView=transactionsApi.getTransactionsByDate(token.getAccessToken(), startDate, endDate,100,page);        	   
+        	   transactionView.getTransactionDetails().forEach(t->{
+        		   BigDecimal fee=BigDecimal.ZERO;
+        		   if(t.getTransactionInfo().getFeeAmount()!=null){        		          		   
+        		    fee=t.getTransactionInfo().getFeeAmount().asBigDecimal();
+        		   }
+    	    	   BigDecimal amount=t.getTransactionInfo().getTransactionAmount().asBigDecimal();
+    	    	   
+        		   OrderTransactionResult orderTransactionResult=new OrderTransactionResult();		    	   
+    	    	   orderTransactionResult.setCurrencyCode(t.getTransactionInfo().getTransactionAmount().getCurrencyCode());
+    	    	   orderTransactionResult.setTransactionSubject(t.getTransactionInfo().getTransactionSubject());
+    	    	   orderTransactionResult.setValue(amount.add(fee));
+    	    	   result.add(orderTransactionResult); 
+               });
+
+        	 }
+           }
 		
-		for(PaymentTransactionSearchResultType transaction: txnresponse.getPaymentTransactions()){			
-			OrderTransactionResult orderTransactionResult=new OrderTransactionResult();
-			orderTransactionResult.setCurrencyCode(transaction.getNetAmount().getCurrencyID().getValue());
-			orderTransactionResult.setValueAsStr(transaction.getNetAmount().getValue());
-			orderTransactionResult.setTimestamp(transaction.getTimestamp());			
-			result.add(orderTransactionResult);			
-	    }	
-		return result;
+	    
+	    return result;
 	}
 
 	/*
 	 * group by currency code
-	 */
+	 */	
 	public Map<String,BigDecimal> getOrderTransactionsGroupBy(Collection<OrderTransactionResult> orderTransactions)throws Exception{
 		Map<String,BigDecimal> result=new HashMap<String, BigDecimal>();
 						
@@ -171,6 +202,30 @@ public class PaymentOrderTransactionsService extends AbstractService{
 				 sb.append(" "+entry.getKey()+" - "+Utilities.formatPrice(entry.getValue())+"<br>");	 
 			 }		 		 
 		 }
+		 
+		 Email email=new Email();
+		 email.setTo(emailTo);
+		 email.setContent(sb.toString());
+		 email.setFrom(emailFrom);
+		 email.setSubject(subject);
+		 
+		 MailService mailService = new MailService();
+		 mailService.sendMailGrid(email);		
+	}
+	/*
+	 * PayPal email
+	 */
+	public void sendEmail(Map<String,BigDecimal> map,String subject,String transactionSubject,String emailTo,String emailFrom)throws IOException{
+		 StringBuffer sb=new StringBuffer(transactionSubject);
+		 sb.append("<br>");sb.append("<br>");
+         
+		 map.entrySet().forEach(e->{
+			 sb.append(e.getKey());
+			 sb.append(" - ");
+			 sb.append(Utilities.formatPrice(e.getValue()));
+			 sb.append("<br>");
+		 });
+		 
 		 
 		 Email email=new Email();
 		 email.setTo(emailTo);

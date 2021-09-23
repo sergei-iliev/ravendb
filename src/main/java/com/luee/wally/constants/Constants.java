@@ -96,7 +96,14 @@ public interface Constants {
 	/******************Tenjin*******************************/
 	public static final String TENJIN_CUSTOM_EVENT_URL = "https://track.tenjin.io/v0/event?advertising_id=%s&bundle_id=%s&event=%s&platform=android&sdk_version=server&value=Nil&country=%s";
 	
+	/********************PayPal**************/
+	public static final String PAYPAL_AUTHENTICATION_PROD_URL = "https://api-m.paypal.com/v1/oauth2/token";
+	public static final String PAYPAL_AUTHENTICATION_SANDBOX_URL = "https://api-m.sandbox.paypal.com/v1/oauth2/token";
 	
-
+	public static final String PAYPAL_BALANCES_PROD_URL ="https://api-m.paypal.com/v1/reporting/balances";
+	public static final String PAYPAL_BALANCES_SANDBOX_URL ="https://api-m.sandbox.paypal.com/v1/reporting/balances";
+	
+	public static final String PAYPAL_TRANSACTIONS_PROD_URL ="https://api-m.paypal.com/v1/reporting/transactions";
+	public static final String PAYPAL_TRANSACTIONS_SANDBOX_URL ="https://api-m.sandbox.paypal.com/v1/reporting/transactions";
 	
 }

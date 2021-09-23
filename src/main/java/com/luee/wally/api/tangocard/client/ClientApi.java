@@ -8,6 +8,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Base64;
 
+import com.luee.wally.utils.Utilities;
+
 
 
 public abstract class ClientApi {
@@ -32,7 +34,7 @@ public abstract class ClientApi {
 		// Set HTTP request method.
 		conn.setRequestMethod("GET");				
 		conn.setRequestProperty("Accept", "application/json");		
-		conn.setRequestProperty("Authorization", this.getBasicAuthString(platformName, platformKey));			    				
+		conn.setRequestProperty("Authorization", Utilities.createBasicAuthString(platformName, platformKey));			    				
 		conn.setUseCaches( false );
 		
 		
@@ -64,9 +66,4 @@ public abstract class ClientApi {
 		return response.toString();
 	}
 	
-	private String getBasicAuthString(String user, String password) {
-        return String.format("Basic %s", Base64.getEncoder()
-                .encodeToString(String.format("%s:%s", user, password)
-                        .getBytes()));
-    }	
 }
