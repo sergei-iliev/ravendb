@@ -234,13 +234,13 @@ public class PaymentOrderTransactionController implements Controller {
 		Collection<OrderTransactionResult> justPlayList=new  ArrayList<>();
 		Collection<OrderTransactionResult> playSpotList=new  ArrayList<>();
 		
-		orderTransactionResults.forEach(o->{
+		orderTransactionResults.forEach(o->{			
 			if(o.getTransactionSubject().toLowerCase().contains("justplay")){
 				justPlayList.add(o);
-			}else{
+			}else if(o.getTransactionSubject().toLowerCase().contains("playspot")){				
 				playSpotList.add(o);
 			}
-		});
+		});		
 		String formattedDate = Utilities.formatedDate(yesterday, "yyyy-MM-dd");
 		//group by currency code
 		Map<String,BigDecimal> justPlayMap= paymentOrderTransactionsService.getOrderTransactionsGroupBy(justPlayList);

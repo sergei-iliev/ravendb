@@ -116,8 +116,11 @@ public class PaymentOrderTransactionsService extends AbstractService{
 		Token token=transactionsApi.authenticate();
 		//***find first page
 		TransactionView transactionView=transactionsApi.getTransactionsByDate(token.getAccessToken(), startDate, endDate,100,1);           
-           transactionView.getTransactionDetails().forEach(t->{           	
-	    	   BigDecimal fee=t.getTransactionInfo().getFeeAmount().asBigDecimal();
+           transactionView.getTransactionDetails().forEach(t->{        	   	    	  
+    		   BigDecimal fee=BigDecimal.ZERO;
+    		   if(t.getTransactionInfo().getFeeAmount()!=null){        		          		   
+    		    fee=t.getTransactionInfo().getFeeAmount().asBigDecimal();
+    		   }
 	    	   BigDecimal amount=t.getTransactionInfo().getTransactionAmount().asBigDecimal();
 	    	   
         	   OrderTransactionResult orderTransactionResult=new OrderTransactionResult();	    	   
