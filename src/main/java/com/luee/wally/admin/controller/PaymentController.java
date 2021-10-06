@@ -247,9 +247,14 @@ public class PaymentController implements Controller {
 			PayoutResult payoutResult = payPalService.payout(redeemingRequests, currencyCode);
 			// create invoice number
 			String invoiceNumber = Long.toString(invoiceRepository.createInvoiceNumber());
-
+			//convert fee amount to euro
+			BigDecimal fee=new BigDecimal(payoutResult.getFee().getValue());
+			BigDecimal amount=new BigDecimal(redeemingRequests.getAmount());			
+			BigDecimal amountNet=amount.add(fee);			
+			BigDecimal eurAmountNet = paymentRepository.convert(amountNet.doubleValue(), currencyCode,"EUR");
+			
 			// save payment
-			paymentRepository.savePayPalPayment(redeemingRequests, currencyCode, eurAmount, invoiceNumber,
+			paymentRepository.savePayPalPayment(redeemingRequests, currencyCode, eurAmount,amountNet,eurAmountNet, invoiceNumber,
 					payoutResult.getPayoutBatchId(), payoutResult.getPayoutError());
 			// create invoice
 			PdfAttachment attachment = new PdfAttachment();

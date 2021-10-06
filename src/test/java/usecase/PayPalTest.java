@@ -309,7 +309,7 @@ public class PayPalTest {
 			PayoutResult payoutResult = payPalService.payout(redeemingRequests, "GBP");
 
 			String invoiceNumber = Long.toString(invoiceRepository.createInvoiceNumber());
-			paymentRepository.savePayPalPayment(redeemingRequests, "GBP", BigDecimal.ZERO, invoiceNumber,
+			paymentRepository.savePayPalPayment(redeemingRequests, "GBP", BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO, invoiceNumber,
 					payoutResult.getPayoutBatchId(),null);
 
 			PdfAttachment attachment = new PdfAttachment();
