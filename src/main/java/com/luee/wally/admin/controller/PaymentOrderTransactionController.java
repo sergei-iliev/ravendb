@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -23,10 +24,12 @@ import com.luee.wally.api.route.Controller;
 import com.luee.wally.api.service.ApplicationSettingsService;
 import com.luee.wally.api.service.GiftCardService;
 import com.luee.wally.api.service.MailService;
+import com.luee.wally.api.service.PaidUsersService;
 import com.luee.wally.api.service.PaymentOrderTransactionsService;
 import com.luee.wally.command.Email;
 import com.luee.wally.command.order.OrderTransactionResult;
 import com.luee.wally.constants.Constants;
+import com.luee.wally.entity.PaidUser;
 import com.luee.wally.utils.Utilities;
 
 import urn.ebay.api.PayPalAPI.GetBalanceResponseType;
@@ -227,7 +230,13 @@ public class PaymentOrderTransactionController implements Controller {
 		   
 		ZonedDateTime yesterdayStart=yesterday.truncatedTo(ChronoUnit.DAYS);
 		ZonedDateTime yesterdayEnd=yesterdayStart.plusHours(24);
-		
+		/*read records from 'paid_user' table
+		 *Our system records PayPal payments for PlaySpot only 
+		 */
+		PaidUsersService paidUsersService=new PaidUsersService();
+		Collection<PaidUser> localPlaySpotList=paidUsersService.getPaidUsersByDateAndType("PayPal",Date.from(yesterdayStart.toInstant()), Date.from(yesterdayEnd.toInstant()));							
+		Map<String,BigDecimal> localPlaySpotMap=localPlaySpotList.stream().collect(Collectors.groupingBy(PaidUser::getPaidCurrency, Collectors.reducing(BigDecimal.ZERO, PaidUser::getAmountNet, BigDecimal::add)));
+
 		PaymentOrderTransactionsService paymentOrderTransactionsService=new PaymentOrderTransactionsService();
 		Collection<OrderTransactionResult> orderTransactionResults=paymentOrderTransactionsService.getPayPalOrderTransactions(yesterdayStart,yesterdayEnd);  
 	    //group by transaction message  "JustPlay" or "PlaySpot"
@@ -253,7 +262,7 @@ public class PaymentOrderTransactionController implements Controller {
 		paymentOrderTransactionsService.sendEmail(justPlayMap, "PayPal payments total for "+formattedDate,"Payments for JustPlay:", emailTo, emailFrom);
         		 		 
 		emailTo=applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.PAYMENT_REPORT_EMAIL_2);
-		paymentOrderTransactionsService.sendEmail(playSpotMap,"PayPal payments total for "+formattedDate,"Payments for PlaySpot:", emailTo, emailFrom);	
+		paymentOrderTransactionsService.sendEmail(playSpotMap,localPlaySpotMap,"PayPal payments total for "+formattedDate,"Payments for PlaySpot:", emailTo, emailFrom);	
 		
 	}
 

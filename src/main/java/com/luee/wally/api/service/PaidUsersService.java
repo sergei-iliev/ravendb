@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -236,6 +237,23 @@ public class PaidUsersService {
     	
     	return result;
     }	
+    
+    public Collection<PaidUser> getPaidUsersByDateAndType(String type,Date startDate,Date endDate){
+    	Collection<Entity> output=new ArrayList<>();
+    	Collection<Entity> result=new ArrayList<>();
+	    /*
+	     * Split filtering to first fetching data from paid_users and then filtering over redeeming_requests
+	     */
+	    String cursor=null;
+	    do{
+	       output.clear();	
+	       cursor= paidUsersRepository.findPaidUsers(cursor,output,type, startDate, endDate);
+	       result.addAll(output);	              
+	    }while(cursor!=null);    
+	    //convert to vo
+    	Collection<PaidUser> paidUsers=result.stream().map(PaidUser::valueOf).collect(Collectors.toList());
+    	return paidUsers;
+    }
     
 	public Collection<PaidUser> search(PaidUserSearchForm form){
 		Collection<Entity> output=new ArrayList<>();

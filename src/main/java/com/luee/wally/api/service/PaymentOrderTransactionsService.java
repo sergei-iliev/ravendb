@@ -239,4 +239,37 @@ public class PaymentOrderTransactionsService extends AbstractService{
 		 MailService mailService = new MailService();
 		 mailService.sendMailGrid(email);		
 	}
+	/*
+	 * PayPal PlaySpot email
+	 * Remote transactions API and local data store data
+	 */
+	public void sendEmail(Map<String,BigDecimal> map,Map<String,BigDecimal> localMap,String subject,String transactionSubject,String emailTo,String emailFrom)throws IOException{
+		 StringBuffer sb=new StringBuffer(transactionSubject);
+		 sb.append("<br><br>");
+        
+		 map.entrySet().forEach(e->{
+			 sb.append(e.getKey());
+			 sb.append(" - ");
+			 sb.append(Utilities.formatPrice(e.getValue()));
+			 sb.append("<br>");
+		 });
+		 
+		 sb.append("<br><br>");
+		 
+		 localMap.entrySet().forEach(e->{
+			 sb.append(e.getKey());
+			 sb.append(" - ");
+			 sb.append(Utilities.formatPrice(e.getValue().negate()));
+			 sb.append("<br>");
+		 });
+		 
+		 Email email=new Email();
+		 email.setTo(emailTo);
+		 email.setContent(sb.toString());
+		 email.setFrom(emailFrom);
+		 email.setSubject(subject);
+		 
+		 MailService mailService = new MailService();
+		 mailService.sendMailGrid(email);		
+	}	
 }

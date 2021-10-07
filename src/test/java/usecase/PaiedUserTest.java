@@ -373,4 +373,19 @@ public class PaiedUserTest {
 		Assert.assertTrue(userRepository.findEntities("redeeming_requests_new", null, null).size() == 0);
 
 	}
+
+	@Test
+	public void getPaidUsersByDateAndTypeTest() throws Exception {
+		TestDatabase.INSTANCE.generateDB();
+		Date startDate=TestDatabase.INSTANCE.createDate(1,1, 2000);
+		Date endDate=TestDatabase.INSTANCE.createDate(1,1, 2027);
+		PaidUsersService paidUsersService=new PaidUsersService();
+		Collection<PaidUser> list=paidUsersService.getPaidUsersByDateAndType("PayPal",startDate, endDate);
+		list.forEach(e->System.out.println(e.getPaidCurrency()+"::"+e.getAmountNet()));
+			
+		Map<String,BigDecimal> localPlaySpotMap=list.stream().collect(Collectors.groupingBy(PaidUser::getPaidCurrency, Collectors.reducing(BigDecimal.ZERO, PaidUser::getAmountNet, BigDecimal::add)));
+		System.out.println(localPlaySpotMap);
+		Map<String,Double> result=list.stream().collect(Collectors.groupingBy(PaidUser::getPaidCurrency,Collectors.summingDouble(p->p.getAmountNet().doubleValue())));
+		System.out.println(result);
+	}
 }

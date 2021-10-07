@@ -58,7 +58,7 @@ public enum TestDatabase {
 		entity.setProperty("full_address", "baba tonka 6 for accson");
 		entity.setProperty("max_rev", (double)1.559953);
 		ds.put(entity);		
-		crearePaiedUsersEntity(entity,10.8,"CAD",createDate(1, 12, 2020));
+		crearePaiedUsersEntity(entity,10.8,"USD",createDate(1, 12, 2020));
 		
 		entity=createRedeemingRequestEntity("Minko","696f-4258-baef-55b6aa6550b1","48bb2675-a072-4b6b-ab66-cb599a29147d", "1111",new Date(), "com.moregames.makemoney", "PayPal", "sergei.iliev-facilitator@gmail.com", "FR");
 		entity.setProperty("ua_channel", "supersonic");
@@ -75,7 +75,7 @@ public enum TestDatabase {
 		entity.setProperty("max_rev", (double)2);
 		entity.setProperty("full_address", "baba tonka 26 for accson");
 		ds.put(entity);
-		crearePaiedUsersEntity(entity,30,"GBP",createDate(1, 12, 2020));
+		crearePaiedUsersEntity(entity,30,"USD",createDate(1, 12, 2020));
 		
 		entity=createRedeemingRequestEntity("Minko1 and Macarena","696f-4258-baef-55b6aa6550b12","ffff2675-a072-4b6b-ab66-cb599a29147d2", "1113", new Date(), "com.moregames.makemoney", "PayPal", "sergei.iliev-facilitator@gmail.com", "US");		
 		entity.setProperty("full_address", "baba tonka 3456 for accson");
@@ -111,7 +111,7 @@ public enum TestDatabase {
 		entity.setProperty("ip_address", "77.98.102.111");
 		ds.put(entity);
 		
-		crearePaiedUsersEntity(entity,2.9,"CAD",createDate(1, 1, 2019));
+		crearePaiedUsersEntity(entity,2.9,"EUR",createDate(1, 1, 2019));
 		createRedeemingRequestsEmailJob(entity.getKey());
 		
 		entity=createRedeemingRequestEntity("Gurmen","8957-48bb-a089-de0adca6a91e","cccc1675-a072-4b6b-ab66-cb599a291BAA", "90", new Date(), "com.moregames.makemoney", "Amazon", "sergei.iliev@gmail.com", "DE");		
@@ -165,7 +165,7 @@ public enum TestDatabase {
 		   entity.setProperty("user_guid",redeeminRequest.getProperty("user_guid"));
 		   entity.setProperty("paid_currency",currencyCode);
 		   entity.setProperty("amount", String.valueOf(eurCurrency));
-		   entity.setProperty("type", redeeminRequest.getProperty("type"));
+		   entity.setProperty("type", "PayPal"/*redeeminRequest.getProperty("type")*/);
 		   entity.setProperty("eur_currency",eurCurrency);
 		   entity.setProperty("email_address","mikelo@yahoo.com");
 		   entity.setProperty("paypal_account","hristo@yahoo.com");
@@ -174,8 +174,11 @@ public enum TestDatabase {
 		   entity.setProperty("redeeming_request_key",KeyFactory.keyToString(redeeminRequest.getKey()));
 		   entity.setProperty("redeeming_request_id",redeeminRequest.getProperty("redeeming_request_id"));
 		   entity.setProperty("payment_reference_id","ref-number");
-		   entity.setProperty("invoice_number","1111");		
+		   entity.setProperty("invoice_number","1111");	
+		   entity.setProperty("amount_net",((eurCurrency/2)+1));
+		   entity.setProperty("amount_net_eur_currency",(eurCurrency+2));
 		   ds.put(entity);
+		   System.out.println(entity);
 		   
 	}
 	

@@ -23,6 +23,8 @@ public class PaidUser {
     private String paymentReferenceId;
 	private String paidCurrency;
 	private BigDecimal eurCurrency;
+	private BigDecimal eurAmountNet=BigDecimal.ZERO;;
+	private BigDecimal amountNet=BigDecimal.ZERO;
 	private String invoiceNumber;
 	private boolean paidUserSuccess,emailSentSuccess;
 	private String link;   
@@ -38,6 +40,7 @@ public class PaidUser {
 		paidUser.setType((String) entity.getProperty("type"));
 		paidUser.setDate((Date) entity.getProperty("date"));
 		paidUser.setPaypalAccount((String) entity.getProperty("paypal_account"));
+		
 		/*
 		 * We may store both types Key(old inherited) and String
 		 */
@@ -53,6 +56,8 @@ public class PaidUser {
 		paidUser.paidCurrency=((String) entity.getProperty("paid_currency"));
 		paidUser.email=((String) entity.getProperty("email_address"));
 		paidUser.eurCurrency=BigDecimal.valueOf((double)entity.getProperty("eur_currency"));
+		paidUser.amountNet=BigDecimal.valueOf(entity.getProperty("amount_net")==null?0:(double)entity.getProperty("amount_net"));
+		paidUser.eurAmountNet=BigDecimal.valueOf(entity.getProperty("amount_net_eur_currency")==null?0:(double)entity.getProperty("amount_net_eur_currency"));
 		paidUser.paidUserSuccess= ((Boolean)entity.getProperty("paid_user_success"));
 		paidUser.emailSentSuccess= ((Boolean)entity.getProperty("email_sent_success"));
 		paidUser.paymentReferenceId=((String) entity.getProperty("payment_reference_id"));
@@ -198,5 +203,20 @@ public class PaidUser {
 	@JsonIgnore
 	public boolean isPayPalType() {
 		return type.equalsIgnoreCase("paypal");
-	}	
+	}
+	
+	public BigDecimal getAmountNet() {
+		return amountNet;
+	}
+	public void setAmountNet(BigDecimal amountNet) {
+		this.amountNet = amountNet;
+	}
+	
+	public BigDecimal getEurAmountNet() {
+		return eurAmountNet;
+	}
+	
+	public void setEurAmountNet(BigDecimal eurAmountNet) {
+		this.eurAmountNet = eurAmountNet;
+	}
 }
