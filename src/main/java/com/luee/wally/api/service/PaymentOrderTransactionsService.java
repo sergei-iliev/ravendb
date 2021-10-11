@@ -255,6 +255,8 @@ public class PaymentOrderTransactionsService extends AbstractService{
 		 });
 		 
 		 sb.append("<br><br>");
+		 sb.append("Payments for PlaySpot from our server:");
+		 sb.append("<br><br>");
 		 
 		 localMap.entrySet().forEach(e->{
 			 sb.append(e.getKey());
