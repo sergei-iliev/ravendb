@@ -95,7 +95,13 @@ public class PaymentRuleService extends AbstractService {
 		
 		//illegal domains
 		
-		for(RuleResultType ruleResult:ruleResults){			
+		for(RuleResultType ruleResult:ruleResults){		
+			if(ruleResult==RuleResultType.SUSPICIOUS_IP_ADDRESS_RED){
+				result.put("suspiciousipaddress","IP address in a suspicious (red) range: : "+redeemingRequest.getIpAddress()); 
+			}else if(ruleResult==RuleResultType.SUSPICIOUS_IP_ADDRESS_YELLOW){
+				result.put("suspiciousipaddress","IP address in a potentially suspicious (yellow) range: : "+redeemingRequest.getIpAddress());
+			}
+			
 			if(ruleResult==RuleResultType.SUSPICIOUS_EMAIL_DOMAIN_RED||ruleResult==RuleResultType.SUSPICIOUS_EMAIL_DOMAIN_YELLOW){		 					
 				SuspiciousEmailDomainRepository suspiciousEmailDomainRepository=new SuspiciousEmailDomainRepository();
 				Collection<Entity> entities=suspiciousEmailDomainRepository.findSuspiciousDomainByEmail(redeemingRequest.getEmail());

@@ -24,7 +24,9 @@ public class RedeemingRequestRuleContext {
 	private Set<RuleResultType> result=EnumSet.noneOf(RuleResultType.class); 
 	
 	private Collection<Entity> suspiciousDomains;
-
+	
+	private Collection<Entity> suspiciousIpAddresses;
+	
 	private Map<String,String> payPalCountryCodeMap;
 	
 	private Map<String,String> tangoCardCountryCodeMap;
@@ -40,6 +42,9 @@ public class RedeemingRequestRuleContext {
 		SuspiciousEmailDomainRepository suspiciousEmailDomainRepository=new SuspiciousEmailDomainRepository();
 		Collection<Entity> entities=suspiciousEmailDomainRepository.findEntities("suspicious_email_domains", null, null);
 		this.setSuspiciousDomains(entities);
+		
+		entities=suspiciousEmailDomainRepository.findEntities("suspicious_ip_addresses", null, null);
+		this.setSuspiciousIpAddresses(entities);
 		
 		PaymentRepository paymentRepository=new PaymentRepository();
 		Collection<Entity> giftCardMapping= paymentRepository.findEntities("tango_card_country_code_mapping",null, null);
@@ -84,6 +89,14 @@ public class RedeemingRequestRuleContext {
 	
 	public Map<String, String> getTangoCardCountryCodeMap() {
 		return tangoCardCountryCodeMap;
+	}
+	
+	public void setSuspiciousIpAddresses(Collection<Entity> suspiciousIpAddresses) {
+		this.suspiciousIpAddresses = suspiciousIpAddresses;
+	}
+	
+	public Collection<Entity> getSuspiciousIpAddresses() {
+		return suspiciousIpAddresses;
 	}
 	
 }

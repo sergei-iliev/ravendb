@@ -33,6 +33,7 @@ public enum TestDatabase {
 		createPayPalCurrencyMap();	
 		createEmailTemplates();
 		createSuspiciousEmailDomainsTable();
+		createSuspiciousIpAddressesTable();
 		createUserRemovalReason();
 	}
 	private  void createUsers(){
@@ -178,7 +179,6 @@ public enum TestDatabase {
 		   entity.setProperty("amount_net",((eurCurrency/2)+1));
 		   entity.setProperty("amount_net_eur_currency",(eurCurrency+2));
 		   ds.put(entity);
-		   System.out.println(entity);
 		   
 	}
 	
@@ -563,7 +563,18 @@ public enum TestDatabase {
 		entity.setIndexedProperty("level",RuleStatusType.Red.toString().toLowerCase());		
 		ds.put(entity);
 	}
-	
+	private void createSuspiciousIpAddressesTable(){
+		DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
+		Entity entity = new Entity("suspicious_ip_addresses");
+		entity.setIndexedProperty("ip_prefix", "123.1");
+		entity.setIndexedProperty("level",RuleStatusType.Yellow.toString().toLowerCase());		
+		ds.put(entity);
+		
+		entity = new Entity("suspicious_ip_addresses");
+		entity.setIndexedProperty("ip_prefix", "123.0");
+		entity.setIndexedProperty("level",RuleStatusType.Red.toString().toLowerCase());		
+		ds.put(entity);		
+	}
 	private void createRedeemingRequestsEmailJob(Key key){
 		DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
 		Entity entity = new Entity("redeeming_requests_email_job");	

@@ -129,6 +129,9 @@ payment.PaymentEligibleUsersView = Backbone.View.extend({
  					if(map.suspiciousdomain!=null){
  						rule_status_result+="<li>Suspected email domain : <strong>"+map.suspiciousdomain+"</strong></li>";
  					}
+ 					if(map.suspiciousipaddress!=null){
+ 						rule_status_result+="<li>"+map.suspiciousipaddress+"</li>";
+ 					} 					 					
  					map.differentuserlist.forEach((item)=>{ 						
  						rule_status_result+="<li>"+item.text+"<br><a href='"+item.url+"' target='_blank'>"+item.name+"</a></li>";
  					});

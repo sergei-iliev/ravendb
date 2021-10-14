@@ -14,6 +14,7 @@ public class RedeemingRequestEngine {
 	
 	public RedeemingRequestEngine() {
 		first=new NoGaidInAffsRule();
+		first.setNext(new SuspiciousIPAddressRule());
 		first.setNext(new UserCountriesConnectedFromRule());
 		first.setNext(new UsingVPNRule());
 		first.setNext(new UAChannelOrganicAmount());
