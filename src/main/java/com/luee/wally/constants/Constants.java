@@ -1,9 +1,8 @@
 package com.luee.wally.constants;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
-
-import com.luee.wally.api.service.AffsSearchService;
 
 public interface Constants {
 
@@ -105,5 +104,5 @@ public interface Constants {
 	
 	public static final String PAYPAL_TRANSACTIONS_PROD_URL ="https://api-m.paypal.com/v1/reporting/transactions";
 	public static final String PAYPAL_TRANSACTIONS_SANDBOX_URL ="https://api-m.sandbox.paypal.com/v1/reporting/transactions";
-	
+	public static final BigDecimal PAYPAL_LOCAL_SYSTEM_DISCREPANCIES = new BigDecimal(1.0); 
 }

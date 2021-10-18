@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -157,7 +158,7 @@ public class PaymentOrderTransactionController implements Controller {
 	public void runOrderTransactionReport(HttpServletRequest req, HttpServletResponse resp)
 			throws Exception{
 		
-		//PayPal
+		//PayPal and alerts
 		processPayPalOrderTransactions();
 		
 		//Tango card PS
@@ -256,14 +257,23 @@ public class PaymentOrderTransactionController implements Controller {
 		Map<String,BigDecimal> playSpotMap= paymentOrderTransactionsService.getOrderTransactionsGroupBy(playSpotList);								
 		
         
-        String emailTo=applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.PAYMENT_REPORT_EMAIL_1);
+        String emailTo1=applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.PAYMENT_REPORT_EMAIL_1);
         String emailFrom=applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.NO_REPLY_EMAIL);
         
-		paymentOrderTransactionsService.sendEmail(justPlayMap, "PayPal payments total for "+formattedDate,"Payments for JustPlay:", emailTo, emailFrom);
+		paymentOrderTransactionsService.sendEmail(justPlayMap, "PayPal payments total for "+formattedDate,"Payments for JustPlay:", emailTo1, emailFrom);
         		 		 
-		emailTo=applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.PAYMENT_REPORT_EMAIL_2);
-		paymentOrderTransactionsService.sendEmail(playSpotMap,localPlaySpotMap,"PayPal payments total for "+formattedDate,"Payments for PlaySpot:", emailTo, emailFrom);	
+		String emailTo2=applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.PAYMENT_REPORT_EMAIL_2);
 		
+		paymentOrderTransactionsService.sendEmail(playSpotMap,localPlaySpotMap,"PayPal payments total for "+formattedDate,"Payments for PlaySpot:", emailTo2, emailFrom);	
+		
+		//PayPal to Local System discrepencies
+		List<String> discrepencyList=paymentOrderTransactionsService.validatePayPalToLocalSystemOrdersAmount(playSpotMap,localPlaySpotMap);
+		if(discrepencyList.size()>0){
+			paymentOrderTransactionsService.sendEmail(discrepencyList, playSpotMap, localPlaySpotMap, "PayPal payout discrepancy found.", emailTo1, emailFrom);
+			
+			paymentOrderTransactionsService.sendEmail(discrepencyList, playSpotMap, localPlaySpotMap, "PayPal payout discrepancy found.", emailTo2, emailFrom);
+		}
 	}
+
 
 }

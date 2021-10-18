@@ -1,95 +1,35 @@
 package usecase;
 
-import static org.mockito.Mockito.when;
-
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.math.BigDecimal;
-import java.net.URL;
-import java.net.URLEncoder;
-import java.text.SimpleDateFormat;
-import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.http.HttpStatus;
-import org.apache.http.protocol.HTTP;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import com.google.appengine.api.datastore.DatastoreService;
-import com.google.appengine.api.datastore.DatastoreServiceFactory;
-import com.google.appengine.api.datastore.Entity;
-import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
-import com.luee.wally.admin.controller.PaymentController;
 import com.luee.wally.admin.controller.PaymentOrderTransactionController;
-import com.luee.wally.admin.repository.InvoiceRepository;
-import com.luee.wally.admin.repository.PaymentRepository;
-import com.luee.wally.api.ConnectionMgr;
 import com.luee.wally.api.paypal.client.BalancesApi;
-import com.luee.wally.api.paypal.client.ClientApi;
 import com.luee.wally.api.paypal.client.TransactionsApi;
 import com.luee.wally.api.paypal.client.model.BalanceListView;
 import com.luee.wally.api.paypal.client.model.Token;
 import com.luee.wally.api.paypal.client.model.TransactionView;
-import com.luee.wally.api.service.InvoiceService;
-import com.luee.wally.api.service.MailService;
-import com.luee.wally.api.service.PayPalService;
 import com.luee.wally.api.service.PaymentOrderTransactionsService;
-import com.luee.wally.api.service.impex.ImportService;
-import com.luee.wally.api.tangocard.client.config.TangoCardJSON;
-import com.luee.wally.command.Email;
-import com.luee.wally.command.PdfAttachment;
-import com.luee.wally.command.invoice.Money;
-import com.luee.wally.command.invoice.PayoutResult;
-import com.luee.wally.command.order.OrderTransactionResult;
-import com.luee.wally.constants.Constants;
-import com.luee.wally.entity.RedeemingRequests;
-import com.luee.wally.json.ExchangeRateVO;
 import com.luee.wally.utils.TestDatabase;
 import com.luee.wally.utils.Utilities;
-import com.paypal.api.payments.Currency;
-import com.paypal.api.payments.Payment;
-import com.paypal.api.payments.PaymentHistory;
-import com.paypal.api.payments.Payout;
-import com.paypal.api.payments.PayoutBatch;
-import com.paypal.api.payments.PayoutItem;
-import com.paypal.api.payments.PayoutSenderBatchHeader;
-import com.paypal.base.rest.APIContext;
-
-import urn.ebay.api.PayPalAPI.GetBalanceResponseType;
-import urn.ebay.api.PayPalAPI.PayPalAPIInterfaceServiceService;
-import urn.ebay.api.PayPalAPI.TransactionSearchReq;
-import urn.ebay.api.PayPalAPI.TransactionSearchRequestType;
-import urn.ebay.api.PayPalAPI.TransactionSearchResponseType;
-import urn.ebay.apis.CoreComponentTypes.BasicAmountType;
 
 
 public class PayPalRestApiTest {
@@ -191,6 +131,23 @@ public class PayPalRestApiTest {
 
 	}
 
+	@Test
+	public void validatePayPalToLocalSystemOrdersAmountTest() throws Exception {	
+		Map<String,BigDecimal> payPalMap=new HashMap<>();
+		payPalMap.put("USD",new BigDecimal(21.0));
+		payPalMap.put("EUR",new BigDecimal(10.4));
+		
+		Map<String,BigDecimal> localMap=new HashMap<>();
+		localMap.put("USD",new BigDecimal(22.0));
+		//payPalMap.put("EUR",new BigDecimal(10.4));
+		
+		PaymentOrderTransactionsService service=new PaymentOrderTransactionsService();
+		List<String> list=service.validatePayPalToLocalSystemOrdersAmount(payPalMap, localMap);
+		
+		System.out.println(list);
+		
+		
+	}
 	@Test
 	public void getPayPalTransactionsByDateRestAPITest() throws Exception {	
 		   String paypalClientId="AafeAthS3PRG_dkpJPVTkCgVc-O9pQ6o2PldSIOceWsn7nIm0H404DHDFg4svXJa63Pe8OtM55ySzppG";

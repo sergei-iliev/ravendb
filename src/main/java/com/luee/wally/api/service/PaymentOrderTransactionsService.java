@@ -3,10 +3,12 @@ package com.luee.wally.api.service;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -27,12 +29,6 @@ import urn.ebay.api.PayPalAPI.GetBalanceReq;
 import urn.ebay.api.PayPalAPI.GetBalanceRequestType;
 import urn.ebay.api.PayPalAPI.GetBalanceResponseType;
 import urn.ebay.api.PayPalAPI.PayPalAPIInterfaceServiceService;
-import urn.ebay.api.PayPalAPI.TransactionSearchReq;
-import urn.ebay.api.PayPalAPI.TransactionSearchRequestType;
-import urn.ebay.api.PayPalAPI.TransactionSearchResponseType;
-import urn.ebay.apis.CoreComponentTypes.BasicAmountType;
-import urn.ebay.apis.eBLBaseComponents.PaymentTransactionSearchResultType;
-import urn.ebay.apis.eBLBaseComponents.PaymentTransactionStatusCodeType;
 
 /*
  * Query external PayPal and GiftCard API services
@@ -82,6 +78,32 @@ public class PaymentOrderTransactionsService extends AbstractService{
 		return result;		
 		
 	}
+	/*
+	 * Reuse data from previous PayPal call
+	 * Check  for discrepancies between PayPal system and Local server(PlaySpot only)
+	 * 1.0 difference is a discrepancy
+	 * @return - list of currency codes with discrepency
+	 */
+	public List<String> validatePayPalToLocalSystemOrdersAmount(Map<String,BigDecimal> payPalOrderSumMap,Map<String,BigDecimal> localSystemOrderSumMap){
+		List<String> result=new ArrayList<>();
+		for(Map.Entry<String, BigDecimal> entry:payPalOrderSumMap.entrySet()){
+		   String currencyCode=entry.getKey();
+		   BigDecimal amount=entry.getValue();
+		   //local system
+		   BigDecimal localAmount=localSystemOrderSumMap.get(currencyCode);
+		   if(localAmount!=null){			   
+			   BigDecimal diff=amount.subtract(localAmount).abs();
+			   BigDecimal rounded=diff.setScale(2, BigDecimal.ROUND_HALF_EVEN);
+			   System.out.println(rounded);
+			   if(rounded.compareTo(Constants.PAYPAL_LOCAL_SYSTEM_DISCREPANCIES)>0){
+				   result.add(currencyCode);
+			   }
+		   }
+		   
+		}
+		return result;
+	}
+	
 	public GetBalanceResponseType getPayPalBalance(Map<String,String> configMap)throws Exception{
 		GetBalanceReq getBalanceReq=new GetBalanceReq();
 		
@@ -274,4 +296,43 @@ public class PaymentOrderTransactionsService extends AbstractService{
 		 MailService mailService = new MailService();
 		 mailService.sendMailGrid(email);		
 	}	
+	
+	/*
+	 * PayPal to local system PlaySpot discrepency email	 
+	 */
+	public void sendEmail(List<String> discrepencyList,Map<String,BigDecimal> map,Map<String,BigDecimal> localMap,String subject,String emailTo,String emailFrom)throws IOException{
+		 StringBuffer sb=new StringBuffer("Payments for PlaySpot from PayPal:");
+		 sb.append("<br><br>");
+        
+		 map.entrySet().forEach(e->{
+			 if(discrepencyList.contains(e.getKey())){
+				 sb.append(e.getKey());
+				 sb.append(" - ");
+				 sb.append(Utilities.formatPrice(e.getValue()));
+				 sb.append("<br>");
+			 }
+		 });
+		 
+		 sb.append("<br><br>");
+		 sb.append("Payments for PlaySpot from our server:");
+		 sb.append("<br><br>");
+		 
+		 localMap.entrySet().forEach(e->{
+			 if(discrepencyList.contains(e.getKey())){
+				 sb.append(e.getKey());
+				 sb.append(" - ");
+				 sb.append(Utilities.formatPrice(e.getValue().negate()));
+				 sb.append("<br>");
+			 }
+		 });
+		 
+		 Email email=new Email();
+		 email.setTo(emailTo);
+		 email.setContent(sb.toString());
+		 email.setFrom(emailFrom);
+		 email.setSubject(subject);
+		 
+		 MailService mailService = new MailService();
+		 mailService.sendMailGrid(email);		
+	}
 }
