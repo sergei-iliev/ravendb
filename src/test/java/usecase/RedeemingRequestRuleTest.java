@@ -5,10 +5,15 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -202,5 +207,20 @@ public class RedeemingRequestRuleTest {
 		
 		result.forEach(e->System.out.println(e.getRuleStatus()+"::"+e.getRuleResultType()));
 
+	}
+	@Test
+	public void orderSuspitiosIpAddresses() throws Exception{
+		Map<String,String> m=new HashMap<>();
+		m.put("178.209","yellow");
+		m.put("178.208.160","red");
+		m.put("178.207.","yellow");
+		m.put("178.207.","yellow");
+		m.put("178.208.161","red");
+		m.put("178.207.162","red");
+		
+		
+		Map<String,String> result=m.entrySet().stream().sorted(Map.Entry.<String, String>comparingByValue()).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,(e1,e2)->e1,LinkedHashMap::new));
+		System.out.println(result);
+	  
 	}
 }
