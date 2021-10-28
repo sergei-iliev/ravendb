@@ -57,6 +57,7 @@
           		<a class="dropdown-item" href="/administration/payment/paidusers?groupby">Paid Users Group By</a>   
           		<a class="dropdown-item" href="/administration/payment/confirmemail">Confirm Email</a>
           		<a class="dropdown-item" href="/administration/payment/paidusers/export">Export Paid User</a>
+          		<a class="dropdown-item" href="/administration/payment/user/remove">Remove User</a>
           		<a class="dropdown-item" href="/administration/payment/user/unremove">Unremove User</a>
           		<a class="dropdown-item" href="/administration/payment/paidusers/removed">Removed Redeeming Requests</a>
           		           		      

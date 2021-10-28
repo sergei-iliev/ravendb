@@ -90,6 +90,7 @@ INSTANCE;
     	 
     	 httpGetRouteList.put("/administration/payment/paidusers", new Route(new PaidUsersController(),"index"));
     	 httpGetRouteList.put("/administration/payment/user/unremove", new Route(new PaidUsersController(),"unremove"));
+    	 httpGetRouteList.put("/administration/payment/user/remove", new Route(new PaidUsersController(),"remove"));
     	 httpGetRouteList.put("/administration/payment/confirmemail", new Route(new ConfirmEmailController(),"index"));
     	 
     	 httpGetRouteList.put("/administration/settings", new Route(new ApplicationSettingsController(),"index"));
@@ -142,6 +143,7 @@ INSTANCE;
     	 httpPostRouteList.put("/administration/job/payment/paidusers/checkvpnusage", new Route(new PaidUsersController(),"checkVPNUsageAsync"));
     	 httpPostRouteList.put("/administration/job/payment/paidusers/checkcountrylist", new Route(new PaidUsersController(),"checkUserCountriesAsync"));
     	 httpPostRouteList.put("/administration/payment/user/unremoveuser", new Route(new PaidUsersController(),"unremoveUser"));
+    	 httpPostRouteList.put("/administration/payment/user/removeuser", new Route(new PaidUsersController(),"removeUser"));
     	 httpPostRouteList.put("/administration/payment/paidusers/search/removed",new Route(new PaidUsersController(),"getRemovedRedeemingRequests"));
     	 
     	 //email template

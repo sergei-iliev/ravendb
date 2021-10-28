@@ -230,7 +230,9 @@ public class PaymentOrderTransactionController implements Controller {
 		ZonedDateTime yesterday=now.minusDays(1);
 		   
 		ZonedDateTime yesterdayStart=yesterday.truncatedTo(ChronoUnit.DAYS);
-		ZonedDateTime yesterdayEnd=yesterdayStart.plusHours(24);
+		ZonedDateTime yesterdayEnd=yesterdayStart.plusHours(23).plusMinutes(59).plusSeconds(59);
+		
+		
 		/*read records from 'paid_user' table
 		 *Our system records PayPal payments for PlaySpot only 
 		 */
@@ -238,8 +240,11 @@ public class PaymentOrderTransactionController implements Controller {
 		Collection<PaidUser> localPlaySpotList=paidUsersService.getPaidUsersByDateAndType("PayPal",Date.from(yesterdayStart.toInstant()), Date.from(yesterdayEnd.toInstant()));							
 		Map<String,BigDecimal> localPlaySpotMap=localPlaySpotList.stream().collect(Collectors.groupingBy(PaidUser::getPaidCurrency, Collectors.reducing(BigDecimal.ZERO, PaidUser::getAmountNet, BigDecimal::add)));
 
+		/*
+		 * PayPal REST API
+		 */
 		PaymentOrderTransactionsService paymentOrderTransactionsService=new PaymentOrderTransactionsService();
-		Collection<OrderTransactionResult> orderTransactionResults=paymentOrderTransactionsService.getPayPalOrderTransactions(yesterdayStart,yesterdayEnd);  
+		Collection<OrderTransactionResult> orderTransactionResults=paymentOrderTransactionsService.getPayPalOrderTransactionsIn24Hours(yesterdayStart);  
 	    //group by transaction message  "JustPlay" or "PlaySpot"
 		Collection<OrderTransactionResult> justPlayList=new  ArrayList<>();
 		Collection<OrderTransactionResult> playSpotList=new  ArrayList<>();

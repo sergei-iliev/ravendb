@@ -2,7 +2,9 @@ package com.luee.wally.api.service;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -92,9 +94,10 @@ public class PaymentOrderTransactionsService extends AbstractService{
 		   //local system
 		   BigDecimal localAmount=localSystemOrderSumMap.get(currencyCode);
 		   if(localAmount!=null){			   
-			   BigDecimal diff=amount.subtract(localAmount).abs();
-			   BigDecimal rounded=diff.setScale(2, BigDecimal.ROUND_HALF_EVEN);
-			   System.out.println(rounded);
+			   logger.warning(amount+"::"+localAmount);
+			   BigDecimal diff=amount.abs().subtract(localAmount.abs()).abs();
+			   BigDecimal rounded=diff.setScale(2, BigDecimal.ROUND_HALF_EVEN);			   
+			   logger.warning("diff="+rounded);
 			   if(rounded.compareTo(Constants.PAYPAL_LOCAL_SYSTEM_DISCREPANCIES)>0){
 				   result.add(currencyCode);
 			   }
@@ -126,6 +129,38 @@ public class PaymentOrderTransactionsService extends AbstractService{
 		return getBalanceResponseType;
 	}
 	
+	/*
+	 * Split 1 day in chunks of 4
+	 */
+	public Collection<OrderTransactionResult> getPayPalOrderTransactionsIn24Hours(ZonedDateTime startDate) throws Exception{		
+
+		Collection<OrderTransactionResult> result=new LinkedList<>();
+		
+		ZonedDateTime startDate1=startDate;
+		ZonedDateTime endDate1=startDate.plusHours(5).plusMinutes(59).plusSeconds(59);
+		Collection<OrderTransactionResult> first=this.getPayPalOrderTransactions(startDate1,endDate1);	
+		result.addAll(first);
+		
+		ZonedDateTime startDate2=startDate.plusHours(6).plusMinutes(0).plusSeconds(0);
+		ZonedDateTime endDate2=startDate.plusHours(11).plusMinutes(59).plusSeconds(59);
+		Collection<OrderTransactionResult> second=this.getPayPalOrderTransactions(startDate2,endDate2);	
+		result.addAll(second);
+		
+		ZonedDateTime startDate3=startDate.plusHours(12).plusMinutes(0).plusSeconds(0);;
+		ZonedDateTime endDate3=startDate.plusHours(17).plusMinutes(59).plusSeconds(59);
+		Collection<OrderTransactionResult> third=this.getPayPalOrderTransactions(startDate3,endDate3);	
+		result.addAll(third);
+		
+		ZonedDateTime startDate4=startDate.plusHours(18).plusMinutes(0).plusSeconds(0);;
+		ZonedDateTime endDate4=startDate.plusHours(23).plusMinutes(59).plusSeconds(59);
+		Collection<OrderTransactionResult> forth=this.getPayPalOrderTransactions(startDate4,endDate4);	
+		result.addAll(forth);
+
+		return result;
+	}
+	/*
+	 * Assume less then 10000 result quater
+	 */
 	public Collection<OrderTransactionResult> getPayPalOrderTransactions(ZonedDateTime startDate,ZonedDateTime endDate) throws Exception{
 		Collection<OrderTransactionResult> result=new LinkedList<>();
 		ApplicationSettingsService applicationSettingsService=new ApplicationSettingsService(); 

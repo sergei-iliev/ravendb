@@ -166,7 +166,6 @@ public class PaidUsersController implements Controller {
 		req.setAttribute("removalReasons",removalReasons);
 		req.getRequestDispatcher("/jsp/unremove_user.jsp").forward(req, resp);
 	}
-	
 	public void unremoveUser(HttpServletRequest req, HttpServletResponse resp)throws ServletException, IOException{
 		UserRepository userRepository=new UserRepository();
 		Collection<Entity> entities=userRepository.findEntities("user_payments_removal_reasons",null, null);
@@ -197,9 +196,40 @@ public class PaidUsersController implements Controller {
 		}else{  //more then 1 record
 			req.setAttribute("error","Error. More than one removed redeeming request was found for the user.");
 			req.getRequestDispatcher("/jsp/unremove_user.jsp").forward(req, resp);
-		}
-		
-		
-		
+		}						
 	}
+	public void remove(HttpServletRequest req, HttpServletResponse resp)throws ServletException, IOException{
+		UserRepository userRepository=new UserRepository();
+		Collection<Entity> entities=userRepository.findEntities("user_payments_removal_reasons",null, null);
+		Collection<String> removalReasons=entities.stream().map(e->(String)e.getProperty("removal_reason")).collect(Collectors.toList());
+		
+		req.setAttribute("removalReasons",removalReasons);
+		req.getRequestDispatcher("/jsp/remove_user.jsp").forward(req, resp);
+	}	
+	public void removeUser(HttpServletRequest req, HttpServletResponse resp)throws ServletException, IOException{
+		UserRepository userRepository=new UserRepository();
+		Collection<Entity> entities=userRepository.findEntities("user_payments_removal_reasons",null, null);
+		Collection<String> removalReasons=entities.stream().map(e->(String)e.getProperty("removal_reason")).collect(Collectors.toList());
+		
+		
+		UnremoveUserForm unremoveUserForm=UnremoveUserForm.parse(req);
+		req.setAttribute("webform",unremoveUserForm);
+		req.setAttribute("removalReasons",removalReasons);
+
+		if(unremoveUserForm.getRemovalReason()==null||unremoveUserForm.getUserGuid()==null){
+			req.setAttribute("error","Invalid input parameters");
+			req.getRequestDispatcher("/jsp/remove_user.jsp").forward(req, resp);			
+			return;
+		}
+		PaidUsersService paidUsersService=new PaidUsersService();
+		boolean result=paidUsersService.removeRedeemingRequests(unremoveUserForm.getUserGuid(),unremoveUserForm.getRemovalReason());
+		
+		if(!result){
+			req.setAttribute("error","The redeeming request wasn’t found and therefore wasn’t removed.");			
+			req.getRequestDispatcher("/jsp/remove_user.jsp").forward(req, resp);
+		}else{
+			req.setAttribute("success","The redeeming request was removed.");	
+			req.getRequestDispatcher("/jsp/remove_user.jsp").forward(req, resp);			
+		}						
+	}	
 }

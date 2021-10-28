@@ -13,14 +13,8 @@
 	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 		
 <link rel="stylesheet" href="/css/bootstrap/bootstrap.min.css">
-
-<script src="/js/bootstrap/popper.min.js"></script>
 <script src="/js/bootstrap/bootstrap.min.js"></script>
 
-
-<script src="/js/backbone/underscore.min.js"></script>
-<script src="/js/backbone/backbone.min.js"></script>
-<script src="/js/jsp/paid_users.js"></script>
 </head>
 <body>
 	<jsp:include page="/jsp/fragments/header.jsp">
@@ -28,11 +22,11 @@
 	</jsp:include>
 	<div class="container" id="contentid">
 	<div class="card card-body bg-light">
-	<h4>Unremove User</h4>
+	<h4>Remove User</h4>
 		<div class="row">
 			<div class="col-md-12">					
 					<form class="form-horizontal" id="form" method="post"
-						action="/administration/payment/user/unremoveuser">
+						action="/administration/payment/user/removeuser">
 						<fieldset>
 							<div class="form-label-group mt-3">
 								<div class="col-md-3">
@@ -53,7 +47,7 @@
 							</div>							
 							<div class="form-group">
 								<div class="col-md-12 text-center">
-									<button type="submit" class="btn btn-primary btn-lg mt-5" >Unremove</button>
+									<button type="submit" class="btn btn-primary btn-lg mt-5" >Remove</button>
 								</div>
 							</div>
 						</fieldset>
@@ -71,11 +65,6 @@
 			</c:if>	
 	</div>				
 	</div>	
-	</div>
-		<script type="text/javascript">
-			'use strict';
-
-			new payment.PaidUsersView();
-		</script>	
+	</div>	
 </body>
 </html>

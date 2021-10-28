@@ -39,6 +39,20 @@ public class PaidUsersService {
 		Collection<Entity> entities= paymentRepository.findRedeemingRequestsRemoved(userGuid, removalReason);
 		return entities.stream().map(RedeemingRequests::valueOf).collect(Collectors.toList());
 	}
+	
+	public  boolean removeRedeemingRequests(String userGuid,String removalReason){
+		Collection<Entity> entities= paymentRepository.findEntities("redeeming_requests_new","user_guid", userGuid);
+		if(entities.isEmpty()){
+			return false;
+		}
+		for(Entity entity:entities){
+		  entity.setProperty("type", "Removed");
+		  entity.setProperty("removal_reason",removalReason);
+		  paymentRepository.save(entity); 
+		}			
+		return true;
+	}
+	
 	public Collection<PaidUserGroupByVO> searchGroupBy(PaidUserGroupByForm form){
 		
 	    /*

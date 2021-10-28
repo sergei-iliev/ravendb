@@ -5,6 +5,8 @@ import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +30,8 @@ import com.luee.wally.api.paypal.client.model.BalanceListView;
 import com.luee.wally.api.paypal.client.model.Token;
 import com.luee.wally.api.paypal.client.model.TransactionView;
 import com.luee.wally.api.service.PaymentOrderTransactionsService;
+import com.luee.wally.command.order.OrderTransactionResult;
+import com.luee.wally.constants.Constants;
 import com.luee.wally.utils.TestDatabase;
 import com.luee.wally.utils.Utilities;
 
@@ -156,24 +160,51 @@ public class PayPalRestApiTest {
 		   TransactionsApi transactionsApi=new TransactionsApi(paypalClientId, paypalClientSecret,true); 	   
 		   Token token=transactionsApi.authenticate();
 		   
-		   ZonedDateTime start = ZonedDateTime.now(ZoneOffset.UTC);		   
-		   start=start.minusDays(20);
-		   
-		   ZonedDateTime end = ZonedDateTime.now(ZoneOffset.UTC);
+			ZonedDateTime now=ZonedDateTime.now(ZoneOffset.UTC);
+			ZonedDateTime yesterday=now.minusDays(1);
+			   
+			ZonedDateTime startDate=yesterday.truncatedTo(ChronoUnit.DAYS);
+			ZonedDateTime startDate1=startDate;
+			ZonedDateTime endDate1=startDate.plusHours(5).plusMinutes(59).plusSeconds(59);
+
+			
+			ZonedDateTime startDate2=startDate.plusHours(6).plusMinutes(0).plusSeconds(0);
+			ZonedDateTime endDate2=startDate.plusHours(11).plusMinutes(59).plusSeconds(59);
+
+			
+			ZonedDateTime startDate3=startDate.plusHours(12).plusMinutes(0).plusSeconds(0);;
+			ZonedDateTime endDate3=startDate.plusHours(17).plusMinutes(59).plusSeconds(59);
+
+			
+			ZonedDateTime startDate4=startDate.plusHours(18).plusMinutes(0).plusSeconds(0);;
+			ZonedDateTime endDate4=startDate.plusHours(23).plusMinutes(59).plusSeconds(59);
+
+			
+			//2021-09-07T00:00Z 19 records
+			//ZonedDateTime now=ZonedDateTime.now(ZoneOffset.UTC);
+			//ZonedDateTime yesterday=now.minusDays(45);
+			   
+			ZonedDateTime yesterdayStart=yesterday.truncatedTo(ChronoUnit.DAYS);
+			
+			ZonedDateTime yesterdayEnd=yesterdayStart.plusHours(23).plusMinutes(59).plusSeconds(59);
+			
+			
+			System.out.println(yesterdayStart);
+			System.out.println(yesterdayEnd);
 
 	       
-		   TransactionView transactionView=transactionsApi.getTransactionsByDate(token.getAccessToken(), start, end,10,1);
+		   TransactionView transactionView=transactionsApi.getTransactionsByDate(token.getAccessToken(), yesterdayStart, yesterdayEnd,10,1);
            System.out.println(transactionView.getTotalItems()+"::"+transactionView.getTotalPages());
            transactionView.getTransactionDetails().forEach(t->{
-        	   System.out.println(t.getTransactionInfo().getTransactionAmount().getValue()+"::"+t.getTransactionInfo().getTransactionAmount().getCurrencyCode());
+        	   System.out.println(t.getTransactionInfo().getTransactionId() +"::"+t.getTransactionInfo().getTransactionAmount().getValue()+"::"+t.getTransactionInfo().getTransactionAmount().getCurrencyCode());
            });
            
            for(int i=2;i<=transactionView.getTotalPages();i++){
         	   
-        	   transactionView=transactionsApi.getTransactionsByDate(token.getAccessToken(), start, end,10,i);
+        	   transactionView=transactionsApi.getTransactionsByDate(token.getAccessToken(), yesterdayStart, yesterdayEnd,10,i);
         	   System.out.println(transactionView.getPage()+"::"+transactionView.getTotalPages());
         	   transactionView.getTransactionDetails().forEach(t->{
-            	   System.out.println(t.getTransactionInfo().getTransactionAmount().getValue()+"::"+t.getTransactionInfo().getTransactionAmount().getCurrencyCode());
+            	   System.out.println(t.getTransactionInfo().getTransactionId() +"::"+t.getTransactionInfo().getTransactionAmount().getValue()+"::"+t.getTransactionInfo().getTransactionAmount().getCurrencyCode());
                });
 
            }
@@ -181,7 +212,26 @@ public class PayPalRestApiTest {
 	
 	@Test
 	public void getPayPalTransactionsServiceRestAPITest() throws Exception {	
-          PaymentOrderTransactionController paymentOrderTransactionController=new PaymentOrderTransactionController();
-          paymentOrderTransactionController.processPayPalOrderTransactions();
+		   BigDecimal amount=new BigDecimal(-8.4);
+		   BigDecimal localAmount=new BigDecimal(9.8);
+		   BigDecimal diff=amount.abs().subtract(localAmount.abs()).abs();
+		   BigDecimal rounded=diff.setScale(2, BigDecimal.ROUND_HALF_EVEN);
+		   System.out.println(rounded);
+		   if(rounded.compareTo(Constants.PAYPAL_LOCAL_SYSTEM_DISCREPANCIES)>0){
+			   System.out.println("DISCREPENCY");
+		   }
+		
+		
+		/*
+		ZonedDateTime now=ZonedDateTime.now(ZoneOffset.UTC);
+		ZonedDateTime yesterday=now.minusDays(45);
+		   
+		ZonedDateTime yesterdayStart=yesterday.truncatedTo(ChronoUnit.DAYS);
+
+		
+	    PaymentOrderTransactionsService paymentOrderTransactionController=new PaymentOrderTransactionsService();          
+	    Collection<OrderTransactionResult> result=paymentOrderTransactionController.getPayPalOrderTransactionsIn24Hours(yesterdayStart);
+	    System.out.println(result.size());
+	    */
 	}
 }
