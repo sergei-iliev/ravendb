@@ -13,6 +13,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
+import java.util.logging.Level;
 
 import com.luee.wally.admin.repository.ApplicationSettingsRepository;
 import com.luee.wally.api.paypal.client.TransactionsApi;
@@ -39,12 +40,12 @@ public class PaymentOrderTransactionsService extends AbstractService{
 
 	private final Logger logger = Logger.getLogger(PaymentOrderTransactionsService.class.getName());
 	
-	public Collection<OrderTransactionResult> getGiftCardOrderTransactions(String startDate,String endDate,Map<String,String> configMap) throws Exception{
+	public Collection<OrderTransactionResult> getGiftCardOrderTransactions(String startDate,String endDate,Map<String,String> configMap,Map<String,String> currencyCodeMap) throws Exception{
 		Collection<OrderTransactionResult> result=new LinkedList<>();
 		int page=0;
 		//iterate through paged results
 		while(true){
-			Collection<OrderTransactionResult> paging=getGiftCardOrderTransactions(startDate, endDate,100,page++, configMap);
+			Collection<OrderTransactionResult> paging=getGiftCardOrderTransactions(startDate, endDate,100,page++, configMap,currencyCodeMap);
 			if(paging.size()==0){
 				break;
 			}
@@ -55,7 +56,7 @@ public class PaymentOrderTransactionsService extends AbstractService{
 	/*
 	 * Page through TC 
 	 */
-	public Collection<OrderTransactionResult> getGiftCardOrderTransactions(String startDate,String endDate,int elementsPerBlock,int page,Map<String,String> configMap) throws Exception{
+	public Collection<OrderTransactionResult> getGiftCardOrderTransactions(String startDate,String endDate,int elementsPerBlock,int page,Map<String,String> configMap,Map<String,String> currencyCodeMap) throws Exception{
 		Collection<OrderTransactionResult> result=new LinkedList<>();
 		String platformIdentifier=configMap.get(Constants.PLATFORM_IDENTIFIER);
 		String platformKey=configMap.get(Constants.PLATFORM_KEY);
@@ -70,11 +71,17 @@ public class PaymentOrderTransactionsService extends AbstractService{
 		   
 		orderListView.getOrders().forEach(o->{
 		       if("COMPLETE".equals(o.getStatus())){
-		    	   OrderTransactionResult orderTransactionResult=new OrderTransactionResult();		    	   
-		    	   orderTransactionResult.setCurrencyCode(o.getAmountCharged().getCurrencyCode());
-		    	   orderTransactionResult.setTimestamp(o.getCreatedAt());
-		    	   orderTransactionResult.setValue(o.getAmountCharged().getTotal());
-		    	   result.add(orderTransactionResult);  
+		    	   OrderTransactionResult orderTransactionResult=new OrderTransactionResult();	
+		    	   String currencyCode=currencyCodeMap.get(o.getUtid());
+		    	   if(currencyCode==null){
+		    		   logger.log(Level.SEVERE,"Missing Tango Card currency code for unitid="+o.getUtid());		    	       
+		    	   }else{
+		    		   orderTransactionResult.setCurrencyCode(currencyCode);	
+		    		   orderTransactionResult.setUnitid(o.getUtid());
+		    		   orderTransactionResult.setTimestamp(o.getCreatedAt());
+		    		   orderTransactionResult.setValue(o.getAmountCharged().getValue());
+		    		   result.add(orderTransactionResult);
+		    	   }
 		       }
 		});
 		return result;		
@@ -86,18 +93,16 @@ public class PaymentOrderTransactionsService extends AbstractService{
 	 * 1.0 difference is a discrepancy
 	 * @return - list of currency codes with discrepency
 	 */
-	public List<String> validatePayPalToLocalSystemOrdersAmount(Map<String,BigDecimal> payPalOrderSumMap,Map<String,BigDecimal> localSystemOrderSumMap){
+	public List<String> validateOrdersAmount(Map<String,BigDecimal> orderSumMap,Map<String,BigDecimal> localSystemOrderSumMap){
 		List<String> result=new ArrayList<>();
-		for(Map.Entry<String, BigDecimal> entry:payPalOrderSumMap.entrySet()){
+		for(Map.Entry<String, BigDecimal> entry:orderSumMap.entrySet()){
 		   String currencyCode=entry.getKey();
 		   BigDecimal amount=entry.getValue();
 		   //local system
 		   BigDecimal localAmount=localSystemOrderSumMap.get(currencyCode);
-		   if(localAmount!=null){			   
-			   logger.warning(amount+"::"+localAmount);
+		   if(localAmount!=null){			   			   
 			   BigDecimal diff=amount.abs().subtract(localAmount.abs()).abs();
-			   BigDecimal rounded=diff.setScale(2, BigDecimal.ROUND_HALF_EVEN);			   
-			   logger.warning("diff="+rounded);
+			   BigDecimal rounded=diff.setScale(2, BigDecimal.ROUND_HALF_EVEN);			   			   
 			   if(rounded.compareTo(Constants.PAYPAL_LOCAL_SYSTEM_DISCREPANCIES)>0){
 				   result.add(currencyCode);
 			   }
@@ -370,4 +375,40 @@ public class PaymentOrderTransactionsService extends AbstractService{
 		 MailService mailService = new MailService();
 		 mailService.sendMailGrid(email);		
 	}
+	//Tango Card
+	public void sendEmailTangoCard(List<String> discrepencyList,Map<String,BigDecimal> map,Map<String,BigDecimal> localMap,String subject,String emailTo,String emailFrom)throws IOException{
+		 StringBuffer sb=new StringBuffer("Payments from Tango Card:");		 
+		 sb.append("<br><br>");
+		 
+		 map.entrySet().forEach(e->{
+			 if(discrepencyList.contains(e.getKey())){
+				 sb.append(e.getKey());
+				 sb.append(" - ");
+				 sb.append(Utilities.formatPrice(e.getValue().negate()));
+				 sb.append("<br>");
+			 }
+		 });
+		 
+		 sb.append("<br><br>");
+		 sb.append("Payments from our server:");
+		 sb.append("<br><br>");
+		 
+		 localMap.entrySet().forEach(e->{
+			 if(discrepencyList.contains(e.getKey())){
+				 sb.append(e.getKey());
+				 sb.append(" - ");
+				 sb.append(Utilities.formatPrice(e.getValue().negate()));
+				 sb.append("<br>");
+			 }
+		 });
+		 
+		 Email email=new Email();
+		 email.setTo(emailTo);
+		 email.setContent(sb.toString());
+		 email.setFrom(emailFrom);
+		 email.setSubject(subject);
+		 
+		 MailService mailService = new MailService();
+		 mailService.sendMailGrid(email);		
+	}	
 }

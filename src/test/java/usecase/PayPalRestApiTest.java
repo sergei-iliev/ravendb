@@ -146,7 +146,7 @@ public class PayPalRestApiTest {
 		//payPalMap.put("EUR",new BigDecimal(10.4));
 		
 		PaymentOrderTransactionsService service=new PaymentOrderTransactionsService();
-		List<String> list=service.validatePayPalToLocalSystemOrdersAmount(payPalMap, localMap);
+		List<String> list=service.validateOrdersAmount(payPalMap, localMap);
 		
 		System.out.println(list);
 		

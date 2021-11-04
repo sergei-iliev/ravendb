@@ -9,7 +9,14 @@ public class OrderTransactionResult implements Serializable{
 	private BigDecimal value=BigDecimal.ZERO;
 	private String timestamp;
 	private String transactionSubject;
+	private String unitid;
 	
+	public void setUnitid(String unitid) {
+		this.unitid = unitid;
+	}
+	public String getUnitid() {
+		return unitid;
+	}
 	public String getCurrencyCode() {
 		return currencyCode;
 	}

@@ -298,49 +298,56 @@ public enum TestDatabase {
 		entity.setIndexedProperty("country_code","GB");
 		entity.setIndexedProperty("currency","GBP");
 		entity.setIndexedProperty("brand","Amazon.co.uk");
-		entity.setIndexedProperty("unitid","U666425");
+		entity.setIndexedProperty("unitid","U139281");
 		ds.put(entity);
 		
 		entity = new Entity("tango_card_country_code_mapping");	
 		entity.setIndexedProperty("country_code","UK");
 		entity.setIndexedProperty("currency","GBP");
 		entity.setIndexedProperty("brand","Amazon.co.uk");
-		entity.setIndexedProperty("unitid","U666425");
+		entity.setIndexedProperty("unitid","U139281");
 		ds.put(entity);
 
 		entity = new Entity("tango_card_country_code_mapping");	
 		entity.setIndexedProperty("country_code","CA");
 		entity.setIndexedProperty("currency","CAD");
 		entity.setIndexedProperty("brand","Amazon.ca");
-		entity.setIndexedProperty("unitid","U666425");
+		entity.setIndexedProperty("unitid","U350230");
 		ds.put(entity);
 		
 		entity = new Entity("tango_card_country_code_mapping");	
 		entity.setIndexedProperty("country_code","DE");
 		entity.setIndexedProperty("currency","EUR");
 		entity.setIndexedProperty("brand","Amazon.de");
-		entity.setIndexedProperty("unitid","U666425");
+		entity.setIndexedProperty("unitid","U752627");
 		ds.put(entity);
 		
 		entity = new Entity("tango_card_country_code_mapping");	
 		entity.setIndexedProperty("country_code","FR");
 		entity.setIndexedProperty("currency","EUR");
 		entity.setIndexedProperty("brand","Amazon.fr");
-		entity.setIndexedProperty("unitid","U666425");
+		entity.setIndexedProperty("unitid","U079023");
 		ds.put(entity);
 
+		entity = new Entity("tango_card_country_code_mapping");	
+		entity.setIndexedProperty("country_code","BE");
+		entity.setIndexedProperty("currency","EUR");
+		entity.setIndexedProperty("brand","Amazon.fr");
+		entity.setIndexedProperty("unitid","U079023");
+		ds.put(entity);
+		
 		entity = new Entity("tango_card_country_code_mapping");	
 		entity.setIndexedProperty("country_code","ES");
 		entity.setIndexedProperty("currency","EUR");
 		entity.setIndexedProperty("brand","Amazon.es");
-		entity.setIndexedProperty("unitid","U666425");
+		entity.setIndexedProperty("unitid","U156320");
 		ds.put(entity);
 
 		entity = new Entity("tango_card_country_code_mapping");	
 		entity.setIndexedProperty("country_code","IT");
 		entity.setIndexedProperty("currency","EUR");
 		entity.setIndexedProperty("brand","Amazon.it");
-		entity.setIndexedProperty("unitid","U666425");
+		entity.setIndexedProperty("unitid","U006961");
 		ds.put(entity);
 		
 		entity = new Entity("tango_card_country_code_mapping");	
@@ -350,20 +357,40 @@ public enum TestDatabase {
 		entity.setIndexedProperty("unitid","U666425");
 		ds.put(entity);		
 		
-		
-		entity = new Entity("tango_card_country_code_mapping_external");	
-		entity.setIndexedProperty("country_code","US");
-		entity.setIndexedProperty("currency","USD");
+		entity = new Entity("tango_card_country_code_mapping");	
+		entity.setIndexedProperty("country_code","NZ");
+		entity.setIndexedProperty("currency","AUD");
 		entity.setIndexedProperty("brand","Amazon.com");
-		entity.setIndexedProperty("unitid","U666425");
+		entity.setIndexedProperty("unitid","U730756");
 		ds.put(entity);
 		
-		entity = new Entity("tango_card_country_code_mapping_external");	
-		entity.setIndexedProperty("country_code","US");
+		entity = new Entity("tango_card_country_code_mapping");	
+		entity.setIndexedProperty("country_code","AT");
 		entity.setIndexedProperty("currency","EUR");
 		entity.setIndexedProperty("brand","Amazon.com");
-		entity.setIndexedProperty("unitid","U666425");
+		entity.setIndexedProperty("unitid","U363538");
 		ds.put(entity);
+
+		entity = new Entity("tango_card_country_code_mapping");	
+		entity.setIndexedProperty("country_code","NL");
+		entity.setIndexedProperty("currency","EUR");
+		entity.setIndexedProperty("brand","Amazon.com");
+		entity.setIndexedProperty("unitid","U697325");
+		ds.put(entity);
+		
+//		entity = new Entity("tango_card_country_code_mapping_external");	
+//		entity.setIndexedProperty("country_code","US");
+//		entity.setIndexedProperty("currency","USD");
+//		entity.setIndexedProperty("brand","Amazon.com");
+//		entity.setIndexedProperty("unitid","U666425");
+//		ds.put(entity);
+//		
+//		entity = new Entity("tango_card_country_code_mapping_external");	
+//		entity.setIndexedProperty("country_code","US");
+//		entity.setIndexedProperty("currency","EUR");
+//		entity.setIndexedProperty("brand","Amazon.com");
+//		entity.setIndexedProperty("unitid","U666425");
+//		ds.put(entity);
 
 	}
 	

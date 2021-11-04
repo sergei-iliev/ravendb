@@ -20,7 +20,9 @@ import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.google.appengine.api.datastore.Entity;
 import com.luee.wally.admin.repository.ApplicationSettingsRepository;
+import com.luee.wally.admin.repository.GiftCardRepository;
 import com.luee.wally.api.route.Controller;
 import com.luee.wally.api.service.ApplicationSettingsService;
 import com.luee.wally.api.service.GiftCardService;
@@ -181,15 +183,27 @@ public class PaymentOrderTransactionController implements Controller {
 	}
 	private void processTangoCardOrderTransactions(String platformIdentifier,String platformKey,String customerName,String accountName, String title)throws Exception{
 	    GiftCardService giftCardService=new GiftCardService();
-		//Yesterday report
+				   	
+	    //Yesterday report
 		ZonedDateTime now=ZonedDateTime.now(ZoneOffset.UTC);
 		ZonedDateTime yesterday=now.minusDays(1);
 		   
 		ZonedDateTime yesterdayStart=yesterday.truncatedTo(ChronoUnit.DAYS);
-		ZonedDateTime yesterdayEnd=yesterdayStart.plusHours(24);
+		ZonedDateTime yesterdayEnd=yesterdayStart.plusHours(23).plusMinutes(59).plusSeconds(59);
 		
 	    ApplicationSettingsService applicationSettingsService=new ApplicationSettingsService(); 
 			
+		/*read records from 'paid_user' table
+		 * Tango Card/Amazon only 
+		 */
+		PaidUsersService paidUsersService=new PaidUsersService();
+		Collection<PaidUser> localList=paidUsersService.getPaidUsersByDateAndType("Amazon",Date.from(yesterdayStart.toInstant()), Date.from(yesterdayEnd.toInstant()));							
+		Map<String,BigDecimal> localMap=localList.stream().collect(Collectors.groupingBy(PaidUser::getPaidCurrency, Collectors.reducing(BigDecimal.ZERO, PaidUser::getAmountNet, BigDecimal::add)));
+
+		//***extract unitid to country code mapping
+		GiftCardRepository repository=new GiftCardRepository();
+		Collection<Entity> entities=repository.findEntities("tango_card_country_code_mapping", null, null);
+		Map<String,String> tangoCardCurrencyCodeMappings=entities.stream().collect(Collectors.toMap(e->(String)e.getProperty("unitid"), e->(String)e.getProperty("currency"),(e1,e2)->e1)); 
 
 		
 		Map<String,String> configMap=new HashMap<>();
@@ -198,7 +212,7 @@ public class PaymentOrderTransactionController implements Controller {
 		configMap.put(Constants.TANGO_CARD_CUSTOMER,customerName);
 		
 		PaymentOrderTransactionsService paymentOrderTransactionsService=new PaymentOrderTransactionsService();
-		Collection<OrderTransactionResult> orderTransactionResults=paymentOrderTransactionsService.getGiftCardOrderTransactions(Instant.from(yesterdayStart).toString(),Instant.from(yesterdayEnd).toString(),configMap);
+		Collection<OrderTransactionResult> orderTransactionResults=paymentOrderTransactionsService.getGiftCardOrderTransactions(Instant.from(yesterdayStart).toString(),Instant.from(yesterdayEnd).toString(),configMap,tangoCardCurrencyCodeMappings);
 	    //group by
 		Map<String,BigDecimal> map= paymentOrderTransactionsService.getOrderTransactionsGroupBy(orderTransactionResults);
 		//get the sum in usd
@@ -211,14 +225,21 @@ public class PaymentOrderTransactionController implements Controller {
 		//get account balance;
 		BigDecimal balance=giftCardService.getGiftCardAccountBalance(platformIdentifier, platformKey, accountName);
 		
-        String emailTo=applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.PAYMENT_REPORT_EMAIL_1);
+        String emailTo1=applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.PAYMENT_REPORT_EMAIL_1);
         String emailFrom=applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.NO_REPLY_EMAIL);
         
-		paymentOrderTransactionsService.sendEmail(map,balance, usdSum, eurSum, title+" total at "+formattedDate, emailTo, emailFrom);
+		paymentOrderTransactionsService.sendEmail(map,balance, usdSum, eurSum, title+" total at "+formattedDate, emailTo1, emailFrom);
         		 		 
-		emailTo=applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.PAYMENT_REPORT_EMAIL_2);
-		paymentOrderTransactionsService.sendEmail(map,balance, usdSum, eurSum, title+" total at "+formattedDate, emailTo, emailFrom);	
+		String emailTo2=applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.PAYMENT_REPORT_EMAIL_2);
+		paymentOrderTransactionsService.sendEmail(map,balance, usdSum, eurSum, title+" total at "+formattedDate, emailTo2, emailFrom);	
 
+		//Tango Card to Local System discrepencies
+		List<String> discrepencyList=paymentOrderTransactionsService.validateOrdersAmount(map,localMap);
+		if(discrepencyList.size()>0){
+			paymentOrderTransactionsService.sendEmailTangoCard(discrepencyList,map, localMap, "TangoCard payout discrepancy found.", emailTo1, emailFrom);
+			
+			paymentOrderTransactionsService.sendEmailTangoCard(discrepencyList,map, localMap, "TangoCard payout discrepancy found.", emailTo2, emailFrom);
+		}
 		
 	}
 	public void processPayPalOrderTransactions()throws Exception{				
@@ -272,7 +293,7 @@ public class PaymentOrderTransactionController implements Controller {
 		paymentOrderTransactionsService.sendEmail(playSpotMap,localPlaySpotMap,"PayPal payments total for "+formattedDate,"Payments for PlaySpot:", emailTo2, emailFrom);	
 		
 		//PayPal to Local System discrepencies
-		List<String> discrepencyList=paymentOrderTransactionsService.validatePayPalToLocalSystemOrdersAmount(playSpotMap,localPlaySpotMap);
+		List<String> discrepencyList=paymentOrderTransactionsService.validateOrdersAmount(playSpotMap,localPlaySpotMap);
 		if(discrepencyList.size()>0){
 			paymentOrderTransactionsService.sendEmail(discrepencyList, playSpotMap, localPlaySpotMap, "PayPal payout discrepancy found.", emailTo1, emailFrom);
 			

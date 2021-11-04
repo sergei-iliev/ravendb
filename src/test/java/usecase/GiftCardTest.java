@@ -2,12 +2,14 @@ package usecase;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.joda.time.DateTime;
 import org.junit.After;
@@ -16,17 +18,21 @@ import org.junit.Test;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
+import com.luee.wally.admin.repository.GiftCardRepository;
 import com.luee.wally.api.service.GiftCardService;
 import com.luee.wally.api.service.PaymentOrderTransactionsService;
 import com.luee.wally.api.tangocard.client.AccountsApi;
 import com.luee.wally.api.tangocard.client.OrdersApi;
+import com.luee.wally.api.tangocard.client.config.TangoCardJSON;
 import com.luee.wally.api.tangocard.client.model.AccountView;
 import com.luee.wally.api.tangocard.client.model.OrderListView;
 import com.luee.wally.command.Email;
 import com.luee.wally.command.order.OrderTransactionResult;
 import com.luee.wally.constants.Constants;
+import com.luee.wally.utils.TestDatabase;
 import com.luee.wally.utils.Utilities;
 import com.tangocard.raas.Configuration;
 import com.tangocard.raas.RaasClient;
@@ -152,18 +158,26 @@ public class GiftCardTest {
 	}
 	@Test
 	public void getGiftCardOrdersTest() throws Exception {
-		ZonedDateTime now=ZonedDateTime.now();
+		TestDatabase.INSTANCE.generateDB();
+		ZonedDateTime now=ZonedDateTime.now(ZoneOffset.UTC);
 		ZonedDateTime yesterday=now.minusDays(1);
 		   
 		ZonedDateTime yesterdayStart=yesterday.truncatedTo(ChronoUnit.DAYS);
-		ZonedDateTime yesterdayEnd=yesterdayStart.plusHours(24);
+		ZonedDateTime yesterdayEnd=yesterdayStart.plusHours(23).plusMinutes(59).plusSeconds(59);
 		
 		Map<String,String> configMap=new HashMap<>();
 		configMap.put(Constants.PLATFORM_IDENTIFIER,Constants.PROD_PLATFORM_IDENTIFIER);
 		configMap.put(Constants.PLATFORM_KEY,Constants.PROD_PLATFORM_KEY);
+		configMap.put(Constants.TANGO_CARD_CUSTOMER,"G71971146");
+		
+		//extract unitid to country code mapping
+		GiftCardRepository repository=new GiftCardRepository();
+		Collection<Entity> entities=repository.findEntities("tango_card_country_code_mapping", null, null);
+		Map<String,String> tangoCardMappings=entities.stream().collect(Collectors.toMap(e->(String)e.getProperty("unitid"), e->(String)e.getProperty("currency"),(e1,e2)->e1)); 
+		
 		
 		PaymentOrderTransactionsService paymentOrderTransactionsService=new PaymentOrderTransactionsService();
-		Collection<OrderTransactionResult> orderTransactionResults=paymentOrderTransactionsService.getGiftCardOrderTransactions(Instant.from(yesterdayStart).toString(),Instant.from(yesterdayEnd).toString(),configMap);
+		Collection<OrderTransactionResult> orderTransactionResults=paymentOrderTransactionsService.getGiftCardOrderTransactions(Instant.from(yesterdayStart).toString(),Instant.from(yesterdayEnd).toString(),configMap,tangoCardMappings);
 	    //group by
 		Map<String,BigDecimal> map= paymentOrderTransactionsService.getOrderTransactionsGroupBy(orderTransactionResults);
 		//get the sum in usd
