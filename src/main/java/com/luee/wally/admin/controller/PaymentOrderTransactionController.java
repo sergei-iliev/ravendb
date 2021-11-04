@@ -170,19 +170,19 @@ public class PaymentOrderTransactionController implements Controller {
 		String customerName=applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.TANGO_CARD_CUSTOMER_NAME);
 		String accountName=applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.TANGO_CARD_ACCOUNT_NAME);
 		
-		processTangoCardOrderTransactions(platformIdentifier,platformKey,customerName,accountName,"Tango Card PS");
+		processTangoCardOrderTransactions(platformIdentifier,platformKey,customerName,accountName,"Tango Card PS",true);
 		
 		platformIdentifier=applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.JP_TANGO_CARD_PLATFORM_IDENTIFIER);
 		platformKey=applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.JP_TANGO_CARD_PLATFORM_KEY);		
 		customerName=applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.JP_TANGO_CARD_CUSTOMER_NAME);
 		accountName=applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.JP_TANGO_CARD_ACCOUNT_NAME);
 		
-		processTangoCardOrderTransactions(platformIdentifier,platformKey,customerName,accountName,"Tango Card JP");
+		processTangoCardOrderTransactions(platformIdentifier,platformKey,customerName,accountName,"Tango Card JP",false);
 		
 		
 	}
-	private void processTangoCardOrderTransactions(String platformIdentifier,String platformKey,String customerName,String accountName, String title)throws Exception{
-	    GiftCardService giftCardService=new GiftCardService();
+	private void processTangoCardOrderTransactions(String platformIdentifier,String platformKey,String customerName,String accountName, String title,boolean sendAlert)throws Exception{
+		GiftCardService giftCardService=new GiftCardService();
 				   	
 	    //Yesterday report
 		ZonedDateTime now=ZonedDateTime.now(ZoneOffset.UTC);
@@ -233,12 +233,14 @@ public class PaymentOrderTransactionController implements Controller {
 		String emailTo2=applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.PAYMENT_REPORT_EMAIL_2);
 		paymentOrderTransactionsService.sendEmail(map,balance, usdSum, eurSum, title+" total at "+formattedDate, emailTo2, emailFrom);	
 
-		//Tango Card to Local System discrepencies
-		List<String> discrepencyList=paymentOrderTransactionsService.validateOrdersAmount(map,localMap);
-		if(discrepencyList.size()>0){
-			paymentOrderTransactionsService.sendEmailTangoCard(discrepencyList,map, localMap, "TangoCard payout discrepancy found.", emailTo1, emailFrom);
+		//Tango Card to Local System discrepencies -applicable to Tango Card PS only
+		if(sendAlert){
+			List<String> discrepencyList=paymentOrderTransactionsService.validateOrdersAmount(map,localMap);		
+			if(discrepencyList.size()>0){
+				paymentOrderTransactionsService.sendEmailTangoCard(discrepencyList,map, localMap, title +" payout discrepancy found.", emailTo1, emailFrom);
 			
-			paymentOrderTransactionsService.sendEmailTangoCard(discrepencyList,map, localMap, "TangoCard payout discrepancy found.", emailTo2, emailFrom);
+				paymentOrderTransactionsService.sendEmailTangoCard(discrepencyList,map, localMap, title+" payout discrepancy found.", emailTo2, emailFrom);
+			}
 		}
 		
 	}

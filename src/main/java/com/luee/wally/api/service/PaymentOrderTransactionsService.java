@@ -177,7 +177,7 @@ public class PaymentOrderTransactionsService extends AbstractService{
 		TransactionsApi transactionsApi=new TransactionsApi(paypalClientId, paypalClientSecret,"sandbox".equalsIgnoreCase(paypalMode)); 	   
 		Token token=transactionsApi.authenticate();
 		//***find first page
-		TransactionView transactionView=transactionsApi.getTransactionsByDate(token.getAccessToken(), startDate, endDate,100,1);           
+		TransactionView transactionView=transactionsApi.getTransactionsByDate(token.getAccessToken(), startDate, endDate,500,1);           
            transactionView.getTransactionDetails().forEach(t->{        	   	    	  
     		   BigDecimal fee=BigDecimal.ZERO;
     		   if(t.getTransactionInfo().getFeeAmount()!=null){        		          		   
@@ -195,7 +195,7 @@ public class PaymentOrderTransactionsService extends AbstractService{
            if(transactionView.getTotalPages()>1){
         	 for(int page=2;page<=transactionView.getTotalPages();page++){
         	   
-        	   transactionView=transactionsApi.getTransactionsByDate(token.getAccessToken(), startDate, endDate,100,page);        	   
+        	   transactionView=transactionsApi.getTransactionsByDate(token.getAccessToken(), startDate, endDate,500,page);        	   
         	   transactionView.getTransactionDetails().forEach(t->{
         		   BigDecimal fee=BigDecimal.ZERO;
         		   if(t.getTransactionInfo().getFeeAmount()!=null){        		          		   
@@ -262,11 +262,11 @@ public class PaymentOrderTransactionsService extends AbstractService{
 		 sb.append("- amount paid in USD  "+Utilities.formatPrice(usdSum)+"<br>");
 		 sb.append("- amount paid in EUR  "+Utilities.formatPrice(eurSum)+"<br>");
 		 
-		 if(map.size()>1){ //tango card has a single value only
+		 //if(map.size()>1){ //tango card has a single value only
 			 for(Map.Entry<String,BigDecimal> entry: map.entrySet()){
 				 sb.append(" "+entry.getKey()+" - "+Utilities.formatPrice(entry.getValue())+"<br>");	 
 			 }		 		 
-		 }
+		 //}
 		 
 		 Email email=new Email();
 		 email.setTo(emailTo);
