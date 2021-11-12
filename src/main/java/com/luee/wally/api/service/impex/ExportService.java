@@ -34,7 +34,7 @@ import com.luee.wally.utils.Utilities;
 public class ExportService extends AbstractService{
 	private final Logger logger = Logger.getLogger(ExportService.class.getName());
 	
-	private Collection<String> HEADER = Arrays.asList("date","internal user id","country code","full name","paid currency","paid amount","amount in eur","payment method","credit note id");
+	private Collection<String> HEADER = Arrays.asList("date","internal user id","payment reference id","country code","full name","paid currency","paid amount","amount in eur","payment method","credit note id");
 	
 	
 	//private final static String message = "Congratulations! This is your reward from PlaySpot :-)";
@@ -48,8 +48,10 @@ public class ExportService extends AbstractService{
 			// item
 			line.add(entity.getLeft().getDate().toString());
 			line.add(entity.getLeft().getUserGuid());
+			line.add(entity.getLeft().getPaymentReferenceId()!=null?entity.getLeft().getPaymentReferenceId():"");
 			line.add(entity.getRight()!=null?entity.getRight().getCountryCode():"");
 			line.add(entity.getRight()!=null?entity.getRight().getFullName():"");
+			
 			if(entity.getLeft().getPaidCurrency().equals("EUR")){
 				line.add("EUR");
 				line.add(Utilities.formatPrice(entity.getLeft().getEurCurrency()));				
@@ -76,6 +78,7 @@ public class ExportService extends AbstractService{
 			// item
 			line.add(entity.getDate().toString());
 			line.add(entity.getRedeemingRequestId());
+			line.add(entity.getPaymentReferenceId()!=null?entity.getPaymentReferenceId():"");
 			line.add(entity.getCountryCode());
 			line.add(entity.getFullName());
 			if(entity.getPaidCurrency().equals("EUR")){
