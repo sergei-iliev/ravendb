@@ -430,6 +430,17 @@ public enum TestDatabase {
 		ds.put(entity);
 
 		entity = new Entity("application_settings");	
+		entity.setIndexedProperty("name","SLACK_BOT_TOKEN");
+		entity.setIndexedProperty("value","xoxb-2703218318967-2725265480435-UAuA2x4TWoUhZQFvOw5PDkUa");
+		ds.put(entity);
+
+		entity = new Entity("application_settings");	
+		entity.setIndexedProperty("name","SLACK_BOT_CHANNEL_NAME");
+		entity.setIndexedProperty("value","general");
+		ds.put(entity);
+
+		
+		entity = new Entity("application_settings");	
 		entity.setIndexedProperty("name","PAYPAL_MODE");
 		entity.setIndexedProperty("value","sandbox");
 		ds.put(entity);

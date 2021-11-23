@@ -3,7 +3,11 @@ package usecase;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.junit.After;
 import org.junit.Before;
@@ -17,13 +21,16 @@ import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.datastore.ReadPolicy.Consistency;
 import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
+import com.luee.wally.admin.repository.ApplicationSettingsRepository;
 import com.luee.wally.admin.repository.EmailTemplateRepository;
 import com.luee.wally.admin.repository.GiftCardRepository;
 import com.luee.wally.admin.repository.PaidUsersRepository;
+import com.luee.wally.api.service.ApplicationSettingsService;
 import com.luee.wally.api.service.EmailTemplateService;
 import com.luee.wally.api.service.PaidUsersService;
 import com.luee.wally.api.service.PaymentReportsService;
 import com.luee.wally.api.service.PaymentService;
+import com.luee.wally.api.service.SlackMessagingService;
 import com.luee.wally.command.PaidUserSearchForm;
 import com.luee.wally.entity.PaidUserExternal;
 import com.luee.wally.utils.TestDatabase;
@@ -134,5 +141,29 @@ public class PaymentReportsTest {
 	}
 	
 	
-	
+	@Test
+	public void slackPostMessageTest() throws Exception{				
+		TestDatabase.INSTANCE.generateDB();
+	    
+		ApplicationSettingsService applicationSettingsService=new ApplicationSettingsService();
+		String token=applicationSettingsService.getApplicationSetting(ApplicationSettingsRepository.SLACK_BOT_TOKEN);
+		
+		List<String> discrepencyList=new ArrayList<String>();
+		discrepencyList.add("USD");
+		discrepencyList.add("EUR");
+		
+		Map<String,BigDecimal> map=new HashMap<String, BigDecimal>();
+		map.put("EUR", BigDecimal.valueOf(1.4));
+		map.put("USD", BigDecimal.valueOf(2.4));
+		
+		Map<String,BigDecimal> localMap=new HashMap<String, BigDecimal>();
+		localMap.put("EUR", BigDecimal.valueOf(12.4));
+		localMap.put("USD", BigDecimal.valueOf(3.2));
+		
+		SlackMessagingService slackMessagingService=new SlackMessagingService();
+		slackMessagingService.sendMessage(discrepencyList,map, localMap,"TangoCard SP payout discrepancy found.");
+		
+		
+				
+	}
 }

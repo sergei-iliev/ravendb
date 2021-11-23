@@ -65,6 +65,8 @@ public class ApplicationSettingsRepository extends AbstractRepository {
 	public static final String PAYPAL_BALANCE_THRESHOLD_USD="PAYPAL_BALANCE_THRESHOLD_USD";
 	public static final String PAYPAL_BALANCE_THRESHOLD_EUR="PAYPAL_BALANCE_THRESHOLD_EUR";
 	
+	public static final String SLACK_BOT_TOKEN="SLACK_BOT_TOKEN";
+	public static final String SLACK_BOT_CHANNEL_NAME="SLACK_BOT_CHANNEL_NAME";
 	
 	public static final String FIREBASE_APP_KEY="FIREBASE_APP_KEY";
 	public static final String TENJIN_APP_KEY="TENJIN_APP_KEY";

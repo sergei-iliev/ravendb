@@ -29,6 +29,7 @@ import com.luee.wally.api.service.GiftCardService;
 import com.luee.wally.api.service.MailService;
 import com.luee.wally.api.service.PaidUsersService;
 import com.luee.wally.api.service.PaymentOrderTransactionsService;
+import com.luee.wally.api.service.SlackMessagingService;
 import com.luee.wally.command.Email;
 import com.luee.wally.command.order.OrderTransactionResult;
 import com.luee.wally.constants.Constants;
@@ -118,11 +119,15 @@ public class PaymentOrderTransactionController implements Controller {
 		
 		Optional<BasicAmountType> usdBalance=basicAmountType.getBalanceHoldings().stream().filter(e->e.getCurrencyID().getValue().equalsIgnoreCase("USD")).findFirst();
 		Optional<BasicAmountType> eurBalance=basicAmountType.getBalanceHoldings().stream().filter(e->e.getCurrencyID().getValue().equalsIgnoreCase("EUR")).findFirst();
-		calculateAlert1(usdThreshold,usdBalance.get());
-		calculateAlert1(eurThreshold,eurBalance.get());
+		
+		sendBalanceAlert(usdThreshold,usdBalance.get());
+		sendBalanceAlert(eurThreshold,eurBalance.get());
+		
+		
+		
 	}
 	
-	private void calculateAlert1(String threshold,BasicAmountType balance) throws IOException{
+	private void sendBalanceAlert(String threshold,BasicAmountType balance) throws IOException{
 		BigDecimal thresholdValue;
 		Objects.requireNonNull(balance, "Balance value is NULL");
 		try {
@@ -134,7 +139,8 @@ public class PaymentOrderTransactionController implements Controller {
 		}
 		BigDecimal balanceValue=new BigDecimal(balance.getValue());
 		if(balanceValue.compareTo(thresholdValue)<0) {
-		    ApplicationSettingsService applicationSettingsService=new ApplicationSettingsService(); 
+		    //email alert
+			ApplicationSettingsService applicationSettingsService=new ApplicationSettingsService(); 
 			String emailTo=applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.PAYMENT_REPORT_EMAIL_1);
 	        String emailFrom=applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.NO_REPLY_EMAIL);
 	        
@@ -148,7 +154,10 @@ public class PaymentOrderTransactionController implements Controller {
 			MailService mailService = new MailService();
 		    mailService.sendMailGrid(email);
 			
-			
+			//slack alert
+		    		    
+		    SlackMessagingService slackMessagingService=new SlackMessagingService();
+		    slackMessagingService.sendMessage("PayPal balance for "+balance.getCurrencyID().getValue()+" is "+balance.getValue());
 		}
 		
 	}
@@ -240,6 +249,9 @@ public class PaymentOrderTransactionController implements Controller {
 				paymentOrderTransactionsService.sendEmailTangoCard(discrepencyList,map, localMap, title +" payout discrepancy found.", emailTo1, emailFrom);
 			
 				paymentOrderTransactionsService.sendEmailTangoCard(discrepencyList,map, localMap, title+" payout discrepancy found.", emailTo2, emailFrom);
+			    //slack alert
+			    SlackMessagingService slackMessagingService=new SlackMessagingService();
+			    slackMessagingService.sendMessage(discrepencyList,map, localMap, title+" payout discrepancy found.");
 			}
 		}
 		
@@ -300,6 +312,10 @@ public class PaymentOrderTransactionController implements Controller {
 			paymentOrderTransactionsService.sendEmail(discrepencyList, playSpotMap, localPlaySpotMap, "PayPal payout discrepancy found.", emailTo1, emailFrom);
 			
 			paymentOrderTransactionsService.sendEmail(discrepencyList, playSpotMap, localPlaySpotMap, "PayPal payout discrepancy found.", emailTo2, emailFrom);
+			
+		    //slack alert
+		    SlackMessagingService slackMessagingService=new SlackMessagingService();
+		    slackMessagingService.sendMessage(discrepencyList,playSpotMap, localPlaySpotMap,"PayPal payout discrepancy found.");
 		}
 	}
 

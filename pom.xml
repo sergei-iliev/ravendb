@@ -162,6 +162,11 @@
       <version>2.23.4</version>
       <scope>test</scope>
     </dependency>
+<dependency>
+      <groupId>com.slack.api</groupId>
+      <artifactId>slack-api-client</artifactId>
+      <version>1.14.0</version>
+</dependency>   
     <!-- [END_EXCLUDE] -->
   </dependencies>
 

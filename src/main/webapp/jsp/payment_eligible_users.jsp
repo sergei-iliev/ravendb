@@ -205,7 +205,8 @@
 							<th scope="col">Type</th>							
 							<th scope="col">Details</th>
 							<th scope="col">Country</th>
-							<th scope="col">Emails</th>
+							<th scope="col">IP</th>
+							<th scope="col">Emails</th>							
 							<th scope="col">Paid</th>
 						</tr>
 					</thead>
@@ -268,6 +269,7 @@
 								</table>
 								</td>
 								<td>${entity.redeemingRequest.countryCode}</td>
+								<td>${entity.redeemingRequest.ipAddress}</td>
 								<td>								
 									<table  class="table table-bordered"><tr>
 									<td>
