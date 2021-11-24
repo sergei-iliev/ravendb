@@ -388,4 +388,19 @@ public class PaiedUserTest {
 		Map<String,Double> result=list.stream().collect(Collectors.groupingBy(PaidUser::getPaidCurrency,Collectors.summingDouble(p->p.getAmountNet().doubleValue())));
 		System.out.println(result);
 	}
+	
+	@Test
+	public void encodeEmailTest() throws Exception {
+	  String email="sergei.iliev@gmail.com";	
+	  String result=Utilities.encodeEmail(email);
+	  
+	  Assert.assertTrue(result.equals("sergei!iliev9gmail!com"));
+	  
+	  email="sergei.s.iliev@gmail.mega.com";	
+	  result=Utilities.encodeEmail(email);
+	  
+	  Assert.assertTrue(result.equals("sergei!s!iliev9gmail!mega!com"));
+	  
+	}
+	
 }

@@ -48,4 +48,14 @@ public final class Utilities {
                 .encodeToString(String.format("%s:%s", user, password)
                         .getBytes()));
     }	
+	/*
+	 * replace every "@" with a "9" and every "." with a "1"
+	 */
+	public static String encodeEmail(String email){
+		if(email==null){
+			return null;
+		}
+		
+		return email.replace("@","9").replace(".", "!");
+	}
 }
