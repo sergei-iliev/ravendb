@@ -56,6 +56,6 @@ public final class Utilities {
 			return null;
 		}
 		
-		return email.replace("@","9").replace(".", "!");
+		return email.replace("@","9").replace(".", "1");
 	}
 }
