@@ -34,7 +34,7 @@ import com.luee.wally.utils.Utilities;
 public class ExportService extends AbstractService{
 	private final Logger logger = Logger.getLogger(ExportService.class.getName());
 	
-	private Collection<String> HEADER = Arrays.asList("date","internal user id","payment reference id","email","email encoded","country code","full name","paid currency","paid amount","amount in eur","payment method","credit note id");
+	private Collection<String> HEADER = Arrays.asList("date","CET date","internal user id","payment reference id","email","email encoded","country code","full name","paid currency","paid amount","amount in eur","payment method","credit note id");
 	
 	
 	//private final static String message = "Congratulations! This is your reward from PlaySpot :-)";
@@ -47,6 +47,7 @@ public class ExportService extends AbstractService{
 		for (Pair<PaidUser, RedeemingRequests> entity : entities) {
 			// item
 			line.add(entity.getLeft().getDate().toString());
+			line.add(Utilities.toCETDate(entity.getLeft().getDate()).toString());
 			line.add(entity.getLeft().getUserGuid());
 			line.add(entity.getLeft().getPaymentReferenceId()!=null?entity.getLeft().getPaymentReferenceId():"");
 			if(entity.getLeft().getType().equalsIgnoreCase("PayPal")){
@@ -84,8 +85,16 @@ public class ExportService extends AbstractService{
 		for (PaidUserExternal entity : entities) {
 			// item
 			line.add(entity.getDate().toString());
+			line.add(Utilities.toCETDate(entity.getDate()).toString());
 			line.add(entity.getRedeemingRequestId());
 			line.add(entity.getPaymentReferenceId()!=null?entity.getPaymentReferenceId():"");
+			if(entity.getType().equalsIgnoreCase("PayPal")){
+			  	line.add(entity.getPaypalAccount());
+			  	line.add(Utilities.encodeEmail(entity.getPaypalAccount()));
+			}else{
+				line.add(entity.getEmail());
+				line.add(Utilities.encodeEmail(entity.getEmail()));
+			}						
 			line.add(entity.getCountryCode());
 			line.add(entity.getFullName());
 			if(entity.getPaidCurrency().equals("EUR")){

@@ -1,6 +1,9 @@
 package usecase;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.Date;
@@ -402,5 +405,27 @@ public class PaiedUserTest {
 	  Assert.assertTrue(result.equals("sergei!s!iliev9gmail!mega!com"));
 	  
 	}
+	
+	@Test
+	public void dateETCTest() throws Exception {
+		ZonedDateTime date = ZonedDateTime.now(ZoneId.of("CET"));
+        System.out.println(date);
+
+        ZonedDateTime utcdate = cetToUtc(date);
+        System.out.println(utcdate);
+
+        ZonedDateTime cetdate = utcToCet(utcdate);
+        System.out.println(cetdate);
+	}
+	
+	public static ZonedDateTime cetToUtc(ZonedDateTime timeInCet) {
+		//ZonedDateTime cetTimeZoned = ZonedDateTime.of .of(timeInCet, ZoneId.of("CET"));
+        return timeInCet.withZoneSameInstant(ZoneOffset.UTC);
+    }
+
+    public static ZonedDateTime utcToCet(ZonedDateTime timeInUtc) {
+         //ZonedDateTime utcTimeZoned = ZonedDateTime.of(timeInUtc,ZoneId.of("UTC"));
+         return timeInUtc.withZoneSameInstant(ZoneId.of("CET"));
+     }
 	
 }

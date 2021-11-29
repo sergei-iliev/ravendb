@@ -2,6 +2,9 @@ package com.luee.wally.utils;
 
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Base64;
@@ -36,6 +39,12 @@ public final class Utilities {
 		  DateTimeFormatter formater = DateTimeFormatter.ofPattern(format);
 		  return formater.format(date);
 	}
+
+	public static Date toCETDate(Date date){		 		  		  
+		  ZonedDateTime zdt=date.toInstant().atZone(ZoneId.of("CET"));		  
+		  return Date.from(zdt.toInstant());
+	}
+	
     public static String formatPrice(BigDecimal price) {
         if (price == null) {
             return BigDecimal.ZERO.toString();
