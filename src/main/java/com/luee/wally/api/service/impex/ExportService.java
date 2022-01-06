@@ -47,7 +47,7 @@ public class ExportService extends AbstractService{
 		for (Pair<PaidUser, RedeemingRequests> entity : entities) {
 			// item
 			line.add(entity.getLeft().getDate().toString());
-			line.add(Utilities.toCETDate(entity.getLeft().getDate()).toString());
+			line.add(Utilities.toCETZoneDateTime(entity.getLeft().getDate()).toString());
 			line.add(entity.getLeft().getUserGuid());
 			line.add(entity.getLeft().getPaymentReferenceId()!=null?entity.getLeft().getPaymentReferenceId():"");
 			if(entity.getLeft().getType().equalsIgnoreCase("PayPal")){
@@ -85,7 +85,7 @@ public class ExportService extends AbstractService{
 		for (PaidUserExternal entity : entities) {
 			// item
 			line.add(entity.getDate().toString());
-			line.add(Utilities.toCETDate(entity.getDate()).toString());
+			line.add(Utilities.toCETZoneDateTime(entity.getDate()).toString());
 			line.add(entity.getRedeemingRequestId());
 			line.add(entity.getPaymentReferenceId()!=null?entity.getPaymentReferenceId():"");
 			if(entity.getType().equalsIgnoreCase("PayPal")){

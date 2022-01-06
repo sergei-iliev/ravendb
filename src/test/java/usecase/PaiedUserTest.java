@@ -408,14 +408,17 @@ public class PaiedUserTest {
 	
 	@Test
 	public void dateETCTest() throws Exception {
-		ZonedDateTime date = ZonedDateTime.now(ZoneId.of("CET"));
-        System.out.println(date);
-
-        ZonedDateTime utcdate = cetToUtc(date);
-        System.out.println(utcdate);
-
-        ZonedDateTime cetdate = utcToCet(utcdate);
-        System.out.println(cetdate);
+		Date d=new Date();
+		System.out.println(d);
+		ZonedDateTime cet=Utilities.toCETZoneDateTime(d);
+		System.out.println(cet);
+		
+		//ZonedDateTime date = ZonedDateTime.now();
+        //System.out.println(date);
+		
+		
+        //ZonedDateTime cetdate = utcToCet(date);
+        //System.out.println(cetdate);
 	}
 	
 	public static ZonedDateTime cetToUtc(ZonedDateTime timeInCet) {

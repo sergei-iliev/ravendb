@@ -5,6 +5,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -205,7 +206,7 @@ public class PaymentController implements Controller {
 
 		// find user to paypal to
 		PaymentRepository paymentRepository = new PaymentRepository();
-		Entity user = paymentRepository.getRedeemingRequestsByKey(key);
+		Entity user = paymentRepository.findEntityByKey(key);
 		logger.warning("Pay user: "+user.getProperty("email")+","+user.getProperty("paypal_account"));
 		
 		RedeemingRequests redeemingRequests = RedeemingRequests.valueOf(user);
@@ -311,7 +312,7 @@ public class PaymentController implements Controller {
 
 		PaymentRepository paymentRepository = new PaymentRepository();
 		// get redeeming request by key
-		Entity redeemingRequests = paymentRepository.getRedeemingRequestsByKey(form.getKey());
+		Entity redeemingRequests = paymentRepository.findEntityByKey(form.getKey());
 		logger.warning("Pay user: "+redeemingRequests.getProperty("email")+","+redeemingRequests.getProperty("paypal_account"));
 		
 		Entity paidUser = paymentRepository.getPaidUserByRedeemingRequestId((String) redeemingRequests.getProperty("redeeming_request_id"));
@@ -339,7 +340,27 @@ public class PaymentController implements Controller {
 		req.setAttribute("colorFlags", RuleStatusType.values());
 		req.getRequestDispatcher("/jsp/payment_eligible_users.jsp").forward(req, resp);
 	}
+	public void comments(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
+		req.getRequestDispatcher("/jsp/add_comments.jsp").forward(req, resp);
+	}
+	public void addComments(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		String redeemingRequestId= req.getParameter("redeemingRequestId");
+		String comments= req.getParameter("comments");
+
+		PaymentRepository paymentRepository = new PaymentRepository();
+		Entity entity = paymentRepository.findEntity("redeeming_requests_new", "redeeming_request_id",redeemingRequestId) ;
+		if(entity!=null){
+		   entity.setProperty("comments", comments);
+		   paymentRepository.save(entity);
+			req.setAttribute("success","Comments successfully saved");
+		}else{
+			req.setAttribute("error","Unable to find redeeming request entity");	
+		}
+		req.setAttribute("redeemingRequestId",redeemingRequestId);
+		req.setAttribute("comments", comments);
+		req.getRequestDispatcher("/jsp/add_comments.jsp").forward(req, resp);
+	}
 	public void searchByFilterTemplate(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
 		// could come from a search filter template
@@ -389,7 +410,7 @@ public class PaymentController implements Controller {
 			throws ServletException, IOException {
 		String key = req.getParameter("key");
 		PaymentRepository paymentRepository = new PaymentRepository();
-		Entity entity = paymentRepository.getRedeemingRequestsByKey(key);
+		Entity entity = paymentRepository.findEntityByKey(key);
 		RedeemingRequests redeemingRequest = RedeemingRequests.valueOf(entity);
 
 		PaymentRuleService paymentRuleService = new PaymentRuleService();
@@ -398,7 +419,32 @@ public class PaymentController implements Controller {
 		resp.getWriter().write(JSONUtils.writeObject(result));
 
 	}
+	public void getRedeemingRequestComments(HttpServletRequest req, HttpServletResponse resp)
+			throws ServletException, IOException {
+		String key = req.getParameter("key");
+		PaymentRepository paymentRepository = new PaymentRepository();
+		Entity entity = paymentRepository.findEntityByKey(key);
+		RedeemingRequests redeemingRequest = RedeemingRequests.valueOf(entity);
 
+
+		Map<String, Object> result =new HashMap<>(1);
+        result.put("comments",redeemingRequest.getComments());
+		resp.getWriter().write(JSONUtils.writeObject(result));
+
+	}
+	public void saveRedeemingRequestComments(HttpServletRequest req, HttpServletResponse resp)
+			throws ServletException, IOException {
+		String key = req.getParameter("key");
+		String comments = req.getParameter("comments");
+		
+		PaymentRepository paymentRepository = new PaymentRepository();
+		Entity entity = paymentRepository.findEntityByKey(key);
+		entity.setProperty("comments", comments);
+		paymentRepository.save(entity);
+		
+		resp.getWriter().write("OK");
+
+	}
 	public void search(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
 		PaymentService paymentService = new PaymentService();

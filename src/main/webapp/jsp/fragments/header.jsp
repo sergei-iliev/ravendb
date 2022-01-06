@@ -54,6 +54,7 @@
         	<div class="dropdown-menu" aria-labelledby="navbarDropdown">
           		<a class="dropdown-item" href="/administration/payment/eligibleusers">Eligible Users</a>
           		<a class="dropdown-item" href="/administration/payment/paidusers">Paid Users</a> 
+          		<a class="dropdown-item" href="/administration/payment/eligibleusers/comments/add">Add comment</a>
           		<a class="dropdown-item" href="/administration/payment/paidusers?groupby">Paid Users Group By</a>   
           		<a class="dropdown-item" href="/administration/payment/confirmemail">Confirm Email</a>
           		<a class="dropdown-item" href="/administration/payment/paidusers/export">Export Paid User</a>

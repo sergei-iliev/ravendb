@@ -21,6 +21,7 @@ public class RedeemingRequests {
 	private String key, redeemingRequestId, packageName;
 	private String uaChannel;
 	private String ipAddress;
+	private String comments;
 	private boolean paid;
 	private List<Long> coinsPerGame;
 	private boolean confirmedEmail;
@@ -48,6 +49,7 @@ public class RedeemingRequests {
 		redeemingRequests.setUaChannel((String) entity.getProperty("ua_channel"));
 		redeemingRequests.setIpAddress((String) entity.getProperty("ip_address"));
 		redeemingRequests.setFullAddress((String) entity.getProperty("full_address"));
+		redeemingRequests.setComments((String) entity.getProperty("comments"));
 		redeemingRequests.setPaid((Boolean) entity.getProperty("is_paid"));
 		redeemingRequests.setCoinsPerGame((List) entity.getProperty("coins_per_game"));
 		redeemingRequests.setUserCountriesConnectedFrom((List) entity.getProperty("user_countries"));
@@ -67,6 +69,14 @@ public class RedeemingRequests {
 		}
 
 		return redeemingRequests;
+	}
+
+	public String getComments() {
+		return comments;
+	}
+
+	public void setComments(String comments) {
+		this.comments = comments;
 	}
 
 	public void setUserCountriesConnectedFrom(List<String> userCountriesConnectedFrom) {

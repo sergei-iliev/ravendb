@@ -39,10 +39,10 @@ public final class Utilities {
 		  DateTimeFormatter formater = DateTimeFormatter.ofPattern(format);
 		  return formater.format(date);
 	}
-
-	public static Date toCETDate(Date date){		 		  		  
-		  ZonedDateTime zdt=date.toInstant().atZone(ZoneId.of("CET"));		  
-		  return Date.from(zdt.toInstant());
+	
+	public static ZonedDateTime toCETZoneDateTime(Date date){
+		  ZonedDateTime zdt=date.toInstant().atZone(ZoneId.systemDefault());						 
+		  return zdt.withZoneSameInstant(ZoneId.of("CET"));		  		  
 	}
 	
     public static String formatPrice(BigDecimal price) {

@@ -59,7 +59,7 @@ public class EmailTemplateController implements Controller{
 		
 		
 		PaymentRepository paymentRepository=new PaymentRepository();
-		Entity entity=paymentRepository.getRedeemingRequestsByKey(key);
+		Entity entity=paymentRepository.findEntityByKey(key);
 		
 		RedeemingRequests redeemingRequests = RedeemingRequests.valueOf(entity);
 		String payPalAccount = redeemingRequests.getPaypalAccount();

@@ -14,7 +14,7 @@
 	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 		
 <link rel="stylesheet" href="/css/bootstrap/bootstrap.min.css">
-<link rel="stylesheet" href="/css/app.css">
+
 <script src="/js/bootstrap/popper.min.js"></script>
 <script src="/js/bootstrap/bootstrap.min.js"></script>
 
@@ -34,6 +34,11 @@
 
 	<div class="container" id="contentid">
 	<div class="card card-body bg-light">
+	    <div class="row">
+           <div class="col-md-12">
+            <h4>Eligible Users</h4>
+           </div>
+        </div>
 		<div class="row mt-3">
 		  <div class="col-md-2">
 			<button class="btn" id="save-template-btn" data-toggle="tooltip" data-placement="top" title="Save search template">
@@ -229,11 +234,11 @@
 								</c:if>									    
 								</td>
 								<td><a href="${entity.redeemingRequest.link1}"
-									class="btn btn-primary btn-sm active" role="button"
+									class="btn btn-primary btn-sm active mb-1" role="button"
 									aria-pressed="true" target="_blank">Find</a>
 									
-									<button type="button" class="btn btn-primary btn-sm" data-entitykey="${entity.redeemingRequest.key}" remove-reason-button="true">Remove</button>									 																									
-									
+									<button type="button" class="btn btn-primary btn-sm mb-1" data-entitykey="${entity.redeemingRequest.key}" remove-reason-button="true">Remove</button>									 																									
+									<button type="button" class="btn btn-primary btn-sm mb-1" data-entitykey="${entity.redeemingRequest.key}" comments-button="true">Comment</button>
 									</td>
 								<td>${entity.redeemingRequest.userGuid}</td>
 								<td>${entity.redeemingRequest.date}</td>
@@ -556,7 +561,32 @@
     </div>
   </div>
 </div>
-
+<!-- Comments -->
+<div class="modal fade" id="commentsDialog" tabindex="-1" role="dialog" aria-labelledby="commentsDialogLabel" aria-hidden="true">
+  	<div class="modal-dialog"  role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="commentsDialogLabel">Comments</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+      <div class="container">
+		<div class="row mt-3">
+				<div class="col-md-12">
+					 <textarea class="form-control" id="commentsEligibleUsers" rows="4"></textarea>
+				</div>			
+		</div>
+      </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" id="saveCommentBtn">Save</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>    
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- Send Email Template -->
 <div class="modal fade" id="sendUserEmailDialog" tabindex="-1" role="dialog" aria-labelledby="sendUserEmailDialogLabel" aria-hidden="true">

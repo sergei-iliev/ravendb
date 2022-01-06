@@ -64,20 +64,20 @@ public class PaymentService extends AbstractService {
 	}
 
 	public void editEmail(String email, String key) {		
-		Entity entity = paymentRepository.getRedeemingRequestsByKey(key);
+		Entity entity = paymentRepository.findEntityByKey(key);
 		entity.setProperty("email", email);
 		paymentRepository.save(entity);
 	}
 
 	public void editPayPalAccount(String paypal, String key) {
 		
-		Entity entity = paymentRepository.getRedeemingRequestsByKey(key);
+		Entity entity = paymentRepository.findEntityByKey(key);
 		entity.setProperty("paypal_account", paypal);
 		paymentRepository.save(entity);
 	}
 
 	public void validatePayPalAccount(String key) throws IOException {		
-		Entity entity = paymentRepository.getRedeemingRequestsByKey(key);
+		Entity entity = paymentRepository.findEntityByKey(key);
 
 		RedeemingRequests redeemingRequests = RedeemingRequests.valueOf(entity);
 		String payPalAccount = redeemingRequests.getPaypalAccount();
@@ -355,7 +355,7 @@ public class PaymentService extends AbstractService {
 	public void sendGiftCard(String key) throws JsonProcessingException, RestResponseException {		
 		GiftCardRepository giftCardRepository = new GiftCardRepository();
 
-		Entity entity = paymentRepository.getRedeemingRequestsByKey(key);
+		Entity entity = paymentRepository.findEntityByKey(key);
 		RedeemingRequests redeemingRequests = RedeemingRequests.valueOf(entity);
 
 		entity = giftCardRepository.getGiftCardCountryCodeMapping(redeemingRequests.getCountryCode());
@@ -413,7 +413,7 @@ public class PaymentService extends AbstractService {
 		paymentRepository.saveUserPaymentRemovalReason(key, reason);
 	}
 
-	public Collection<RedeemingRequests> searchEligibleUsers(PaymentEligibleUserForm form) {		
+	public Collection<RedeemingRequests> searchEligibleUsers(PaymentEligibleUserForm form) {				
 		Collection<RedeemingRequests> result = new ArrayList<RedeemingRequests>();
 		for (String type : form.getTypes()) {
 			if (form.getPackageNames().size() > 0) {
@@ -434,7 +434,7 @@ public class PaymentService extends AbstractService {
 						result.addAll(paymentRepository.findEligibleUsers(type, form.getStartDate(), form.getEndDate(),
 								null, countryCode, form.getConfirmedEmail()));
 					}
-				} else {
+				} else {					
 					result.addAll(paymentRepository.findEligibleUsers(type, form.getStartDate(), form.getEndDate(),
 							null, null, form.getConfirmedEmail()));
 				}

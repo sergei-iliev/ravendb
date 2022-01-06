@@ -398,6 +398,50 @@ payment.PaymentEligibleUsersView = Backbone.View.extend({
 		  });
 		  			
 	  } );
+	  //*********Comments button****************
+	  $('[comments-button="true"]').click(function(e) {		  
+		  e.preventDefault();
+	
+		  var key = $(this).data('entitykey');
+			$.ajax({
+				url:'/administration/payment/eligibleusers/comments?key='+key,
+				type:'get',			
+				success: function(data, textStatus, jQxhr ){
+					let map=JSON.parse(data);
+					$('#commentsEligibleUsers').val(map.comments);					 					
+				},
+				error: function( jqXhr, textStatus, errorThrown ){
+					alert( errorThrown );
+				}
+	  
+			});			  
+
+		  $('#commentsDialog').modal('show');	 
+		  
+		  //disconnect event handler		  
+		  $('#saveCommentBtn').off();
+		  $('#saveCommentBtn').on( "click", function() {			  
+			  var formData={
+					  comments:$("#commentsEligibleUsers").val(),
+					  key:key,
+			  };
+			  
+			  $.ajax({
+			    url: '/administration/payment/eligibleusers/comments',
+			    type: 'post',
+			    data:formData,	    
+			    success: function(data, textStatus, jQxhr ){
+			    	$('#commentsDialog').modal('hide');  				    
+			    },
+			    error: function( jqXhr, textStatus, errorThrown ){			        
+			    	console.log( errorThrown );			        
+			    	alert(errorThrown);
+			    }
+			  
+			  });
+			  			  
+			});		  		  
+	  });	
 	  
 	  $('[remove-reason-button="true"]').click(function(e) {		  
 		  e.preventDefault();

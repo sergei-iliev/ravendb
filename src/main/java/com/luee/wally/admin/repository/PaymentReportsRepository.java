@@ -48,7 +48,7 @@ public class PaymentReportsRepository extends AbstractRepository{
 					paymentAmount.addTotalAmountByTypeMap((String) e.getProperty("type"),(double) e.getProperty("eur_currency"));										
 				    paymentAmount.addTotalAmountByAmountMap((String) e.getProperty("amount"),(double) e.getProperty("eur_currency"));
 					
-				    Entity redeemingRequest=paymentRepository.getRedeemingRequestsByKey((String) e.getProperty("redeeming_request_key"));
+				    Entity redeemingRequest=paymentRepository.findEntityByKey((String) e.getProperty("redeeming_request_key"));
 				    String countryCode=(String)redeemingRequest.getProperty("country_code");
 				    
 				    paymentAmount.addTotalAmountByCountryCodeMap(countryCode,(double) e.getProperty("eur_currency"));

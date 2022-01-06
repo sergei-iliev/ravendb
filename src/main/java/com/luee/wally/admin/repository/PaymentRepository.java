@@ -87,15 +87,15 @@ public class PaymentRepository extends AbstractRepository {
 		return e;
 	}
 
-	public Entity getRedeemingRequestsByKey(String _key) {
-		Key key = KeyFactory.stringToKey(_key);
-		DatastoreService ds = createDatastoreService(Consistency.STRONG);
-		try {
-			return ds.get(key);
-		} catch (EntityNotFoundException e) {
-			return null;
-		}
-	}
+//	public Entity getRedeemingRequestsByKey(String _key) {
+//		Key key = KeyFactory.stringToKey(_key);
+//		DatastoreService ds = createDatastoreService(Consistency.STRONG);
+//		try {
+//			return ds.get(key);
+//		} catch (EntityNotFoundException e) {
+//			return null;
+//		}
+//	}
 
 	public void deleteRedeemingRequestsByKey(String _key) {
 		Key key = KeyFactory.stringToKey(_key);

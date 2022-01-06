@@ -296,7 +296,7 @@ public class PayPalTest {
 		Entity entity = paymentRepository.getRedeemingRequestsByUserGuid("ffff2675-a072-4b6b-ab66-cb599a29147d");
 		// ****comes from server*********
 		String key = KeyFactory.keyToString(entity.getKey());
-		Entity user = paymentRepository.getRedeemingRequestsByKey(key);
+		Entity user = paymentRepository.findEntityByKey(key);
 		RedeemingRequests redeemingRequests = RedeemingRequests.valueOf(user);
 
 		PayPalService payPalService = new PayPalService();
