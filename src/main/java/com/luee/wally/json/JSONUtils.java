@@ -6,6 +6,7 @@ import java.util.Map;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -22,6 +23,11 @@ public class JSONUtils {
     public static <T> T readObject(String map,Class<T> clazz) throws JsonParseException, JsonMappingException, IOException{
         return mapper.readValue(map, clazz);
     }
+    
+    public static <T> T readObject(String map,TypeReference<T> reference) throws JsonParseException, JsonMappingException, IOException{
+        return mapper.readValue(map,reference);
+    }
+    
 	public static <T> String writeObject(T object,Class<T> clazz)throws JsonProcessingException{
 	    return mapper.writeValueAsString(object);	
 	}

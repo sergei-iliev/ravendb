@@ -2,8 +2,10 @@ package com.luee.wally.api.service;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -15,7 +17,9 @@ import java.util.Map;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.luee.wally.admin.repository.ApplicationSettingsRepository;
+import com.luee.wally.api.ConnectionMgr;
 import com.luee.wally.api.paypal.client.TransactionsApi;
 import com.luee.wally.api.paypal.client.model.Token;
 import com.luee.wally.api.paypal.client.model.TransactionView;
@@ -26,7 +30,10 @@ import com.luee.wally.command.Email;
 import com.luee.wally.command.order.OrderTransactionResult;
 import com.luee.wally.constants.Constants;
 import com.luee.wally.json.ExchangeRateVO;
+import com.luee.wally.json.JSONUtils;
+import com.luee.wally.json.JustPlayAmountVO;
 import com.luee.wally.utils.Utilities;
+
 
 import urn.ebay.api.PayPalAPI.GetBalanceReq;
 import urn.ebay.api.PayPalAPI.GetBalanceRequestType;
@@ -40,12 +47,35 @@ public class PaymentOrderTransactionsService extends AbstractService{
 
 	private final Logger logger = Logger.getLogger(PaymentOrderTransactionsService.class.getName());
 	
-	public Collection<OrderTransactionResult> getGiftCardOrderTransactions(String startDate,String endDate,Map<String,String> configMap,Map<String,String> currencyCodeMap) throws Exception{
+	/*
+	 * payments for JustPlay are tracked by API server
+	 */
+	public List<JustPlayAmountVO> getExternalTotalPaymentAmount(ZonedDateTime startDate,ZonedDateTime endDate)throws IOException{
+		Map<String,String> requestHeader=new HashMap<String,String>();
+		requestHeader.put("Authorization",Utilities.createBasicAuthString(Constants.PAYPAL_JUSTPLAY_PAYMENT_USER, Constants.PAYPAL_JUSTPLAY_PAYMENT_PASSWORD));				
+		requestHeader.put("User-Agent", Constants.AGENT_NAME);		
+		requestHeader.put("Content-Type", "application/json; charset=UTF-8");
+		requestHeader.put("Accept", "application/json");		
+		
+		
+	    DateTimeFormatter isoFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SS'Z'");				
+		
+		StringBuilder url=new StringBuilder(Constants.PAYPAL_JUSTPLAY_PAYMENT_URL);
+	    url.append("?");
+	    url.append("startDateTime="+isoFormatter.format(startDate));
+		url.append("&endDateTime="+isoFormatter.format(endDate));
+		
+		//List<JustPlayAmountVO> list=JSONUtils.readObject(map, clazz)
+		String json=ConnectionMgr.INSTANCE.getJSON(url.toString(),requestHeader);				
+		return JSONUtils.readObject(json,new TypeReference<List<JustPlayAmountVO>>(){});
+		
+	}
+	public Collection<OrderTransactionResult> getGiftCardOrderTransactions(ZonedDateTime startDate,ZonedDateTime endDate,Map<String,String> configMap,Map<String,String> currencyCodeMap) throws Exception{
 		Collection<OrderTransactionResult> result=new LinkedList<>();
 		int page=0;
 		//iterate through paged results
 		while(true){
-			Collection<OrderTransactionResult> paging=getGiftCardOrderTransactions(startDate, endDate,100,page++, configMap,currencyCodeMap);
+			Collection<OrderTransactionResult> paging=getGiftCardOrderTransactions(Instant.from(startDate).toString(), Instant.from(endDate).toString(),100,page++, configMap,currencyCodeMap);
 			if(paging.size()==0){
 				break;
 			}
@@ -56,7 +86,7 @@ public class PaymentOrderTransactionsService extends AbstractService{
 	/*
 	 * Page through TC 
 	 */
-	public Collection<OrderTransactionResult> getGiftCardOrderTransactions(String startDate,String endDate,int elementsPerBlock,int page,Map<String,String> configMap,Map<String,String> currencyCodeMap) throws Exception{
+	private Collection<OrderTransactionResult> getGiftCardOrderTransactions(String startDate,String endDate,int elementsPerBlock,int page,Map<String,String> configMap,Map<String,String> currencyCodeMap) throws Exception{
 		Collection<OrderTransactionResult> result=new LinkedList<>();
 		String platformIdentifier=configMap.get(Constants.PLATFORM_IDENTIFIER);
 		String platformKey=configMap.get(Constants.PLATFORM_KEY);
@@ -220,6 +250,24 @@ public class PaymentOrderTransactionsService extends AbstractService{
 	/*
 	 * group by currency code
 	 */	
+	public Map<String,BigDecimal> getJustPlayVOGroupBy(Collection<JustPlayAmountVO> justPlayVOs)throws Exception{
+		Map<String,BigDecimal> result=new HashMap<String, BigDecimal>();
+						
+		for(JustPlayAmountVO justPlay:justPlayVOs){
+			BigDecimal sum=result.get(justPlay.getCurrencyCode());
+			if(sum==null){
+				sum=new BigDecimal(0);
+			}
+			BigDecimal accumulator=sum.add(new BigDecimal(justPlay.getAmount()));
+			result.put(justPlay.getCurrencyCode(),accumulator);
+		}		
+		return result;
+	}
+
+	
+	/*
+	 * group by currency code
+	 */	
 	public Map<String,BigDecimal> getOrderTransactionsGroupBy(Collection<OrderTransactionResult> orderTransactions)throws Exception{
 		Map<String,BigDecimal> result=new HashMap<String, BigDecimal>();
 						
@@ -280,10 +328,10 @@ public class PaymentOrderTransactionsService extends AbstractService{
 	/*
 	 * PayPal email
 	 */
-	public void sendEmail(Map<String,BigDecimal> map,String subject,String transactionSubject,String emailTo,String emailFrom)throws IOException{
+	public void sendEmailJustPlay(Map<String,BigDecimal> map,Map<String,BigDecimal> localMap,String subject,String transactionSubject,String emailTo,String emailFrom)throws IOException{
 		 StringBuffer sb=new StringBuffer(transactionSubject);
-		 sb.append("<br>");sb.append("<br>");
-         
+		 sb.append("<br><br>");
+       
 		 map.entrySet().forEach(e->{
 			 sb.append(e.getKey());
 			 sb.append(" - ");
@@ -291,6 +339,16 @@ public class PaymentOrderTransactionsService extends AbstractService{
 			 sb.append("<br>");
 		 });
 		 
+		 sb.append("<br><br>");
+		 sb.append("Payments for JustPlay from our server:");
+		 sb.append("<br><br>");
+		 
+		 localMap.entrySet().forEach(e->{
+			 sb.append(e.getKey());
+			 sb.append(" - ");
+			 sb.append(Utilities.formatPrice(e.getValue().negate()));
+			 sb.append("<br>");
+		 });
 		 
 		 Email email=new Email();
 		 email.setTo(emailTo);
@@ -340,8 +398,8 @@ public class PaymentOrderTransactionsService extends AbstractService{
 	/*
 	 * PayPal to local system PlaySpot discrepency email	 
 	 */
-	public void sendEmail(List<String> discrepencyList,Map<String,BigDecimal> map,Map<String,BigDecimal> localMap,String subject,String emailTo,String emailFrom)throws IOException{
-		 StringBuffer sb=new StringBuffer("Payments for PlaySpot from PayPal:");
+	public void sendEmail(List<String> discrepencyList,Map<String,BigDecimal> map,Map<String,BigDecimal> localMap,String channel,String subject,String emailTo,String emailFrom)throws IOException{
+		 StringBuffer sb=new StringBuffer("Payments for "+channel+" from PayPal:");
 		 sb.append("<br><br>");
         
 		 map.entrySet().forEach(e->{
@@ -354,7 +412,7 @@ public class PaymentOrderTransactionsService extends AbstractService{
 		 });
 		 
 		 sb.append("<br><br>");
-		 sb.append("Payments for PlaySpot from our server:");
+		 sb.append("Payments for "+channel+" from our server:");
 		 sb.append("<br><br>");
 		 
 		 localMap.entrySet().forEach(e->{

@@ -5,10 +5,14 @@ import static org.mockito.Mockito.when;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.math.BigDecimal;
+import java.net.URLEncoder;
 import java.time.Instant;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -36,6 +40,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
@@ -61,6 +66,8 @@ import com.luee.wally.command.order.OrderTransactionResult;
 import com.luee.wally.constants.Constants;
 import com.luee.wally.entity.RedeemingRequests;
 import com.luee.wally.json.ExchangeRateVO;
+import com.luee.wally.json.JSONUtils;
+import com.luee.wally.json.JustPlayAmountVO;
 import com.luee.wally.utils.TestDatabase;
 import com.luee.wally.utils.Utilities;
 import com.paypal.api.payments.Currency;
@@ -387,6 +394,35 @@ public class PayPalTest {
         
         //paymentController.payExternal(request,response);	
 	}
+	@Test
+	public void externalPaymentRESTTest()throws Exception{
+		Map<String,String> requestHeader=new HashMap<String,String>();
+		requestHeader.put("Authorization",Utilities.createBasicAuthString(Constants.PAYPAL_JUSTPLAY_PAYMENT_USER, Constants.PAYPAL_JUSTPLAY_PAYMENT_PASSWORD));				
+		requestHeader.put("User-Agent", Constants.AGENT_NAME);		
+		requestHeader.put("Content-Type", "application/json; charset=UTF-8");
+		requestHeader.put("Accept", "application/json");		
+
+		ZonedDateTime now=ZonedDateTime.now(ZoneOffset.UTC);
+		ZonedDateTime yesterday=now.minusDays(1);
+
+		ZonedDateTime yesterdayStart=yesterday.truncatedTo(ChronoUnit.DAYS);		
+		ZonedDateTime yesterdayEnd=yesterdayStart.plusHours(23).plusMinutes(59).plusSeconds(59);
+		DateTimeFormatter isoFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SS'Z'");	
+				
+		
+		StringBuilder _url=new StringBuilder(Constants.PAYPAL_JUSTPLAY_PAYMENT_URL);
+	    _url.append("?");
+	    _url.append("startDateTime="+isoFormatter.format(yesterdayStart));
+		_url.append("&endDateTime="+isoFormatter.format(yesterdayEnd));
+		
+				
+		PaymentOrderTransactionsService service=new PaymentOrderTransactionsService();
+		List<JustPlayAmountVO> l=service.getExternalTotalPaymentAmount(yesterdayStart,yesterdayEnd);
+		l.forEach(e->{
+			System.out.println(e.getType()+":"+ e.getAmount()+":"+e.getCurrencyCode());
+		});
+	
+	}
 	
 	@Mock
 	private HttpServletRequest request1;
@@ -396,9 +432,10 @@ public class PayPalTest {
 	private HttpServletRequest request3;
 	@Mock
 	private HttpServletRequest request4;
-	
+
 	@Test
 	public void distributeLockTest()throws Exception{
+		
 	   List<HttpServletRequest> requests=new LinkedList<>();
 	   requests.add(request);
 	   requests.add(request1);
