@@ -1,5 +1,6 @@
 package com.luee.wally.json;
 
+import java.math.BigDecimal;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -36,6 +37,11 @@ public class JustPlayAmountVO implements ValueObject {
 		this.fee = fee;
 	}
 	
-	
+	public BigDecimal getNetAmount(){
+		BigDecimal a=new BigDecimal(this.amount!=null?this.amount:"0.0");
+		BigDecimal b=new BigDecimal(this.fee!=null?this.fee:"0.0");
+	    
+		return a.add(b);
+	}
 	
 }

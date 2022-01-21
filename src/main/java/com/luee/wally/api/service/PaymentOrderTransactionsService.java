@@ -258,7 +258,7 @@ public class PaymentOrderTransactionsService extends AbstractService{
 			if(sum==null){
 				sum=new BigDecimal(0);
 			}
-			BigDecimal accumulator=sum.add(new BigDecimal(justPlay.getAmount()));
+			BigDecimal accumulator=sum.add(justPlay.getNetAmount());
 			result.put(justPlay.getCurrencyCode(),accumulator);
 		}		
 		return result;
