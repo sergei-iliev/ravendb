@@ -361,7 +361,7 @@ public class PaymentOrderTransactionController implements Controller {
 		paymentOrderTransactionsService.sendEmailJustPlay(justPlayMap,localJustPlayMap,"PayPal payments total for "+formattedDate,"Payments for JustPlay:", emailTo2, emailFrom);
 		
 		//PayPal to Local System discrepencies
-		List<String> discrepencyList=paymentOrderTransactionsService.validateOrdersAmount(justPlayMap,localJustPlayMap);
+		List<String> discrepencyList=paymentOrderTransactionsService.validateOrdersAmountInPercentage(justPlayMap,localJustPlayMap);
 		if(discrepencyList.size()>0){
 			paymentOrderTransactionsService.sendEmail(discrepencyList, justPlayMap, localJustPlayMap,"JustPlay", "PayPal payout discrepancy found.", emailTo1, emailFrom);
 			

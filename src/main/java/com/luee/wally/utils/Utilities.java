@@ -30,7 +30,11 @@ public final class Utilities {
 			return Constants.BUCKET_NAME_PROD;
 		}
 	}
-	
+	//If your answer is a negative number, then this is a percentage decrease.
+	public static double findPercentageDifferenceBetween(double a,double b){
+		double c=(a-b);		
+		return (c/b)*100;
+	}
 	public static String formatedDate(Date date,String format){		 
 		  SimpleDateFormat formater = new SimpleDateFormat(format);//("yyyy-MM-dd");
 		  return formater.format(date);

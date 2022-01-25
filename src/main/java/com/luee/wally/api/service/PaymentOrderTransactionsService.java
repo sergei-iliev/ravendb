@@ -141,6 +141,25 @@ public class PaymentOrderTransactionsService extends AbstractService{
 		}
 		return result;
 	}
+	public List<String> validateOrdersAmountInPercentage(Map<String,BigDecimal> orderSumMap,Map<String,BigDecimal> localSystemOrderSumMap){
+		List<String> result=new ArrayList<>();
+		for(Map.Entry<String, BigDecimal> entry:orderSumMap.entrySet()){
+		   String currencyCode=entry.getKey();
+		   BigDecimal amount=entry.getValue();
+		   //local system
+		   BigDecimal localAmount=localSystemOrderSumMap.get(currencyCode);
+		   if(localAmount!=null){
+			   double number=Utilities.findPercentageDifferenceBetween(amount.abs().doubleValue(),localAmount.abs().doubleValue());
+			   
+			   if(Double.compare(Math.abs(number),Constants.PERCENTAGE_DISCREPANCIES)>0){
+				   result.add(currencyCode);
+			   }
+			   
+		   }
+		   
+		}
+		return result;
+	}
 	
 	public GetBalanceResponseType getPayPalBalance(Map<String,String> configMap)throws Exception{
 		GetBalanceReq getBalanceReq=new GetBalanceReq();

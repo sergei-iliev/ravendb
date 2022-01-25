@@ -105,6 +105,7 @@ public interface Constants {
 	public static final String PAYPAL_TRANSACTIONS_PROD_URL ="https://api-m.paypal.com/v1/reporting/transactions";
 	public static final String PAYPAL_TRANSACTIONS_SANDBOX_URL ="https://api-m.sandbox.paypal.com/v1/reporting/transactions";
 	public static final BigDecimal PAYPAL_LOCAL_SYSTEM_DISCREPANCIES = new BigDecimal(1.0);
+	public static final double PERCENTAGE_DISCREPANCIES = 1;
 	
 	//JustPlay API tracker
 	public static final String PAYPAL_JUSTPLAY_PAYMENT_URL ="https://payment-dot-playspot-server-dev.appspot.com/service-api/payment-api/payments";
