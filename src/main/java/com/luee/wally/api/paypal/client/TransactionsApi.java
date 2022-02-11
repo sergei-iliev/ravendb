@@ -48,11 +48,38 @@ public class TransactionsApi extends ClientApi{
 	  	requestHeader.put("Content-Type", "application/json");
 	  	requestHeader.put("Authorization", "Bearer "+accessToken);
 	  	   
-	  	String response=ConnectionMgr.INSTANCE.getJSON(_url.toString(), requestHeader);
-	 	return TangoCardJSON.readObject(response,TransactionView.class);	
+	  	String response=ConnectionMgr.INSTANCE.getJSON(_url.toString(), requestHeader);	 	
+	  	return TangoCardJSON.readObject(response,TransactionView.class);	
 
 	}
 	
+	public TransactionView getTransactionsById(String accessToken,ZonedDateTime startDate,ZonedDateTime endDate,String transactionId)throws IOException{
+		DateTimeFormatter isoFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssZ");	
+		
+		StringBuilder _url=new StringBuilder(url);
+	    _url.append("?");
+	    _url.append("page_size=100");
+	    _url.append("&page=1");
+	    _url.append("&transaction_id="+transactionId);
+		_url.append("&transaction_type=T0001");
+		_url.append("&fields=all");
+		
+		if(startDate!=null){
+		  _url.append("&start_date="+URLEncoder.encode(isoFormatter.format(startDate),"UTF-8"));
+		}
+		if(endDate!=null){
+		  _url.append("&end_date="+URLEncoder.encode(isoFormatter.format(endDate),"UTF-8"));
+		}
+		
+	  	Map<String,String> requestHeader=new HashMap<>();
+	  	requestHeader.put("User-Agent", Constants.AGENT_NAME);
+	  	requestHeader.put("Content-Type", "application/json");
+	  	requestHeader.put("Authorization", "Bearer "+accessToken);
+	  	   
+	  	String response=ConnectionMgr.INSTANCE.getJSON(_url.toString(), requestHeader);	 	
+	  	return TangoCardJSON.readObject(response,TransactionView.class);	
+		
+	}
 
 
 }

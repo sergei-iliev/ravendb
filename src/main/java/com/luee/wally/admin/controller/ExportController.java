@@ -20,7 +20,10 @@ import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.luee.wally.admin.repository.CloudStorageRepository;
 import com.luee.wally.admin.repository.PaidUsersRepository;
+import com.luee.wally.api.paypal.client.model.TransactionDetailView;
+import com.luee.wally.api.paypal.client.model.TransactionView;
 import com.luee.wally.api.route.Controller;
+import com.luee.wally.api.service.PayPalService;
 import com.luee.wally.api.service.impex.ExportService;
 import com.luee.wally.command.ExportPaidUsersForm;
 import com.luee.wally.entity.PaidUser;
@@ -63,6 +66,7 @@ public class ExportController implements Controller {
 					String internalFolder="user_credit_notes_2020_with_id/"+createCloudStoragePath(formatedStartDate,formatedEndDate,"internal");
 					String externalFolder="user_credit_notes_2020_with_id/"+createCloudStoragePath(formatedStartDate,formatedEndDate,"external");
 					
+					PayPalService payPalService=new PayPalService();
 					ExportService exportService = new ExportService();
 					PaidUsersRepository paidUsersRepository = new PaidUsersRepository();
 					
@@ -76,7 +80,21 @@ public class ExportController implements Controller {
 					if (form.isExternal()) {
 						paidUserExternals = exportService.findPaidUsersExternalByDate(form.getStartDate(),
 								form.getEndDate());
-						for (PaidUserExternal user : paidUserExternals) {							
+						for (PaidUserExternal user : paidUserExternals) {
+							if(user.getType().equalsIgnoreCase("paypal")){
+							    try{
+							    	TransactionView transactionView= payPalService.getTransactionByPayoutBatchId(user.getPaymentReferenceId());
+							    	TransactionDetailView transactionDetailView= transactionView.getTransactionDetails().get(0);
+							    	//check if status => SUCCESS
+							    	if(!transactionDetailView.getTransactionInfo().getTransactionStatus().equalsIgnoreCase("S")){							    		
+							    		continue;
+							    	}							    
+							    	}catch(Exception e){
+							    		logger.log(Level.SEVERE, "Transaction detail error for external payment_batch_id="+user.getPaymentReferenceId(),e);
+							    		continue;
+							    	}								
+							}
+
 							invoiceNumber = prefix + String.valueOf(count++);
 							user.setInvoiceNumber(invoiceNumber);
 					
@@ -88,6 +106,23 @@ public class ExportController implements Controller {
 					} else {
 						paidUsers = exportService.findPaidUsersByDate(form.getStartDate(), form.getEndDate());
 						for (PaidUser user : paidUsers) {
+							//test transaction status
+							if(user.getType().equalsIgnoreCase("paypal")){
+							    try{
+							    	TransactionView transactionView= payPalService.getTransactionByPayoutBatchId(user.getPaymentReferenceId());
+							    	TransactionDetailView transactionDetailView= transactionView.getTransactionDetails().get(0);
+							    	//check if status => SUCCESS
+							    	if(!transactionDetailView.getTransactionInfo().getTransactionStatus().equalsIgnoreCase("S")){
+										logger.log(Level.WARNING,
+												String.format("SKIP transaction status %s for redeeming request id:%s",transactionDetailView.getTransactionInfo().getTransactionStatus(),user.getRedeemingRequestId()));
+
+							    		continue;
+							    	}							    
+							    	}catch(Exception e){
+							    		logger.log(Level.SEVERE, "Transaction detail error for payment_batch_id="+user.getPaymentReferenceId(),e);
+							    		continue;
+							    	}								
+							}
 							invoiceNumber = prefix + String.valueOf(count++);
 							user.setInvoiceNumber(invoiceNumber);
 							

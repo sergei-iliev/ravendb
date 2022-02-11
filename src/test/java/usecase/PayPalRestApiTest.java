@@ -1,6 +1,7 @@
 package usecase;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -21,19 +22,28 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 import com.luee.wally.admin.controller.PaymentOrderTransactionController;
+import com.luee.wally.admin.repository.ApplicationSettingsRepository;
+import com.luee.wally.admin.repository.GiftCardRepository;
+import com.luee.wally.api.ConnectionMgr;
 import com.luee.wally.api.paypal.client.BalancesApi;
+import com.luee.wally.api.paypal.client.PayoutApi;
 import com.luee.wally.api.paypal.client.TransactionsApi;
 import com.luee.wally.api.paypal.client.model.BalanceListView;
 import com.luee.wally.api.paypal.client.model.Token;
 import com.luee.wally.api.paypal.client.model.TransactionView;
+import com.luee.wally.api.paypal.client.model.payout.BatchPayoutView;
+import com.luee.wally.api.service.ApplicationSettingsService;
+import com.luee.wally.api.service.PayPalService;
 import com.luee.wally.api.service.PaymentOrderTransactionsService;
 import com.luee.wally.command.order.OrderTransactionResult;
 import com.luee.wally.constants.Constants;
 import com.luee.wally.utils.TestDatabase;
 import com.luee.wally.utils.Utilities;
+import com.paypal.base.rest.PayPalRESTException;
 
 
 public class PayPalRestApiTest {
@@ -85,6 +95,13 @@ public class PayPalRestApiTest {
 	   TransactionsApi ordersApi=new TransactionsApi(paypalClientId, paypalClientSecret,true); 	   
 	   System.out.println(ordersApi.authenticate().getAccessToken());	   	  
 	}
+	@Test
+	public void getPayPalPayoutStatusRestAPITest() throws Exception {
+		    String payoutBatchId="VSEGXT2EGNPL2";
+			PayPalService service=new PayPalService();
+			TransactionView transactionView=service.getTransactionByPayoutBatchId(payoutBatchId);
+			System.out.println(transactionView.getTransactionDetails().get(0).getTransactionInfo().getTransactionStatus());
+	}	
 	
 	@Test
 	public void getPayPalBalancesRestAPITest() throws Exception {	   
@@ -212,6 +229,7 @@ public class PayPalRestApiTest {
 	
 	@Test
 	public void getPayPalTransactionsServiceRestAPITest() throws Exception {	
+		 /*  
 		   BigDecimal amount=new BigDecimal(-8.4);
 		   BigDecimal localAmount=new BigDecimal(9.8);
 		   BigDecimal diff=amount.abs().subtract(localAmount.abs()).abs();
@@ -220,18 +238,28 @@ public class PayPalRestApiTest {
 		   if(rounded.compareTo(Constants.PAYPAL_LOCAL_SYSTEM_DISCREPANCIES)>0){
 			   System.out.println("DISCREPENCY");
 		   }
+		*/
 		
 		
-		/*
 		ZonedDateTime now=ZonedDateTime.now(ZoneOffset.UTC);
-		ZonedDateTime yesterday=now.minusDays(45);
+		ZonedDateTime yesterday=now.minusDays(3);
 		   
 		ZonedDateTime yesterdayStart=yesterday.truncatedTo(ChronoUnit.DAYS);
 
+		//Yesterday report
+	    //ZonedDateTime now=ZonedDateTime.now(ZoneOffset.UTC);
+		//ZonedDateTime yesterday=now.minusDays(1);
+				   
+		//ZonedDateTime yesterdayStart=yesterday.truncatedTo(ChronoUnit.DAYS);
+		//ZonedDateTime yesterdayEnd=yesterdayStart.plusHours(23).plusMinutes(59).plusSeconds(59);	
+				
 		
 	    PaymentOrderTransactionsService paymentOrderTransactionController=new PaymentOrderTransactionsService();          
 	    Collection<OrderTransactionResult> result=paymentOrderTransactionController.getPayPalOrderTransactionsIn24Hours(yesterdayStart);
-	    System.out.println(result.size());
-	    */
+	    result.forEach(e->{
+	    	System.out.println(e.getTransactionSubject());	
+	    });
+	    
+	    
 	}
 }

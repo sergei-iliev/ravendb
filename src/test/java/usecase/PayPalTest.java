@@ -297,10 +297,9 @@ public class PayPalTest {
 
 
 	@Test
-	public void payPalTest() throws Throwable {
-
-		PaymentRepository paymentRepository = new PaymentRepository();
-		Entity entity = paymentRepository.getRedeemingRequestsByUserGuid("ffff2675-a072-4b6b-ab66-cb599a29147d");
+	public void payPalTest() throws Throwable {		
+		PaymentRepository paymentRepository = new PaymentRepository();		
+		Entity entity = paymentRepository.getRedeemingRequestsByUserGuid("ffff2675-a072-4b6b-ab66-cb599a29147d1");
 		// ****comes from server*********
 		String key = KeyFactory.keyToString(entity.getKey());
 		Entity user = paymentRepository.findEntityByKey(key);
@@ -314,7 +313,6 @@ public class PayPalTest {
 		try {
 
 			PayoutResult payoutResult = payPalService.payout(redeemingRequests, "GBP");
-
 			String invoiceNumber = Long.toString(invoiceRepository.createInvoiceNumber());
 			paymentRepository.savePayPalPayment(redeemingRequests, "GBP", BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO, invoiceNumber,
 					payoutResult.getPayoutBatchId(),null);

@@ -1,5 +1,8 @@
 package com.luee.wally.api.service;
 
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -10,6 +13,11 @@ import java.util.logging.Logger;
 import com.google.appengine.api.datastore.Entity;
 import com.luee.wally.admin.repository.ApplicationSettingsRepository;
 import com.luee.wally.admin.repository.GiftCardRepository;
+import com.luee.wally.api.paypal.client.PayoutApi;
+import com.luee.wally.api.paypal.client.TransactionsApi;
+import com.luee.wally.api.paypal.client.model.Token;
+import com.luee.wally.api.paypal.client.model.TransactionView;
+import com.luee.wally.api.paypal.client.model.payout.BatchPayoutView;
 import com.luee.wally.command.invoice.Money;
 import com.luee.wally.command.invoice.PayoutResult;
 import com.luee.wally.constants.Constants;
@@ -38,7 +46,28 @@ public class PayPalService {
 	private static final String RECEIVER_UNREGISTERED="RECEIVER_UNREGISTERED";
 	private static final String RECEIVER_UNCONFIRMED="RECEIVER_UNCONFIRMED";
 	private static final String PENDING_RECIPIENT_NON_HOLDING_CURRENCY_PAYMENT_PREFERENCE="PENDING_RECIPIENT_NON_HOLDING_CURRENCY_PAYMENT_PREFERENCE";	
-	
+
+	private ApplicationSettingsService applicationSettingsService=new ApplicationSettingsService();
+
+	/**
+	 * Use new Rest API to get transaction corresponding to a payout	 
+	 */
+	public TransactionView getTransactionByPayoutBatchId(String payoutBatchId)throws Exception{
+		
+		String payPalClientId=applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.PAYPAL_CLIENT_ID);
+		String payPalClientSecret=applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.PAYPAL_CLIENT_SECRET);
+         
+		PayoutApi payoutApi=new PayoutApi(payPalClientId, payPalClientSecret,true);
+		Token token=payoutApi.authenticate();
+		
+		BatchPayoutView batchPayoutView=payoutApi.getPayoutById(payoutBatchId, token.getAccessToken());						
+		ZonedDateTime date=ZonedDateTime.ofInstant(batchPayoutView.getItems().get(0).getTimeProcessed().toInstant(),ZoneOffset.UTC);
+		
+		TransactionsApi transactionsApi=new TransactionsApi(payPalClientId, payPalClientSecret, true);
+		TransactionView transactionView= transactionsApi.getTransactionsById(token.getAccessToken(), date.minusDays(1),date.plusDays(1),batchPayoutView.getItems().get(0).getTransactionId());	    						
+		
+		return transactionView;
+	}
 	public PayoutResult payout(RedeemingRequests payPalUser,String currencyCode) throws PayPalRESTException {
 		PayoutResult payoutResult=new PayoutResult();
 		ApplicationSettingsService applicationSettingsService=new ApplicationSettingsService();

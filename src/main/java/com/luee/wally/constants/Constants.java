@@ -102,6 +102,9 @@ public interface Constants {
 	public static final String PAYPAL_BALANCES_PROD_URL ="https://api-m.paypal.com/v1/reporting/balances";
 	public static final String PAYPAL_BALANCES_SANDBOX_URL ="https://api-m.sandbox.paypal.com/v1/reporting/balances";
 	
+	public static final String PAYPAL_PAYOUT_PROD_URL ="https://api-m.paypal.com/v1/payments/payouts";
+	public static final String PAYPAL_PAYOUT_SANDBOX_URL ="https://api-m.sandbox.paypal.com/v1/payments/payouts";
+	
 	public static final String PAYPAL_TRANSACTIONS_PROD_URL ="https://api-m.paypal.com/v1/reporting/transactions";
 	public static final String PAYPAL_TRANSACTIONS_SANDBOX_URL ="https://api-m.sandbox.paypal.com/v1/reporting/transactions";
 	public static final BigDecimal PAYPAL_LOCAL_SYSTEM_DISCREPANCIES = new BigDecimal(1.0);

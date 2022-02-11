@@ -1,4 +1,4 @@
-package com.luee.wally.api.paypal.client.model;
+package com.luee.wally.api.paypal.client.model.payout;
 
 import java.math.BigDecimal;
 
@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class MoneyView {
-	@JsonProperty("currency_code")
+	@JsonProperty("currency")
 	private String currencyCode;
 	@JsonProperty("value")
 	private String value;

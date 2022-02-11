@@ -61,7 +61,7 @@ public enum TestDatabase {
 		ds.put(entity);		
 		crearePaiedUsersEntity(entity,10.8,"USD",createDate(1, 12, 2020));
 		
-		entity=createRedeemingRequestEntity("Minko","696f-4258-baef-55b6aa6550b1","48bb2675-a072-4b6b-ab66-cb599a29147d", "1111",new Date(), "com.moregames.makemoney", "PayPal", "sergei.iliev-facilitator@gmail.com", "FR");
+		entity=createRedeemingRequestEntity("Minko","696f-4258-baef-55b6aa6550b1","48bb2675-a072-4b6b-ab66-cb599a29147d", "11",new Date(), "com.moregames.makemoney", "PayPal", "sergei.iliev-facilitator@gmail.com", "FR");
 		entity.setProperty("ua_channel", "supersonic");
 		entity.setProperty("ip_address", "123.0.0.23");
 		entity.setProperty("type", "Removed");
@@ -70,7 +70,7 @@ public enum TestDatabase {
 		ds.put(entity);
 		crearePaiedUsersEntity(entity,2.8,"USD",createDate(1, 12, 2020));
 		
-		entity=createRedeemingRequestEntity("Minko1 and Macarena","696f-4258-baef-55b6aa6550b11","ffff2675-a072-4b6b-ab66-cb599a29147d1", "111", new Date(), "com.moregames.makemoney2", "PayPal", "sergei.iliev-facilitator@gmail.com", "US");
+		entity=createRedeemingRequestEntity("Minko1 and Macarena","696f-4258-baef-55b6aa6550b11","ffff2675-a072-4b6b-ab66-cb599a29147d1", "3.8", new Date(), "com.moregames.makemoney2", "PayPal", "sergei.iliev-facilitator@gmail.com", "US");
 		entity.setProperty("ua_channel", "vungle");
 		entity.setProperty("ip_address", "123.0.0.23");
 		entity.setProperty("max_rev", (double)2);
@@ -400,6 +400,11 @@ public enum TestDatabase {
 		entity.setIndexedProperty("package_name","com.moregames.makemoney");
 		entity.setIndexedProperty("title","PlaySpot");
 		ds.put(entity);
+		entity = new Entity("package_name_title_mapping");	
+		entity.setIndexedProperty("package_name","com.moregames.makemoney2");
+		entity.setIndexedProperty("title","PlaySpot");
+		ds.put(entity);
+		
 		
 		entity = new Entity("package_name_title_mapping");	
 		entity.setIndexedProperty("package_name","com.gametrix.app");
