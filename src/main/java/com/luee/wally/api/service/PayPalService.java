@@ -56,8 +56,9 @@ public class PayPalService {
 		
 		String payPalClientId=applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.PAYPAL_CLIENT_ID);
 		String payPalClientSecret=applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.PAYPAL_CLIENT_SECRET);
-         
-		PayoutApi payoutApi=new PayoutApi(payPalClientId, payPalClientSecret,true);
+		String paypalMode=applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.PAYPAL_MODE);
+		
+		PayoutApi payoutApi=new PayoutApi(payPalClientId, payPalClientSecret,"sandbox".equalsIgnoreCase(paypalMode));
 		Token token=payoutApi.authenticate();
 		
 		BatchPayoutView batchPayoutView=payoutApi.getPayoutById(payoutBatchId, token.getAccessToken());						
