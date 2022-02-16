@@ -114,7 +114,7 @@ public class ExportController implements Controller {
 							    	TransactionView transactionView= payPalService.getTransactionByPayoutBatchId(token,user.getPaymentReferenceId());
 							    	TransactionDetailView transactionDetailView= transactionView.getTransactionDetails().get(0);
 							    	//check if status => SUCCESS
-							    	if(!transactionDetailView.getTransactionInfo().getTransactionStatus().equalsIgnoreCase("S")){
+							    	if(!(transactionDetailView.getTransactionInfo().getTransactionStatus().equalsIgnoreCase("S")||transactionDetailView.getTransactionInfo().getTransactionStatus().equalsIgnoreCase("P"))){
 										logger.log(Level.WARNING,
 												String.format("SKIP transaction status %s for redeeming request id:%s",transactionDetailView.getTransactionInfo().getTransactionStatus(),user.getRedeemingRequestId()));
 
