@@ -20,6 +20,7 @@ import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.luee.wally.admin.repository.CloudStorageRepository;
 import com.luee.wally.admin.repository.PaidUsersRepository;
+import com.luee.wally.api.paypal.client.model.Token;
 import com.luee.wally.api.paypal.client.model.TransactionDetailView;
 import com.luee.wally.api.paypal.client.model.TransactionView;
 import com.luee.wally.api.route.Controller;
@@ -76,14 +77,15 @@ public class ExportController implements Controller {
 
 					Collection<Pair<PaidUser, RedeemingRequests>> paidUserPairs = new ArrayList<>();
 					
-
+					//authenticate
+					Token token=payPalService.authenticatePayPal();
 					if (form.isExternal()) {
 						paidUserExternals = exportService.findPaidUsersExternalByDate(form.getStartDate(),
 								form.getEndDate());
 						for (PaidUserExternal user : paidUserExternals) {
 							if(user.getType().equalsIgnoreCase("paypal")){
 							    try{
-							    	TransactionView transactionView= payPalService.getTransactionByPayoutBatchId(user.getPaymentReferenceId());
+							    	TransactionView transactionView= payPalService.getTransactionByPayoutBatchId(token,user.getPaymentReferenceId());
 							    	TransactionDetailView transactionDetailView= transactionView.getTransactionDetails().get(0);
 							    	//check if status => SUCCESS
 							    	if(!transactionDetailView.getTransactionInfo().getTransactionStatus().equalsIgnoreCase("S")){							    		
@@ -109,7 +111,7 @@ public class ExportController implements Controller {
 							//test transaction status
 							if(user.getType().equalsIgnoreCase("paypal")){
 							    try{
-							    	TransactionView transactionView= payPalService.getTransactionByPayoutBatchId(user.getPaymentReferenceId());
+							    	TransactionView transactionView= payPalService.getTransactionByPayoutBatchId(token,user.getPaymentReferenceId());
 							    	TransactionDetailView transactionDetailView= transactionView.getTransactionDetails().get(0);
 							    	//check if status => SUCCESS
 							    	if(!transactionDetailView.getTransactionInfo().getTransactionStatus().equalsIgnoreCase("S")){

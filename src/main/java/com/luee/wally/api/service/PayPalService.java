@@ -52,19 +52,29 @@ public class PayPalService {
 	/**
 	 * Use new Rest API to get transaction corresponding to a payout	 
 	 */
-	public TransactionView getTransactionByPayoutBatchId(String payoutBatchId)throws Exception{
+	public Token authenticatePayPal()throws Exception{
+		String payPalClientId=applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.PAYPAL_CLIENT_ID);
+		String payPalClientSecret=applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.PAYPAL_CLIENT_SECRET);
+		String paypalMode=applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.PAYPAL_MODE);
+
+		PayoutApi payoutApi=new PayoutApi(payPalClientId, payPalClientSecret,"sandbox".equalsIgnoreCase(paypalMode));
+		return payoutApi.authenticate();		
+		
+	}
+	public TransactionView getTransactionByPayoutBatchId(Token token,String payoutBatchId)throws Exception{
 		
 		String payPalClientId=applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.PAYPAL_CLIENT_ID);
 		String payPalClientSecret=applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.PAYPAL_CLIENT_SECRET);
 		String paypalMode=applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.PAYPAL_MODE);
 		
-		PayoutApi payoutApi=new PayoutApi(payPalClientId, payPalClientSecret,"sandbox".equalsIgnoreCase(paypalMode));
-		Token token=payoutApi.authenticate();
+		
+		PayoutApi payoutApi=new PayoutApi(payPalClientId, payPalClientSecret,"sandbox".equalsIgnoreCase(paypalMode));		
 		
 		BatchPayoutView batchPayoutView=payoutApi.getPayoutById(payoutBatchId, token.getAccessToken());						
 		ZonedDateTime date=ZonedDateTime.ofInstant(batchPayoutView.getItems().get(0).getTimeProcessed().toInstant(),ZoneOffset.UTC);
 		
-		TransactionsApi transactionsApi=new TransactionsApi(payPalClientId, payPalClientSecret, true);
+		
+		TransactionsApi transactionsApi=new TransactionsApi(payPalClientId, payPalClientSecret,"sandbox".equalsIgnoreCase(paypalMode));
 		TransactionView transactionView= transactionsApi.getTransactionsById(token.getAccessToken(), date.minusDays(1),date.plusDays(1),batchPayoutView.getItems().get(0).getTransactionId());	    						
 		
 		return transactionView;

@@ -99,7 +99,8 @@ public class PayPalRestApiTest {
 	public void getPayPalPayoutStatusRestAPITest() throws Exception {
 		    String payoutBatchId="VSEGXT2EGNPL2";
 			PayPalService service=new PayPalService();
-			TransactionView transactionView=service.getTransactionByPayoutBatchId(payoutBatchId);
+			Token token=service.authenticatePayPal();
+			TransactionView transactionView=service.getTransactionByPayoutBatchId(token,payoutBatchId);
 			System.out.println(transactionView.getTransactionDetails().get(0).getTransactionInfo().getTransactionStatus());
 	}	
 	
