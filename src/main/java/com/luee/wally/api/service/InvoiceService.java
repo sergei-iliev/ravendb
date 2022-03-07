@@ -137,9 +137,12 @@ public class InvoiceService extends AbstractService{
 		sumsDetailTable.addCell(getCell("Currency", Element.ALIGN_CENTER, font));
 		
 		for(Map.Entry<String,BigDecimal> entry:map.entrySet()){
-			sumsDetailTable.addCell(getCell("", Element.ALIGN_CENTER, font));
-			sumsDetailTable.addCell(getCell(Utilities.formatPrice(entry.getValue()), Element.ALIGN_CENTER, font));
-			sumsDetailTable.addCell(getCell(entry.getKey(), Element.ALIGN_CENTER, font));
+			BigDecimal amount =entry.getValue();
+			if(amount.compareTo(BigDecimal.ZERO)>0){
+			  sumsDetailTable.addCell(getCell("", Element.ALIGN_CENTER, font));
+			  sumsDetailTable.addCell(getCell(Utilities.formatPrice(entry.getValue()), Element.ALIGN_CENTER, font));
+			  sumsDetailTable.addCell(getCell(entry.getKey(), Element.ALIGN_CENTER, font));
+			}
 					      		
 		}
 		cell.addElement(sumsDetailTable);

@@ -204,7 +204,7 @@ public class PaidUser implements Payable{
 	public boolean isPayPalType() {
 		return type.equalsIgnoreCase("paypal");
 	}
-	
+	@Override
 	public BigDecimal getAmountNet() {
 		return amountNet;
 	}

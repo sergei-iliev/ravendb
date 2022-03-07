@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import org.mortbay.log.Log;
 
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.Key;
@@ -126,7 +127,7 @@ public class ExportService extends AbstractService{
 	 * Export summary currency total
 	 */
 	public void createPDFExportSummary(String folder,Date startDate,Date endDate,String creditNoteNumber,String subject,
-			int minCreditNoteId,int maxCreditNoteId,Collection<? extends Payable> list)throws Exception{
+			String minCreditNoteId,String maxCreditNoteId,Collection<? extends Payable> list)throws Exception{
 	   ZonedDateTime start= Utilities.toCETZoneDateTime(startDate);
 	   ZonedDateTime e= Utilities.toCETZoneDateTime(endDate);
 	   ZonedDateTime end=e.minusDays(1);
@@ -169,6 +170,7 @@ public class ExportService extends AbstractService{
 		Map<String,BigDecimal> result=new HashMap<String, BigDecimal>();
 						
 		for(Payable item:list){
+			Log.warn("ITEM "+item.getAmountNet()+"::"+item.getPaidCurrency());
 			BigDecimal sum=result.get(item.getPaidCurrency());
 			if(sum==null){
 				sum=new BigDecimal(0);

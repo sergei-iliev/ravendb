@@ -133,6 +133,7 @@ public class PaidUserExternal implements Payable{
 		public void setAddress(String address) {
 			this.address = address;
 		}
+		@Override
 		public BigDecimal getAmountNet(){
 			if(amount==null){
 				return BigDecimal.ZERO;
