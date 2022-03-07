@@ -54,12 +54,16 @@ public class GiftCardService {
 				   if(Double.compare(Constants.TANGO_CARD_ACCOUNT_BALANCE_THRESHOLD, balance)>0){
 					   //send email
 						Email email = new Email();
-						email.setSubject("Tango card account balance threshold!");
+						email.setSubject("Tango Card account balance threshold!");
 						email.setContent("Tango Card account "+accountIdentifier+" balance is "+balance);
 						email.setFrom(supportEmail);
 						email.setTo(toEmail_1);						
 						email.setCC(toEmail_2);
 						mailService.sendMailGrid(email);
+					  //send slack
+					    SlackMessagingService slackMessagingService=new SlackMessagingService();
+					    slackMessagingService.sendMessage("Tango Card balance for "+accountIdentifier+" is "+balance);
+						
 				   }
 			   }
 		} catch (Throwable e) {

@@ -6,7 +6,7 @@ import java.util.Date;
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.KeyFactory;
 
-public class PaidUserExternal {
+public class PaidUserExternal implements Payable{
 		private String key;				
 		private String amount;
 		private String type;
@@ -133,5 +133,13 @@ public class PaidUserExternal {
 		public void setAddress(String address) {
 			this.address = address;
 		}
+		public BigDecimal getAmountNet(){
+			if(amount==null){
+				return BigDecimal.ZERO;
+			}else{
+				return new BigDecimal(amount);
+			}
+		}
+
 	
 }

@@ -52,11 +52,15 @@ import com.luee.wally.api.ConnectionMgr;
 import com.luee.wally.api.service.ConfirmEmailService;
 import com.luee.wally.api.service.FBAffsSearchService;
 import com.luee.wally.api.service.InvoiceService;
+import com.luee.wally.api.service.impex.ExportService;
 import com.luee.wally.api.service.impex.FBUserRevenueService;
 import com.luee.wally.api.service.impex.ImportService;
 import com.luee.wally.constants.Constants;
 import com.luee.wally.constants.FBAirConstants;
 import com.luee.wally.csv.PaidUsers2018;
+import com.luee.wally.entity.PaidUser;
+import com.luee.wally.entity.PaidUserExternal;
+import com.luee.wally.entity.Payable;
 import com.luee.wally.entity.RedeemingRequests;
 import com.luee.wally.json.ExchangeRateVO;
 import com.luee.wally.json.JSONUtils;
@@ -140,6 +144,59 @@ public class UserRevenueTest {
 		 
 	    FileUtils.copyInputStreamToFile(in, targetFile);
 	}
+
+	@Test
+	public void createExportSummery() throws Exception {
+		ExportService exportService=new ExportService();
+	    
+		Calendar cal = Calendar.getInstance();	    
+	    cal.set(Calendar.YEAR, 2022);
+	    cal.set(Calendar.MONTH, 1);
+	    cal.set(Calendar.DAY_OF_MONTH, 1);
+	    
+	    Date startDate = cal.getTime();
+		Date endDate=new Date();
+		
+		Collection<Payable> list=new ArrayList<>();
+		PaidUserExternal user =new PaidUserExternal();
+		user.setAmount("23");
+		user.setPaidCurrency("USD");
+		user.setType("PayPal");
+		list.add(user);
+		
+		user =new PaidUserExternal();
+		user.setAmount("3.2");
+		user.setType("PayPal");
+		user.setPaidCurrency("CAD");
+		list.add(user);
+		
+		user =new PaidUserExternal();
+		user.setAmount("3.2");
+		user.setType("PayPal");
+		user.setPaidCurrency("CAD");
+		list.add(user);
+		
+		user =new PaidUserExternal();
+		user.setAmount("3.21");
+		user.setType("Amazon");
+		user.setPaidCurrency("CAD");
+		list.add(user);
+		
+		user =new PaidUserExternal();
+		user.setAmount("13.21");
+		user.setType("Amazon");
+		user.setPaidCurrency("GBP");
+		list.add(user);
+		
+		user =new PaidUserExternal();
+		user.setAmount("6.07");
+		user.setType("Amazon");
+		user.setPaidCurrency("GBP");
+		list.add(user);
+		exportService.createPDFExportSummary("internal",startDate, endDate,"0011111","PlaySpot rewards",0,100,list);
+				
+    }
+
 	
 	@Test
 	public void createCSVFile() throws Exception {

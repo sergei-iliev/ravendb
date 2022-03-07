@@ -10,7 +10,7 @@ import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.luee.wally.api.service.PaidUsersService;
 
-public class PaidUser {
+public class PaidUser implements Payable{
 	
 	private String key;
 	private String userGuid;

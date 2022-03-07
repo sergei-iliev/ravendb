@@ -5,6 +5,7 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -29,6 +30,7 @@ import com.luee.wally.api.service.impex.ExportService;
 import com.luee.wally.command.ExportPaidUsersForm;
 import com.luee.wally.entity.PaidUser;
 import com.luee.wally.entity.PaidUserExternal;
+import com.luee.wally.entity.Payable;
 import com.luee.wally.entity.RedeemingRequests;
 import com.luee.wally.utils.Utilities;
 
@@ -76,78 +78,91 @@ public class ExportController implements Controller {
 					Collection<PaidUserExternal> paidUserExternals = null;
 
 					Collection<Pair<PaidUser, RedeemingRequests>> paidUserPairs = new ArrayList<>();
+					Collection<Payable> payableList = new ArrayList<>();
+					int minCreditNoteId=0;
+					int maxCreditNoteId=0;
 					
 					//authenticate
 					Token token=payPalService.authenticatePayPal();
 					if (form.isExternal()) {
 						paidUserExternals = exportService.findPaidUsersExternalByDate(form.getStartDate(),
 								form.getEndDate());
-						for (PaidUserExternal user : paidUserExternals) {
-							if(user.getType().equalsIgnoreCase("paypal")){
+						for (PaidUserExternal paidUserExternal : paidUserExternals) {
+							if(paidUserExternal.getType().equalsIgnoreCase("paypal")){
 							    try{
-							    	TransactionView transactionView= payPalService.getTransactionByPayoutBatchId(token,user.getPaymentReferenceId());
+							    	TransactionView transactionView= payPalService.getTransactionByPayoutBatchId(token,paidUserExternal.getPaymentReferenceId());
 							    	TransactionDetailView transactionDetailView= transactionView.getTransactionDetails().get(0);
-							    	//check if status => SUCCESS
-							    	if(!transactionDetailView.getTransactionInfo().getTransactionStatus().equalsIgnoreCase("S")){							    		
+							    	//check if status => SUCCESS							    	
+							    	if(!(transactionDetailView.getTransactionInfo().getTransactionStatus().equalsIgnoreCase("S")||transactionDetailView.getTransactionInfo().getTransactionStatus().equalsIgnoreCase("P"))){							    		
 							    		continue;
 							    	}							    
 							    	}catch(Exception e){
-							    		logger.log(Level.SEVERE, "Transaction detail error for external payment_batch_id="+user.getPaymentReferenceId(),e);
+							    		logger.log(Level.SEVERE, "Transaction detail error for external payment_batch_id="+paidUserExternal.getPaymentReferenceId(),e);
 							    		continue;
 							    	}								
 							}
 
+							payableList.add(paidUserExternal);
 							invoiceNumber = prefix + String.valueOf(count++);
-							user.setInvoiceNumber(invoiceNumber);
-					
+							paidUserExternal.setInvoiceNumber(invoiceNumber);
+					        maxCreditNoteId=count; 
 							// create pdf in cloud store
-							exportService.createPDFInCloudStore(user,externalFolder,"invoices","PaidUser_"+invoiceNumber, invoiceNumber);									         
+							exportService.createPDFInCloudStore(paidUserExternal,externalFolder,"invoices","PaidUser_"+invoiceNumber, invoiceNumber);									         
 						}
 						// create CSV
 						_saveCSVFile(paidUserExternals,externalFolder,"credit_notes.csv");
+						//create pdf summery
+						exportService.createPDFExportSummary(externalFolder,form.getStartDate(), form.getEndDate(), form.getInvoiceBase(), "PlayTime Rewards", minCreditNoteId, maxCreditNoteId, payableList);
+						
 					} else {
 						paidUsers = exportService.findPaidUsersByDate(form.getStartDate(), form.getEndDate());
-						for (PaidUser user : paidUsers) {
+						for (PaidUser paidUser : paidUsers) {
 							//test transaction status
-							if(user.getType().equalsIgnoreCase("paypal")){
+							if(paidUser.getType().equalsIgnoreCase("paypal")){
 							    try{
-							    	TransactionView transactionView= payPalService.getTransactionByPayoutBatchId(token,user.getPaymentReferenceId());
+							    	TransactionView transactionView= payPalService.getTransactionByPayoutBatchId(token,paidUser.getPaymentReferenceId());
 							    	TransactionDetailView transactionDetailView= transactionView.getTransactionDetails().get(0);
 							    	//check if status => SUCCESS
 							    	if(!(transactionDetailView.getTransactionInfo().getTransactionStatus().equalsIgnoreCase("S")||transactionDetailView.getTransactionInfo().getTransactionStatus().equalsIgnoreCase("P"))){
 										logger.log(Level.WARNING,
-												String.format("SKIP transaction status %s for redeeming request id:%s",transactionDetailView.getTransactionInfo().getTransactionStatus(),user.getRedeemingRequestId()));
+												String.format("SKIP transaction status %s for redeeming request id:%s",transactionDetailView.getTransactionInfo().getTransactionStatus(),paidUser.getRedeemingRequestId()));
 
 							    		continue;
 							    	}							    
 							    	}catch(Exception e){
-							    		logger.log(Level.SEVERE, "Transaction detail error for payment_batch_id="+user.getPaymentReferenceId(),e);
+							    		logger.log(Level.SEVERE, "Transaction detail error for payment_batch_id="+paidUser.getPaymentReferenceId(),e);
 							    		continue;
 							    	}								
 							}
-							invoiceNumber = prefix + String.valueOf(count++);
-							user.setInvoiceNumber(invoiceNumber);
 							
-							if(user.getRedeemingRequestKey()!=null){
-								Entity entity = paidUsersRepository.findEntityByKey(KeyFactory.stringToKey(user.getRedeemingRequestKey()));
+							payableList.add(paidUser);
+							invoiceNumber = prefix + String.valueOf(count++);
+							paidUser.setInvoiceNumber(invoiceNumber);
+							maxCreditNoteId=count;
+							
+							if(paidUser.getRedeemingRequestKey()!=null){
+								Entity entity = paidUsersRepository.findEntityByKey(KeyFactory.stringToKey(paidUser.getRedeemingRequestKey()));
 
 								if (entity == null) {
-									logger.log(Level.SEVERE, "No user entry found for - " + user.getRedeemingRequestKey());
+									logger.log(Level.SEVERE, "No user entry found for - " + paidUser.getRedeemingRequestKey());
 									continue;
 								}
 
 								RedeemingRequests redeemingRequest = RedeemingRequests.valueOf(entity);
-								paidUserPairs.add(new ImmutablePair<>(user, redeemingRequest));
+								paidUserPairs.add(new ImmutablePair<>(paidUser, redeemingRequest));
 								// create pdf in cloud store
-								exportService.createPDFInCloudStore(redeemingRequest, user,internalFolder,"invoices","PaidUser_"+invoiceNumber, invoiceNumber);								
+								exportService.createPDFInCloudStore(redeemingRequest, paidUser,internalFolder,"invoices","PaidUser_"+invoiceNumber, invoiceNumber);								
 							}else{
-								paidUserPairs.add(new ImmutablePair<>(user, null));
+								paidUserPairs.add(new ImmutablePair<>(paidUser, null));
 								// create pdf in cloud store
-								exportService.createPDFInCloudStore(null, user,internalFolder,"invoices","PaidUser_"+invoiceNumber, invoiceNumber);																
+								exportService.createPDFInCloudStore(null, paidUser,internalFolder,"invoices","PaidUser_"+invoiceNumber, invoiceNumber);																
 							}
 						}
 						// create CSV
 						saveCSVFile(paidUserPairs,internalFolder,"credit_notes.csv");
+						//create pdf summery
+						exportService.createPDFExportSummary(internalFolder,form.getStartDate(), form.getEndDate(), form.getInvoiceBase(), "PlaySpot Rewards", minCreditNoteId, maxCreditNoteId, payableList);
+						
 					}
 
 				} catch (Exception e) {

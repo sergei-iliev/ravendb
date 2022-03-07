@@ -3,20 +3,24 @@ package com.luee.wally.api.service;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 import com.google.appengine.api.datastore.Entity;
 import com.itextpdf.text.BaseColor;
+import com.itextpdf.text.Chunk;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.Element;
 import com.itextpdf.text.Font;
 import com.itextpdf.text.FontFactory;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.Phrase;
+import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.pdf.FontSelector;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
@@ -31,6 +35,134 @@ import com.luee.wally.utils.Utilities;
 
 public class InvoiceService extends AbstractService{
 	
+	public InputStream createExportSummary(Date date,String creditNoteNumber,String reportDateRange,String paymentMethod,
+			String _subject,String creditNoteIdRange,Map<String,BigDecimal> map)throws Exception{
+	    ByteArrayOutputStream output=new ByteArrayOutputStream();
+		Document document = new Document();
+		PdfWriter.getInstance(document,output);		
+
+	    Font font = FontFactory.getFont(FontFactory.HELVETICA,12);
+	    Font fontBold = FontFactory.getFont(FontFactory.HELVETICA,12,Font.BOLD);    
+	    
+		Paragraph title=new Paragraph();
+		title.add(new Paragraph(" "));
+		
+		
+		PdfPTable topTable = new PdfPTable(2);
+		topTable.setWidthPercentage(100f);
+		topTable.addCell(getCell("Soft Baked Apps GmbH", Element.ALIGN_LEFT,font));		
+		topTable.addCell(getCell("", Element.ALIGN_RIGHT,font));
+		topTable.addCell(getCell("Raumerstr 36, 10437, Berlin", Element.ALIGN_LEFT,font));		
+		topTable.addCell(getCell("Timestamp: "+date.toString(), Element.ALIGN_RIGHT,font));
+		topTable.addCell(getCell("", Element.ALIGN_LEFT,font));
+		
+		Paragraph address= new Paragraph("");
+		address.setAlignment(Element.ALIGN_RIGHT);
+		Paragraph address1= new Paragraph("Interacted with: finance@softbakedapps.com",font);
+		Paragraph address2= new Paragraph("Report status: success",font);
+		Paragraph address3= new Paragraph("Value: complete",font);
+		
+		address.add(Chunk.NEWLINE);
+		address.add(Chunk.NEWLINE);
+		address.add(address1);
+		address.add(Chunk.NEWLINE);
+		address.add(address2);
+		address.add(Chunk.NEWLINE);
+		address.add(address3);
+		
+		PdfPCell cell = new PdfPCell(address);
+		cell.setBorder(Rectangle.NO_BORDER);
+		topTable.addCell(cell);
+		
+		PdfPTable creditNoteTable = new PdfPTable(1);
+		creditNoteTable.setWidthPercentage(60);
+		creditNoteTable.setHorizontalAlignment(Element.ALIGN_CENTER);
+		creditNoteTable.setSpacingBefore(80);
+		
+		Paragraph credit=new Paragraph();			
+		cell = new PdfPCell(credit);
+		cell.setPadding(10);
+		Paragraph credit1= new Paragraph("Credit note report n.   ",fontBold);		
+		credit1.setAlignment(Element.ALIGN_LEFT);
+		credit.add(credit1);
+		
+		Paragraph credit2= new Paragraph("#"+creditNoteNumber,font);
+		credit.add(credit2);
+		credit.add(Chunk.NEWLINE);
+		
+		Paragraph credit3= new Paragraph("Period reported        ",fontBold);
+		credit1.setAlignment(Element.ALIGN_LEFT);
+		credit.add(credit3);
+		
+		Paragraph credit4= new Paragraph(reportDateRange,font);
+		credit.add(credit4);
+		credit.add(Chunk.NEWLINE);
+		credit.add(Chunk.NEWLINE);
+		
+		Paragraph payment= new Paragraph("Payment method    ",font);		
+		payment.setAlignment(Element.ALIGN_LEFT);
+		credit.add(payment);
+		
+		Paragraph payment1= new Paragraph(paymentMethod,font);				
+		credit.add(payment1);
+		credit.add(Chunk.NEWLINE);
+		
+		Paragraph subject= new Paragraph("Subject                   ",font);		
+		subject.setAlignment(Element.ALIGN_LEFT);
+		credit.add(subject);
+		
+		Paragraph subject1= new Paragraph(_subject,font);				
+		credit.add(subject1);
+		credit.add(Chunk.NEWLINE);
+		credit.add(Chunk.NEWLINE);		
+		
+		Paragraph range= new Paragraph("Credit note ID range  ",font);		
+		range.setAlignment(Element.ALIGN_LEFT);
+		credit.add(range);
+		
+		Paragraph range1= new Paragraph(creditNoteIdRange,font);				
+		credit.add(range1);				
+		creditNoteTable.addCell(cell);
+		
+		PdfPTable sumsTable = new PdfPTable(1);
+		sumsTable.setWidthPercentage(60);
+		sumsTable.setHorizontalAlignment(Element.ALIGN_CENTER);
+		sumsTable.setSpacingBefore(80);
+		cell = new PdfPCell(credit);
+		cell.setPadding(10);
+		
+		PdfPTable sumsDetailTable = new PdfPTable(3);
+		sumsDetailTable.addCell(getCell("Total payouts completed", Element.ALIGN_CENTER, font));
+		sumsDetailTable.addCell(getCell("Sum paid amount", Element.ALIGN_CENTER, font));
+		sumsDetailTable.addCell(getCell("Currency", Element.ALIGN_CENTER, font));
+		
+		for(Map.Entry<String,BigDecimal> entry:map.entrySet()){
+			sumsDetailTable.addCell(getCell("", Element.ALIGN_CENTER, font));
+			sumsDetailTable.addCell(getCell(Utilities.formatPrice(entry.getValue()), Element.ALIGN_CENTER, font));
+			sumsDetailTable.addCell(getCell(entry.getKey(), Element.ALIGN_CENTER, font));
+					      		
+		}
+		cell.addElement(sumsDetailTable);
+		sumsTable.addCell(cell);
+		
+		document.open();
+		document.add(title);
+		document.add(topTable);
+		document.add(creditNoteTable);
+		document.add(sumsTable);
+		
+		document.close();
+
+		return  new ByteArrayInputStream(output.toByteArray());
+		
+	}
+	public PdfPCell getCell(String text, int alignment, Font font) {
+		PdfPCell cell = new PdfPCell(new Paragraph(text,font));
+	    cell.setPadding(0);
+	    cell.setHorizontalAlignment(alignment);
+	    cell.setBorder(Rectangle.NO_BORDER);
+	    return cell;
+	}
 	public InputStream createInvoice(PaidUserExternal paidUserExternal,String invoiceNumber) throws Exception{
 	    ByteArrayOutputStream output=new ByteArrayOutputStream();
 		Document document = new Document();

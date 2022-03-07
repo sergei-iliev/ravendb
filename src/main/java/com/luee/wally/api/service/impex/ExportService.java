@@ -1,16 +1,24 @@
 package com.luee.wally.api.service.impex;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.Writer;
+import java.math.BigDecimal;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
 import com.google.appengine.api.datastore.Entity;
@@ -26,7 +34,9 @@ import com.luee.wally.command.PdfAttachment;
 import com.luee.wally.csv.PaidUsers2018;
 import com.luee.wally.entity.PaidUser;
 import com.luee.wally.entity.PaidUserExternal;
+import com.luee.wally.entity.Payable;
 import com.luee.wally.entity.RedeemingRequests;
+import com.luee.wally.json.JustPlayAmountVO;
 import com.luee.wally.utils.Utilities;
 
 
@@ -112,6 +122,74 @@ public class ExportService extends AbstractService{
 			line.clear();
 		}
 	}
+	/*
+	 * Export summary currency total
+	 */
+	public void createPDFExportSummary(String folder,Date startDate,Date endDate,String creditNoteNumber,String subject,
+			int minCreditNoteId,int maxCreditNoteId,Collection<? extends Payable> list)throws Exception{
+	   ZonedDateTime start= Utilities.toCETZoneDateTime(startDate);
+	   ZonedDateTime e= Utilities.toCETZoneDateTime(endDate);
+	   ZonedDateTime end=e.minusDays(1);
+	   DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+	   
+	   String reportDateRange=formatter.format(start)+" - "+formatter.format(end);
+	   String creditNoteIdRange=minCreditNoteId+" - "+maxCreditNoteId;
+	   
+	   InvoiceService invoiceService=new InvoiceService();
+	   //extract paypal
+	   Collection<? extends Payable> paypalList=list.stream().filter(i->i.getType().equalsIgnoreCase("paypal")).collect(Collectors.toList());
+	   Map<String,BigDecimal> map=this.groupBy(paypalList);	   	   
+	   InputStream in=invoiceService.createExportSummary(new Date(), creditNoteNumber, reportDateRange,"PayPal",subject,creditNoteIdRange,map);
+	   
+	   //create file name
+	   String fileName=start.getYear()+"_"+start.getMonthValue() +"_"+start.getDayOfMonth()+"_"+end.getYear()+"_"+end.getMonthValue()+"_"+end.getDayOfMonth()+"_paypal";
+	   this.savePDFInCloudStore(folder,null,fileName,in);
+	   
+	   //File targetFile = new File("D:\\demo.pdf");		
+	   //FileUtils.copyInputStreamToFile(in, targetFile);
+	   
+	   //extract amazon
+	   Collection<? extends Payable> amazonList=list.stream().filter(i->i.getType().equalsIgnoreCase("amazon")).collect(Collectors.toList());
+	   map=this.groupBy(amazonList);	   	   
+	   in=invoiceService.createExportSummary(new Date(), creditNoteNumber, reportDateRange,"Amazon",subject,creditNoteIdRange,map);
+
+	   //create file name
+	   fileName=start.getYear()+"_"+start.getMonthValue()+"_"+start.getDayOfMonth()+"_"+end.getYear()+"_"+end.getMonthValue()+"_"+end.getDayOfMonth()+"_amazon";	   
+	   this.savePDFInCloudStore(folder,null,fileName,in);
+	   
+	   //targetFile = new File("D:\\demo1.pdf");		
+	   //FileUtils.copyInputStreamToFile(in, targetFile);
+
+	}
+	
+	/*
+	 * group by currency code
+	 */	
+	private Map<String,BigDecimal> groupBy(Collection<? extends Payable> list)throws Exception{
+		Map<String,BigDecimal> result=new HashMap<String, BigDecimal>();
+						
+		for(Payable item:list){
+			BigDecimal sum=result.get(item.getPaidCurrency());
+			if(sum==null){
+				sum=new BigDecimal(0);
+			}
+			BigDecimal accumulator=sum.add(item.getAmountNet());
+			result.put(item.getPaidCurrency(),accumulator);
+		}		
+		return result;
+	}
+	
+	private void savePDFInCloudStore(String folder,String subfolder,String fileName,InputStream in)throws Exception{
+		PdfAttachment attachment=new PdfAttachment();               
+        
+		attachment.setFileName(subfolder!=null?folder+"/"+subfolder+"/"+fileName+".pdf":folder+"/"+fileName+".pdf");
+        attachment.setContentType("application/pdf");               
+        attachment.readFromStream(in); 
+        
+        
+	    CloudStorageRepository cloudStorageRepository=new CloudStorageRepository();
+	    cloudStorageRepository.saveFile(attachment);               
+	}
 	
 	/*
 	 * User payment
@@ -171,73 +249,5 @@ public class ExportService extends AbstractService{
 		return paidUsers;
 	}
 	
-//	public Collection<Entity> find(boolean paid,String countryCode,String packageName,boolean confirmedEmail,String type,String amount,Date date){
-//		return DB.getAmazonUsers( paid, countryCode, packageName, confirmedEmail, type, amount, date);
-//	}
-//	
-//	
-//	public void convertToCSV(Writer write,Collection<Entity> list)throws IOException{
-//		Collection<String> line=new ArrayList<String>();
-//		
-//		line.add("Amount ($) *");
-//		line.add("Name of Recipient  (50 character limit)");
-//		line.add("Email Address *");
-//		line.add("Message (1500 character limit)");
-//		line.add("From *  (50 character limit)");
-//		line.add("user_guid");
-//		line.add("country_code");
-//		GenerateCSV.INSTANCE.writeLine(write, line);
-//		line.clear();
-//
-//
-//
-//		for(Entity item:list){		    
-//			//item
-//			line.add((String) item.getProperty("amount"));
-//			
-//			String s = ((String) item.getProperty("full_name")).replaceAll(",", " ");
-//			
-//			String[] values = s.split(",");
-//
-//			line.add(values[0]);
-//			line.add((String) item.getProperty("email"));
-//			line.add(message);
-//			line.add(from);
-//			line.add((String) item.getProperty("user_guid"));
-//			line.add((String) item.getProperty("country_code"));
-//			GenerateCSV.INSTANCE.writeLine(write, line);
-//			line.clear();
-//		}
-//	}
-//
-//	public void convertToCSVGlobal(Writer write,Collection<Entity> list)throws IOException{
-//		Collection<String> line=new ArrayList<String>();
-//		
-//		line.add("Amount");
-//		line.add("Name of Recipient  (50 character limit)");
-//		line.add("Email Address *");
-//		line.add("user_guid");
-//		line.add("country_code");
-//		GenerateCSV.INSTANCE.writeLine(write, line);
-//		line.clear();
-//
-//
-//
-//		for(Entity item:list){		    
-//			//item
-//			line.add((String) item.getProperty("amount"));
-//			
-//			String s = ((String) item.getProperty("full_name")).replaceAll(",", " ");
-//			
-//			String[] values = s.split(",");
-//
-//			line.add(values[0]);
-//			line.add((String) item.getProperty("email"));
-//			line.add((String) item.getProperty("user_guid"));
-//			line.add((String) item.getProperty("country_code"));
-//			GenerateCSV.INSTANCE.writeLine(write, line);
-//			line.clear();
-//		}
-//	}
 
 }
