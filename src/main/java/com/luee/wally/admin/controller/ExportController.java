@@ -101,7 +101,7 @@ public class ExportController implements Controller {
 							    		continue;
 							    	}								
 							}
-							logger.warning("ITEMS "+paidUserExternal.getCalculatedAmount()+"::"+paidUserExternal.getAmount());
+							
 							payableList.add(paidUserExternal);
 							invoiceNumber = prefix + String.valueOf(count++);
 							if(minCreditNoteId==null){
@@ -138,7 +138,7 @@ public class ExportController implements Controller {
 							    		continue;
 							    	}								
 							}
-							logger.warning("ITEMS "+paidUser.getCalculatedAmount()+"::"+paidUser.getAmount());
+							
 							payableList.add(paidUser);
 							invoiceNumber = prefix + String.valueOf(count++);
 							if(minCreditNoteId==null){

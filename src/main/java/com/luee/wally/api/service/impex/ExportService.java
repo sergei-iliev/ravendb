@@ -138,7 +138,7 @@ public class ExportService extends AbstractService{
 	   InvoiceService invoiceService=new InvoiceService();
 	   //extract paypal
 	   Collection<? extends Payable> paypalList=list.stream().filter(i->i.getType().equalsIgnoreCase("paypal")).collect(Collectors.toList());
-	   Map<String,BigDecimal> map=this.groupBy(paypalList);	   	   
+	   Map<String,Pair<Integer,BigDecimal>> map=this.groupBy(paypalList);	   	   
 	   InputStream in=invoiceService.createExportSummary(new Date(), creditNoteNumber, reportDateRange,"PayPal",subject,creditNoteIdRange,map);
 	   
 	   //create file name
@@ -151,7 +151,7 @@ public class ExportService extends AbstractService{
 	   //extract amazon
 	   Collection<? extends Payable> amazonList=list.stream().filter(i->i.getType().equalsIgnoreCase("amazon")).collect(Collectors.toList());
 	   map=this.groupBy(amazonList);	   	   
-	   in=invoiceService.createExportSummary(new Date(), creditNoteNumber, reportDateRange,"Amazon",subject,creditNoteIdRange,map);
+	   in=invoiceService.createExportSummary(new Date(), creditNoteNumber, reportDateRange,"TangoCard",subject,creditNoteIdRange,map);
 
 	   //create file name
 	   fileName=start.getYear()+"_"+start.getMonthValue()+"_"+start.getDayOfMonth()+"_"+end.getYear()+"_"+end.getMonthValue()+"_"+end.getDayOfMonth()+"_amazon";	   
@@ -165,17 +165,26 @@ public class ExportService extends AbstractService{
 	/*
 	 * group by currency code
 	 */	
-	private Map<String,BigDecimal> groupBy(Collection<? extends Payable> list)throws Exception{
-		Map<String,BigDecimal> result=new HashMap<String, BigDecimal>();
-						
+	private Map<String,Pair<Integer,BigDecimal>> groupBy(Collection<? extends Payable> list)throws Exception{
+		Map<String,Pair<Integer,BigDecimal>> result=new HashMap<String, Pair<Integer,BigDecimal>>();
+		BigDecimal sum;
+		int counter=0;
 		for(Payable item:list){
-			BigDecimal sum=result.get(item.getPaidCurrency());
-			if(sum==null){
+			Pair<Integer,BigDecimal> value=result.get(item.getPaidCurrency());
+			
+			if(value==null){
 				sum=new BigDecimal(0);
+				counter=0;				
+			}else{
+				sum=value.getValue();
+				counter=value.getKey();
 			}
+			
 			BigDecimal accumulator=sum.add(item.getCalculatedAmount());
-			result.put(item.getPaidCurrency(),accumulator);
-		}		
+			counter++;
+			result.put(item.getPaidCurrency(),Pair.of(counter,accumulator));
+		}	
+		
 		return result;
 	}
 	

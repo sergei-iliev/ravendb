@@ -11,6 +11,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.lang3.tuple.Pair;
+
 import com.google.appengine.api.datastore.Entity;
 import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Chunk;
@@ -36,7 +38,7 @@ import com.luee.wally.utils.Utilities;
 public class InvoiceService extends AbstractService{
 	
 	public InputStream createExportSummary(Date date,String creditNoteNumber,String reportDateRange,String paymentMethod,
-			String _subject,String creditNoteIdRange,Map<String,BigDecimal> map)throws Exception{
+			String _subject,String creditNoteIdRange,Map<String,Pair<Integer,BigDecimal>> map)throws Exception{
 	    ByteArrayOutputStream output=new ByteArrayOutputStream();
 		Document document = new Document();
 		PdfWriter.getInstance(document,output);		
@@ -136,11 +138,11 @@ public class InvoiceService extends AbstractService{
 		sumsDetailTable.addCell(getCell("Sum paid amount", Element.ALIGN_CENTER, font));
 		sumsDetailTable.addCell(getCell("Currency", Element.ALIGN_CENTER, font));
 		
-		for(Map.Entry<String,BigDecimal> entry:map.entrySet()){
-			BigDecimal amount =entry.getValue();
-			if(amount.compareTo(BigDecimal.ZERO)>0){
-			  sumsDetailTable.addCell(getCell("", Element.ALIGN_CENTER, font));
-			  sumsDetailTable.addCell(getCell(Utilities.formatPrice(entry.getValue()), Element.ALIGN_CENTER, font));
+		for(Map.Entry<String,Pair<Integer,BigDecimal>> entry:map.entrySet()){
+			Pair<Integer,BigDecimal> amount =entry.getValue();
+			if(amount.getValue().compareTo(BigDecimal.ZERO)>0){
+			  sumsDetailTable.addCell(getCell(amount.getKey().toString(), Element.ALIGN_CENTER, font));
+			  sumsDetailTable.addCell(getCell(Utilities.formatPrice(amount.getValue()), Element.ALIGN_CENTER, font));
 			  sumsDetailTable.addCell(getCell(entry.getKey(), Element.ALIGN_CENTER, font));
 			}
 					      		
