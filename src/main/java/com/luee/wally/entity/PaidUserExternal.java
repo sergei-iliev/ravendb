@@ -134,7 +134,7 @@ public class PaidUserExternal implements Payable{
 			this.address = address;
 		}
 		@Override
-		public BigDecimal getAmountNet(){
+		public BigDecimal getCalculatedAmount(){
 			if(amount==null){
 				return BigDecimal.ZERO;
 			}else{

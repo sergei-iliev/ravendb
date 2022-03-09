@@ -71,7 +71,14 @@
 									<label class="form-check-label"
 									for="externalId"> External paid user </label>
 				    </div>
-				</div>			
+				</div>
+			    <div class="form-label-group">
+					<div class="col-12 mt-3">
+					<div class="alert alert-warning">
+  						<strong>For the summary pdfs:</strong> paypal amounts before 01/01/2022 do not include fees, from 01/01/2022 the amounts include fees.
+					</div>
+				    </div>
+				</div>
                 <div class="row justify-content-center">
                         <div class="form-group">
                             <div class="col-md-12 text-center">

@@ -193,7 +193,7 @@ public class UserRevenueTest {
 		user.setType("Amazon");
 		user.setPaidCurrency("GBP");
 		list.add(user);
-		exportService.createPDFExportSummary("internal",startDate, endDate,"0011111","PlaySpot rewards",0,100,list);
+		exportService.createPDFExportSummary("internal",startDate, endDate,"0011111","PlaySpot rewards","0","100",list);
 				
     }
 

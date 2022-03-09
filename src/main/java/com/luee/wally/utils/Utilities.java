@@ -1,6 +1,7 @@
 package com.luee.wally.utils;
 
 import java.math.BigDecimal;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
@@ -61,6 +62,17 @@ public final class Utilities {
                 .encodeToString(String.format("%s:%s", user, password)
                         .getBytes()));
     }	
+	
+	public static Date toDate(String date,String format){	       	       
+	       SimpleDateFormat formatter = new SimpleDateFormat(format);      	       
+	       try {
+			return formatter.parse(date);
+		} catch (ParseException e) {			
+			e.printStackTrace();
+			return null;
+		}      	       
+	}
+	
 	/*
 	 * replace every "@" with a "9" and every "." with a "1"
 	 */

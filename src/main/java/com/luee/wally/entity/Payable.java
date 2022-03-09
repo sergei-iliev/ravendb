@@ -3,9 +3,10 @@ package com.luee.wally.entity;
 import java.math.BigDecimal;
 
 public interface Payable {
-	public default BigDecimal getAmountNet(){
-		return BigDecimal.ZERO;
-	}
+	public BigDecimal getCalculatedAmount();
+	//public default BigDecimal getAmountNet(){
+	//	return BigDecimal.ZERO;
+	//}
 	
 	public String getPaidCurrency();
 	

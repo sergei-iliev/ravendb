@@ -20,7 +20,6 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.tuple.Pair;
-import org.mortbay.log.Log;
 
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.Key;
@@ -170,12 +169,11 @@ public class ExportService extends AbstractService{
 		Map<String,BigDecimal> result=new HashMap<String, BigDecimal>();
 						
 		for(Payable item:list){
-			Log.warn("ITEM "+item.getAmountNet()+"::"+item.getPaidCurrency());
 			BigDecimal sum=result.get(item.getPaidCurrency());
 			if(sum==null){
 				sum=new BigDecimal(0);
 			}
-			BigDecimal accumulator=sum.add(item.getAmountNet());
+			BigDecimal accumulator=sum.add(item.getCalculatedAmount());
 			result.put(item.getPaidCurrency(),accumulator);
 		}		
 		return result;

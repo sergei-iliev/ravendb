@@ -9,6 +9,7 @@ import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.luee.wally.api.service.PaidUsersService;
+import com.luee.wally.utils.Utilities;
 
 public class PaidUser implements Payable{
 	
@@ -29,6 +30,8 @@ public class PaidUser implements Payable{
 	private boolean paidUserSuccess,emailSentSuccess;
 	private String link;   
 
+	private static final Date NET_AMOUNT_DATE=Utilities.toDate("01/01/2022","dd/MM/yyyy");
+	
 	public static PaidUser valueOf(Entity entity) {
 		
 		
@@ -204,10 +207,19 @@ public class PaidUser implements Payable{
 	public boolean isPayPalType() {
 		return type.equalsIgnoreCase("paypal");
 	}
-	@Override
+	
 	public BigDecimal getAmountNet() {
 		return amountNet;
 	}
+	@Override
+	public BigDecimal getCalculatedAmount(){
+		 if(date.after(NET_AMOUNT_DATE)){
+			 return this.amountNet;
+		 }else{
+			 return new BigDecimal(this.amount);
+		 }
+	}
+	
 	public void setAmountNet(BigDecimal amountNet) {
 		this.amountNet = amountNet;
 	}

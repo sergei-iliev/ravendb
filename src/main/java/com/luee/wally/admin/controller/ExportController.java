@@ -79,8 +79,8 @@ public class ExportController implements Controller {
 
 					Collection<Pair<PaidUser, RedeemingRequests>> paidUserPairs = new ArrayList<>();
 					Collection<Payable> payableList = new ArrayList<>();
-					int minCreditNoteId=0;
-					int maxCreditNoteId=0;
+					String minCreditNoteId=null;
+					String maxCreditNoteId=null;
 					
 					//authenticate
 					Token token=payPalService.authenticatePayPal();
@@ -101,11 +101,15 @@ public class ExportController implements Controller {
 							    		continue;
 							    	}								
 							}
-
+							logger.warning("ITEMS "+paidUserExternal.getCalculatedAmount()+"::"+paidUserExternal.getAmount());
 							payableList.add(paidUserExternal);
 							invoiceNumber = prefix + String.valueOf(count++);
-							paidUserExternal.setInvoiceNumber(invoiceNumber);
-					        maxCreditNoteId=count; 
+							if(minCreditNoteId==null){
+							   minCreditNoteId=invoiceNumber;	
+							}
+							maxCreditNoteId=invoiceNumber;
+							
+							paidUserExternal.setInvoiceNumber(invoiceNumber);					        
 							// create pdf in cloud store
 							exportService.createPDFInCloudStore(paidUserExternal,externalFolder,"invoices","PaidUser_"+invoiceNumber, invoiceNumber);									         
 						}
@@ -134,11 +138,16 @@ public class ExportController implements Controller {
 							    		continue;
 							    	}								
 							}
-							
+							logger.warning("ITEMS "+paidUser.getCalculatedAmount()+"::"+paidUser.getAmount());
 							payableList.add(paidUser);
 							invoiceNumber = prefix + String.valueOf(count++);
+							if(minCreditNoteId==null){
+								   minCreditNoteId=invoiceNumber;	
+								}
+							maxCreditNoteId=invoiceNumber;							
+							
 							paidUser.setInvoiceNumber(invoiceNumber);
-							maxCreditNoteId=count;
+							
 							
 							if(paidUser.getRedeemingRequestKey()!=null){
 								Entity entity = paidUsersRepository.findEntityByKey(KeyFactory.stringToKey(paidUser.getRedeemingRequestKey()));
