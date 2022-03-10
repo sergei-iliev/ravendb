@@ -126,35 +126,37 @@ public class InvoiceService extends AbstractService{
 		credit.add(range1);				
 		creditNoteTable.addCell(cell);
 		
-		PdfPTable sumsTable = new PdfPTable(1);
-		sumsTable.setWidthPercentage(60);
-		sumsTable.setHorizontalAlignment(Element.ALIGN_CENTER);
-		sumsTable.setSpacingBefore(80);
-		cell = new PdfPCell(credit);
-		cell.setPadding(10);
+		//PdfPTable sumsTable = new PdfPTable(1);
+		//sumsTable.setWidthPercentage(60);
+		//sumsTable.setHorizontalAlignment(Element.ALIGN_CENTER);
+		//sumsTable.setSpacingBefore(80);
+		//cell = new PdfPCell(credit);
+		//cell.setPadding(10);
 		
 		PdfPTable sumsDetailTable = new PdfPTable(3);
-		sumsDetailTable.addCell(getCell("Total payouts completed", Element.ALIGN_CENTER, font));
-		sumsDetailTable.addCell(getCell("Sum paid amount", Element.ALIGN_CENTER, font));
-		sumsDetailTable.addCell(getCell("Currency", Element.ALIGN_CENTER, font));
+		sumsDetailTable.setSpacingBefore(80);
+		sumsDetailTable.setWidthPercentage(60);
+		sumsDetailTable.addCell(getCell("Total payouts completed", Element.ALIGN_CENTER, font,true));
+		sumsDetailTable.addCell(getCell("Sum paid amount", Element.ALIGN_CENTER, font,true));
+		sumsDetailTable.addCell(getCell("Currency", Element.ALIGN_CENTER, font,true));
 		
 		for(Map.Entry<String,Pair<Integer,BigDecimal>> entry:map.entrySet()){
 			Pair<Integer,BigDecimal> amount =entry.getValue();
 			if(amount.getValue().compareTo(BigDecimal.ZERO)>0){
-			  sumsDetailTable.addCell(getCell(amount.getKey().toString(), Element.ALIGN_CENTER, font));
-			  sumsDetailTable.addCell(getCell(Utilities.formatPrice(amount.getValue()), Element.ALIGN_CENTER, font));
-			  sumsDetailTable.addCell(getCell(entry.getKey(), Element.ALIGN_CENTER, font));
+			  sumsDetailTable.addCell(getCell(amount.getKey().toString(), Element.ALIGN_CENTER, font,true));
+			  sumsDetailTable.addCell(getCell(Utilities.formatPrice(amount.getValue()), Element.ALIGN_CENTER, font,true));
+			  sumsDetailTable.addCell(getCell(entry.getKey(), Element.ALIGN_CENTER, font,true));
 			}
 					      		
 		}
-		cell.addElement(sumsDetailTable);
-		sumsTable.addCell(cell);
+		//cell.addElement(sumsDetailTable);
+		//sumsTable.addCell(cell);
 		
 		document.open();
 		document.add(title);
 		document.add(topTable);
 		document.add(creditNoteTable);
-		document.add(sumsTable);
+		document.add(sumsDetailTable);
 		
 		document.close();
 
@@ -162,10 +164,17 @@ public class InvoiceService extends AbstractService{
 		
 	}
 	public PdfPCell getCell(String text, int alignment, Font font) {
+		return this.getCell(text, alignment, font,false);
+	}
+	public PdfPCell getCell(String text, int alignment, Font font,boolean withBorder) {
 		PdfPCell cell = new PdfPCell(new Paragraph(text,font));
 	    cell.setPadding(0);
 	    cell.setHorizontalAlignment(alignment);
-	    cell.setBorder(Rectangle.NO_BORDER);
+	    if(withBorder){
+	        cell.setPadding(5.0f);
+	    }else{
+	    	cell.setBorder(Rectangle.NO_BORDER);
+	    }
 	    return cell;
 	}
 	public InputStream createInvoice(PaidUserExternal paidUserExternal,String invoiceNumber) throws Exception{
