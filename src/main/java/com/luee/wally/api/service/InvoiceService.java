@@ -52,35 +52,71 @@ public class InvoiceService extends AbstractService{
 		
 		PdfPTable topTable = new PdfPTable(2);
 		topTable.setWidthPercentage(100f);
-		topTable.addCell(getCell("Soft Baked Apps GmbH", Element.ALIGN_LEFT,font));		
-		topTable.addCell(getCell("", Element.ALIGN_RIGHT,font));
-		topTable.addCell(getCell("Raumerstr 36, 10437, Berlin", Element.ALIGN_LEFT,font));		
-		topTable.addCell(getCell("Timestamp: "+date.toString(), Element.ALIGN_RIGHT,font));
-		topTable.addCell(getCell("", Element.ALIGN_LEFT,font));
+		
+		Paragraph leftside= new Paragraph("");
+		leftside.setAlignment(Element.ALIGN_LEFT);
+		Paragraph left1= new Paragraph("Soft Baked Apps GmbH",font);		
+		Paragraph left2= new Paragraph("Raumerstr 36, 10437, Berlin",font);
+		
+		
+		leftside.add(Chunk.NEWLINE);
+		leftside.add(Chunk.NEWLINE);
+		leftside.add(left1);
+		leftside.add(Chunk.NEWLINE);
+		//leftside.add(Chunk.NEWLINE);
+		leftside.add(left2);
+		
+		PdfPCell cell = new PdfPCell(leftside);
+		cell.setBorder(Rectangle.NO_BORDER);
+		cell.setPadding(5);
+		topTable.addCell(cell);
+		
 		
 		Paragraph address= new Paragraph("");
 		address.setAlignment(Element.ALIGN_RIGHT);
+		Paragraph time= new Paragraph("Timestamp: "+date.toString(),font);
+		time.setSpacingAfter(10);
 		Paragraph address1= new Paragraph("Interacted with: finance@softbakedapps.com",font);
+		address1.setSpacingAfter(10);
 		Paragraph address2= new Paragraph("Report status: success",font);
+		address2.setSpacingAfter(10);
 		Paragraph address3= new Paragraph("Value: complete",font);
+		address3.setSpacingAfter(10);
 		
 		address.add(Chunk.NEWLINE);
 		address.add(Chunk.NEWLINE);
+		address.add(time);
+		address.add(Chunk.NEWLINE);		
 		address.add(address1);
 		address.add(Chunk.NEWLINE);
 		address.add(address2);
 		address.add(Chunk.NEWLINE);
 		address.add(address3);
 		
-		PdfPCell cell = new PdfPCell(address);
+	    cell = new PdfPCell(address);
 		cell.setBorder(Rectangle.NO_BORDER);
 		topTable.addCell(cell);
 		
-		PdfPTable creditNoteTable = new PdfPTable(1);
-		creditNoteTable.setWidthPercentage(60);
+		PdfPTable creditNoteTable = new PdfPTable(2);
+		creditNoteTable.setWidthPercentage(80);
 		creditNoteTable.setHorizontalAlignment(Element.ALIGN_CENTER);
 		creditNoteTable.setSpacingBefore(80);
 		
+		creditNoteTable.addCell(getCell("Credit note report n.   ", Element.ALIGN_LEFT, fontBold,true));
+		creditNoteTable.addCell(getCell("#"+creditNoteNumber, Element.ALIGN_LEFT, font,true));
+
+		creditNoteTable.addCell(getCell("Period reported", Element.ALIGN_LEFT, fontBold,true));
+		creditNoteTable.addCell(getCell(reportDateRange, Element.ALIGN_LEFT, font,true));
+		
+		creditNoteTable.addCell(getCell("Payment method", Element.ALIGN_LEFT, fontBold,true));
+		creditNoteTable.addCell(getCell(paymentMethod, Element.ALIGN_LEFT, font,true));
+		
+		creditNoteTable.addCell(getCell("Subject", Element.ALIGN_LEFT, fontBold,true));
+		creditNoteTable.addCell(getCell(_subject, Element.ALIGN_LEFT, font,true));
+		
+		creditNoteTable.addCell(getCell("Credit note ID range", Element.ALIGN_LEFT, fontBold,true));
+		creditNoteTable.addCell(getCell(creditNoteIdRange, Element.ALIGN_LEFT, font,true));
+		/*
 		Paragraph credit=new Paragraph();			
 		cell = new PdfPCell(credit);
 		cell.setPadding(10);
@@ -125,17 +161,11 @@ public class InvoiceService extends AbstractService{
 		Paragraph range1= new Paragraph(creditNoteIdRange,font);				
 		credit.add(range1);				
 		creditNoteTable.addCell(cell);
-		
-		//PdfPTable sumsTable = new PdfPTable(1);
-		//sumsTable.setWidthPercentage(60);
-		//sumsTable.setHorizontalAlignment(Element.ALIGN_CENTER);
-		//sumsTable.setSpacingBefore(80);
-		//cell = new PdfPCell(credit);
-		//cell.setPadding(10);
+		*/
 		
 		PdfPTable sumsDetailTable = new PdfPTable(3);
 		sumsDetailTable.setSpacingBefore(80);
-		sumsDetailTable.setWidthPercentage(60);
+		sumsDetailTable.setWidthPercentage(80);
 		sumsDetailTable.addCell(getCell("Total payouts completed", Element.ALIGN_CENTER, font,true));
 		sumsDetailTable.addCell(getCell("Sum paid amount", Element.ALIGN_CENTER, font,true));
 		sumsDetailTable.addCell(getCell("Currency", Element.ALIGN_CENTER, font,true));
@@ -149,8 +179,6 @@ public class InvoiceService extends AbstractService{
 			}
 					      		
 		}
-		//cell.addElement(sumsDetailTable);
-		//sumsTable.addCell(cell);
 		
 		document.open();
 		document.add(title);
