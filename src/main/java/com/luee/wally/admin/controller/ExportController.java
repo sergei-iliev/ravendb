@@ -3,9 +3,11 @@ package com.luee.wally.admin.controller;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -82,6 +84,10 @@ public class ExportController implements Controller {
 					String minCreditNoteId=null;
 					String maxCreditNoteId=null;
 					
+					//****DELETE 
+					List<PaidUserExternal> skipedPaidUserExternals=new ArrayList<>();
+					List<PaidUser> skipedPaidUsers=new ArrayList<>();
+					
 					//authenticate
 					Token token=payPalService.authenticatePayPal();
 					if (form.isExternal()) {
@@ -91,9 +97,19 @@ public class ExportController implements Controller {
 							if(paidUserExternal.getType().equalsIgnoreCase("paypal")){
 							    try{
 							    	TransactionView transactionView= payPalService.getTransactionByPayoutBatchId(token,paidUserExternal.getPaymentReferenceId());
+							    	if(transactionView.getTransactionDetails().size()==0){
+										logger.log(Level.WARNING,
+												String.format("NO transaction for redeeming request id:%s",paidUserExternal.getRedeemingRequestId()));							    		
+										skipedPaidUserExternals.add(paidUserExternal);
+										continue;
+							    	}							    	
 							    	TransactionDetailView transactionDetailView= transactionView.getTransactionDetails().get(0);
 							    	//check if status => SUCCESS							    	
 							    	if(!(transactionDetailView.getTransactionInfo().getTransactionStatus().equalsIgnoreCase("S")||transactionDetailView.getTransactionInfo().getTransactionStatus().equalsIgnoreCase("P"))){							    		
+										logger.log(Level.WARNING,
+												String.format("SKIP transaction status %s for redeeming request id:%s",transactionDetailView.getTransactionInfo().getTransactionStatus(),paidUserExternal.getRedeemingRequestId()));							    		
+							    		logger.warning("Skiping transaction amount "+transactionDetailView.getTransactionInfo().getTransactionAmount().getValue()+" and fee "+transactionDetailView.getTransactionInfo().getFeeAmount().getValue()+" in "+transactionDetailView.getTransactionInfo().getTransactionAmount().getCurrencyCode());
+							    		skipedPaidUserExternals.add(paidUserExternal);
 							    		continue;
 							    	}							    
 							    	}catch(Exception e){
@@ -125,12 +141,19 @@ public class ExportController implements Controller {
 							if(paidUser.getType().equalsIgnoreCase("paypal")){
 							    try{
 							    	TransactionView transactionView= payPalService.getTransactionByPayoutBatchId(token,paidUser.getPaymentReferenceId());
+							    	if(transactionView.getTransactionDetails().size()==0){
+										logger.log(Level.WARNING,
+												String.format("NO transaction for redeeming request id:%s",paidUser.getRedeemingRequestId()));
+										skipedPaidUsers.add(paidUser);
+							    		continue;
+							    	}
 							    	TransactionDetailView transactionDetailView= transactionView.getTransactionDetails().get(0);
 							    	//check if status => SUCCESS
 							    	if(!(transactionDetailView.getTransactionInfo().getTransactionStatus().equalsIgnoreCase("S")||transactionDetailView.getTransactionInfo().getTransactionStatus().equalsIgnoreCase("P"))){
 										logger.log(Level.WARNING,
 												String.format("SKIP transaction status %s for redeeming request id:%s",transactionDetailView.getTransactionInfo().getTransactionStatus(),paidUser.getRedeemingRequestId()));
-
+							    		logger.warning("Skiping transaction amount "+transactionDetailView.getTransactionInfo().getTransactionAmount().getValue()+" and fee "+transactionDetailView.getTransactionInfo().getFeeAmount().getValue()+" in "+transactionDetailView.getTransactionInfo().getTransactionAmount().getCurrencyCode());
+							    		skipedPaidUsers.add(paidUser);
 							    		continue;
 							    	}							    
 							    	}catch(Exception e){
@@ -173,7 +196,22 @@ public class ExportController implements Controller {
 						exportService.createPDFExportSummary(internalFolder,form.getStartDate(), form.getEndDate(), form.getInvoiceBase(), "PlaySpot Rewards", minCreditNoteId, maxCreditNoteId, payableList);
 						
 					}
-
+					//***********DELETE	
+					   Map<String,Pair<Integer,BigDecimal>> external=exportService.groupBy(skipedPaidUserExternals);
+					   Map<String,Pair<Integer,BigDecimal>> internal=exportService.groupBy(skipedPaidUsers);
+					   logger.warning("**************SKIPPED Paid Users External MAP size="+external.size());
+					   external.entrySet().forEach(e->{
+						   logger.warning("currency :"+e.getKey()+" count: "+e.getValue().getKey()+" amount: "+e.getValue().getValue());						   
+					   });
+					   logger.warning("**************SKIPPED Paid Users MAP size="+internal.size());
+					   internal.entrySet().forEach(e->{
+						   logger.warning("currency :"+e.getKey()+" count: "+e.getValue().getKey()+" amount: "+e.getValue().getValue());						   
+					   });
+						   
+						logger.log(Level.WARNING,
+								"*************************END EXPORT********************");
+ 
+					
 				} catch (Exception e) {
 					logger.log(Level.SEVERE, "export paid user  service:", e);
 				}

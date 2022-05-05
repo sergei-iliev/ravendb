@@ -165,7 +165,7 @@ public class ExportService extends AbstractService{
 	/*
 	 * group by currency code
 	 */	
-	private Map<String,Pair<Integer,BigDecimal>> groupBy(Collection<? extends Payable> list)throws Exception{
+	public Map<String,Pair<Integer,BigDecimal>> groupBy(Collection<? extends Payable> list)throws Exception{
 		Map<String,Pair<Integer,BigDecimal>> result=new HashMap<String, Pair<Integer,BigDecimal>>();
 		BigDecimal sum;
 		int counter=0;
