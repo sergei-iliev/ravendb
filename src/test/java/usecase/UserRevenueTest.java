@@ -55,6 +55,7 @@ import com.luee.wally.api.service.InvoiceService;
 import com.luee.wally.api.service.impex.ExportService;
 import com.luee.wally.api.service.impex.FBUserRevenueService;
 import com.luee.wally.api.service.impex.ImportService;
+import com.luee.wally.api.service.impex.UserRevenueService;
 import com.luee.wally.constants.Constants;
 import com.luee.wally.constants.FBAirConstants;
 import com.luee.wally.csv.PaidUsers2018;
@@ -601,7 +602,13 @@ public class UserRevenueTest {
 
 	
 		
-	@Test
+    @Test
+	public void AffsRevenueAPICallTest() throws Exception {
+      UserRevenueService service=new UserRevenueService();
+      service.processUserRevenueAggregated("2022-05-03");
+      
+    }
+    @Test
 	public void fbAffsRevenueAPICallTest() throws Exception {
 		
 		List<String> acpms=new ArrayList<>();
