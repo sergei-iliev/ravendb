@@ -38,17 +38,24 @@ import com.luee.wally.utils.Utilities;
 public class InvoiceService extends AbstractService{
 	
 	public InputStream createExportSummary(Date date,String creditNoteNumber,String reportDateRange,String paymentMethod,
-			String _subject,String creditNoteIdRange,Map<String,Pair<Integer,BigDecimal>> map)throws Exception{
+			String _subject,String creditNoteIdRange,Map<String,Pair<Integer,BigDecimal>> map,String error)throws Exception{
 	    ByteArrayOutputStream output=new ByteArrayOutputStream();
 		Document document = new Document();
 		PdfWriter.getInstance(document,output);		
 
 	    Font font = FontFactory.getFont(FontFactory.HELVETICA,12);
 	    Font fontBold = FontFactory.getFont(FontFactory.HELVETICA,12,Font.BOLD);    
-	    
-		Paragraph title=new Paragraph();
+	    		
+	    Paragraph title=new Paragraph();
 		title.add(new Paragraph(" "));
 		
+		if(error!=null){
+			Font errorFont = FontFactory.getFont(FontFactory.HELVETICA,12);
+			errorFont.setColor(BaseColor.RED);
+		    Paragraph errorMsg=new Paragraph(error,errorFont);
+		    errorMsg.setAlignment(Element.ALIGN_CENTER);		    
+			title.add(errorMsg);						
+		}
 		
 		PdfPTable topTable = new PdfPTable(2);
 		topTable.setWidthPercentage(100f);

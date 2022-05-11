@@ -29,7 +29,8 @@ public class PaidUser implements Payable{
 	private String invoiceNumber;
 	private boolean paidUserSuccess,emailSentSuccess;
 	private String link;   
-
+    private String error;
+	
 	private static final Date NET_AMOUNT_DATE=Utilities.toDate("01/01/2022","dd/MM/yyyy");
 	
 	public static PaidUser valueOf(Entity entity) {
@@ -231,4 +232,13 @@ public class PaidUser implements Payable{
 	public void setEurAmountNet(BigDecimal eurAmountNet) {
 		this.eurAmountNet = eurAmountNet;
 	}
+	@Override
+	public void setError(String error){
+		this.error=error;
+	}
+	@Override
+	public String getError(){
+		return error;
+	}
+	
 }

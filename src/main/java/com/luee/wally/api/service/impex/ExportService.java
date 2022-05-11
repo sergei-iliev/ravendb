@@ -31,6 +31,7 @@ import com.luee.wally.admin.repository.PaidUsersRepository;
 import com.luee.wally.api.service.AbstractService;
 import com.luee.wally.api.service.InvoiceService;
 import com.luee.wally.command.PdfAttachment;
+import com.luee.wally.constants.Constants;
 import com.luee.wally.csv.PaidUsers2018;
 import com.luee.wally.entity.PaidUser;
 import com.luee.wally.entity.PaidUserExternal;
@@ -125,6 +126,7 @@ public class ExportService extends AbstractService{
 	/*
 	 * Export summary currency total
 	 */
+	private String error;
 	public void createPDFExportSummary(String folder,Date startDate,Date endDate,String creditNoteNumber,String subject,
 			String minCreditNoteId,String maxCreditNoteId,Collection<? extends Payable> list)throws Exception{
 	   ZonedDateTime start= Utilities.toCETZoneDateTime(startDate);
@@ -132,14 +134,20 @@ public class ExportService extends AbstractService{
 	   ZonedDateTime end=e.minusDays(1);
 	   DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
 	   
+	   
 	   String reportDateRange=formatter.format(start)+" - "+formatter.format(end);
 	   String creditNoteIdRange=minCreditNoteId+" - "+maxCreditNoteId;
 	   
 	   InvoiceService invoiceService=new InvoiceService();
 	   //extract paypal
-	   Collection<? extends Payable> paypalList=list.stream().filter(i->i.getType().equalsIgnoreCase("paypal")).collect(Collectors.toList());
+	   Collection<? extends Payable> paypalList=list.stream().filter(i->i.getType().equalsIgnoreCase("paypal")).peek(p->{
+	     if(p.getError()!=null&&p.getError().contains(Constants.RATE_LIMIT_REACHED)){
+	    	 error=p.getError();
+	     }
+	   }).collect(Collectors.toList());
+	   
 	   Map<String,Pair<Integer,BigDecimal>> map=this.groupBy(paypalList);	   	   
-	   InputStream in=invoiceService.createExportSummary(new Date(), creditNoteNumber, reportDateRange,"PayPal",subject,creditNoteIdRange,map);
+	   InputStream in=invoiceService.createExportSummary(new Date(), creditNoteNumber, reportDateRange,"PayPal",subject,creditNoteIdRange,map,error);
 	   
 	   //create file name
 	   String fileName=start.getYear()+"_"+start.getMonthValue() +"_"+start.getDayOfMonth()+"_"+end.getYear()+"_"+end.getMonthValue()+"_"+end.getDayOfMonth()+"_paypal";
@@ -149,9 +157,10 @@ public class ExportService extends AbstractService{
 	   //FileUtils.copyInputStreamToFile(in, targetFile);
 	   
 	   //extract amazon
+	   error=null;
 	   Collection<? extends Payable> amazonList=list.stream().filter(i->i.getType().equalsIgnoreCase("amazon")).collect(Collectors.toList());
 	   map=this.groupBy(amazonList);	   	   
-	   in=invoiceService.createExportSummary(new Date(), creditNoteNumber, reportDateRange,"TangoCard",subject,creditNoteIdRange,map);
+	   in=invoiceService.createExportSummary(new Date(), creditNoteNumber, reportDateRange,"TangoCard",subject,creditNoteIdRange,map,error);
 
 	   //create file name
 	   fileName=start.getYear()+"_"+start.getMonthValue()+"_"+start.getDayOfMonth()+"_"+end.getYear()+"_"+end.getMonthValue()+"_"+end.getDayOfMonth()+"_amazon";	   

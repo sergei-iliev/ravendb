@@ -11,5 +11,14 @@ public interface Payable {
 	public String getPaidCurrency();
 	
 	public String getType();
+	
+	public default void setError(String error){
+		
+	}
+	
+	public default String getError(){
+		return null;
+	}
+	
 
 }

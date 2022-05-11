@@ -5,7 +5,8 @@ import java.util.Arrays;
 import java.util.List;
 
 public interface Constants {
-
+    public static final String RATE_LIMIT_REACHED="RATE_LIMIT_REACHED";
+    
 	//public static final String clientId = "AafeAthS3PRG_dkpJPVTkCgVc-O9pQ6o2PldSIOceWsn7nIm0H404DHDFg4svXJa63Pe8OtM55ySzppG";
 	//public static final String clientSecret = "EC1ludnxStRx1M1VP9DDfz2xdTxMA8xcthmP_hRaQgWS09thWY2ihInfz5AA03DMxLjYZnR6sRQn-0XV";
 	//public static final String mode = "sandbox";

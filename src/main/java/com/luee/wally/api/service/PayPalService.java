@@ -1,5 +1,6 @@
 package com.luee.wally.api.service;
 
+import java.io.IOException;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -61,7 +62,7 @@ public class PayPalService {
 		return payoutApi.authenticate();		
 		
 	}
-	public TransactionView getTransactionByPayoutBatchId(Token token,String payoutBatchId)throws Exception{
+	public TransactionView getTransactionByPayoutBatchId(Token token,String payoutBatchId)throws IOException{
 		
 		String payPalClientId=applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.PAYPAL_CLIENT_ID);
 		String payPalClientSecret=applicationSettingsService.getApplicationSettingCached(ApplicationSettingsRepository.PAYPAL_CLIENT_SECRET);

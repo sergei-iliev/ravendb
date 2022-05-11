@@ -171,6 +171,15 @@ public class UserRevenueTest {
 		user.setPaidCurrency("CAD");
 		list.add(user);
 		
+		PaidUser user1 =new PaidUser();
+		user1.setDate(new Date());
+		user1.setAmount("3.2");
+		user1.setType("PayPal");
+		user1.setPaidCurrency("CAD");
+		user1.setError("Huge problem mate, for a rediculaus amount of time and my position is strong to overturn a governmane message{\"name\",\"RATE_LIMIT_REACHED\"} ");
+		list.add(user1);
+		
+		
 		user =new PaidUserExternal();
 		user.setAmount("3.2");
 		user.setType("PayPal");

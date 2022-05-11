@@ -158,6 +158,9 @@ public class ExportController implements Controller {
 							    	}							    
 							    	}catch(Exception e){
 							    		logger.log(Level.SEVERE, "Transaction detail error for payment_batch_id="+paidUser.getPaymentReferenceId(),e);
+							    		if(e instanceof IOException){
+							    		  paidUser.setError(e.getMessage());  	
+							    		}
 							    		continue;
 							    	}								
 							}
