@@ -5,7 +5,6 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -27,6 +26,21 @@ public class UserService {
 	private AffsRepository affsRepository=new AffsRepository();	
 	private PaidUsersRepository paidUsersRepository=new PaidUsersRepository();
 	
+	public void updatePackageName(String userGuid){
+		Entity entity=affsRepository.findEntity("affs","user_guid",userGuid);
+		if(entity==null){
+		  throw new IllegalStateException("Affs record does not exist");	
+		}
+		
+		entity.setProperty("package_name","com.moregames.makemoney");
+		affsRepository.save(entity);
+		Collection<Entity> entities=affsRepository.findEntities("redeeming_requests_not_allowed_by_system", "user_guid", userGuid);
+		if(entities.size()>5){
+			throw new IllegalStateException("Affs record does not exist");
+		}
+		affsRepository.deleteEntities(entities.stream().map(e->e.getKey()).collect(Collectors.toList()));				
+		
+	}
 	public Map<String,Long> countUserGuids(List<String> userGuids){		
 		Collection<Entity> entities=new ArrayList<>();
 		Collection<String> sublist=new ArrayList<>(10);

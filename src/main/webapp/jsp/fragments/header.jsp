@@ -70,7 +70,8 @@
         	</a>
         	<div class="dropdown-menu" aria-labelledby="navbarDropdown">
           		<a class="dropdown-item" href="/administration/users/data/delete">User data removal</a>				           		       	
-				<a class="dropdown-item" href="/administration/users/guid/exists">User guid exists</a>          		
+				<a class="dropdown-item" href="/administration/users/guid/exists">User guid exists</a>
+				<a class="dropdown-item" href="/administration/users/package/wrong/name">Wrong package name</a>              		
         	</div>
       	</li>      
       	<li class="nav-item dropdown ${param.activeMenuItem eq 'tools' ? 'active' : ''}">

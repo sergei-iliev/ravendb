@@ -7,8 +7,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -17,22 +15,11 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
-
 import com.google.appengine.api.ThreadManager;
-import com.google.appengine.api.datastore.Entity;
-import com.google.appengine.api.datastore.KeyFactory;
 import com.luee.wally.admin.repository.CloudStorageRepository;
-import com.luee.wally.admin.repository.PaidUsersRepository;
 import com.luee.wally.api.route.Controller;
 import com.luee.wally.api.service.UserService;
-import com.luee.wally.api.service.impex.ExportService;
 import com.luee.wally.command.DeleteUserDataForm;
-import com.luee.wally.entity.PaidUser;
-import com.luee.wally.entity.PaidUserExternal;
-import com.luee.wally.entity.RedeemingRequests;
-import com.luee.wally.utils.Utilities;
 
 public class UsersController implements Controller {
 	private final Logger logger = Logger.getLogger(UsersController.class.getName());
@@ -41,7 +28,23 @@ public class UsersController implements Controller {
 
 		req.getRequestDispatcher("/jsp/delete_users_data.jsp").forward(req, resp);
 	}
-
+	public void userWrongPackageName(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		req.getRequestDispatcher("/jsp/user_wrong_package_name.jsp").forward(req, resp);
+	}
+	public void doUserWrongPackageName(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		String userGuid=req.getParameter("userGuid");
+					
+		
+		UserService userService=new UserService();
+		try{
+		  userService.updatePackageName(userGuid);
+		  req.setAttribute("success", "Job succesfully executed");
+		}catch(Exception e){
+			req.setAttribute("error", e.getMessage());
+		}	
+		req.setAttribute("userGuid",userGuid);
+		req.getRequestDispatcher("/jsp/user_wrong_package_name.jsp").forward(req, resp);
+	}
 	public void deleteUserData(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		DeleteUserDataForm form = DeleteUserDataForm.parse(req);
 		req.setAttribute("webform", form);

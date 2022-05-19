@@ -104,6 +104,7 @@ INSTANCE;
     	 
     	 httpGetRouteList.put("/administration/users/data/delete", new Route(new UsersController(),"index"));
     	 httpGetRouteList.put("/administration/users/guid/exists", new Route(new UsersController(),"userExists"));
+    	 httpGetRouteList.put("/administration/users/package/wrong/name", new Route(new UsersController(),"userWrongPackageName"));
     	 //QA
     	 httpGetRouteList.put("/administration/qa", new Route(new QAController(),"index"));
     	 httpGetRouteList.put("/administration/qa/experiment", new Route(new QAController(),"experiment"));
@@ -156,6 +157,7 @@ INSTANCE;
     
     	 httpPostRouteList.put("/administration/users/data/delete", new Route(new UsersController(),"deleteUserData"));
     	 httpPostRouteList.put("/administration/users/guid/exists", new Route(new UsersController(),"doUserExists"));
+    	 httpPostRouteList.put("/administration/users/package/wrong/name", new Route(new UsersController(),"doUserWrongPackageName"));
     	 
     	 
     	 //QA
