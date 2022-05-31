@@ -241,7 +241,7 @@ public class InvoiceService extends AbstractService{
 		addressTable.addCell(getCell("",12, PdfPCell.ALIGN_LEFT, Font.BOLD));
 		addressTable.addCell(getCell("From",12, PdfPCell.ALIGN_LEFT, Font.BOLD));	
 		
-		addressTable.addCell(getCell((String) paidUserExternal.getFullName(),10, PdfPCell.ALIGN_LEFT));
+		addressTable.addCell(getCell((String) paidUserExternal.getFullName()==null?"unknown":paidUserExternal.getFullName(),10, PdfPCell.ALIGN_LEFT));
 		addressTable.addCell(getCell("",12, PdfPCell.ALIGN_LEFT, Font.BOLD));
 		addressTable.addCell(getCell("Soft Baked Apps GmbH (haftungsbeschränkt)",10, PdfPCell.ALIGN_LEFT));
 		
