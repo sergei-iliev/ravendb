@@ -119,7 +119,10 @@ INSTANCE;
 	public  String getJSON(String urlStr) throws MalformedURLException,IOException  {
 		//default
 		Map<String,String> headers=new HashMap<String, String>();
-		headers.put("Referrer Policy", "strict-origin-when-cross-origin");
+		/*
+		 * Is this a bug of AppLovin only?
+		 */
+		//headers.put("Referrer Policy", "strict-origin-when-cross-origin");
 		headers.put("Accept", "application/json");		
 		
 		return this.getJSON(urlStr, headers);

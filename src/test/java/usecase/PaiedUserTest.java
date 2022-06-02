@@ -23,6 +23,7 @@ import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestC
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 import com.luee.wally.admin.repository.PaymentRepository;
 import com.luee.wally.admin.repository.UserRepository;
+import com.luee.wally.api.ConnectionMgr;
 import com.luee.wally.api.service.AffsSearchService;
 import com.luee.wally.api.service.PaidUsersService;
 import com.luee.wally.api.service.impex.ExportService;
@@ -35,6 +36,8 @@ import com.luee.wally.command.viewobject.PaidUserGroupByVO;
 import com.luee.wally.entity.PaidUser;
 import com.luee.wally.entity.RedeemingRequests;
 import com.luee.wally.json.ExchangeRateVO;
+import com.luee.wally.json.JSONUtils;
+import com.luee.wally.json.RevenueLinkVO;
 import com.luee.wally.utils.TestDatabase;
 import com.luee.wally.utils.Utilities;
 
@@ -328,24 +331,24 @@ public class PaiedUserTest {
 	@Test
 	public void exportPaiedUserExternalTest() throws Exception {
 
-		// String response =
-		// ConnectionMgr.INSTANCE.getJSON("https://r.applovin.com/max/userAdRevenueReport?api_key=QuN5chUnh2cONoLJRB9oI8tu2bqrOhVqatvBZOzFQaepM-7pAHaSPSLR29GQsmFQd9cBXZRz94mV2uIC9tfTJ_&date=2021-01-05&platform=android&application=com.relaxingbraintraining.cookiejellymatch");
-		// RevenueLinkVO revenue = JSONUtils.readObject(response,
-		// RevenueLinkVO.class);
-		// System.out.println(revenue.getUrl());
-		// System.out.println(revenue.getAd_revenue_report_url());
+		 String response =
+		 ConnectionMgr.INSTANCE.getJSON("https://r.applovin.com/max/userAdRevenueReport?api_key=QuN5chUnh2cONoLJRB9oI8tu2bqrOhVqatvBZOzFQaepM-7pAHaSPSLR29GQsmFQd9cBXZRz94mV2uIC9tfTJ_&date=2022-05-29&platform=android&application=com.relaxingbraintraining.cookiejellymatch");
+		 RevenueLinkVO revenue = JSONUtils.readObject(response,
+		 RevenueLinkVO.class);
+		 System.out.println(revenue.getUrl());
+		 System.out.println(revenue.getAd_revenue_report_url());
 
-		DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
-
-		for (int i = 0; i < 10000; i++) {
-			Entity entity = new Entity("paid_users_external");
-			entity.setProperty("date", new Date());
-			entity.setProperty("eur_currency", 10.0);
-			entity.setProperty("email_address", "email@" + i);
-			entity.setProperty("payment_reference_id", "234244");
-			entity.setProperty("invoice_number", "5434444");
-			ds.put(entity);
-		}
+//		DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
+//
+//		for (int i = 0; i < 10000; i++) {
+//			Entity entity = new Entity("paid_users_external");
+//			entity.setProperty("date", new Date());
+//			entity.setProperty("eur_currency", 10.0);
+//			entity.setProperty("email_address", "email@" + i);
+//			entity.setProperty("payment_reference_id", "234244");
+//			entity.setProperty("invoice_number", "5434444");
+//			ds.put(entity);
+//		}
 	}
 
 	@Test
